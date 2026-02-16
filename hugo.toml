@@ -18,14 +18,9 @@ title = 'Scriptling'
     [[params.navigation.header]]
       name = 'Docs'
       url = '/docs'
-
-    # Static navigation links
-    # [[params.navigation.static]]
-    #   name = 'Test Page'
-    #   url = '/testing'
-    # [[params.navigation.static]]
-    #   name = 'Changelog'
-    #   url = '/changelog'
+    [[params.navigation.header]]
+      name = 'Changelog'
+      url = '/docs/changelog/'
 
 [build]
   [build.buildStats]
