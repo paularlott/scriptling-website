@@ -149,7 +149,7 @@ p.SetVar("timeout", 30)
 // Execute script
 p.Eval(`
 response = requests.get(api_base + "/users", {"timeout": timeout})
-data = json.loads(response["body"])
+data = json.loads(response.body)
 result = len(data)
 `)
 

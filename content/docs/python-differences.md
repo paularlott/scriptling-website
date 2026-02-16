@@ -34,41 +34,30 @@ class Outer:
         pass
 ```
 
-### Simplified Scope Rules
-
-The `nonlocal` and `global` keywords work differently than in Python:
-
-```python
-# In Python, this modifies outer scope
-# In Scriptling, behavior may differ
-counter = 0
-def increment():
-    global counter
-    counter += 1
-```
-
 ## Standard Library Differences
 
-### HTTP Response Format
+### HTTP Response Object
 
-HTTP responses always return a dictionary with a consistent structure:
+HTTP responses return a Response object with fields (not a dictionary):
 
 ```python
 import requests
 
 response = requests.get("https://api.example.com")
-# Response is always:
-# {
-#   "status": 200,
-#   "body": "...",
-#   "headers": {"Content-Type": "application/json", ...}
-# }
+# Response object with fields:
+#   status_code - HTTP status code (int)
+#   body        - Response body (string)
+#   text        - Response body (string, same as body)
+#   headers     - Response headers (dict)
+#   url         - Request URL (string)
 
-print(response["status"])  # Access status code
-print(response["body"])    # Access response body
+print(response.status_code)  # Access status code
+print(response.body)         # Access response body
+print(response.text)         # Same as body
+print(response.headers)      # Headers dictionary
 ```
 
-This differs from Python's `requests` library where you'd use `response.status_code` and `response.text`.
+This is similar to Python's `requests` library, but Scriptling uses `response.body` instead of `response.text` as the primary field name.
 
 ### Default HTTP Timeout
 
@@ -113,19 +102,19 @@ Security can be configured when embedding in Go:
 
 The following Python features are not implemented in Scriptling:
 
-| Feature | Notes |
-|---------|-------|
-| Multiple inheritance | Single inheritance only |
-| Nested classes | Classes at module level only |
-| Decorators | Not supported (use wrapper functions) |
-| Generators/yield | Not supported |
-| Async/await | Not supported |
-| Type hints | Not supported |
-| Walrus operator (`:=`) | Not supported |
-| f-strings | Use `%` formatting or `format()` method |
-| Context managers (`with`) | Not supported |
-| Metaclasses | Not supported |
-| Descriptors | Not supported |
+| Feature                   | Notes                                   |
+| ------------------------- | --------------------------------------- |
+| Multiple inheritance      | Single inheritance only                 |
+| Nested classes            | Classes at module level only            |
+| Decorators                | Not supported (use wrapper functions)   |
+| Generators/yield          | Not supported                           |
+| Async/await               | Not supported                           |
+| Type hints                | Not supported                           |
+| Walrus operator (`:=`)    | Not supported                           |
+| f-strings                 | Use `%` formatting or `format()` method |
+| Context managers (`with`) | Not supported                           |
+| Metaclasses               | Not supported                           |
+| Descriptors               | Not supported                           |
 
 ## String Formatting
 
