@@ -1,8 +1,7 @@
 ---
-title: html.parser Library (Extended)
+title: html.parser Library
 weight: 1
 ---
-
 
 The `html.parser` library provides an HTML/XHTML parser compatible with Python's `html.parser` module. This is an **extended library** that is automatically available as a built-in library.
 

@@ -1,8 +1,7 @@
 ---
-title: sys Library (Extended)
+title: sys Library
 weight: 1
 ---
-
 
 The `sys` library provides access to system-specific parameters and functions. This is an **extended library** that must be explicitly registered.
 

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <rect width="100" height="100" rx="16" fill="#0d9488" fill-opacity="0.1"/>
+  <!-- Open book -->
+  <!-- Left page -->
+  <path d="M50 25C40 25 25 30 22 35L22 72C25 67 40 62 50 62" fill="#f0fdfa" stroke="#0d9488" stroke-width="3"/>
+  <!-- Right page -->
+  <path d="M50 25C60 25 75 30 78 35L78 72C75 67 60 62 50 62" fill="#f0fdfa" stroke="#0d9488" stroke-width="3"/>
+  <!-- Spine -->
+  <line x1="50" y1="25" x2="50" y2="62" stroke="#059669" stroke-width="3"/>
+  <!-- Text lines left page -->
+  <line x1="28" y1="40" x2="45" y2="40" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/>
+  <line x1="28" y1="48" x2="42" y2="48" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/>
+  <line x1="28" y1="56" x2="45" y2="56" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/>
+  <!-- Text lines right page -->
+  <line x1="55" y1="40" x2="72" y2="40" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/>
+  <line x1="55" y1="48" x2="68" y2="48" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/>
+  <line x1="55" y1="56" x2="72" y2="56" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/>
+  <!-- Book base/stand -->
+  <path d="M20 75L50 82L80 75" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

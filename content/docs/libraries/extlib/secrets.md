@@ -1,8 +1,7 @@
 ---
-title: secrets Library (Extended)
+title: secrets Library
 weight: 1
 ---
-
 
 The `secrets` library provides functions for generating cryptographically strong random numbers suitable for managing secrets such as account authentication, tokens, and similar. This is an **extended library** that must be explicitly registered.
 

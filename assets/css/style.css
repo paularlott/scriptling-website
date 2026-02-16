@@ -157,7 +157,7 @@ tr:nth-child(odd) {
 
 /* Hero */
 .gradientHero {
-  background: linear-gradient(135deg, #3b82f6, #9333ea);
+  background: linear-gradient(135deg, #0d9488, #059669);
   position: relative;
   overflow: hidden;
 }
@@ -188,7 +188,7 @@ tr:nth-child(odd) {
 }
 
 .marker-highlight {
-  background: linear-gradient(104deg, rgba(118, 77, 238, 0.3) 0.9%, rgba(118, 77, 238, 0.8) 2.4%, rgba(118, 77, 238, 0.6) 5.8%, rgba(118, 77, 238, 0.2) 93%, rgba(118, 77, 238, 0.8) 96%, rgba(118, 77, 238, 0.5) 98%), linear-gradient(183deg, rgba(118, 77, 238, 0.4) 0%, rgba(118, 77, 238, 0.4) 7.9%, rgba(118, 77, 238, 0) 15%);
+  background: linear-gradient(104deg, rgba(13, 148, 136, 0.3) 0.9%, rgba(13, 148, 136, 0.8) 2.4%, rgba(13, 148, 136, 0.6) 5.8%, rgba(13, 148, 136, 0.2) 93%, rgba(13, 148, 136, 0.8) 96%, rgba(13, 148, 136, 0.5) 98%), linear-gradient(183deg, rgba(13, 148, 136, 0.4) 0%, rgba(13, 148, 136, 0.4) 7.9%, rgba(13, 148, 136, 0) 15%);
   background-size: 100% 100%;
   background-repeat: no-repeat;
   padding: 0.1em 0.2em;
@@ -203,7 +203,7 @@ tr:nth-child(odd) {
   left: 0;
   right: 0;
   bottom: 0;
-  background: #FB37FE;
+  background: #14b8a6;
   opacity: 0.3;
   border-radius: 0.2em;
   transform: rotate(-1deg) skew(-2deg);

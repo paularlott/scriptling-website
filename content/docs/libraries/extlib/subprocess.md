@@ -1,8 +1,7 @@
 ---
-title: subprocess Library (Extended)
+title: subprocess Library
 weight: 1
 ---
-
 
 The `subprocess` library provides functions for spawning and managing subprocesses. This is an **extended library** that must be explicitly registered.
 
