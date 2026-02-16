@@ -23,7 +23,7 @@ description: A minimal, sandboxed Python-like scripting language for Go applicat
 
   {{< feature-row
     reverse=true
-    img="/images/mascot.png"
+    img="/images/icon-code.svg"
     alt="Python-like Syntax"
     is4=true
   >}}
@@ -33,7 +33,7 @@ description: A minimal, sandboxed Python-like scripting language for Go applicat
 
   {{< feature-row
     reverse=true
-    img="/images/mascot.png"
+    img="/images/icon-shield.svg"
     alt="Sandboxed Execution"
     is4=true
   >}}
@@ -45,7 +45,7 @@ description: A minimal, sandboxed Python-like scripting language for Go applicat
 {{< feature-grid >}}
   {{< feature-row
     reverse=false
-    img="/images/mascot.png"
+    img="/images/icon-go.svg"
     alt="Go Integration"
     is4=true
   >}}
@@ -55,7 +55,7 @@ description: A minimal, sandboxed Python-like scripting language for Go applicat
 
   {{< feature-row
     reverse=false
-    img="/images/mascot.png"
+    img="/images/icon-ai.svg"
     alt="AI & LLM Ready"
     is4=true
   >}}
@@ -67,7 +67,7 @@ description: A minimal, sandboxed Python-like scripting language for Go applicat
 {{< feature-grid >}}
   {{< feature-row
     reverse=true
-    img="/images/mascot.png"
+    img="/images/icon-library.svg"
     alt="Rich Library Ecosystem"
     is4=true
   >}}
@@ -77,7 +77,7 @@ description: A minimal, sandboxed Python-like scripting language for Go applicat
 
   {{< feature-row
     reverse=true
-    img="/images/mascot.png"
+    img="/images/icon-server.svg"
     alt="MCP & HTTP Server"
     is4=true
   >}}
