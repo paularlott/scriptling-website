@@ -24,6 +24,14 @@ Download pre-built binaries from [GitHub Releases](https://github.com/paularlott
 | macOS | AMD64, ARM64 |
 | Windows | AMD64, ARM64 |
 
+### Go Install
+
+If you have Go installed:
+
+```bash
+go install github.com/paularlott/scriptling/scriptling-cli@latest
+```
+
 ### Build from Source
 
 ```bash
@@ -31,14 +39,13 @@ Download pre-built binaries from [GitHub Releases](https://github.com/paularlott
 git clone https://github.com/paularlott/scriptling.git
 cd scriptling
 
-# Install Task (build tool)
-brew install go-task/tap/go-task
-
 # Build for current platform
-task build
+make build
+# or use Task: task build
 
 # Build for all platforms
-task build-all
+make build-all
+# or use Task: task build-all
 ```
 
 ## Basic Usage

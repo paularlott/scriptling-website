@@ -399,12 +399,3 @@ import requests
 data = json.loads('{"key":"value"}')
 response = requests.get("https://api.example.com")
 ```
-
-## Differences from Python
-
-- **Single Inheritance Only** - No multiple inheritance
-- **No Nested Classes** - Classes must be at module level
-- **Simplified Scope** - `nonlocal` and `global` work differently
-- **Sandboxed** - No filesystem/network access unless enabled
-- **HTTP Response** - Always `{"status": int, "body": string, "headers": dict}`
-- **Default Timeout** - 5 seconds for HTTP requests

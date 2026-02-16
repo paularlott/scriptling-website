@@ -2,6 +2,7 @@
 title: Changelog
 description: Scriptling release history and changes.
 layout: changelog
+weight: 7
 ---
 
 ## February 2026

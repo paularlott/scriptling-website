@@ -6,7 +6,9 @@ weight: 1
 
 Get up and running with Scriptling in minutes.
 
-## Installation
+## CLI Installation
+
+Install the Scriptling CLI to run scripts from the command line.
 
 ### Homebrew (macOS & Linux)
 
@@ -22,12 +24,12 @@ Download pre-built binaries from [GitHub Releases](https://github.com/paularlott
 - macOS (AMD64, ARM64)
 - Windows (AMD64, ARM64)
 
-### Go Module
+### Go Install
 
-For embedding in Go applications:
+If you have Go installed:
 
 ```bash
-go get github.com/paularlott/scriptling
+go install github.com/paularlott/scriptling/scriptling-cli@latest
 ```
 
 ### Build from Source
@@ -37,17 +39,55 @@ go get github.com/paularlott/scriptling
 git clone https://github.com/paularlott/scriptling.git
 cd scriptling
 
-# Install Task (build tool)
-brew install go-task/tap/go-task
-
 # Build CLI for current platform
-task build
+make build
+# or use Task: task build
 
 # Run scripts
 ./bin/scriptling script.py
 ```
 
-## Basic Usage
+## CLI Quick Start
+
+### Run a Script
+
+```bash
+scriptling script.py
+```
+
+### Interactive Mode
+
+```bash
+scriptling --interactive
+```
+
+### Pipe Script
+
+```bash
+echo 'print("Hello")' | scriptling
+```
+
+### HTTP Server
+
+```bash
+scriptling --server :8000 script.py
+```
+
+### MCP Server
+
+```bash
+scriptling --server :8000 --mcp-tools ./tools script.py
+```
+
+---
+
+## Go Embedding
+
+For embedding Scriptling in Go applications:
+
+```bash
+go get github.com/paularlott/scriptling
+```
 
 ### Hello World
 
@@ -116,38 +156,6 @@ result = len(data)
 // Get variables back
 count, _ := p.GetVarAsInt("result")
 fmt.Printf("Found %d users\n", count)
-```
-
-## CLI Usage
-
-### Run a Script
-
-```bash
-scriptling script.py
-```
-
-### Interactive Mode
-
-```bash
-scriptling --interactive
-```
-
-### Pipe Script
-
-```bash
-echo 'print("Hello")' | scriptling
-```
-
-### HTTP Server
-
-```bash
-scriptling --server :8000 script.py
-```
-
-### MCP Server
-
-```bash
-scriptling --server :8000 --mcp-tools ./tools script.py
 ```
 
 ## Next Steps
