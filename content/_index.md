@@ -78,10 +78,10 @@ description: A minimal, sandboxed Python-like scripting language for Go applicat
   {{< feature-row
     reverse=true
     img="/images/mascot.png"
-    alt="CLI & Server"
+    alt="MCP & HTTP Server"
     is4=true
   >}}
-  ## CLI & HTTP Server
+  ## MCP & HTTP Server
   Run scripts directly, use interactive mode, or start an HTTP server with MCP support. Cross-platform binaries for Linux, macOS, and Windows.
   {{< /feature-row >}}
 {{< /feature-grid >}}
