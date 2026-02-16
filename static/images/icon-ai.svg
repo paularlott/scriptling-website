@@ -1,18 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
   <rect width="100" height="100" rx="16" fill="#0d9488" fill-opacity="0.1"/>
-  <!-- Robot head -->
-  <rect x="28" y="25" width="44" height="35" rx="6" stroke="#0d9488" stroke-width="4"/>
-  <!-- Antenna -->
-  <line x1="50" y1="25" x2="50" y2="15" stroke="#0d9488" stroke-width="3"/>
-  <circle cx="50" cy="12" r="4" fill="#059669"/>
-  <!-- Eyes -->
-  <circle cx="40" cy="40" r="6" fill="#059669"/>
-  <circle cx="60" cy="40" r="6" fill="#059669"/>
-  <!-- Mouth/speaker -->
-  <rect x="40" y="50" width="20" height="4" rx="2" fill="#059669"/>
-  <!-- Body -->
-  <rect x="35" y="62" width="30" height="20" rx="4" stroke="#0d9488" stroke-width="3"/>
-  <!-- Arms -->
-  <line x1="28" y1="70" x2="18" y2="65" stroke="#0d9488" stroke-width="3" stroke-linecap="round"/>
-  <line x1="72" y1="70" x2="82" y2="65" stroke="#0d9488" stroke-width="3" stroke-linecap="round"/>
+  <!-- Chat bubble with sparkle - represents LLM conversation -->
+  <path d="M20 35C20 28 26 22 35 22H65C74 22 80 28 80 35V55C80 62 74 68 65 68H40L28 80V68H35C26 68 20 62 20 55V35Z" stroke="#0d9488" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Typing dots -->
+  <circle cx="38" cy="45" r="5" fill="#059669"/>
+  <circle cx="50" cy="45" r="5" fill="#059669"/>
+  <circle cx="62" cy="45" r="5" fill="#059669"/>
+  <!-- Sparkle/magic -->
+  <path d="M72 18L74 24L80 22L77 28L82 30L77 32L80 38L74 36L72 42L70 36L64 38L67 32L62 30L67 28L64 22L70 24L72 18Z" fill="#059669"/>
 </svg>
