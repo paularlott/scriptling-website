@@ -8,7 +8,7 @@ title = 'Scriptling'
 [params]
   githubURL = "https://github.com/paularlott/scriptling"
   copyright = "Paul Arlott"
-  defaultTheme = "light"  # Options: "light" or "dark"
+  defaultTheme = "dark"  # Options: "light" or "dark"
   includeSections = ["docs"]
 
   [params.navigation]

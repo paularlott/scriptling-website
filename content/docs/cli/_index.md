@@ -68,15 +68,18 @@ scriptling --interactive
 Usage: scriptling [options] [script.py]
 
 Options:
-  -i, --interactive    Start interactive mode
-  -s, --server ADDR    Start HTTP server on address
-  --mcp-tools DIR      Enable MCP tools from directory
-  --tls-generate       Generate self-signed TLS certificate
-  --bearer-token TOKEN Bearer token for authentication
-  --safe               Run in safe mode (restricted access)
-  --lib-dir DIR        Custom library directory
-  --env-file FILE      Load environment from file
-  -h, --help           Show help
+  -i, --interactive         Start interactive mode
+  -S, --server ADDR         Start HTTP server on address (host:port)
+  --mcp-tools DIR           Enable MCP tools from directory
+  --script-mode MODE        Script mode: safe or full (default: full)
+  --bearer-token TOKEN      Bearer token for authentication
+  --tls-cert FILE           TLS certificate file
+  --tls-key FILE            TLS key file
+  --tls-generate            Generate self-signed TLS certificate
+  --libdir DIR              Custom library directory
+  --log-level LEVEL         Log level: trace|debug|info|warn|error
+  --log-format FORMAT       Log format: console|json
+  -h, --help                Show help
 ```
 
 ## HTTP Server
@@ -120,7 +123,7 @@ MCP tools are Scriptling scripts that define tool metadata and handlers.
 Run scripts in a restricted sandbox:
 
 ```bash
-scriptling --safe script.py
+scriptling --script-mode safe script.py
 ```
 
 Safe mode disables:
@@ -130,10 +133,11 @@ Safe mode disables:
 
 ## Environment Variables
 
-Load environment from a `.env` file:
+Scriptling automatically loads environment from a `.env` file in the current directory if it exists. You can also set environment variables:
 
 ```bash
-scriptling --env-file .env script.py
+export API_KEY="your-api-key"
+scriptling script.py
 ```
 
 Access in scripts:
@@ -148,7 +152,7 @@ api_key = os.getenv("API_KEY")
 Load libraries from a custom directory:
 
 ```bash
-scriptling --lib-dir ./mylibs script.py
+scriptling --libdir ./mylibs script.py
 ```
 
 ## Examples

@@ -1,8 +1,7 @@
 ---
-title: os Library (Extended)
+title: os Library
 weight: 1
 ---
-
 
 The `os` library provides operating system interfaces for file system operations and environment variables. This is an **extended library** that must be explicitly registered.
 

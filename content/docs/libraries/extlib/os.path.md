@@ -1,8 +1,7 @@
 ---
-title: os.path Library (Extended)
+title: os.path Library
 weight: 1
 ---
-
 
 The `os.path` library provides common pathname manipulations. This is an **extended library** that must be explicitly registered (registered together with the `os` library).
 
