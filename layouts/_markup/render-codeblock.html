@@ -1,0 +1,9 @@
+{{- $class := .Attributes.class | default "" -}}
+{{- $filename := .Attributes.filename | default "" -}}
+{{- $base_url := .Attributes.base_url | default "" -}}
+{{- $lang := .Attributes.lang | default .Type -}}
+
+
+<div class="code-block relative mt-6 first:mt-0 group/code">
+  {{- partial "components/codeblock" (dict "filename" $filename "lang" $lang "base_url" $base_url "content" .Inner "options" .Options) -}}
+</div>

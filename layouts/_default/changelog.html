@@ -1,0 +1,26 @@
+{{ define "main" }}
+<article class="prose prose-lg dark:prose-invert max-w-none mt-6">
+  <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">{{ .Title }}</h1>
+
+  <div class="text-gray-700 dark:text-gray-300 text-base">{{ .Content }}</div>
+
+  <!-- Archive Links -->
+  {{ if and (eq .File.BaseFileName "changelog") (where .Site.RegularPages "Section" "changelog-archive") }}
+  <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+    <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Archived Changelogs</h2>
+    <ul class="space-y-2">
+      {{ range (where .Site.RegularPages "Section" "changelog-archive") }}
+      <li>
+        <a href="{{ .RelPermalink }}" class="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-base">
+          {{ .Title }}
+          {{ if .Date }}
+          <span class="text-gray-500 dark:text-gray-400 text-sm ml-2">({{ .Date.Format "January 2006" }})</span>
+          {{ end }}
+        </a>
+      </li>
+      {{ end }}
+    </ul>
+  </div>
+  {{ end }}
+</article>
+{{ end }}

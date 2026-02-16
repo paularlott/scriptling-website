@@ -1,0 +1,18 @@
+<nav aria-label="breadcrumb" class="mt-1.5 flex items-center gap-1 overflow-hidden text-sm text-gray-500 dark:text-gray-400 contrast-more:text-current">
+  {{- $ancestors := .Ancestors.Reverse -}}
+  {{- $nonHomeAncestors := where $ancestors "IsHome" false -}}
+
+  {{- if gt (len $nonHomeAncestors) 1 -}}
+    {{- range after 1 $nonHomeAncestors -}}
+      <div class="whitespace-nowrap transition-colors min-w-[24px] overflow-hidden text-ellipsis hover:text-gray-900 dark:hover:text-gray-100">
+        <a href="{{ .RelPermalink }}"> {{ .LinkTitle }} </a>
+      </div>
+      <svg class="w-3 h-3 mx-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    {{- end -}}
+  {{- end -}}
+  <div class="whitespace-nowrap transition-colors font-medium text-gray-700 contrast-more:font-bold contrast-more:text-current dark:text-gray-100 contrast-more:dark:text-current">
+    {{ .LinkTitle }}
+  </div>
+</nav>

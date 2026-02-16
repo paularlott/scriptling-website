@@ -1,0 +1,211 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@source "hugo_stats.json";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-hbg:        var(--color-slate-50);
+  --color-hbg-dark:   var(--color-slate-200);
+  --font-nunito:      Nunito, sans-serif;
+  --font-open-sans:   "Open Sans", sans-serif;
+}
+
+@layer base {
+  @font-face {
+    font-family: 'Nunito';
+    font-style: normal;
+    font-weight: 100 700;
+    font-display: swap;
+    src: url(../fonts/nunito.woff2) format('woff2');
+  }
+
+  @font-face {
+    font-family: "Open Sans";
+    font-style: normal;
+    font-weight: 300 800;
+    font-stretch: 100%;
+    font-display: swap;
+    src: url(../fonts/open-sans.woff2) format('woff2');
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .dark {
+    --color-hbg:         #1c2b33;
+    --color-hbg-dark:    #152027;
+  }
+}
+
+/* Make headings use Nunito */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-nunito);
+}
+
+h1 {
+  @apply text-3xl font-bold mb-6;
+}
+
+h2 {
+  @apply text-2xl font-bold mb-4;
+}
+
+h3 {
+  @apply text-xl font-bold mb-2;
+}
+
+h4 {
+  @apply text-lg font-bold mb-1;
+}
+
+h5, h6 {
+  @apply text-base font-bold mb-1;
+}
+
+/* Changelog specific styles */
+.prose .changelog-section {
+  margin-bottom: 2rem;
+}
+
+.prose .changelog-section h2 {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.dark .prose .changelog-section h2 {
+  border-bottom-color: #374151;
+}
+
+/* Style the code block */
+.code-block pre {
+  margin-top: 0;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+/* Style inline code snippets */
+:where(code):not(:where(.code-block code)) {
+  background-color: var(--color-slate-100);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.dark :where(code):not(:where(.code-block code)) {
+  color: var(--color-slate-200);
+  background-color: var(--color-slate-700);
+}
+
+:where(code):not(:where(.code-block code)):before,
+:where(code):not(:where(.code-block code)):after {
+  display: none;
+}
+
+/* Custom table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+  @apply rounded-lg;
+  overflow: hidden;
+  @apply shadow-md;
+}
+
+th, td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-slate-300);
+}
+
+th {
+  background-color: var(--color-slate-200);
+  font-weight: 600;
+}
+
+tr:nth-child(even) {
+  background-color: var(--color-slate-100);
+}
+
+tr:nth-child(odd) {
+  background-color: var(--color-slate-50); /* Distinct color for odd rows */
+}
+
+.dark th {
+  background-color: var(--color-slate-800);
+}
+
+.dark tr:nth-child(even) {
+  background-color: var(--color-slate-700);
+}
+
+.dark tr:nth-child(odd) {
+  background-color: var(--color-slate-600); /* Distinct color for odd rows in dark mode */
+}
+
+.dark th, .dark td {
+  border-bottom-color: var(--color-slate-600);
+}
+
+.hide-scrollbar {
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Webkit browsers */
+}
+
+/* Hero */
+.gradientHero {
+  background: linear-gradient(135deg, #3b82f6, #9333ea);
+  position: relative;
+  overflow: hidden;
+}
+
+.mesh-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.mesh-canvas {
+  width: 100%;
+  height: 100%;
+  opacity: 0.3;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.feature-row h2 {
+  margin-top: 0;
+}
+
+.marker-highlight {
+  background: linear-gradient(104deg, rgba(118, 77, 238, 0.3) 0.9%, rgba(118, 77, 238, 0.8) 2.4%, rgba(118, 77, 238, 0.6) 5.8%, rgba(118, 77, 238, 0.2) 93%, rgba(118, 77, 238, 0.8) 96%, rgba(118, 77, 238, 0.5) 98%), linear-gradient(183deg, rgba(118, 77, 238, 0.4) 0%, rgba(118, 77, 238, 0.4) 7.9%, rgba(118, 77, 238, 0) 15%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  padding: 0.1em 0.2em;
+  border-radius: 0.2em;
+  position: relative;
+}
+
+.marker-highlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #FB37FE;
+  opacity: 0.3;
+  border-radius: 0.2em;
+  transform: rotate(-1deg) skew(-2deg);
+  z-index: -1;
+}

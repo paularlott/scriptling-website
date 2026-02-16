@@ -1,0 +1,7 @@
+<script>
+  window.siteConfig = {
+    defaultTheme: {{ .Site.Params.defaultTheme | default "light" }}
+  };
+</script>
+{{ $js := resources.Get "js/main.js" | js.Build (dict "target" "es2018" "minify" true) | fingerprint }}
+<script src="{{ $js.RelPermalink }}" defer></script>

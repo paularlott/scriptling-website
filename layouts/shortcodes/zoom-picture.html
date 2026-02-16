@@ -1,0 +1,23 @@
+{{- $src := .Get "src" -}}
+{{- $caption := .Get "caption" | default "" -}}
+{{- $alt := .Get "alt" | default $caption -}}
+{{- $class := .Get "class" | default "" -}}
+{{- $id := printf "zoom-%d" (now.UnixNano) -}}
+
+<figure class="my-6 {{ $class }}">
+  <div class="relative group cursor-pointer" onclick="openImageModal('{{ $src }}', '{{ $alt }}', '{{ $caption | markdownify | htmlEscape | safeJS }}')">
+    <img src="{{ $src }}" alt="{{ $alt }}" class="rounded-lg shadow-md mx-auto mb-0">
+    <div class="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 rounded-lg flex items-center justify-center">
+      <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg">
+        <svg class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+  {{- if $caption -}}
+  <figcaption class="mt-3 text-sm text-gray-600 dark:text-gray-400 text-center italic">
+    {{ $caption | markdownify }}
+  </figcaption>
+  {{- end -}}
+</figure>

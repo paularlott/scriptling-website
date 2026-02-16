@@ -1,0 +1,12 @@
+<!-- Sidebar -->
+<aside class="hidden lg:flex lg:flex-shrink-0">
+  <div class="flex flex-col w-64 sticky top-16 h-[calc(100vh-4rem)]">
+    <div class="flex flex-col flex-1 min-h-0 border-r border-gray-200 dark:border-gray-700">
+      <div class="pt-5 pb-4 overflow-y-auto hide-scrollbar nav-container">
+        <nav class="mt-5 flex-1 px-2 lg:pl-6 space-y-1">
+          {{ partial "navigation.html" (dict "mobile" false "context" .) }}
+        </nav>
+      </div>
+    </div>
+  </div>
+</aside>

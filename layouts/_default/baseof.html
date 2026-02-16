@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full{{ if eq .Site.Params.defaultTheme "dark" }} dark{{ end }}">
+<head>
+  <script>
+    (function() {
+      const defaultTheme = {{ .Site.Params.defaultTheme | default "light" | printf "%q" }};
+      const storedTheme = localStorage.getItem('theme');
+      const theme = storedTheme || defaultTheme;
+
+      // Apply theme class immediately
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ if ne .Title .Site.Title }}{{ .Title }} - {{ end }}{{ .Site.Title }}</title>
+  {{ partialCached "css.html" . }}
+  {{ if .Description }}
+  <meta name="description" content="{{ .Description }}">
+  {{ end }}
+</head>
+<body class="h-full bg-slate-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-open-sans">
+  <div class="flex flex-col min-h-full">
+    {{ partial "header.html" . }}
+    {{ partial "mobile-nav.html" . }}
+
+    <!-- Main Content Area -->
+    <div class="flex flex-1 max-w-screen-xl mx-auto w-full">
+      {{ if not (eq .RelPermalink "/") }}
+        {{ partial "sidebar.html" . }}
+      {{ end }}
+
+      <!-- Main content -->
+      <main class="flex-1 overflow-y-auto">
+        <div class="py-6">
+          <div class="px-4 sm:px-6 lg:px-8">
+            {{ block "main" . }}{{ end }}
+          </div>
+        </div>
+      </main>
+    </div>
+
+    {{ partial "footer.html" . }}
+  </div>
+
+  {{ partial "search-modal.html" . }}
+  {{ partial "image-modal.html" . }}
+  {{ partial "js.html" . }}
+</body>
+</html>

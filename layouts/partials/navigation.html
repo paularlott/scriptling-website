@@ -1,0 +1,168 @@
+<!-- Header Navigation (Mobile Only) -->
+{{ if $.mobile }}
+  {{ if $.context.Site.Params.navigation.header }}
+    <ul class="space-y-1">
+      {{ range $.context.Site.Params.navigation.header }}
+        <li>
+          <a href="{{ .url }}" class="block px-3 py-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-500/20 hover:text-gray-800 dark:hover:text-white {{ if eq $.context.RelPermalink .url }}bg-gray-100 dark:bg-gray-500/20 text-gray-800 dark:text-gray-300 active-nav-item{{ end }}">
+            {{ .name }}
+          </a>
+        </li>
+      {{ end }}
+    </ul>
+    <div class="border-t border-gray-200 dark:border-gray-700 my-3"></div>
+  {{ end }}
+{{ end }}
+
+<!-- Main Navigation Tree -->
+{{- $includeSections := $.context.Site.Params.includeSections | default (slice) -}}
+{{- $filteredSections := slice -}}
+{{- $currentSection := $.context.Section -}}
+
+{{- if $includeSections -}}
+  {{- range $.context.Site.Sections -}}
+    {{- if in $includeSections .Section -}}
+      {{- /* If we're in a specific section, only show that section */ -}}
+      {{- if and $currentSection (eq .Section $currentSection) -}}
+        {{- $filteredSections = $filteredSections | append . -}}
+      {{- else if not $currentSection -}}
+        {{- /* If we're not in any section (e.g., home page), show all included sections */ -}}
+        {{- $filteredSections = $filteredSections | append . -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- else -}}
+  {{- /* If no includeSections specified, use the same logic with all sections */ -}}
+  {{- if $currentSection -}}
+    {{- range $.context.Site.Sections -}}
+      {{- if eq .Section $currentSection -}}
+        {{- $filteredSections = $filteredSections | append . -}}
+      {{- end -}}
+    {{- end -}}
+  {{- else -}}
+    {{- $filteredSections = $.context.Site.Sections -}}
+  {{- end -}}
+{{- end -}}
+{{ template "nav-tree" (dict "context" $.context "sections" $filteredSections "mobile" $.mobile "level" 0) }}
+
+{{- define "nav-tree" -}}
+  {{- $context := .context -}}
+  {{- $sections := .sections -}}
+  {{- $mobile := .mobile -}}
+  {{- $maxDepth := 4 -}}
+  {{- if $sections -}}
+    <ul class="{{ if $mobile }}space-y-0{{ else }}space-y-1{{ end }}">
+      {{- range (where $sections "Params.nav-skip" "ne" true) -}}
+        {{- $isActive := eq $context.RelPermalink .RelPermalink -}}
+        {{- $isAncestor := .IsAncestor $context.Page -}}
+        {{- $childPages := (where .Pages.ByWeight "Params.nav-skip" "ne" true) -}}
+        {{- $hasChildren := gt (len $childPages) 0 -}}
+        {{- $showChildren := and $hasChildren (or $isActive $isAncestor) -}}
+
+        {{- /* Check if this section has content or should be skipped */ -}}
+        {{- $hasContent := or .Content .Summary (not (eq .Kind "section")) -}}
+        {{- $skipTopLevel := and (not $hasContent) $hasChildren -}}
+        {{- $isCurrentSection := eq $context.Section .Section -}}
+
+        {{- if or $skipTopLevel $isCurrentSection -}}
+          {{- /* Render children directly without the parent wrapper */ -}}
+          {{ template "page-tree" (dict "context" $context "pages" $childPages "mobile" $mobile "level" 1 "maxDepth" $maxDepth) }}
+        {{- else -}}
+          <li class="{{ if $mobile }}mt-3{{ else }}mt-4{{ end }}">
+            <a href="{{ .RelPermalink }}" class="group flex items-center justify-between px-2 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 tracking-wider rounded-md hover:bg-gray-100 dark:hover:bg-gray-500/20 hover:text-gray-800 dark:hover:text-white {{ if $isActive }}bg-gray-100 dark:bg-gray-500/20 text-gray-800 dark:text-gray-300 active-nav-item{{ end }}">
+              <span>{{ .LinkTitle }}</span>
+              {{ if $hasChildren }}
+                {{ if $showChildren }}
+                  <svg class="h-5 w-5 flex-shrink-0 text-gray-500 dark:text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                  </svg>
+                {{ else }}
+                  <svg class="h-5 w-5 flex-shrink-0 text-gray-500 dark:text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06.02z" clip-rule="evenodd" />
+                  </svg>
+                {{ end }}
+              {{ end }}
+            </a>
+            {{ if and $childPages (or $isActive $isAncestor) }}
+              {{ template "page-tree" (dict "context" $context "pages" $childPages "mobile" $mobile "level" 2 "maxDepth" $maxDepth) }}
+            {{ end }}
+          </li>
+        {{- end -}}
+      {{- end -}}
+    </ul>
+  {{- end -}}
+{{- end -}}
+
+{{- define "page-tree" -}}
+  {{- $context := .context -}}
+  {{- $pages := .pages -}}
+  {{- $mobile := .mobile -}}
+  {{- $level := .level -}}
+  {{- $maxDepth := .maxDepth -}}
+  {{- $currentPage := $context.Page -}}
+  {{- if and $pages (le $level $maxDepth) -}}
+    <ul class="{{ if $mobile }}{{ if eq $level 0 }}space-y-0{{ else if eq $level 1 }}mt-1 space-y-0{{ else }}ml-4 mt-1 space-y-0 border-l border-gray-300 dark:border-gray-600 pl-3{{ end }}{{ else }}{{ if eq $level 0 }}space-y-1{{ else if eq $level 1 }}mt-2 space-y-1{{ else }}ml-4 mt-1 space-y-1 border-l border-gray-300 dark:border-gray-600 pl-3{{ end }}{{ end }}">
+      {{ range (where $pages.ByWeight "Params.nav-skip" "ne" true) }}
+        {{ $isActive := eq $currentPage.RelPermalink .RelPermalink }}
+        {{ $isAncestor := .IsAncestor $currentPage }}
+        {{ $childPages := (where .Pages.ByWeight "Params.nav-skip" "ne" true) }}
+        {{ $hasChildren := gt (len $childPages) 0 }}
+        {{ $showChildren := and $hasChildren (or $isActive $isAncestor) }}
+        <li>
+          <a href="{{ .RelPermalink }}" class="group flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-500/20 hover:text-gray-800 dark:hover:text-white {{ if $isActive }}bg-gray-100 dark:bg-gray-500/20 text-gray-800 dark:text-gray-300 active-nav-item{{ end }}">
+            <span>{{ .LinkTitle }}</span>
+            {{ if $hasChildren }}
+              {{ if $showChildren }}
+                <svg class="h-5 w-5 flex-shrink-0 text-gray-500 dark:text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                </svg>
+              {{ else }}
+                <svg class="h-5 w-5 flex-shrink-0 text-gray-500 dark:text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06.02z" clip-rule="evenodd" />
+                </svg>
+              {{ end }}
+            {{ end }}
+          </a>
+          {{ if and $childPages (lt $level $maxDepth) (or $isActive $isAncestor) }}
+            {{ template "page-tree" (dict "context" $context "pages" $childPages "mobile" $mobile "level" (add $level 1) "maxDepth" $maxDepth) }}
+          {{ end }}
+        </li>
+      {{ end }}
+    </ul>
+  {{- end -}}
+{{- end -}}
+
+<!-- Static Links from Configuration -->
+{{ if $.context.Site.Params.navigation.static }}
+  <div class="{{ if $.mobile }}mt-3{{ else }}mt-4{{ end }}">
+    <ul class="{{ if $.mobile }}space-y-0{{ else }}space-y-1{{ end }}">
+      {{ range $.context.Site.Params.navigation.static }}
+        {{ $isActive := false }}
+        {{ $currentPath := $.context.RelPermalink }}
+        {{ $linkPath := .url }}
+
+        <!-- Normalize paths by ensuring they end with / -->
+        {{ $normalizedCurrent := $currentPath }}
+        {{ if not (strings.HasSuffix $currentPath "/") }}
+          {{ $normalizedCurrent = printf "%s/" $currentPath }}
+        {{ end }}
+
+        {{ $normalizedLink := $linkPath }}
+        {{ if not (strings.HasSuffix $linkPath "/") }}
+          {{ $normalizedLink = printf "%s/" $linkPath }}
+        {{ end }}
+
+        <!-- Check if paths match -->
+        {{ if eq $normalizedCurrent $normalizedLink }}
+          {{ $isActive = true }}
+        {{ end }}
+
+        <li>
+          <a href="{{ .url }}" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-500/20 hover:text-gray-800 dark:hover:text-white {{ if $isActive }}bg-gray-100 dark:bg-gray-500/20 text-gray-800 dark:text-gray-300 active-nav-item{{ end }}">
+            {{ .name }}
+          </a>
+        </li>
+      {{ end }}
+    </ul>
+  </div>
+{{ end }}

@@ -1,0 +1,13 @@
+{{- $.Scratch.Add "index" slice -}}
+
+{{- /* Index all regular pages (excluding section index pages) */ -}}
+{{- range .Site.RegularPages -}}
+  {{- $.Scratch.Add "index" (dict "title" .Title "href" .Permalink "content" (.Plain | truncate 1000) "section" .Section "date" (.Date.Format "2006-01-02") "type" "page") -}}
+{{- end -}}
+
+{{- /* Index section index pages */ -}}
+{{- range where .Site.Pages "Kind" "section" -}}
+  {{- $.Scratch.Add "index" (dict "title" .Title "href" .Permalink "content" (.Plain | truncate 1000) "section" .Section "date" (.Date.Format "2006-01-02") "type" "section") -}}
+{{- end -}}
+
+{{- $.Scratch.Get "index" | jsonify -}}
