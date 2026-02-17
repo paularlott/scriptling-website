@@ -243,13 +243,102 @@ response = client.completion("gpt-4", "Hello!", max_tokens=4096, temperature=0.9
 
 ## Tool Registry
 
-Build OpenAI-compatible tool schemas for AI agents. See [Agent Library](agent.md) for complete agent examples.
+Build OpenAI-compatible tool schemas for AI agents.
 
 ### ai.ToolRegistry()
 
-Creates a new tool registry.
+Creates a new tool registry for building OpenAI-compatible tool schemas.
 
 **Example:**
+
+```python
+import scriptling.ai as ai
+
+registry = ai.ToolRegistry()
+```
+
+### registry.add(name, description, params, handler)
+
+Adds a tool to the registry.
+
+**Parameters:**
+
+- `name` (str): Tool name
+- `description` (str): Tool description for the AI
+- `params` (dict): Parameter definitions with types
+- `handler` (callable): Function to execute when tool is called
+
+**Parameter Types:**
+
+- `string` - String parameter (required)
+- `integer` - Integer parameter (required)
+- `number` - Number parameter (required, mapped to integer)
+- `boolean` - Boolean parameter (required)
+- `array` - Array parameter (required)
+- `object` - Object parameter (required)
+- `string?` - Optional string (add `?` suffix for optional)
+- `integer?` - Optional integer
+- etc.
+
+**Example:**
+
+```python
+tools = ai.ToolRegistry()
+
+# Simple tool
+tools.add("get_time", "Get current time", {}, lambda args: "12:00 PM")
+
+# Tool with required parameters
+tools.add("read_file", "Read a file", {
+    "path": "string"
+}, lambda args: os.read_file(args["path"]))
+
+# Tool with optional parameters
+tools.add("search", "Search files", {
+    "query": "string",
+    "limit": "integer?",
+    "path": "string?"
+}, lambda args: search_files(args["query"], args.get("limit", 10)))
+```
+
+### registry.build()
+
+Builds OpenAI-compatible tool schemas for passing to completion requests.
+
+**Returns:** list - List of tool schema dicts
+
+**Example:**
+
+```python
+tools = ai.ToolRegistry()
+tools.add("get_time", "Get current time", {}, time_handler)
+
+# Direct completion calls
+schemas = tools.build()
+response = client.completion("gpt-4", [{"role": "user", "content": "What time is it?"}], tools=schemas)
+
+# With Agent (recommended - tools handled automatically)
+# See [Agent Library](agent.md) for details
+```
+
+### registry.get_handler(name)
+
+Gets a tool handler by name.
+
+**Parameters:**
+
+- `name` (str): Tool name
+
+**Returns:** callable - Tool handler function
+
+**Example:**
+
+```python
+handler = tools.get_handler("read_file")
+result = handler({"path": "config.json"})
+```
+
+### Using Tools with Completions
 
 ```python
 import scriptling.ai as ai
@@ -264,7 +353,7 @@ schemas = tools.build()
 response = client.completion("gpt-4", [{"role": "user", "content": "Read file /data/config.txt"}], tools=schemas)
 ```
 
-See [Agent Library](agent.md) for detailed ToolRegistry documentation and automatic tool handling.
+For automatic tool execution with an agent loop, see [Agent Library](agent.md).
 
 ## AIClient Class
 
