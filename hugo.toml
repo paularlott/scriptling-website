@@ -19,9 +19,6 @@ title = 'Scriptling'
       name = 'Docs'
       url = '/docs'
     [[params.navigation.header]]
-      name = 'Python Differences'
-      url = '/docs/python-differences/'
-    [[params.navigation.header]]
       name = 'Changelog'
       url = '/docs/changelog/'
 
