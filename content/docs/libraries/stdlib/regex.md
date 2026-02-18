@@ -1,8 +1,7 @@
 ---
-title: Regex Library
+title: regex
 weight: 1
 ---
-
 
 Regular expression functions for pattern matching and text processing. The function signatures follow Python's `re` module conventions.
 

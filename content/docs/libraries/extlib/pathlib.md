@@ -1,8 +1,7 @@
 ---
-title: Pathlib Library
+title: pathlib
 weight: 1
 ---
-
 
 The pathlib library provides object-oriented filesystem path operations, similar to Python's pathlib module. It offers a more convenient and readable way to work with file paths compared to string manipulation.
 

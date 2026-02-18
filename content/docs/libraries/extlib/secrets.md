@@ -1,5 +1,5 @@
 ---
-title: secrets Library
+title: secrets
 weight: 1
 ---
 

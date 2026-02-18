@@ -1,8 +1,7 @@
 ---
-title: itertools Library
+title: itertools
 weight: 1
 ---
-
 
 The `itertools` library provides Python-compatible iteration utilities for efficient looping and combinatorial operations.
 

@@ -1,8 +1,7 @@
 ---
-title: statistics Library
+title: statistics
 weight: 1
 ---
-
 
 The `statistics` library provides functions for calculating mathematical statistics of numeric data, compatible with Python's `statistics` module.
 

@@ -1,8 +1,7 @@
 ---
-title: Runtime Sync Library
+title: scriptling.runtime.sync
 weight: 1
 ---
-
 
 Named cross-environment concurrency primitives shared across all environments.
 

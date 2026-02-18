@@ -1,8 +1,7 @@
 ---
-title: urllib.parse Library
+title: urllib.parse
 weight: 1
 ---
-
 
 URL parsing and encoding/decoding functions. Python-compatible with the `urllib.parse` module.
 

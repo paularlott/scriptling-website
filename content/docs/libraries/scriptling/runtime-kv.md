@@ -1,8 +1,7 @@
 ---
-title: Runtime KV Library
+title: scriptling.runtime.kv
 weight: 1
 ---
-
 
 Thread-safe key-value store for sharing state across requests and background tasks.
 

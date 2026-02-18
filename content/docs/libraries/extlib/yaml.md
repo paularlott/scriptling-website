@@ -1,8 +1,7 @@
 ---
-title: yaml - YAML Parsing and Generation
+title: yaml
 weight: 1
 ---
-
 
 Parse and generate YAML (YAML Ain't Markup Language) data.
 

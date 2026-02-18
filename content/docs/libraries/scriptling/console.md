@@ -1,8 +1,7 @@
 ---
-title: Console Library
+title: scriptling.console
 weight: 1
 ---
-
 
 The `scriptling.console` library provides console input/output functions for interactive scripts.
 

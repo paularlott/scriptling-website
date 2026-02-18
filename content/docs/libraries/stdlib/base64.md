@@ -1,8 +1,7 @@
 ---
-title: Base64 Library
+title: base64
 weight: 1
 ---
-
 
 Functions for Base64 encoding and decoding. Python-compatible function names.
 

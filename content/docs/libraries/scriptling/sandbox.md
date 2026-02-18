@@ -1,8 +1,7 @@
 ---
-title: Sandbox Library
+title: runtime.sandbox
 weight: 1
 ---
-
 
 The `scriptling.runtime.sandbox` sub-library provides isolated script execution environments. It allows a running script to create a fresh, independent Scriptling instance, set variables in it, execute code, and read variables back.
 
@@ -24,13 +23,13 @@ env = runtime.sandbox.create()
 
 ## Sandbox Object Methods
 
-| Method              | Description                                          |
-| ------------------- | ---------------------------------------------------- |
-| `set(name, value)`  | Set a variable in the sandbox                        |
-| `get(name)`         | Get a variable from the sandbox                      |
-| `exec(code)`        | Execute script code in the sandbox                   |
-| `exec_file(path)`   | Load and execute a script file in the sandbox        |
-| `exit_code()`       | Get the exit code from the last execution            |
+| Method             | Description                                   |
+| ------------------ | --------------------------------------------- |
+| `set(name, value)` | Set a variable in the sandbox                 |
+| `get(name)`        | Get a variable from the sandbox               |
+| `exec(code)`       | Execute script code in the sandbox            |
+| `exec_file(path)`  | Load and execute a script file in the sandbox |
+| `exit_code()`      | Get the exit code from the last execution     |
 
 ## Functions
 
@@ -284,6 +283,7 @@ extlibs.SetSandboxAllowedPaths([]string{"/opt/scripts", "/home/user/scripts"})
 ```
 
 Path restrictions use `fssecurity.Config` internally and protect against:
+
 - Path traversal attacks (`../../../etc/passwd`)
 - Symlink attacks (symlinks pointing outside allowed directories)
 - Prefix attacks (`/allowed` vs `/allowed-other`)

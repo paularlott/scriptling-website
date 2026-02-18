@@ -1,8 +1,7 @@
 ---
-title: Requests Library
+title: requests
 weight: 1
 ---
-
 
 Functions for making HTTP requests. Matches Python's `requests` library API.
 

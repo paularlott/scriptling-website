@@ -1,8 +1,7 @@
 ---
-title: Glob Library
+title: glob
 weight: 1
 ---
-
 
 The glob library provides Unix shell-style wildcards for filename matching, similar to Python's glob module. It allows you to find files and directories matching specific patterns.
 

@@ -1,8 +1,7 @@
 ---
-title: Random Library
+title: random
 weight: 1
 ---
-
 
 Random number generation functions. Python-compatible.
 

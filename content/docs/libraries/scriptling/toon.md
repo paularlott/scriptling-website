@@ -1,8 +1,7 @@
 ---
-title: TOON Library
+title: scriptling.toon
 weight: 1
 ---
-
 
 TOON (Token-Oriented Object Notation) encoding/decoding library. TOON is a human-readable data format that's more compact and readable than JSON, with support for inline objects, flexible syntax, and tabular data.
 

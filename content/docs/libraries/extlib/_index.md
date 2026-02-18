@@ -52,6 +52,7 @@ extlibs.RegisterPathlibLibrary(p, []string{"/tmp", "/data"})
 | [html.parser](html.parser/) | HTML/XHTML parser |
 | [logging](logging/) | Logging functionality |
 | [yaml](yaml/) | YAML parsing and generation |
+| [toml](toml/) | TOML parsing and generation |
 
 ## Utilities
 

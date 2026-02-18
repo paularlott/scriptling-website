@@ -1,8 +1,7 @@
 ---
-title: Datetime Library
+title: datetime
 weight: 1
 ---
-
 
 Datetime functions for formatting and parsing dates and times. Python-compatible.
 

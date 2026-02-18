@@ -1,5 +1,5 @@
 ---
-title: os.path Library
+title: os.path
 weight: 1
 ---
 

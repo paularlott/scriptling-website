@@ -1,8 +1,7 @@
 ---
-title: Time Library
+title: time
 weight: 1
 ---
-
 
 Time-related functions for timestamps, time tuples, formatting, and sleeping. Python-compatible implementation.
 

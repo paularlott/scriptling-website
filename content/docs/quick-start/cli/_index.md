@@ -1,7 +1,7 @@
 ---
 title: CLI Reference
 description: Command-line interface for Scriptling.
-weight: 5
+weight: 10
 ---
 
 Scriptling includes a command-line interface for running scripts, interactive mode, and HTTP/MCP server.
@@ -215,7 +215,7 @@ scriptling --script-mode safe script.py
 - `requests` - HTTP client
 - `os` - Environment variables access only
 - `secrets` - Cryptographic random number generation
-- `scriptling.kv` - Key-value store
+- `scriptling.runtime.kv` - Key-value store
 - AI, agent, and MCP libraries
 
 **Full mode additionally includes:**

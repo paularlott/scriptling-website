@@ -1,8 +1,7 @@
 ---
-title: Hashlib Library
+title: hashlib
 weight: 1
 ---
-
 
 Cryptographic hash functions.
 

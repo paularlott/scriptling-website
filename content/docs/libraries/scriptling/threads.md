@@ -1,8 +1,7 @@
 ---
-title: threads - Asynchronous Execution Library
+title: scriptling.threads
 weight: 1
 ---
-
 
 Go-inspired async library for safe concurrent execution through isolated environments.
 

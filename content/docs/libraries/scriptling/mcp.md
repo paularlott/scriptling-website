@@ -1,8 +1,7 @@
 ---
-title: MCP Library
+title: scriptling.mcp
 weight: 1
 ---
-
 
 MCP (Model Context Protocol) tool interaction library. This library provides functions for interacting with MCP servers that expose tools for AI models to use.
 

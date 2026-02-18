@@ -1,8 +1,7 @@
 ---
-title: string Library
+title: string
 weight: 1
 ---
-
 
 String constants for character classification, matching Python's `string` module.
 

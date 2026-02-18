@@ -1,5 +1,5 @@
 ---
-title: html.parser Library
+title: html.parser
 weight: 1
 ---
 

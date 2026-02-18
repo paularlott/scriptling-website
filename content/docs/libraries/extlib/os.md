@@ -1,5 +1,5 @@
 ---
-title: os Library
+title: os
 weight: 1
 ---
 

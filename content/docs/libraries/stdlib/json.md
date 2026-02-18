@@ -1,8 +1,7 @@
 ---
-title: JSON Library
+title: json
 weight: 1
 ---
-
 
 Functions for parsing and generating JSON data.
 

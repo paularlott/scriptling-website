@@ -1,8 +1,7 @@
 ---
-title: functools Library
+title: functools
 weight: 1
 ---
-
 
 The `functools` library provides higher-order functions that act on or return other functions, compatible with Python's `functools` module.
 

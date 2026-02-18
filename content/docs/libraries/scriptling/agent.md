@@ -1,18 +1,17 @@
 ---
-title: Agent Library
+title: scriptling.ai.agent
 weight: 1
 ---
-
 
 Agentic AI loop for building AI agents with automatic tool execution. The agent handles the complete agentic loop including tool calling, execution, and response formatting.
 
 ## Available Classes & Methods
 
-| Class/Method                                 | Description                          |
-| -------------------------------------------- | ------------------------------------ |
-| `Agent(client, tools, system_prompt, model)` | Create AI agent                      |
-| `agent.trigger(message, max_iterations)`     | One-shot trigger with response       |
-| `agent.interact()`                           | Start interactive session            |
+| Class/Method                                 | Description                    |
+| -------------------------------------------- | ------------------------------ |
+| `Agent(client, tools, system_prompt, model)` | Create AI agent                |
+| `agent.trigger(message, max_iterations)`     | One-shot trigger with response |
+| `agent.interact()`                           | Start interactive session      |
 
 For tool registry documentation, see [AI Library](ai.md#tool-registry).
 

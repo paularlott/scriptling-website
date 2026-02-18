@@ -163,4 +163,4 @@ fmt.Printf("Found %d users\n", count)
 - [Language Guide](../language/) - Learn the complete language syntax
 - [Libraries](../libraries/) - Explore available libraries
 - [Go Integration](../go-integration/) - Deep dive into Go embedding
-- [CLI Reference](../cli/) - CLI tool documentation
+- [CLI Reference](cli/) - CLI tool documentation

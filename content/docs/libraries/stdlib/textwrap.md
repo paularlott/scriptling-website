@@ -1,8 +1,7 @@
 ---
-title: textwrap Library
+title: textwrap
 weight: 1
 ---
-
 
 The `textwrap` library provides text wrapping and filling utilities, compatible with Python's `textwrap` module.
 

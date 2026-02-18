@@ -1,8 +1,7 @@
 ---
-title: uuid Library
+title: uuid
 weight: 1
 ---
-
 
 UUID generation library, matching Python's `uuid` module.
 

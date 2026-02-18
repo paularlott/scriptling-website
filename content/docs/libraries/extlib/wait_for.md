@@ -1,8 +1,7 @@
 ---
-title: wait_for Library
+title: wait_for
 weight: 1
 ---
-
 
 Functions for waiting on resources to become available. Useful for coordination between services, waiting for files, ports, or HTTP endpoints.
 

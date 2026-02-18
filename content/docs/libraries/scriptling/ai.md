@@ -1,8 +1,7 @@
 ---
-title: AI Library
+title: scriptling.ai
 weight: 1
 ---
-
 
 AI and LLM functions for interacting with OpenAI-compatible APIs. This library provides:
 

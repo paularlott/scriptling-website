@@ -1,8 +1,7 @@
 ---
-title: Platform Library
+title: platform
 weight: 1
 ---
-
 
 The `platform` library provides access to underlying platform's identifying data.
 

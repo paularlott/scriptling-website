@@ -1,8 +1,7 @@
 ---
-title: html Library
+title: html
 weight: 1
 ---
-
 
 HTML escaping and unescaping library, matching Python's `html` module.
 

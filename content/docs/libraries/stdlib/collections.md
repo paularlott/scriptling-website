@@ -1,8 +1,7 @@
 ---
-title: collections Library
+title: collections
 weight: 1
 ---
-
 
 The `collections` library provides Python-compatible specialized container datatypes.
 

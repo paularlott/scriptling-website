@@ -1,8 +1,7 @@
 ---
-title: Fuzzy Library
+title: scriptling.fuzzy
 weight: 1
 ---
-
 
 The `scriptling.fuzzy` library provides fuzzy string matching utilities for searching and matching text. It uses a multi-tier matching algorithm that combines exact matching, substring matching, word boundary matching, and Levenshtein distance calculation.
 
@@ -14,11 +13,11 @@ import scriptling.fuzzy as fuzzy
 
 ## Available Functions
 
-| Function                                          | Description                                       |
-| ------------------------------------------------- | ------------------------------------------------- |
-| `search(query, items, max_results, threshold, key)` | Find multiple matches in a list                  |
-| `best(query, items, entity_type, key, threshold)`  | Find single best match with error formatting     |
-| `score(s1, s2)`                                     | Calculate similarity between two strings         |
+| Function                                            | Description                                  |
+| --------------------------------------------------- | -------------------------------------------- |
+| `search(query, items, max_results, threshold, key)` | Find multiple matches in a list              |
+| `best(query, items, entity_type, key, threshold)`   | Find single best match with error formatting |
+| `score(s1, s2)`                                     | Calculate similarity between two strings     |
 
 ## Overview
 

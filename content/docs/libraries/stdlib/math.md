@@ -1,8 +1,7 @@
 ---
-title: Math Library
+title: math
 weight: 1
 ---
-
 
 Mathematical functions and constants.
 
