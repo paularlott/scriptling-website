@@ -1,5 +1,6 @@
 ---
 title: scriptling.console
+linkTitle: console
 weight: 1
 ---
 

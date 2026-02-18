@@ -1,5 +1,6 @@
 ---
 title: scriptling.mcp
+linkTitle: mcp
 weight: 1
 ---
 

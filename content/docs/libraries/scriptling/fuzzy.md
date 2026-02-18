@@ -1,5 +1,6 @@
 ---
 title: scriptling.fuzzy
+linkTitle: fuzzy
 weight: 1
 ---
 

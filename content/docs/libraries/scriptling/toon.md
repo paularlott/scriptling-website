@@ -1,5 +1,6 @@
 ---
 title: scriptling.toon
+linkTitle: toon
 weight: 1
 ---
 

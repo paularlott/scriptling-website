@@ -1,7 +1,7 @@
 ---
 title: CLI Reference
 description: Command-line interface for Scriptling.
-weight: 10
+weight: 2
 ---
 
 Scriptling includes a command-line interface for running scripts, interactive mode, and HTTP/MCP server.
@@ -19,10 +19,10 @@ brew install paularlott/tap/scriptling
 Download pre-built binaries from [GitHub Releases](https://github.com/paularlott/scriptling/releases):
 
 | Platform | Architectures |
-|----------|---------------|
-| Linux | AMD64, ARM64 |
-| macOS | AMD64, ARM64 |
-| Windows | AMD64, ARM64 |
+| -------- | ------------- |
+| Linux    | AMD64, ARM64  |
+| macOS    | AMD64, ARM64  |
+| Windows  | AMD64, ARM64  |
 
 ### Go Install
 
@@ -87,11 +87,13 @@ scriptling --lint --lint-format json script.py
 ```
 
 **Text output format:**
+
 ```
 script.py:3: expected token COLON (error)
 ```
 
 **JSON output format:**
+
 ```json
 {
   "files_checked": 1,
@@ -112,22 +114,22 @@ The linter exits with code 0 if no errors are found, and code 1 if any errors ex
 
 ## Command Line Options
 
-| Flag | Environment Variable | Description | Default |
-|------|---------------------|-------------|---------|
-| `-i`, `--interactive` | - | Start interactive mode | false |
-| `-l`, `--lint` | - | Lint script files without executing | false |
-| `--lint-format` | `SCRIPTLING_LINT_FORMAT` | Output format for lint (text/json) | text |
-| `--libdir` | `SCRIPTLING_LIBDIR` | Directory to load libraries from | (current dir) |
-| `--log-level` | `SCRIPTLING_LOG_LEVEL` | Log level (trace/debug/info/warn/error) | info |
-| `--log-format` | `SCRIPTLING_LOG_FORMAT` | Log format (console/json) | console |
-| `-S`, `--server` | `SCRIPTLING_SERVER` | HTTP server address (host:port) | (disabled) |
-| `--mcp-tools` | `SCRIPTLING_MCP_TOOLS` | Directory containing MCP tools | (disabled) |
-| `--bearer-token` | `SCRIPTLING_BEARER_TOKEN` | Bearer token for authentication | none |
-| `--script-mode` | `SCRIPTLING_SCRIPT_MODE` | Script mode: safe or full | full |
-| `--allowed-paths` | `SCRIPTLING_ALLOWED_PATHS` | Comma-separated allowed filesystem paths | (no restriction) |
-| `--tls-cert` | `SCRIPTLING_TLS_CERT` | TLS certificate file | none |
-| `--tls-key` | `SCRIPTLING_TLS_KEY` | TLS key file | none |
-| `--tls-generate` | - | Generate self-signed certificate | false |
+| Flag                  | Environment Variable       | Description                              | Default          |
+| --------------------- | -------------------------- | ---------------------------------------- | ---------------- |
+| `-i`, `--interactive` | -                          | Start interactive mode                   | false            |
+| `-l`, `--lint`        | -                          | Lint script files without executing      | false            |
+| `--lint-format`       | `SCRIPTLING_LINT_FORMAT`   | Output format for lint (text/json)       | text             |
+| `--libdir`            | `SCRIPTLING_LIBDIR`        | Directory to load libraries from         | (current dir)    |
+| `--log-level`         | `SCRIPTLING_LOG_LEVEL`     | Log level (trace/debug/info/warn/error)  | info             |
+| `--log-format`        | `SCRIPTLING_LOG_FORMAT`    | Log format (console/json)                | console          |
+| `-S`, `--server`      | `SCRIPTLING_SERVER`        | HTTP server address (host:port)          | (disabled)       |
+| `--mcp-tools`         | `SCRIPTLING_MCP_TOOLS`     | Directory containing MCP tools           | (disabled)       |
+| `--bearer-token`      | `SCRIPTLING_BEARER_TOKEN`  | Bearer token for authentication          | none             |
+| `--script-mode`       | `SCRIPTLING_SCRIPT_MODE`   | Script mode: safe or full                | full             |
+| `--allowed-paths`     | `SCRIPTLING_ALLOWED_PATHS` | Comma-separated allowed filesystem paths | (no restriction) |
+| `--tls-cert`          | `SCRIPTLING_TLS_CERT`      | TLS certificate file                     | none             |
+| `--tls-key`           | `SCRIPTLING_TLS_KEY`       | TLS key file                             | none             |
+| `--tls-generate`      | -                          | Generate self-signed certificate         | false            |
 
 ## Environment Configuration
 
@@ -157,11 +159,11 @@ SCRIPTLING_ALLOWED_PATHS=/tmp/data,./uploads
 
 Scriptling supports three levels of filesystem access control:
 
-| Mode | Flag | Filesystem Access | Path Restrictions |
-|------|------|-------------------|-------------------|
-| **Full** | `--script-mode full` (default) | All libraries | None |
-| **Restricted** | `--allowed-paths /path1,/path2` | All libraries | Only specified paths |
-| **Safe** | `--script-mode safe` | No filesystem libraries | N/A |
+| Mode           | Flag                            | Filesystem Access       | Path Restrictions    |
+| -------------- | ------------------------------- | ----------------------- | -------------------- |
+| **Full**       | `--script-mode full` (default)  | All libraries           | None                 |
+| **Restricted** | `--allowed-paths /path1,/path2` | All libraries           | Only specified paths |
+| **Safe**       | `--script-mode safe`            | No filesystem libraries | N/A                  |
 
 ### Full Mode (default)
 
@@ -298,24 +300,24 @@ description = "Number of times to repeat the greeting"
 
 **Parameter Types:**
 
-| Type | Aliases | Description |
-|------|---------|-------------|
-| `string` | | Text values |
-| `int` | `integer` | Integer numbers |
-| `float` | `number` | Floating point numbers |
-| `bool` | `boolean` | True/false values |
-| `array:string` | | Array of strings |
-| `array:number` | `array:int`, `array:integer`, `array:float` | Array of numbers |
-| `array:bool` | `array:boolean` | Array of booleans |
+| Type           | Aliases                                     | Description            |
+| -------------- | ------------------------------------------- | ---------------------- |
+| `string`       |                                             | Text values            |
+| `int`          | `integer`                                   | Integer numbers        |
+| `float`        | `number`                                    | Floating point numbers |
+| `bool`         | `boolean`                                   | True/false values      |
+| `array:string` |                                             | Array of strings       |
+| `array:number` | `array:int`, `array:integer`, `array:float` | Array of numbers       |
+| `array:bool`   | `array:boolean`                             | Array of booleans      |
 
 **Parameter Fields:**
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `name` | Yes | Parameter name |
-| `type` | Yes | Data type (see table above) |
-| `description` | Yes | Description shown to the LLM |
-| `required` | No | Whether the parameter must be provided (default: `false`) |
+| Field         | Required | Description                                               |
+| ------------- | -------- | --------------------------------------------------------- |
+| `name`        | Yes      | Parameter name                                            |
+| `type`        | Yes      | Data type (see table above)                               |
+| `description` | Yes      | Description shown to the LLM                              |
+| `required`    | No       | Whether the parameter must be provided (default: `false`) |
 
 **Registration Modes:**
 

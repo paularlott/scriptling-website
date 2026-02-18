@@ -1,5 +1,6 @@
 ---
 title: scriptling.runtime.sync
+linkTitle: runtime.sync
 weight: 1
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: scriptling.runtime.kv
+linkTitle: runtime.kv
 weight: 1
 ---
 

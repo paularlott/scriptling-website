@@ -1,5 +1,6 @@
 ---
-title: runtime.sandbox
+title: scriptling.runtime.sandbox
+linkTitle: runtime.sandbox
 weight: 1
 ---
 

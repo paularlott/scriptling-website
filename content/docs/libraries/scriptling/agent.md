@@ -1,5 +1,6 @@
 ---
 title: scriptling.ai.agent
+linkTitle: ai.agent
 weight: 1
 ---
 

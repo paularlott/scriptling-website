@@ -1,5 +1,6 @@
 ---
 title: scriptling.ai
+linkTitle: ai
 weight: 1
 ---
 

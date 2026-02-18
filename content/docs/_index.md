@@ -11,6 +11,7 @@ Welcome to the Scriptling documentation. Scriptling is a minimal, sandboxed inte
 - [Quick Start](quick-start/) - Get up and running quickly
 - [Language Guide](language/) - Complete language reference
 - [Libraries](libraries/) - Available libraries and APIs
+- [Security Guide](security/) - Security best practices for embedding Scriptling
 
 ## Core Concepts
 
