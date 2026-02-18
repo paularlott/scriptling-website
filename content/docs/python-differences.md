@@ -111,26 +111,25 @@ The following Python features are not implemented in Scriptling:
 | Async/await               | Not supported                           |
 | Type hints                | Not supported                           |
 | Walrus operator (`:=`)    | Not supported                           |
-| f-strings                 | Use `%` formatting or `format()` method |
 | Context managers (`with`) | Not supported                           |
 | Metaclasses               | Not supported                           |
 | Descriptors               | Not supported                           |
 
 ## String Formatting
 
-Scriptling supports `%` formatting and the `format()` method, but not f-strings:
+Scriptling supports multiple string formatting options including f-strings:
 
 ```python
 name = "Alice"
 age = 30
 
-# NOT supported - f-strings
-# message = f"{name} is {age} years old"
+# f-strings (recommended)
+message = f"{name} is {age} years old"
 
-# Use % formatting instead
+# % formatting
 message = "%s is %d years old" % (name, age)
 
-# Or use format() method
+# format() method
 message = "{} is {} years old".format(name, age)
 ```
 
@@ -156,18 +155,19 @@ finally:
 
 ## Import System
 
-Scriptling uses a simpler import system:
+Scriptling supports various import styles:
 
 ```python
 # Import entire module
 import json
 import requests
 
-# NOT supported - from imports
-# from json import loads, dumps
+# Import specific names from a module
+from json import loads, dumps
 
-# NOT supported - import as
-# import numpy as np
+# Import with alias
+import json as j
+from json import loads as parse_json
 ```
 
 ## Summary

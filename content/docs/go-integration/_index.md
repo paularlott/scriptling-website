@@ -45,6 +45,7 @@ func main() {
 - [Go Libraries](libraries/) - Creating Go libraries with functions and constants
 - [Go Classes](classes/) - Creating Go classes for object-oriented integration
 - [Builder API](builder/) - Type-safe builder pattern for performance
+- [Linting](lint/) - Code analysis for detecting syntax errors without execution
 
 ## Two Integration Approaches
 
