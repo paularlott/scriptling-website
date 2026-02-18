@@ -20,8 +20,7 @@ HTTP server route registration and response helpers.
 | `json(status_code, data)`          | Create JSON response                |
 | `html(status_code, content)`       | Create HTML response                |
 | `text(status_code, content)`       | Create text response                |
-| `redirect(url, status_code=302)`   | Create redirect response            |
-| `error(status_code, message)`      | Create error response               |
+| `redirect(location, status=302)`   | Create redirect response            |
 
 ## Setup
 

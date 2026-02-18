@@ -441,7 +441,7 @@ curl -X POST http://127.0.0.1:8000/mcp \
 - **Environment configuration**: Auto-load settings from `.env` file
 - **Configurable logging**: Set log level with `--log-level` (debug, info, warn, error)
 - **Cross-platform**: Built for Linux, macOS, and Windows on AMD64 and ARM64
-- **Minimal size**: Optimized with stripped binaries (~7MB)
+- **Minimal size**: Optimized with stripped binaries (~10MB)
 
 ## Examples
 
@@ -466,20 +466,27 @@ if response.status_code == 200:
 ### HTTP Server with Routes
 
 ```bash
-scriptling --server :8000 server.py
+scriptling --server :8000 setup.py
 ```
 
 ```python
-# server.py
-import scriptling.runtime.http as http
+# setup.py
+import scriptling.runtime as runtime
 
-@http.route("/api/hello", methods=["GET"])
+# Register routes (handler functions referenced as "module.function")
+runtime.http.get("/api/hello", "handlers.hello")
+runtime.http.post("/api/echo", "handlers.echo")
+```
+
+```python
+# handlers.py
+import scriptling.runtime as runtime
+
 def hello(request):
-    return http.json({"message": "Hello, World!"})
+    return runtime.http.json(200, {"message": "Hello, World!"})
 
-@http.route("/api/echo", methods=["POST"])
 def echo(request):
-    return http.json(request["body"])
+    return runtime.http.json(200, request.json())
 ```
 
 ## Help

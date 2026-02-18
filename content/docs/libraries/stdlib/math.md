@@ -7,30 +7,44 @@ Mathematical functions and constants.
 
 ## Available Functions
 
-| Function         | Description                                 |
-| ---------------- | ------------------------------------------- |
-| `sqrt(x)`        | Returns the square root of x                |
-| `pow(base, exp)` | Returns base raised to the power of exp     |
-| `fabs(x)`        | Returns the absolute value of x as a float  |
-| `floor(x)`       | Rounds x down to the nearest integer        |
-| `ceil(x)`        | Rounds x up to the nearest integer          |
-| `sin(x)`         | Returns the sine of x (in radians)          |
-| `cos(x)`         | Returns the cosine of x (in radians)        |
-| `tan(x)`         | Returns the tangent of x (in radians)       |
-| `log(x)`         | Returns the natural logarithm of x          |
-| `exp(x)`         | Returns e raised to the power of x          |
-| `degrees(x)`     | Converts radians to degrees                 |
-| `radians(x)`     | Converts degrees to radians                 |
-| `fmod(x, y)`     | Returns the floating-point remainder of x/y |
-| `gcd(a, b)`      | Returns the greatest common divisor         |
-| `factorial(n)`   | Returns the factorial of n                  |
+| Function           | Description                                        |
+| ------------------ | -------------------------------------------------- |
+| `sqrt(x)`          | Returns the square root of x                       |
+| `pow(base, exp)`   | Returns base raised to the power of exp            |
+| `fabs(x)`          | Returns the absolute value of x as a float         |
+| `floor(x)`         | Rounds x down to the nearest integer               |
+| `ceil(x)`          | Rounds x up to the nearest integer                 |
+| `trunc(x)`         | Truncates x to the nearest integer toward zero     |
+| `sin(x)`           | Returns the sine of x (in radians)                 |
+| `cos(x)`           | Returns the cosine of x (in radians)               |
+| `tan(x)`           | Returns the tangent of x (in radians)              |
+| `asin(x)`          | Returns the arc sine of x (in radians)             |
+| `acos(x)`          | Returns the arc cosine of x (in radians)           |
+| `atan(x)`          | Returns the arc tangent of x (in radians)          |
+| `atan2(y, x)`      | Returns the arc tangent of y/x (in radians)        |
+| `log(x)`           | Returns the natural logarithm of x                 |
+| `log10(x)`         | Returns the base-10 logarithm of x                 |
+| `log2(x)`          | Returns the base-2 logarithm of x                  |
+| `exp(x)`           | Returns e raised to the power of x                 |
+| `degrees(x)`       | Converts radians to degrees                        |
+| `radians(x)`       | Converts degrees to radians                        |
+| `hypot(x, y)`      | Returns the Euclidean distance sqrt(x*x + y*y)     |
+| `fmod(x, y)`       | Returns the floating-point remainder of x/y        |
+| `gcd(a, b)`        | Returns the greatest common divisor                |
+| `factorial(n)`     | Returns the factorial of n                         |
+| `copysign(x, y)`   | Returns x with the sign of y                       |
+| `isnan(x)`         | Returns true if x is NaN (Not a Number)            |
+| `isinf(x)`         | Returns true if x is positive or negative infinity |
+| `isfinite(x)`      | Returns true if x is neither NaN nor infinite      |
 
 ## Constants
 
-| Constant | Description                 |
-| -------- | --------------------------- |
-| `pi`     | The mathematical constant π |
-| `e`      | The mathematical constant e |
+| Constant | Description                            |
+| -------- | -------------------------------------- |
+| `pi`     | The mathematical constant π            |
+| `e`      | The mathematical constant e            |
+| `inf`    | Positive infinity                      |
+| `nan`    | NaN (Not a Number)                     |
 
 ## Functions
 
@@ -308,6 +322,227 @@ result = math.factorial(5)  # 120
 result = math.factorial(0)  # 1
 ```
 
+### math.trunc(x)
+
+Truncates x to the nearest integer toward zero.
+
+**Parameters:**
+
+- `x`: Number (integer or float)
+
+**Returns:** Integer
+
+**Example:**
+
+```python
+import math
+result = math.trunc(3.7)   # 3
+result = math.trunc(-3.7)  # -3
+```
+
+### math.asin(x)
+
+Returns the arc sine of x in radians.
+
+**Parameters:**
+
+- `x`: Number in range [-1, 1]
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import math
+result = math.asin(0)    # 0.0
+result = math.asin(1)    # 1.5707963267948966 (pi/2)
+```
+
+### math.acos(x)
+
+Returns the arc cosine of x in radians.
+
+**Parameters:**
+
+- `x`: Number in range [-1, 1]
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import math
+result = math.acos(1)    # 0.0
+result = math.acos(0)    # 1.5707963267948966 (pi/2)
+```
+
+### math.atan(x)
+
+Returns the arc tangent of x in radians.
+
+**Parameters:**
+
+- `x`: Number
+
+**Returns:** Float in range [-pi/2, pi/2]
+
+**Example:**
+
+```python
+import math
+result = math.atan(0)    # 0.0
+result = math.atan(1)    # 0.7853981633974483 (pi/4)
+```
+
+### math.atan2(y, x)
+
+Returns the arc tangent of y/x in radians, correctly handling the quadrant.
+
+**Parameters:**
+
+- `y`: Y coordinate
+- `x`: X coordinate
+
+**Returns:** Float in range [-pi, pi]
+
+**Example:**
+
+```python
+import math
+result = math.atan2(1, 1)   # 0.7853981633974483 (pi/4)
+result = math.atan2(-1, 1)  # -0.7853981633974483
+```
+
+### math.log10(x)
+
+Returns the base-10 logarithm of x.
+
+**Parameters:**
+
+- `x`: Positive number
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import math
+result = math.log10(100)  # 2.0
+result = math.log10(1000) # 3.0
+```
+
+### math.log2(x)
+
+Returns the base-2 logarithm of x.
+
+**Parameters:**
+
+- `x`: Positive number
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import math
+result = math.log2(8)   # 3.0
+result = math.log2(16)  # 4.0
+```
+
+### math.hypot(x, y)
+
+Returns the Euclidean distance sqrt(x*x + y*y).
+
+**Parameters:**
+
+- `x`: First coordinate
+- `y`: Second coordinate
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import math
+result = math.hypot(3, 4)  # 5.0
+result = math.hypot(5, 12) # 13.0
+```
+
+### math.copysign(x, y)
+
+Returns x with the sign of y.
+
+**Parameters:**
+
+- `x`: Magnitude value
+- `y`: Sign value
+
+**Returns:** Float with magnitude of x and sign of y
+
+**Example:**
+
+```python
+import math
+result = math.copysign(5, -1)   # -5.0
+result = math.copysign(-5, 1)   # 5.0
+```
+
+### math.isnan(x)
+
+Returns true if x is NaN (Not a Number).
+
+**Parameters:**
+
+- `x`: Number to check
+
+**Returns:** Boolean
+
+**Example:**
+
+```python
+import math
+result = math.isnan(math.nan)  # True
+result = math.isnan(5)         # False
+```
+
+### math.isinf(x)
+
+Returns true if x is positive or negative infinity.
+
+**Parameters:**
+
+- `x`: Number to check
+
+**Returns:** Boolean
+
+**Example:**
+
+```python
+import math
+result = math.isinf(math.inf)   # True
+result = math.isinf(-math.inf)  # True
+result = math.isinf(5)          # False
+```
+
+### math.isfinite(x)
+
+Returns true if x is neither NaN nor infinite.
+
+**Parameters:**
+
+- `x`: Number to check
+
+**Returns:** Boolean
+
+**Example:**
+
+```python
+import math
+result = math.isfinite(5)         # True
+result = math.isfinite(math.inf)  # False
+result = math.isfinite(math.nan)  # False
+```
+
 ## Constants
 
 ### math.pi
@@ -334,6 +569,34 @@ The mathematical constant e (Euler's number).
 ```python
 import math
 e = math.e  # 2.718281828459045
+```
+
+### math.inf
+
+Positive infinity.
+
+**Value:** Float (infinity)
+
+**Example:**
+
+```python
+import math
+result = math.inf  # inf
+result = math.isinf(math.inf)  # True
+```
+
+### math.nan
+
+NaN (Not a Number).
+
+**Value:** Float (NaN)
+
+**Example:**
+
+```python
+import math
+result = math.nan  # nan
+result = math.isnan(math.nan)  # True
 ```
 
 ## Usage Example
