@@ -3,197 +3,322 @@ title: datetime
 weight: 1
 ---
 
-Datetime functions for formatting and parsing dates and times. Python-compatible.
+Date and time manipulation library with Python-compatible API.
 
 ```python
 import datetime
 ```
 
-## Available Functions
+## Overview
 
-| Function                        | Description                                     |
-| ------------------------------- | ----------------------------------------------- |
-| `now(format?)`                  | Current local date and time as formatted string |
-| `utcnow(format?)`               | Current UTC date and time as formatted string   |
-| `today(format?)`                | Today's date as a formatted string              |
-| `strptime(date_string, format)` | Parse date string to Unix timestamp             |
-| `strftime(timestamp, format)`   | Format Unix timestamp as string                 |
+The datetime library provides two main classes:
 
-## Functions
+- **`datetime`** - Represents a date and time
+- **`date`** - Represents a date (year, month, day only)
 
-### datetime.now(format?)
+Plus the **`timedelta()`** function for working with durations.
 
-Returns the current local date and time as a formatted string.
-
-**Parameters:**
-
-- `format` (optional): Python-style format string (default: "%Y-%m-%d %H:%M:%S")
-
-**Returns:** String
-
-**Example:**
+## Quick Start
 
 ```python
 import datetime
 
 # Current datetime
-now = datetime.now()  # "2025-11-26 11:15:54"
+now = datetime.datetime.now()
+print(now)  # "2025-11-26 11:15:54"
 
-# Custom format
-now = datetime.now("%Y-%m-%d %H:%M:%S")  # "2025-11-26 11:15:54"
+# Current date
+today = datetime.date.today()
+print(today)  # "2025-11-26"
+
+# Create specific datetime
+dt = datetime.datetime(2024, 1, 15, 10, 30, 45)
+print(dt)  # "2024-01-15 10:30:45"
+
+# Create specific date
+d = datetime.date(2024, 1, 15)
+print(d)  # "2024-01-15"
 ```
 
-### datetime.utcnow(format?)
+## datetime Class
 
-Returns the current UTC date and time as a formatted string.
+### Creating datetime Instances
+
+#### datetime(year, month, day, hour=0, minute=0, second=0, microsecond=0)
+
+Creates a datetime instance for the specified date and time.
 
 **Parameters:**
 
-- `format` (optional): Python-style format string (default: "%Y-%m-%d %H:%M:%S")
-
-**Returns:** String
-
-**Example:**
+- `year` (int): Year
+- `month` (int): Month (1-12)
+- `day` (int): Day (1-31)
+- `hour` (int, optional): Hour (0-23), default 0
+- `minute` (int, optional): Minute (0-59), default 0
+- `second` (int, optional): Second (0-59), default 0
+- `microsecond` (int, optional): Microsecond, default 0
 
 ```python
 import datetime
 
-# Current UTC datetime
-utc_now = datetime.utcnow()  # "2025-11-26 03:15:54"
-
-# Custom format
-utc_now = datetime.utcnow("%Y-%m-%d %H:%M:%S")  # "2025-11-26 03:15:54"
+dt = datetime.datetime(2024, 1, 15)  # "2024-01-15 00:00:00"
+dt = datetime.datetime(2024, 1, 15, 10, 30, 45)  # "2024-01-15 10:30:45"
 ```
 
-### datetime.today(format?)
+#### datetime.now()
 
-Returns today's date as a formatted string.
-
-**Parameters:**
-
-- `format` (optional): Python-style format string (default: "%Y-%m-%d")
-
-**Returns:** String
-
-**Example:**
+Returns the current local datetime as a datetime instance.
 
 ```python
 import datetime
 
-# Today's date
-today = datetime.today()  # "2025-11-26"
-
-# Custom format
-today = datetime.today("%A, %B %d, %Y")  # "Wednesday, November 26, 2025"
+now = datetime.datetime.now()
+print(now)  # "2025-11-26 11:15:54"
+print(now.year())  # 2025
+print(now.month())  # 11
 ```
 
-### datetime.strptime(date_string, format)
+#### datetime.utcnow()
 
-Parses a date string according to the given format and returns a Unix timestamp.
+Returns the current UTC datetime as a datetime instance.
+
+```python
+import datetime
+
+utc_now = datetime.datetime.utcnow()
+print(utc_now)  # "2025-11-26 03:15:54"
+```
+
+#### datetime.strptime(date_string, format)
+
+Parses a date string and returns a datetime instance.
 
 **Parameters:**
 
 - `date_string`: String to parse
 - `format`: Python-style format string
 
-**Returns:** Float (Unix timestamp)
+```python
+import datetime
 
-**Example:**
+dt = datetime.datetime.strptime("2024-01-15 10:30:45", "%Y-%m-%d %H:%M:%S")
+print(dt)  # "2024-01-15 10:30:45"
+```
+
+#### datetime.fromtimestamp(timestamp)
+
+Creates a datetime from a Unix timestamp.
+
+**Parameters:**
+
+- `timestamp`: Unix timestamp (integer or float)
 
 ```python
 import datetime
 
-timestamp = datetime.strptime("2024-01-15 10:30:45", "%Y-%m-%d %H:%M:%S")
-# Returns: 1705314645.0
+dt = datetime.datetime.fromtimestamp(1705314645)
+print(dt)  # "2024-01-15 10:30:45"
 ```
 
-### datetime.strftime(format, timestamp)
+#### datetime.strftime(format, timestamp_or_datetime)
 
-Formats a Unix timestamp according to the given format string.
+Formats a timestamp or datetime as a string.
 
 **Parameters:**
 
 - `format`: Python-style format string
-- `timestamp`: Unix timestamp (integer or float)
-
-**Returns:** String
-
-**Example:**
+- `timestamp_or_datetime`: Unix timestamp (int/float) or datetime instance
 
 ```python
 import datetime
 
-formatted = datetime.strftime("%Y-%m-%d %H:%M:%S", 1705314645.0)
-# Returns: "2024-01-15 18:30:45"
+formatted = datetime.datetime.strftime("%Y-%m-%d %H:%M:%S", 1705314645)
+print(formatted)  # "2024-01-15 10:30:45"
 ```
 
-### datetime.fromtimestamp(timestamp, format?)
+### datetime Instance Methods
 
-Creates a formatted datetime string from a Unix timestamp.
+#### .strftime(format)
 
-**Parameters:**
-
-- `timestamp`: Unix timestamp (integer or float)
-- `format` (optional): Python-style format string (default: "%Y-%m-%d %H:%M:%S")
-
-**Returns:** String
-
-**Example:**
+Formats the datetime as a string.
 
 ```python
 import datetime
 
-dt = datetime.fromtimestamp(1705314645.0)
-# Returns: "2024-01-15 18:30:45"
-
-dt = datetime.fromtimestamp(1705314645.0, "%A, %B %d, %Y at %I:%M %p")
-# Returns: "Monday, January 15, 2024 at 06:30 PM"
+dt = datetime.datetime.now()
+formatted = dt.strftime("%A, %B %d, %Y at %I:%M %p")
+print(formatted)  # "Wednesday, November 26, 2025 at 11:15 AM"
 ```
 
-### datetime.isoformat(timestamp?)
+#### .timestamp()
 
-Returns the date and time in ISO 8601 format.
-
-**Parameters:**
-
-- `timestamp` (optional): Unix timestamp (integer or float). Defaults to current time.
-
-**Returns:** String
-
-**Example:**
+Returns the datetime as a Unix timestamp (float).
 
 ```python
 import datetime
 
-# Current time in ISO format
-iso = datetime.isoformat()
-# Returns: "2025-11-26T12:15:30Z"
-
-# Specific timestamp in ISO format
-iso = datetime.isoformat(1705314645.0)
-# Returns: "2024-01-15T18:30:45Z"
+dt = datetime.datetime(2024, 1, 15, 10, 30, 45)
+ts = dt.timestamp()
+print(ts)  # 1705314645.0
 ```
 
-### datetime.timestamp()
+#### .isoformat()
 
-Returns the current Unix timestamp.
-
-**Parameters:** None
-
-**Returns:** Float (Unix timestamp)
-
-**Example:**
+Returns the datetime in ISO 8601 format.
 
 ```python
 import datetime
 
-ts = datetime.timestamp()
-# Returns: 1732622130.0 (current time as Unix timestamp)
+dt = datetime.datetime(2024, 1, 15, 10, 30, 45)
+print(dt.isoformat())  # "2024-01-15T10:30:45"
 ```
 
-### datetime.timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
+#### Component Methods
 
-Creates a timedelta representing a duration and returns the total seconds.
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `.year()` | int | Year |
+| `.month()` | int | Month (1-12) |
+| `.day()` | int | Day of month (1-31) |
+| `.hour()` | int | Hour (0-23) |
+| `.minute()` | int | Minute (0-59) |
+| `.second()` | int | Second (0-59) |
+| `.weekday()` | int | Day of week (Monday=0, Sunday=6) |
+| `.isoweekday()` | int | Day of week (Monday=1, Sunday=7) |
+
+```python
+import datetime
+
+dt = datetime.datetime(2024, 1, 15, 10, 30, 45)
+print(dt.year())     # 2024
+print(dt.month())    # 1
+print(dt.day())      # 15
+print(dt.hour())     # 10
+print(dt.minute())   # 30
+print(dt.second())   # 45
+print(dt.weekday())  # 0 (Monday)
+```
+
+#### .replace(**kwargs)
+
+Returns a new datetime with specified fields replaced.
+
+```python
+import datetime
+
+dt = datetime.datetime(2024, 1, 15, 10, 30, 45)
+new_dt = dt.replace(year=2025, month=6)
+print(new_dt)  # "2025-06-15 10:30:45"
+```
+
+### datetime Arithmetic and Comparison
+
+datetime instances support arithmetic and comparison operations:
+
+```python
+import datetime
+
+dt1 = datetime.datetime(2024, 1, 15, 10, 30, 45)
+dt2 = datetime.datetime(2024, 1, 16, 10, 30, 45)
+
+# Comparison
+print(dt1 < dt2)   # True
+print(dt1 == dt2)  # False
+
+# Subtraction (returns seconds as float)
+diff = dt2 - dt1
+print(diff)  # 86400.0 (one day in seconds)
+
+# Addition (add seconds)
+dt3 = dt1 + 3600  # One hour later
+print(dt3)  # "2024-01-15 11:30:45"
+
+# Using timedelta
+one_day = datetime.timedelta(days=1)
+tomorrow = dt1 + one_day
+print(tomorrow)  # "2024-01-16 10:30:45"
+```
+
+## date Class
+
+### Creating date Instances
+
+#### date(year, month, day)
+
+Creates a date instance for the specified date.
+
+```python
+import datetime
+
+d = datetime.date(2024, 1, 15)
+print(d)  # "2024-01-15"
+```
+
+#### date.today()
+
+Returns the current local date as a date instance.
+
+```python
+import datetime
+
+today = datetime.date.today()
+print(today)  # "2025-11-26"
+```
+
+### date Instance Methods
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `.strftime(format)` | string | Format date as string |
+| `.year()` | int | Year |
+| `.month()` | int | Month (1-12) |
+| `.day()` | int | Day of month (1-31) |
+| `.weekday()` | int | Day of week (Monday=0, Sunday=6) |
+| `.isoweekday()` | int | Day of week (Monday=1, Sunday=7) |
+| `.isoformat()` | string | ISO 8601 format ("2024-01-15") |
+| `.replace(**kwargs)` | date | Return date with replaced fields |
+
+```python
+import datetime
+
+d = datetime.date(2024, 1, 15)
+print(d.year())      # 2024
+print(d.month())     # 1
+print(d.day())       # 15
+print(d.weekday())   # 0 (Monday)
+print(d.strftime("%A, %B %d, %Y"))  # "Monday, January 15, 2024"
+```
+
+### date Arithmetic and Comparison
+
+```python
+import datetime
+
+d1 = datetime.date(2024, 1, 15)
+d2 = datetime.date(2024, 1, 20)
+
+# Comparison
+print(d1 < d2)   # True
+
+# Subtraction (returns days as int)
+diff = d2 - d1
+print(diff)  # 5 (days)
+
+# Addition (add days)
+next_week = d1 + 7
+print(next_week)  # "2024-01-22"
+
+# Using timedelta
+one_week = datetime.timedelta(weeks=1)
+next_week = d1 + one_week
+print(next_week)  # "2024-01-22"
+```
+
+## timedelta Function
+
+### timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
+
+Creates a duration and returns the total duration in seconds.
 
 **Parameters (all optional, keyword-only):**
 
@@ -207,27 +332,29 @@ Creates a timedelta representing a duration and returns the total seconds.
 
 **Returns:** Float (total duration in seconds)
 
-**Example:**
-
 ```python
 import datetime
 
 # One day in seconds
 one_day = datetime.timedelta(days=1)
-# Returns: 86400.0
+print(one_day)  # 86400.0
 
 # Two hours
 two_hours = datetime.timedelta(hours=2)
-# Returns: 7200.0
+print(two_hours)  # 7200.0
 
 # Combined duration
 duration = datetime.timedelta(days=1, hours=2, minutes=30)
-# Returns: 95400.0
+print(duration)  # 95400.0
 
-# Use with timestamps
-now = datetime.timestamp()
+# Use with datetime arithmetic
+now = datetime.datetime.now()
 tomorrow = now + datetime.timedelta(days=1)
 next_week = now + datetime.timedelta(weeks=1)
+
+# Use with date arithmetic
+today = datetime.date.today()
+next_month = today + datetime.timedelta(weeks=4)
 ```
 
 ## Format Codes
@@ -249,9 +376,69 @@ next_week = now + datetime.timedelta(weeks=1)
 | `%Z` | Timezone name       | MST     |
 | `%z` | Timezone offset     | -0700   |
 
-## Notes
+## Complete Example
 
-- All functions return strings except `timestamp()` and `strptime()` which return floats
-- Timestamps are Unix timestamps (seconds since 1970-01-01 00:00:00 UTC)
-- Format codes follow Python's strftime/strptime conventions
-- Date arithmetic should use standard arithmetic on Unix timestamps (e.g., `ts + 86400` for one day)
+```python
+import datetime
+
+# Current date and time
+now = datetime.datetime.now()
+print(f"Now: {now}")
+print(f"Year: {now.year()}, Month: {now.month()}, Day: {now.day()}")
+print(f"Hour: {now.hour()}, Minute: {now.minute()}, Second: {now.second()}")
+print(f"Weekday: {now.weekday()} (0=Monday)")
+print(f"ISO format: {now.isoformat()}")
+
+# Date arithmetic
+tomorrow = now + datetime.timedelta(days=1)
+next_week = now + datetime.timedelta(weeks=1)
+print(f"Tomorrow: {tomorrow}")
+print(f"Next week: {next_week}")
+
+# Working with dates only
+today = datetime.date.today()
+print(f"Today: {today}")
+print(f"Formatted: {today.strftime('%A, %B %d, %Y')}")
+
+# Parsing and formatting
+dt = datetime.datetime.strptime("2024-12-25", "%Y-%m-%d")
+print(f"Christmas: {dt.strftime('%A, %B %d, %Y')}")
+
+# Comparison
+if now > dt:
+    print("Christmas has passed")
+else:
+    print("Christmas is coming")
+
+# Create specific datetime
+meeting = datetime.datetime(2025, 1, 15, 14, 30)
+print(f"Meeting: {meeting}")
+print(f"Meeting timestamp: {meeting.timestamp()}")
+
+# Date difference
+christmas = datetime.date(2024, 12, 25)
+new_year = datetime.date(2025, 1, 1)
+days_between = new_year - christmas
+print(f"Days between Christmas and New Year: {days_between}")
+```
+
+## Python Compatibility
+
+This library implements a Python-like datetime API:
+
+| Feature | Supported |
+| ------- | --------- |
+| `datetime.datetime()` | ✅ |
+| `datetime.datetime.now()` | ✅ |
+| `datetime.datetime.utcnow()` | ✅ |
+| `datetime.datetime.strptime()` | ✅ |
+| `datetime.datetime.fromtimestamp()` | ✅ |
+| `datetime.date()` | ✅ |
+| `datetime.date.today()` | ✅ |
+| `datetime.timedelta()` | ✅ |
+| Comparison operators | ✅ |
+| Arithmetic operators | ✅ |
+| `.replace()` | ✅ |
+| `.strftime()` | ✅ |
+| `.isoformat()` | ✅ |
+| `.timestamp()` | ✅ |

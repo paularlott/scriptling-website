@@ -79,11 +79,11 @@ print("Done!")
 
 ### time.localtime([secs])
 
-Converts a Unix timestamp to a time tuple representing local time.
+Converts a Unix timestamp or datetime to a time tuple representing local time.
 
 **Parameters:**
 
-- `secs` (optional): Unix timestamp (integer or float). Defaults to current time.
+- `secs` (optional): Unix timestamp (integer or float) or datetime instance. Defaults to current time.
 
 **Returns:** List (9-element time tuple: [year, month, day, hour, minute, second, weekday, yearday, dst])
 
@@ -91,6 +91,7 @@ Converts a Unix timestamp to a time tuple representing local time.
 
 ```python
 import time
+import datetime
 
 # Current local time tuple
 local_tuple = time.localtime()
@@ -99,15 +100,19 @@ local_tuple = time.localtime()
 # Specific timestamp
 specific_tuple = time.localtime(1705314645.0)
 # [2024, 1, 15, 18, 30, 45, 1, 15, 0]
+
+# From datetime instance
+dt = datetime.datetime.now()
+dt_tuple = time.localtime(dt)
 ```
 
 ### time.gmtime([secs])
 
-Converts a Unix timestamp to a time tuple representing UTC time.
+Converts a Unix timestamp or datetime to a time tuple representing UTC time.
 
 **Parameters:**
 
-- `secs` (optional): Unix timestamp (integer or float). Defaults to current time.
+- `secs` (optional): Unix timestamp (integer or float) or datetime instance. Defaults to current time.
 
 **Returns:** List (9-element time tuple: [year, month, day, hour, minute, second, weekday, yearday, dst])
 
@@ -115,6 +120,7 @@ Converts a Unix timestamp to a time tuple representing UTC time.
 
 ```python
 import time
+import datetime
 
 # Current UTC time tuple
 utc_tuple = time.gmtime()
@@ -123,6 +129,10 @@ utc_tuple = time.gmtime()
 # Specific UTC timestamp
 utc_specific = time.gmtime(1705314645.0)
 # [2024, 1, 15, 18, 30, 45, 1, 15, 0]
+
+# From datetime instance
+dt = datetime.datetime.utcnow()
+dt_tuple = time.gmtime(dt)
 ```
 
 ### time.mktime(tuple)

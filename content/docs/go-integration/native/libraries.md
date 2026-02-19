@@ -1,18 +1,17 @@
 ---
-title: Go Libraries
-description: Creating Go libraries with functions and constants.
-weight: 3
+title: Native Libraries
+description: Create libraries with functions, constants, and sub-libraries.
+weight: 2
 ---
 
-Create reusable Go libraries with functions, constants, and sub-libraries.
+Create reusable Go libraries with functions, constants, and sub-libraries using the Native API.
 
-## Native Library API
-
-### Basic Library
+## Basic Library
 
 ```go
 import (
     "context"
+    "github.com/paularlott/scriptling"
     "github.com/paularlott/scriptling/object"
 )
 
@@ -47,7 +46,6 @@ var MyLibrary = object.NewLibrary("mylib",
     "My custom library with connection utilities",
 )
 
-// Register the library
 func main() {
     p := scriptling.New()
     p.RegisterLibrary(MyLibrary)
@@ -60,73 +58,148 @@ Use from Scriptling:
 import mylib
 
 connected = mylib.connect("localhost", 8080)
-print(f"Max connections: {mylib.MAX_CONNECTIONS}")
-print(f"Version: {mylib.VERSION}")
+print("Max connections:", mylib.MAX_CONNECTIONS)
+print("Version:", mylib.VERSION)
 ```
 
-## Library with Sub-Libraries
+## Library with State
+
+Libraries can maintain state using Go closures:
 
 ```go
-var DatabaseLibrary = object.NewLibrary("database",
-    map[string]*object.Builtin{
-        "connect": {
-            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
-                // Connection logic
-                return &object.Boolean{Value: true}
-            },
-            HelpText: "connect(host, port) - Connect to database",
-        },
-    },
-    map[string]object.Object{
-        "DEFAULT_PORT": &object.Integer{Value: 5432},
-    },
-    "Database connectivity library",
-)
+// Logger library that maintains state
+type Logger struct {
+    level    string
+    messages []string
+}
 
-// Add sub-libraries
-var QueryLibrary = object.NewLibrary("query",
-    map[string]*object.Builtin{
-        "select": {
-            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
-                table, _ := args[0].AsString()
-                // SELECT logic
-                return &object.List{Elements: []object.Object{}}
-            },
-            HelpText: "select(table) - Select all rows from table",
-        },
-        "insert": {
-            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
-                table, _ := args[0].AsString()
-                data, _ := args[1].AsDict()
-                // INSERT logic
-                return &object.Integer{Value: 1}
-            },
-            HelpText: "insert(table, data) - Insert row into table",
-        },
-    },
-    nil,
-    "Query operations",
-)
+func NewLogger() *Logger {
+    return &Logger{
+        level:    "INFO",
+        messages: make([]string, 0),
+    }
+}
 
+func (l *Logger) CreateLibrary() map[string]*object.Builtin {
+    return map[string]*object.Builtin{
+        "set_level": {
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                if len(args) != 1 {
+                    return &object.Error{Message: "set_level requires 1 argument"}
+                }
+                level, err := args[0].AsString()
+                if err != nil {
+                    return &object.Error{Message: "level must be string"}
+                }
+                l.level = level
+                return &object.String{Value: "Level set to " + l.level}
+            },
+            HelpText: "set_level(level) - Set the logging level",
+        },
+        "log": {
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                if len(args) != 1 {
+                    return &object.Error{Message: "log requires 1 argument"}
+                }
+                msg, err := args[0].AsString()
+                if err != nil {
+                    return &object.Error{Message: "message must be string"}
+                }
+
+                // Get environment for output
+                env := evaluator.GetEnvFromContext(ctx)
+                writer := env.GetWriter()
+
+                logMsg := fmt.Sprintf("[%s] %s", l.level, msg)
+                l.messages = append(l.messages, logMsg)
+                fmt.Fprintln(writer, logMsg)
+
+                return &object.String{Value: "logged"}
+            },
+            HelpText: "log(message) - Log a message",
+        },
+        "get_messages": {
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                elements := make([]object.Object, len(l.messages))
+                for i, msg := range l.messages {
+                    elements[i] = &object.String{Value: msg}
+                }
+                return &object.List{Elements: elements}
+            },
+            HelpText: "get_messages() - Get all logged messages",
+        },
+    }
+}
+
+// Usage
 func main() {
     p := scriptling.New()
+    logger := NewLogger()
+    p.RegisterLibrary(object.NewLibrary("logger", logger.CreateLibrary(), nil, "Logger library"))
 
-    // Register main library
-    p.RegisterLibrary(DatabaseLibrary)
-
-    // Register as sub-library
-    p.RegisterSubLibrary("database", "query", QueryLibrary)
+    p.Eval(`
+import logger
+logger.set_level("DEBUG")
+logger.log("Application started")
+logger.log("Processing data")
+`)
 }
 ```
 
-Use from Scriptling:
+## Sub-Libraries
 
-```python
-import database
+Organize related functionality into sub-libraries:
 
-db = database.connect("localhost", 5432)
-rows = database.query.select("users")
-database.query.insert("users", {"name": "Alice"})
+```go
+// Create URL parsing sub-library
+parseLib := object.NewLibrary("parse",
+    map[string]*object.Builtin{
+        "quote": {
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                s, _ := args[0].AsString()
+                return &object.String{Value: url.QueryEscape(s)}
+            },
+            HelpText: "quote(s) - URL encode a string",
+        },
+        "unquote": {
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                s, _ := args[0].AsString()
+                val, _ := url.QueryUnescape(s)
+                return &object.String{Value: val}
+            },
+            HelpText: "unquote(s) - URL decode a string",
+        },
+    },
+    nil,
+    "URL parsing utilities",
+)
+
+// Create main URL library and add sub-library
+urlLib := object.NewLibrary("url",
+    map[string]*object.Builtin{
+        "join": {
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                base, _ := args[0].AsString()
+                path, _ := args[1].AsString()
+                return &object.String{Value: strings.TrimSuffix(base, "/") + "/" + strings.TrimPrefix(path, "/")}
+            },
+            HelpText: "join(base, path) - Join URL path segments",
+        },
+    },
+    map[string]object.Object{
+        "parse": parseLib,  // Sub-library as a constant
+    },
+    "URL utilities",
+)
+
+p.RegisterLibrary(urlLib)
+
+// Use in script
+p.Eval(`
+import url
+print(url.join("https://example.com", "/api/users"))  # https://example.com/api/users
+print(url.parse.quote("hello world"))                   # hello+world
+`)
 ```
 
 ## On-Demand Library Loading
@@ -162,36 +235,6 @@ result = heavylib.process(data)
 }
 ```
 
-## Factory Pattern for Stateful Libraries
-
-Libraries that need to create objects with state:
-
-```go
-// Factory function that creates instances
-var ConnectionLibrary = object.NewLibrary("connection",
-    map[string]*object.Builtin{
-        "create": {
-            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
-                host, _ := args[0].AsString()
-                port, _ := kwargs.GetInt("port", 8080)
-
-                // Create a new connection object (as dict with methods)
-                conn := &object.Dict{Pairs: map[string]object.Object{
-                    "host": &object.String{Value: host},
-                    "port": object.NewInteger(int64(port)),
-                    "connected": object.False,
-                }}
-
-                return conn
-            },
-            HelpText: "create(host, port=8080) - Create a new connection",
-        },
-    },
-    nil,
-    "Connection factory library",
-)
-```
-
 ## Complete Library Example
 
 ```go
@@ -200,6 +243,7 @@ package mylib
 import (
     "context"
     "fmt"
+    "math"
     "github.com/paularlott/scriptling/object"
 )
 
@@ -292,10 +336,10 @@ func CreateMathLibrary() *object.Library {
             },
         },
         map[string]object.Object{
-            "PI":    object.NewFloat(3.14159265359),
-            "E":     object.NewFloat(2.71828182846),
-            "PHI":   object.NewFloat(1.61803398875),  // Golden ratio
-            "VERSION": &object.String{Value: "1.0.0"},
+            "PI":       object.NewFloat(3.14159265359),
+            "E":        object.NewFloat(2.71828182846),
+            "PHI":      object.NewFloat(1.61803398875),  // Golden ratio
+            "VERSION":  &object.String{Value: "1.0.0"},
         },
         "Extended math library with statistical functions",
     )
@@ -316,57 +360,108 @@ average = mymath.mean([1, 2, 3, 4, 5])
 }
 ```
 
-## Registering Script Libraries
-
-You can also register libraries written in Scriptling:
-
-```go
-p.RegisterScriptLibrary("helpers", `
-def format_name(first, last):
-    return first + " " + last
-
-def capitalize(text):
-    return text[0].upper() + text[1:]
-
-DEFAULT_GREETING = "Hello"
-`)
-
-p.Eval(`
-import helpers
-
-name = helpers.format_name("john", "doe")
-greeting = helpers.capitalize(helpers.DEFAULT_GREETING)
-`)
-```
-
 ## Best Practices
 
-1. **Group related functions** - Put related functions in the same library
-2. **Use sub-libraries** - Organize large libraries into sub-modules
-3. **Provide help text** - Make functions discoverable
-4. **Export constants** - Share configuration values
-5. **Use lazy loading** - Load heavy libraries on demand
-6. **Handle errors gracefully** - Return meaningful error messages
+### 1. Group Related Functions
 
 ```go
-// Good: Organized library with help text
-var GoodLibrary = object.NewLibrary("goodlib",
+// Good: Organized by functionality
+mathLib := object.NewLibrary("math", map[string]*object.Builtin{
+    "add": {...},
+    "subtract": {...},
+    "multiply": {...},
+}, nil, "Math operations")
+
+stringLib := object.NewLibrary("string", map[string]*object.Builtin{
+    "upper": {...},
+    "lower": {...},
+    "trim": {...},
+}, nil, "String operations")
+```
+
+### 2. Provide Descriptive Help Text
+
+```go
+"add": {
+    Fn: func(...) { ... },
+    HelpText: `add(a, b) - Add two numbers
+
+  Parameters:
+    a - First number
+    b - Second number
+
+  Returns:
+    The sum of a and b
+
+  Examples:
+    add(2, 3)  # Returns 5`,
+}
+```
+
+### 3. Use Constants for Configuration
+
+```go
+configLib := object.NewLibrary(
+    "config",
     map[string]*object.Builtin{
-        "process": {
-            Fn: processFunc,
-            HelpText: `process(data, options={}) - Process data
-
-Parameters:
-  data - Input data
-  options - Configuration options
-
-Returns:
-  Processed result`,
-        },
+        "get_config": {...},
     },
     map[string]object.Object{
-        "VERSION": &object.String{Value: "1.0.0"},
+        "API_VERSION": &object.String{Value: "v1"},
+        "TIMEOUT":     &object.Integer{Value: 30},
+        "DEBUG":       &object.Boolean{Value: false},
     },
-    "A well-documented library",
+    "Configuration library",
 )
 ```
+
+### 4. Add Library Description
+
+```go
+myLib := object.NewLibrary("mylib",
+    functions,
+    constants,
+    "My custom data processing library",  // Description shown by help()
+)
+```
+
+## Testing Libraries
+
+```go
+func TestLibrary(t *testing.T) {
+    p := scriptling.New()
+
+    // Create and register library
+    lib := object.NewLibrary("testlib", map[string]*object.Builtin{
+        "add": {
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                a, _ := args[0].(*object.Integer)
+                b, _ := args[1].(*object.Integer)
+                return &object.Integer{Value: a.Value + b.Value}
+            },
+        },
+    }, nil, "Test library")
+    p.RegisterLibrary(lib)
+
+    // Test the library
+    result, err := p.Eval(`
+import testlib
+result = testlib.add(10, 20)
+`)
+    if err != nil {
+        t.Fatalf("Eval error: %v", err)
+    }
+
+    if value, objErr := p.GetVarAsInt("result"); objErr == nil {
+        if value != 30 {
+            t.Errorf("Expected 30, got %d", value)
+        }
+    }
+}
+```
+
+## See Also
+
+- [Native Functions](functions/) - Register individual functions
+- [Native Classes](classes/) - Define custom classes
+- [Builder Libraries](../builder/libraries/) - Type-safe library builder

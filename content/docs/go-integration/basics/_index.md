@@ -221,8 +221,7 @@ print("Line 1")
 print("Line 2")
 `)
 
-output := p.GetOutput()  // "Line 1\nLine 2\n"
-p.ClearOutput()          // Clear captured output
+output := p.GetOutput()  // "Line 1\nLine 2\n" (also clears the buffer)
 ```
 
 ### Custom Output Writer

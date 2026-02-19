@@ -1,19 +1,20 @@
 ---
-title: Go Classes
-description: Creating Go classes for object-oriented integration.
-weight: 4
+title: Native Classes
+description: Create custom classes with full control over methods and inheritance.
+weight: 3
 ---
 
-Create Go classes that can be instantiated and used from Scriptling.
+Create Go classes that can be instantiated and used from Scriptling using the Native API.
 
 ## Basic Class
 
-### Define a Class
+A class is an `*object.Class` structure containing methods:
 
 ```go
 import (
     "context"
     "fmt"
+    "github.com/paularlott/scriptling"
     "github.com/paularlott/scriptling/object"
 )
 
@@ -62,20 +63,16 @@ var PersonClass = &object.Class{
                 name, _ := instance.Fields["name"].AsString()
                 age, _ := instance.Fields["age"].AsInt()
 
-                return &object.Dict{Pairs: map[string]object.Object{
+                return object.NewStringDict(map[string]object.Object{
                     "name": &object.String{Value: name},
                     "age":  object.NewInteger(age),
-                }}
+                })
             },
             HelpText: "get_info() - Return person info as dict",
         },
     },
 }
-```
 
-### Register and Use
-
-```go
 func main() {
     p := scriptling.New()
 
@@ -120,6 +117,51 @@ bob.birthday()
 }
 ```
 
+## The __init__ Method
+
+The `__init__` method is the constructor, called when creating a new instance:
+
+```go
+var RectangleClass = &object.Class{
+    Name: "Rectangle",
+    Methods: map[string]object.Object{
+        "__init__": &object.Builtin{
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                if len(args) < 3 {
+                    return &object.Error{Message: "__init__ requires instance, width, and height"}
+                }
+                instance := args[0].(*object.Instance)
+                width, _ := args[1].AsFloat()
+                height, _ := args[2].AsFloat()
+
+                instance.Fields["width"] = object.NewFloat(width)
+                instance.Fields["height"] = object.NewFloat(height)
+                return object.None
+            },
+            HelpText: "__init__(width, height) - Initialize Rectangle",
+        },
+        "area": &object.Builtin{
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                instance := args[0].(*object.Instance)
+                width, _ := instance.Fields["width"].AsFloat()
+                height, _ := instance.Fields["height"].AsFloat()
+                return object.NewFloat(width * height)
+            },
+            HelpText: "area() - Calculate area",
+        },
+        "perimeter": &object.Builtin{
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                instance := args[0].(*object.Instance)
+                width, _ := instance.Fields["width"].AsFloat()
+                height, _ := instance.Fields["height"].AsFloat()
+                return object.NewFloat(2 * (width + height))
+            },
+            HelpText: "perimeter() - Calculate perimeter",
+        },
+    },
+}
+```
+
 ## Inheritance
 
 ### Base Class
@@ -143,6 +185,14 @@ var AnimalClass = &object.Class{
             },
             HelpText: "speak() - Make animal sound",
         },
+        "info": &object.Builtin{
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                instance := args[0].(*object.Instance)
+                name, _ := instance.Fields["name"].AsString()
+                return &object.String{Value: "Animal: " + name}
+            },
+            HelpText: "info() - Return animal info",
+        },
     },
 }
 ```
@@ -160,7 +210,10 @@ var DogClass = &object.Class{
                 name, _ := args[1].AsString()
                 breed, _ := args[2].AsString()
 
-                instance.Fields["name"] = &object.String{Value: name}
+                // Call parent __init__
+                animalInit := AnimalClass.Methods["__init__"].(*object.Builtin)
+                animalInit.Fn(ctx, nil, instance, &object.String{Value: name})
+
                 instance.Fields["breed"] = &object.String{Value: breed}
                 return object.None
             },
@@ -196,32 +249,111 @@ func main() {
 dog = Dog("Rex", "German Shepherd")
 print(dog.speak())   # "Woof!" (overridden method)
 print(dog.fetch())   # "Rex fetches the ball!"
+print(dog.info())    # "Animal: Rex" (inherited method)
 `)
 }
 ```
 
-## Class with Static Methods
+## Special Methods
+
+### `__getitem__(key)` - Custom Indexing
 
 ```go
-var UtilityClass = &object.Class{
-    Name: "Utility",
+counterClass := &object.Class{
+    Name: "Counter",
     Methods: map[string]object.Object{
-        "format_currency": &object.Builtin{
+        "__init__": &object.Builtin{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
-                // Static method - self is still passed but ignored
-                amount, _ := args[1].AsFloat()
-                return &object.String{Value: fmt.Sprintf("$%.2f", amount)}
+                instance := args[0].(*object.Instance)
+                instance.Fields["data"] = object.NewStringDict(map[string]object.Object{})
+                return object.None
             },
-            HelpText: "format_currency(amount) - Format as currency",
         },
-        "now": &object.Builtin{
+        "__getitem__": &object.Builtin{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
-                return &object.String{Value: time.Now().Format(time.RFC3339)}
+                instance := args[0].(*object.Instance)
+                key := args[1].Inspect()
+                data := instance.Fields["data"].(*object.Dict)
+                if pair, ok := data.GetByString(key); ok {
+                    return pair.Value
+                }
+                return &object.Integer{Value: 0}  // Default for missing keys
             },
-            HelpText: "now() - Get current timestamp",
+            HelpText: "__getitem__(key) - Get count for key",
+        },
+        "set": &object.Builtin{
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                instance := args[0].(*object.Instance)
+                key := args[1].Inspect()
+                value := args[2]
+                data := instance.Fields["data"].(*object.Dict)
+                data.SetByString(key, value)
+                return object.None
+            },
+            HelpText: "set(key, value) - Set a count",
         },
     },
 }
+
+// Enables: c[key] syntax
+p.Eval(`
+c = Counter()
+c.set("apples", 5)
+print(c["apples"])   # 5
+print(c["oranges"])  # 0 (default)
+`)
+```
+
+**Note:** Use `object.NewStringDict()` to create dicts and `GetByString()`/`SetByString()` for access. Never manipulate the internal `Pairs` map keys directly — they use a type-prefixed canonical format.
+
+### Other Special Methods
+
+| Method | Purpose |
+|--------|---------|
+| `__init__` | Constructor called when creating instances |
+| `__str__` | Custom string representation (for `str()` function) |
+| `__len__` | Custom length (for `len()` function) |
+| `__getitem__` | Custom indexing (for `obj[key]` syntax) |
+
+## Classes in Libraries
+
+Add classes to libraries via the constants map:
+
+```go
+myLib := object.NewLibrary("counters",
+    map[string]*object.Builtin{
+        "create_counter": {
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                // Factory function
+                return &object.Instance{
+                    Class: counterClass,
+                    Fields: map[string]object.Object{
+                        "data": object.NewStringDict(map[string]object.Object{}),
+                    },
+                }
+            },
+            HelpText: "create_counter() - Create a new Counter",
+        },
+    },
+    map[string]object.Object{
+        "Counter": counterClass,           // Expose for direct instantiation
+        "VERSION": &object.String{Value: "1.0.0"},
+    },
+    "Counter utilities library",
+)
+
+p.RegisterLibrary(myLib)
+
+// Use in Scriptling
+p.Eval(`
+import counters
+
+# Use factory
+c = counters.create_counter()
+
+# Or use class directly
+c2 = counters.Counter()
+`)
 ```
 
 ## Complete Example: HTTP Client Class
@@ -253,7 +385,7 @@ var HTTPClientClass = &object.Class{
 
                 instance.Fields["base_url"] = &object.String{Value: baseURL}
                 instance.Fields["timeout"] = object.NewInteger(int64(timeout))
-                instance.Fields["headers"] = &object.Dict{Pairs: map[string]object.Object{}}
+                instance.Fields["headers"] = object.NewStringDict(map[string]object.Object{})
 
                 return object.None
             },
@@ -266,7 +398,7 @@ var HTTPClientClass = &object.Class{
                 value, _ := args[2].AsString()
 
                 headers := instance.Fields["headers"].(*object.Dict)
-                headers.Pairs[key] = &object.String{Value: value}
+                headers.SetByString(key, &object.String{Value: value})
 
                 return object.None
             },
@@ -297,8 +429,9 @@ var HTTPClientClass = &object.Class{
 
                 // Add headers
                 headers := instance.Fields["headers"].(*object.Dict)
-                for key, val := range headers.Pairs {
-                    valStr, _ := val.AsString()
+                for _, pair := range headers.Pairs {
+                    key := pair.Key.Inspect()
+                    valStr, _ := pair.Value.AsString()
                     req.Header.Set(key, valStr)
                 }
 
@@ -311,11 +444,11 @@ var HTTPClientClass = &object.Class{
 
                 body, _ := io.ReadAll(resp.Body)
 
-                return &object.Dict{Pairs: map[string]object.Object{
+                return object.NewStringDict(map[string]object.Object{
                     "status":  object.NewInteger(int64(resp.StatusCode)),
                     "body":    &object.String{Value: string(body)},
-                    "headers": &object.Dict{Pairs: map[string]object.Object{}},
-                }}
+                    "headers": object.NewStringDict(map[string]object.Object{}),
+                })
             },
             HelpText: "get(path) - Make GET request",
         },
@@ -343,11 +476,40 @@ else:
 
 ## Best Practices
 
-1. **Always handle `self`** - First argument is always the instance
-2. **Use `instance.Fields` for state** - Store instance data in the Fields map
-3. **Return `object.None` for void methods** - Methods without return values
-4. **Provide help text** - Document all methods
-5. **Use type assertions safely** - Check types before casting
+### 1. Always Handle `self`
+
+First argument is always the instance:
+
+```go
+Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+    instance := args[0].(*object.Instance)  // self
+    // ... rest of implementation
+}
+```
+
+### 2. Use `instance.Fields` for State
+
+Store instance data in the Fields map:
+
+```go
+instance.Fields["name"] = &object.String{Value: name}
+instance.Fields["count"] = object.NewInteger(count)
+```
+
+### 3. Return `object.None` for Void Methods
+
+Methods without return values should return None:
+
+```go
+Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+    // ... implementation
+    return object.None
+}
+```
+
+### 4. Use Type Assertions Safely
+
+Check types before casting:
 
 ```go
 // Safe type handling
@@ -371,3 +533,59 @@ func safeMethod(ctx context.Context, kwargs object.Kwargs, args ...object.Object
     return object.None
 }
 ```
+
+## Testing Classes
+
+```go
+func TestClass(t *testing.T) {
+    p := scriptling.New()
+
+    // Create class
+    counterClass := &object.Class{
+        Name: "Counter",
+        Methods: map[string]object.Object{
+            "__init__": &object.Builtin{
+                Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                    instance := args[0].(*object.Instance)
+                    instance.Fields["count"] = &object.Integer{Value: 0}
+                    return object.None
+                },
+            },
+            "increment": &object.Builtin{
+                Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                    instance := args[0].(*object.Instance)
+                    count, _ := instance.Fields["count"].AsInt()
+                    instance.Fields["count"] = object.NewInteger(count + 1)
+                    return object.NewInteger(count + 1)
+                },
+            },
+        },
+    }
+
+    // Register class
+    p.SetVar("Counter", counterClass)
+
+    // Test the class
+    result, err := p.Eval(`
+c = Counter()
+c.increment()
+c.increment()
+result = c.increment()
+`)
+    if err != nil {
+        t.Fatalf("Eval error: %v", err)
+    }
+
+    if value, objErr := result.AsInt(); objErr == nil {
+        if value != 3 {
+            t.Errorf("Expected 3, got %d", value)
+        }
+    }
+}
+```
+
+## See Also
+
+- [Native Functions](functions/) - Register individual functions
+- [Native Libraries](libraries/) - Create libraries with functions and constants
+- [Builder Classes](../builder/classes/) - Type-safe class builder

@@ -175,13 +175,7 @@ Parse a URL into 5 components (without params).
 
 - `url`: URL string to parse
 
-**Returns:** Dict with keys:
-
-- `scheme`: Protocol
-- `netloc`: Network location
-- `path`: URL path
-- `query`: Query string
-- `fragment`: URL fragment
+**Returns:** List of 5 elements in order: `[scheme, netloc, path, query, fragment]`
 
 **Example:**
 
@@ -189,13 +183,14 @@ Parse a URL into 5 components (without params).
 import urllib.parse
 
 parsed = urllib.parse.urlsplit("https://example.com/path?query=value#section")
-# Returns: {
-#   "scheme": "https",
-#   "netloc": "example.com",
-#   "path": "/path",
-#   "query": "query=value",
-#   "fragment": "section"
-# }
+# Returns: ["https", "example.com", "/path", "query=value", "section"]
+
+# Access components by index
+scheme = parsed[0]    # "https"
+netloc = parsed[1]    # "example.com"
+path = parsed[2]      # "/path"
+query = parsed[3]     # "query=value"
+fragment = parsed[4]  # "section"
 ```
 
 ### urllib.parse.urlunsplit(components)
@@ -204,7 +199,7 @@ Reconstruct a URL from 5 components.
 
 **Parameters:**
 
-- `components`: Dict or list with 5 URL components
+- `components`: List with 5 URL elements in order: `[scheme, netloc, path, query, fragment]`
 
 **Returns:** String
 
@@ -213,13 +208,7 @@ Reconstruct a URL from 5 components.
 ```python
 import urllib.parse
 
-url = urllib.parse.urlunsplit({
-    "scheme": "https",
-    "netloc": "example.com",
-    "path": "/path",
-    "query": "key=value",
-    "fragment": "section"
-})
+url = urllib.parse.urlunsplit(["https", "example.com", "/path", "key=value", "section"])
 # Returns: "https://example.com/path?key=value#section"
 ```
 

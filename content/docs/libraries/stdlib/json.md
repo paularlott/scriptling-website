@@ -7,10 +7,12 @@ Functions for parsing and generating JSON data.
 
 ## Available Functions
 
-| Function        | Description                                 |
-| --------------- | ------------------------------------------- |
-| `loads(string)` | Parse a JSON string into Scriptling objects |
-| `dumps(object)` | Convert Scriptling objects to a JSON string |
+| Function                   | Description                                 |
+| -------------------------- | ------------------------------------------- |
+| `loads(string)`            | Parse a JSON string into Scriptling objects |
+| `dumps(object, indent="")` | Convert Scriptling objects to a JSON string |
+| `parse(string)`            | Alias for `loads()`                         |
+| `stringify(object)`        | Alias for `dumps()`                         |
 
 ## Functions
 
@@ -33,13 +35,14 @@ data = json.loads('{"users":[{"name":"Alice"},{"name":"Bob"}]}')
 first_user = data["users"][0]["name"]  # "Alice"
 ```
 
-### json.dumps(object)
+### json.dumps(object, indent="")
 
 Converts Scriptling objects to a JSON string.
 
 **Parameters:**
 
 - `object`: Scriptling object to convert (dict, list, string, number, boolean, or null)
+- `indent` (optional): String to use for indentation (enables pretty-printing)
 
 **Returns:** String (JSON formatted)
 
@@ -50,6 +53,31 @@ import json
 
 obj = {"status": "success", "count": 42}
 json_str = json.dumps(obj)  # '{"count":42,"status":"success"}'
+
+# Pretty-printed with 2-space indentation
+pretty = json.dumps(obj, indent="  ")
+# {
+#   "count": 42,
+#   "status": "success"
+# }
+```
+
+### json.parse(string)
+
+Alias for `json.loads()`. Parses a JSON string and returns Scriptling objects.
+
+```python
+import json
+data = json.parse('{"key": "value"}')  # Same as json.loads()
+```
+
+### json.stringify(object, indent="")
+
+Alias for `json.dumps()`. Converts Scriptling objects to a JSON string.
+
+```python
+import json
+json_str = json.stringify({"key": "value"})  # Same as json.dumps()
 ```
 
 ## Supported Types
@@ -96,6 +124,19 @@ person = {
 json_output = json.dumps(person)
 print(json_output)
 # {"age":25,"hobbies":["reading","coding","gaming"],"name":"Bob"}
+
+# Pretty-print with indentation
+pretty_json = json.dumps(person, indent="  ")
+print(pretty_json)
+# {
+#   "age": 25,
+#   "hobbies": [
+#     "reading",
+#     "coding",
+#     "gaming"
+#   ],
+#   "name": "Bob"
+# }
 ```
 
 ## Error Handling

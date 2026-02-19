@@ -18,8 +18,9 @@ The pathlib library provides object-oriented filesystem path operations, similar
 | `exists()`         | Check if path exists               |
 | `is_file()`        | Check if path is a file            |
 | `is_dir()`         | Check if path is a directory       |
-| `resolve()`        | Get absolute path                  |
-| `mkdir()`          | Create directory                   |
+| `mkdir(parents=False)` | Create directory               |
+| `rmdir()`          | Remove empty directory             |
+| `unlink(missing_ok=False)` | Remove file or link        |
 | `read_text()`      | Read file contents as string       |
 | `write_text(data)` | Write string to file               |
 
