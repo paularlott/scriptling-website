@@ -1,7 +1,7 @@
 ---
 title: Security Guide
 description: Security best practices for embedding and running Scriptling in your applications.
-weight: 7
+weight: 6
 ---
 
 Scriptling provides a sandboxed Python-like execution environment, but proper security practices are essential when embedding it in your applications.

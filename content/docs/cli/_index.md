@@ -124,6 +124,7 @@ The linter exits with code 0 if no errors are found, and code 1 if any errors ex
 | `--log-format`        | `SCRIPTLING_LOG_FORMAT`    | Log format (console/json)                | console          |
 | `-S`, `--server`      | `SCRIPTLING_SERVER`        | HTTP server address (host:port)          | (disabled)       |
 | `--mcp-tools`         | `SCRIPTLING_MCP_TOOLS`     | Directory containing MCP tools           | (disabled)       |
+| `--mcp-exec-script`   | -                          | Enable MCP script execution tool         | false            |
 | `--bearer-token`      | `SCRIPTLING_BEARER_TOKEN`  | Bearer token for authentication          | none             |
 | `--script-mode`       | `SCRIPTLING_SCRIPT_MODE`   | Script mode: safe or full                | full             |
 | `--allowed-paths`     | `SCRIPTLING_ALLOWED_PATHS` | Comma-separated allowed filesystem paths | (no restriction) |
@@ -255,8 +256,14 @@ scriptling --server :8000 setup.py
 # With TLS (self-signed certificate)
 scriptling --server :8443 --tls-generate setup.py
 
-# With MCP tools
+# With MCP tools from directory
 scriptling --server :8000 --mcp-tools ./tools setup.py
+
+# With MCP script execution tool
+scriptling --server :8000 --mcp-exec-script setup.py
+
+# With both MCP tools and exec tool
+scriptling --server :8000 --mcp-tools ./tools --mcp-exec-script setup.py
 
 # With authentication
 scriptling --server :8000 --bearer-token my-secret-token setup.py
@@ -266,6 +273,77 @@ scriptling --server :8000 --allowed-paths "/var/www,./uploads" setup.py
 
 # Safe mode (no filesystem access)
 scriptling --server :8000 --script-mode safe setup.py
+```
+
+### MCP Script Execution Tool
+
+The `--mcp-exec-script` flag enables a built-in MCP tool that allows LLMs to execute Scriptling code directly:
+
+```bash
+# Enable script execution tool
+scriptling --server :8000 --mcp-exec-script setup.py
+
+# Combine with custom tools
+scriptling --server :8000 --mcp-tools ./tools --mcp-exec-script setup.py
+```
+
+**Tool Details:**
+
+- **Name:** `execute_script`
+- **Description:** Execute Scriptling code and return the result. Scriptling is a Python 3-like scripting language.
+- **Parameters:**
+  - `code` (string, required): Scriptling code to execute
+
+**Return Behavior:**
+
+- Output from `print()` statements is automatically captured and returned
+- For structured data (JSON), use `import scriptling.mcp.tool` and call `tool.return_object(data)`
+- For text output, use `tool.return_string(text)`
+
+**Usage Example:**
+
+```bash
+# Call the tool via MCP - print() output is captured
+curl -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc":"2.0",
+    "id":1,
+    "method":"tools/call",
+    "params":{
+      "name":"execute_script",
+      "arguments":{
+        "code":"for i in range(1, 21, 3):\n    print(i)"
+      }
+    }
+  }'
+```
+
+**Returning Structured Data:**
+
+```python
+import scriptling.mcp.tool as tool
+
+# Return JSON object
+data = {"users": ["Alice", "Bob"], "count": 2}
+tool.return_object(data)
+
+# Or return text
+tool.return_string("Operation completed successfully")
+```
+
+The tool description instructs LLMs to use `help(topic)` to discover available functions and libraries:
+
+```python
+# Get help on built-in functions
+help('builtins')
+
+# Get help on string methods
+help('str')
+
+# Get help on a library
+import json
+help('json')
 ```
 
 ## MCP Tools
@@ -436,6 +514,7 @@ curl -X POST http://127.0.0.1:8000/mcp \
 - **Lint mode**: Check scripts for syntax errors without execution
 - **HTTP Server**: Start HTTP server with custom routes via `--server`
 - **MCP Server**: Serve tools via Model Context Protocol with `--mcp-tools`
+- **MCP Script Execution**: Allow LLMs to execute Scriptling code via `--mcp-exec-script`
 - **Sandboxed execution**: Safe mode restricts access to file system, network, and subprocess
 - **Custom libraries**: Load libraries from custom directories with `--libdir`
 - **Environment configuration**: Auto-load settings from `.env` file

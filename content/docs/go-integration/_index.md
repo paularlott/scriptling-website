@@ -41,10 +41,10 @@ func main() {
 ## Topics
 
 - [Basics](basics/) - Creating interpreters, variable exchange, calling functions
-- [Go Functions](functions/) - Registering Go functions callable from Scriptling
-- [Go Libraries](libraries/) - Creating Go libraries with functions and constants
-- [Go Classes](classes/) - Creating Go classes for object-oriented integration
-- [Builder API](builder/) - Type-safe builder pattern for performance
+- [Native API](native/) - Direct control with maximum performance
+- [Builder API](builder/) - Type-safe, cleaner syntax
+- [Script Extensions](scripts/) - Extend using Scriptling code
+- [Documenting Extensions](documentation/) - Add help text to functions and libraries
 - [Linting](lint/) - Code analysis for detecting syntax errors without execution
 
 ## Two Integration Approaches
@@ -88,3 +88,14 @@ for _, script := range scripts {
     p.Eval(script)
 }
 ```
+
+## Choosing Your Approach
+
+| Use Case | Recommended Approach |
+|----------|---------------------|
+| Simple functions | Builder API |
+| Rapid development | Builder API |
+| Performance-critical code | Native API |
+| Complex type handling | Native API |
+| Reusing Scriptling code | Script Extensions |
+| Building on Go libraries | Script Extensions |

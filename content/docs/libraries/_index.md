@@ -1,7 +1,7 @@
 ---
 title: Libraries
 description: Available libraries and APIs in Scriptling.
-weight: 3
+weight: 5
 ---
 
 Scriptling provides a rich set of libraries organized into three categories.

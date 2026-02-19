@@ -28,7 +28,9 @@ import os.path
 | `normpath(path)`       | Normalize path (remove . and ..)  |
 | `abspath(path)`        | Get absolute path                 |
 | `relpath(path, start)` | Get relative path from start      |
-| `commonprefix(list)`   | Get longest common path prefix    |
+| `isabs(path)`          | Check if path is absolute         |
+| `getsize(path)`        | Get file size in bytes            |
+| `getmtime(path)`       | Get last modification time        |
 
 ## Security
 

@@ -17,7 +17,8 @@ The `wait_for` library is available by default in the scriptling-cli.
 | `dir(path, timeout=30, poll_rate=1)`  | Wait for directory to exist             |
 | `port(host, port, timeout=30, ...)`   | Wait for TCP port to accept connections |
 | `http(url, timeout=30, ...)`          | Wait for HTTP endpoint to return 200    |
-| `tcp(host, port, timeout=30, ...)`    | Wait for TCP connection                 |
+| `file_content(path, content, ...)`    | Wait for file to contain content        |
+| `process_name(name, timeout=30, ...)` | Wait for process to be running          |
 
 ## Functions
 
