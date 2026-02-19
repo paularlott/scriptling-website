@@ -12,6 +12,7 @@ Scriptling-specific libraries that provide functionality not available in Python
 |---------|-------------|
 | [scriptling.ai](ai/) | AI and LLM functions for OpenAI-compatible APIs |
 | [scriptling.ai.agent](agent/) | Agentic AI loop with automatic tool execution |
+| [scriptling.ai.agent.interact](interact/) | Interactive terminal interface for AI agents |
 
 ## MCP Protocol
 
@@ -35,6 +36,7 @@ Scriptling-specific libraries that provide functionality not available in Python
 |---------|-------------|
 | [scriptling.console](console/) | Console input/output functions |
 | [scriptling.toon](toon/) | TOON (Token-Oriented Object Notation) encoding/decoding |
+| [scriptling.fuzzy](fuzzy/) | Fuzzy string matching utilities |
 
 ## Usage
 

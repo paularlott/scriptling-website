@@ -117,11 +117,11 @@ The `object.Kwargs` type provides convenient helper methods:
 
 | Method | Description |
 |--------|-------------|
-| `GetString(name, default) (string, error)` | Extract string, return default if missing |
-| `GetInt(name, default) (int64, error)` | Extract int (accepts Integer/Float) |
-| `GetFloat(name, default) (float64, error)` | Extract float (accepts Integer/Float) |
-| `GetBool(name, default) (bool, error)` | Extract bool |
-| `GetList(name, default) ([]Object, error)` | Extract list elements |
+| `GetString(name, default) (string, Object)` | Extract string, return default if missing |
+| `GetInt(name, default) (int64, Object)` | Extract int (accepts Integer/Float) |
+| `GetFloat(name, default) (float64, Object)` | Extract float (accepts Integer/Float) |
+| `GetBool(name, default) (bool, Object)` | Extract bool |
+| `GetList(name, default) ([]Object, Object)` | Extract list elements |
 | `Has(name) bool` | Check if key exists |
 | `Keys() []string` | Get all keys |
 | `Len() int` | Get number of kwargs |
@@ -170,12 +170,14 @@ p.RegisterFunc("add_tax", func(ctx context.Context, kwargs object.Kwargs, args .
 
 | Method | Description |
 |--------|-------------|
-| `AsString() (string, error)` | Extract string value |
-| `AsInt() (int64, error)` | Extract integer (floats truncate) |
-| `AsFloat() (float64, error)` | Extract float (ints convert automatically) |
-| `AsBool() (bool, error)` | Extract boolean |
-| `AsList() ([]Object, error)` | Extract list/tuple elements (returns a copy) |
-| `AsDict() (map[string]Object, error)` | Extract dict as map (keys are human-readable strings) |
+| `AsString() (string, Object)` | Extract string value |
+| `AsInt() (int64, Object)` | Extract integer (floats truncate) |
+| `AsFloat() (float64, Object)` | Extract float (ints convert automatically) |
+| `AsBool() (bool, Object)` | Extract boolean |
+| `AsList() ([]Object, Object)` | Extract list/tuple elements (returns a copy) |
+| `AsDict() (map[string]Object, Object)` | Extract dict as map (keys are human-readable strings) |
+
+> **Note:** The second return value is `nil` on success, or an `*Error` object on failure. You can check for errors like `if err != nil { ... }`.
 
 ### Coercion Methods
 
