@@ -18,14 +18,18 @@ import scriptling.console as console
 
 | Function | Description |
 |----------|-------------|
+| `input([prompt])` | Read a line from input |
 | `print(*args)` | Write a message to the output area |
+| `print_as(label, *args)` | Write a message with a custom label |
 | `clear_output()` | Clear the output area |
 | `stream_start()` | Begin a streaming message |
+| `stream_start_as(label)` | Begin a streaming message with a custom label |
 | `stream_chunk(text)` | Append a chunk to the current stream |
 | `stream_end()` | Finalise the current stream |
 | `spinner_start([text])` | Show a spinner |
 | `spinner_stop()` | Hide the spinner |
 | `set_progress(label, pct)` | Set progress bar (0.0–1.0, or <0 to clear) |
+| `set_labels(user, assistant, system)` | Set default role labels; empty string leaves label unchanged |
 | `set_status(left, right)` | Set both status bar texts |
 | `set_status_left(text)` | Set left status bar text only |
 | `set_status_right(text)` | Set right status bar text only |
@@ -38,8 +42,9 @@ import scriptling.console as console
 ## Output
 
 ```python
-console.print("Hello", "world")   # adds a message to the output area
-console.clear_output()             # clears all messages
+console.print("Hello", "world")          # adds a message to the output area
+console.print_as("Tool", "result here")  # message with a custom label
+console.clear_output()                    # clears all messages
 ```
 
 ## Streaming
@@ -47,7 +52,8 @@ console.clear_output()             # clears all messages
 Use streaming to display text as it arrives (e.g. LLM token output).
 
 ```python
-console.stream_start()
+console.stream_start()                    # default label
+console.stream_start_as("Assistant")      # custom label
 for chunk in response_chunks:
     console.stream_chunk(chunk)
 console.stream_end()
@@ -103,19 +109,29 @@ console.on_escape(lambda: console.spinner_stop())
 console.run()  # blocks until /exit or Ctrl+C
 ```
 
+## Labels
+
+Set the display labels used for user, assistant, and system messages:
+
+```python
+console.set_labels("You", "Assistant", "")  # empty string leaves that label unchanged
+```
+
 ## Plain fallback behaviour
 
 When no TUI backend is registered:
 
 | Function | Behaviour |
 |----------|-----------|
-| `print` | Writes to stdout |
-| `stream_start/chunk/end` | Buffer chunks, print on `stream_end` |
-| `spinner_start/stop` | Print `text...` / newline |
-| `set_progress` | Print `label: N%` on change |
-| `set_status / set_status_left / set_status_right` | No-op |
-| `register_command / remove_command` | No-op |
-| `on_submit / on_escape` | No-op |
+| `input` | Reads a line from stdin |
+| `print` / `print_as` | Writes to stdout |
+| `stream_start` / `stream_start_as` / `stream_chunk` / `stream_end` | No-op |
+| `spinner_start` / `spinner_stop` | No-op |
+| `set_progress` | No-op |
+| `set_labels` | No-op |
+| `set_status` / `set_status_left` / `set_status_right` | No-op |
+| `register_command` / `remove_command` | No-op |
+| `on_submit` / `on_escape` | No-op |
 | `clear_output` | No-op |
 | `run` | Returns immediately |
 
@@ -141,12 +157,15 @@ The `ConsoleBackend` interface:
 type ConsoleBackend interface {
     Input(prompt string, env *object.Environment) (string, error)
     Print(text string, env *object.Environment)
+    PrintAs(label, text string, env *object.Environment)
     StreamStart()
+    StreamStartAs(label string)
     StreamChunk(chunk string)
     StreamEnd()
     SpinnerStart(text string)
     SpinnerStop()
     SetProgress(label string, pct float64)
+    SetLabels(user, assistant, system string)
     SetStatus(left, right string)
     SetStatusLeft(left string)
     SetStatusRight(right string)
