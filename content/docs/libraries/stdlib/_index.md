@@ -10,6 +10,7 @@ Built-in libraries available for import without any registration.
 
 | Library | Description |
 |---------|-------------|
+| [contextlib](contextlib/) | Utilities for the `with` statement (`suppress`) |
 | [json](json/) | Parse and generate JSON data |
 | [io](io/) | In-memory I/O streams (StringIO) |
 | [base64](base64/) | Base64 encoding and decoding |
