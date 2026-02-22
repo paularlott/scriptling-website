@@ -446,7 +446,7 @@ print(str(Cat("Whiskers"))) # Cat(Whiskers)
 
 ## Decorators
 
-`@property` and `@staticmethod` are supported. `@classmethod` is not.
+`@property`, `@staticmethod`, and `@classmethod` are supported.
 
 ### `@property`
 
@@ -538,6 +538,51 @@ m = MathHelper()
 print(m.square(5))           # 25  — called on instance
 ```
 
+### `@classmethod`
+
+A method that receives the class (`cls`) as its first argument instead of the instance. Useful for factory methods and accessing class-level state:
+
+```python
+class Date:
+    def __init__(self, year, month, day):
+        self.year = year
+        self.month = month
+        self.day = day
+
+    @classmethod
+    def from_string(cls, s):
+        parts = s.split("-")
+        return cls(int(parts[0]), int(parts[1]), int(parts[2]))
+
+d = Date.from_string("2024-03-15")
+print(d.year)   # 2024
+print(d.month)  # 3
+```
+
+With inheritance, `cls` refers to the actual subclass:
+
+```python
+class Animal:
+    @classmethod
+    def create(cls):
+        return cls()  # creates an instance of the subclass
+
+class Dog(Animal):
+    def kind(self):
+        return "dog"
+
+d = Dog.create()   # creates a Dog, not an Animal
+print(d.kind())    # "dog"
+```
+
+Class methods can be called on both the class and instances:
+
+```python
+Date.from_string("2024-01-01")  # called on class
+d = Date(2024, 1, 1)
+d.from_string("2024-06-15")     # called on instance — cls is still Date
+```
+
 ### Custom function decorators
 
 Any callable can be used as a decorator:
@@ -609,10 +654,6 @@ Only single inheritance is supported:
 class C(A, B):  # Error: multiple inheritance
     pass
 ```
-
-### No `@classmethod`
-
-`@classmethod` is not supported. Use `@staticmethod` or a module-level factory function instead.
 
 ## Example: Complete Class
 

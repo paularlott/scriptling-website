@@ -56,6 +56,114 @@ import re
 pattern = r"\d+\.\d+"  # Matches decimal numbers
 ```
 
+## F-Strings
+
+F-strings (formatted string literals) embed expressions directly in strings using `{expr}` syntax:
+
+```python
+name = "Alice"
+age = 30
+pi = 3.14159
+
+# Basic expression embedding
+greeting = f"Hello, {name}! You are {age} years old."
+
+# Arithmetic in expressions
+result = f"Sum: {2 + 2}, Product: {3 * 4}"
+
+# Method calls
+upper = f"Name: {name.upper()}"
+```
+
+### Format Specifiers
+
+F-strings support Python's full format spec mini-language: `f"{value:[[fill]align][sign][0][width][,][.precision][type]}"`
+
+#### Alignment
+
+| Spec | Meaning | Example | Result |
+|------|---------|---------|--------|
+| `<width` | Left-align | `f"{'hi':<10}"` | `"hi        "` |
+| `>width` | Right-align | `f"{'hi':>10}"` | `"        hi"` |
+| `^width` | Center | `f"{'hi':^10}"` | `"    hi    "` |
+| `fill<width` | Left-align with fill | `f"{'hi':*<10}"` | `"hi********"` |
+| `fill>width` | Right-align with fill | `f"{'hi':*>10}"` | `"********hi"` |
+| `fill^width` | Center with fill | `f"{'hi':*^10}"` | `"****hi****"` |
+
+#### Sign
+
+| Spec | Meaning | Example | Result |
+|------|---------|---------|--------|
+| `+` | Always show sign | `f"{42:+d}"` | `"+42"` |
+| `-` | Only show for negative (default) | `f"{42:-d}"` | `"42"` |
+| ` ` | Space for positive | `f"{42: d}"` | `" 42"` |
+
+#### Integer Types
+
+| Spec | Meaning | Example | Result |
+|------|---------|---------|--------|
+| `d` | Decimal | `f"{255:d}"` | `"255"` |
+| `x` | Hex lowercase | `f"{255:x}"` | `"ff"` |
+| `X` | Hex uppercase | `f"{255:X}"` | `"FF"` |
+| `o` | Octal | `f"{8:o}"` | `"10"` |
+| `b` | Binary | `f"{10:b}"` | `"1010"` |
+| `08x` | Zero-padded hex | `f"{255:08x}"` | `"000000ff"` |
+| `010d` | Zero-padded decimal | `f"{42:010d}"` | `"0000000042"` |
+| `,` | Thousands separator | `f"{1234567:,}"` | `"1,234,567"` |
+
+#### Float Types
+
+| Spec | Meaning | Example | Result |
+|------|---------|---------|--------|
+| `.2f` | Fixed 2 decimal places | `f"{3.14159:.2f}"` | `"3.14"` |
+| `10.2f` | Width + precision | `f"{3.14:10.2f}"` | `"      3.14"` |
+| `,.2f` | Thousands + precision | `f"{1234.5:,.2f}"` | `"1,234.50"` |
+| `.2e` | Scientific notation | `f"{12345:.2e}"` | `"1.23e+04"` |
+| `.2E` | Scientific uppercase | `f"{12345:.2E}"` | `"1.23E+04"` |
+| `.3g` | General (shorter of f/e) | `f"{0.00012:.3g}"` | `"0.00012"` |
+| `.1%` | Percentage | `f"{0.75:.1%}"` | `"75.0%"` |
+| `+.2f` | Always show sign | `f"{3.14:+.2f}"` | `"+3.14"` |
+
+#### String Types
+
+| Spec | Meaning | Example | Result |
+|------|---------|---------|--------|
+| `.5` | Truncate to 5 chars | `f"{'hello world':.5}"` | `"hello"` |
+| `.5s` | Truncate (explicit) | `f"{'hello world':.5s}"` | `"hello"` |
+| `<20` | Left-align in 20 chars | `f"{'hi':<20}"` | `"hi                  "` |
+| `>20` | Right-align in 20 chars | `f"{'hi':>20}"` | `"                  hi"` |
+
+#### Combining Specifiers
+
+```python
+# Date formatting
+year, month, day = 2024, 3, 5
+date = f"{year:04d}-{month:02d}-{day:02d}"  # "2024-03-05"
+
+# Table formatting
+for name, score in [("Alice", 95.5), ("Bob", 87.3)]:
+    print(f"{name:<10} {score:6.1f}")
+# Alice       95.5
+# Bob         87.3
+
+# Financial formatting
+amount = 1234567.89
+print(f"Total: ${amount:,.2f}")  # "Total: $1,234,567.89"
+
+# Hex dump
+for byte in [0, 127, 255]:
+    print(f"0x{byte:02x}")  # "0x00", "0x7f", "0xff"
+```
+
+### Escaped Braces
+
+Use `{{` and `}}` to include literal braces:
+
+```python
+name = "world"
+result = f"{{hello}} {name}"  # "{hello} world"
+```
+
 ## Case Sensitivity
 
 - **Keywords**: lowercase (`if`, `while`, `def`, `return`, `for`, `in`, `not`, `and`, `or`)

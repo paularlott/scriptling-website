@@ -372,6 +372,36 @@ match data:
         print(f"Name: {name}, Age: {age}")
 ```
 
+### OR Patterns
+
+Match multiple values in a single case using `|`:
+
+```python
+match status:
+    case 200 | 201 | 204:
+        print("Success")
+    case 400 | 401 | 403:
+        print("Client error")
+    case 500 | 502 | 503:
+        print("Server error")
+    case _:
+        print("Other")
+
+# OR patterns with strings
+match day:
+    case "Saturday" | "Sunday":
+        print("Weekend")
+    case _:
+        print("Weekday")
+
+# OR patterns with guards
+match x:
+    case 1 | 2 | 3 if x > 1:
+        print("small and > 1")
+    case 1 | 2 | 3:
+        print("small")
+```
+
 ## Nested Loops
 
 ```python
@@ -407,6 +437,23 @@ evens = [x for x in range(10) if x % 2 == 0]  # [0, 2, 4, 6, 8]
 
 # With transformation
 uppercased = [s.upper() for s in ["hello", "world"]]
+```
+
+### Dict Comprehensions
+
+```python
+# Basic dict comprehension
+squares = {x: x * x for x in range(5)}  # {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}
+
+# With condition
+even_squares = {x: x * x for x in range(10) if x % 2 == 0}
+
+# Invert a dictionary
+original = {"a": 1, "b": 2, "c": 3}
+inverted = {v: k for k, v in original.items()}  # {1: "a", 2: "b", 3: "c"}
+
+# Transform values
+doubled = {k: v * 2 for k, v in original.items()}  # {"a": 2, "b": 4, "c": 6}
 ```
 
 ## See Also

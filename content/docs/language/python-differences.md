@@ -14,16 +14,13 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 |---------|-------|
 | `async`/`await` | Asynchronous programming is not supported |
 | Generators with `yield` | Generator functions are not supported |
-| Dictionary comprehensions | Only list comprehensions are supported |
 | Type annotations | Type hints like `def func(x: int) -> str:` are not parsed |
 | Walrus operator (`:=`) | Assignment expressions are not supported |
 | Parameter separators (`/` and `*`) | Positional-only and keyword-only parameter syntax |
-| Decorators | `@decorator` syntax is not supported |
 | Multiple inheritance | Only single inheritance is supported |
 | Nested classes | Classes cannot be defined inside other classes/functions |
 | Metaclasses | Custom metaclasses are not supported |
 | Descriptors | The descriptor protocol is not implemented |
-| Property decorators | `@property`, `@staticmethod`, `@classmethod` |
 | Arithmetic operator overloading | `__add__`, `__sub__`, `__mul__`, etc. are not supported |
 
 ### Built-in Functions NOT Supported
@@ -84,7 +81,7 @@ Scriptling **does support**:
 - ✅ Classes with single inheritance and `super()`
 - ✅ Dunder methods: `__str__`, `__repr__`, `__len__`, `__bool__`, `__eq__`, `__lt__`, `__gt__`, `__le__`, `__ge__`, `__ne__`, `__contains__`, `__iter__`, `__next__`, `__enter__`, `__exit__`
 - ✅ Lambda functions and closures
-- ✅ List comprehensions
+- ✅ List comprehensions and dict comprehensions
 - ✅ Iterators (`range`, `map`, `filter`, `enumerate`, `zip`)
 - ✅ Dictionary views (`keys()`, `values()`, `items()`)
 - ✅ F-strings and `.format()`
@@ -107,6 +104,9 @@ Scriptling **does support**:
 - ✅ Context managers (`with` / `as`, `__enter__` / `__exit__`)
 - ✅ String methods (most Python string methods)
 - ✅ List, dict, set methods (most Python methods)
+- ✅ `@property`, `@staticmethod`, `@classmethod` decorators
+- ✅ `for/else` and `while/else`
+- ✅ `match`/`case` with OR patterns (`case 1 | 2 | 3:`)
 
 ## Key Behavioral Differences
 
