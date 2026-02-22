@@ -25,7 +25,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Metaclasses | Custom metaclasses are not supported |
 | Descriptors | The descriptor protocol is not implemented |
 | Property decorators | `@property`, `@staticmethod`, `@classmethod` |
-| Operator overloading | Magic methods like `__add__`, `__eq__` (except `__init__`) |
+| Arithmetic operator overloading | `__add__`, `__sub__`, `__mul__`, etc. are not supported |
 
 ### Built-in Functions NOT Supported
 
@@ -83,6 +83,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 Scriptling **does support**:
 
 - ✅ Classes with single inheritance and `super()`
+- ✅ Dunder methods: `__str__`, `__repr__`, `__len__`, `__bool__`, `__eq__`, `__lt__`, `__gt__`, `__le__`, `__ge__`, `__ne__`, `__contains__`, `__iter__`, `__next__`
 - ✅ Lambda functions and closures
 - ✅ List comprehensions
 - ✅ Iterators (`range`, `map`, `filter`, `enumerate`, `zip`)
