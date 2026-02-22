@@ -81,16 +81,11 @@ result, err := p.Eval(script)
 ### Script Files
 
 ```go
-import "os"
-
-// Read and execute script file
-content, err := os.ReadFile("script.py")
-if err != nil {
-    log.Fatal(err)
-}
-
-result, err := p.Eval(string(content))
+// Read and execute a script file
+result, err := p.EvalFile("script.py")
 ```
+
+Error messages from `EvalFile` include the filename automatically.
 
 ## Variable Exchange
 
@@ -144,6 +139,29 @@ if items, err := p.GetVarAsList("items"); err == nil {
         fmt.Printf("items[%d] = %s\n", i, item.Inspect())
     }
 }
+
+// Sets
+if s, err := p.GetVarAsSet("my_set"); err == nil {
+    fmt.Printf("set has %d elements\n", len(s.Elements))
+}
+
+// Tuples
+if elems, err := p.GetVarAsTuple("my_tuple"); err == nil {
+    for i, el := range elems {
+        fmt.Printf("tuple[%d] = %s\n", i, el.Inspect())
+    }
+}
+```
+
+### Inspect and Modify the Environment
+
+```go
+// List all variable names (sorted, excludes internals)
+names := p.ListVars()
+fmt.Println("Variables:", names)
+
+// Remove a variable
+p.UnsetVar("temp_result")
 ```
 
 ### Raw Object Access
@@ -273,6 +291,27 @@ data = json.dumps({"numbers": [1, 2, 3]})
 result = math.sqrt(16)
 `)
 ```
+
+### Cloning Interpreters
+
+Create an isolated interpreter that shares library registrations but has a fresh environment. Useful for per-request or multi-tenant isolation:
+
+```go
+// Set up a template interpreter once
+template := scriptling.New()
+stdlib.RegisterAll(template)
+template.RegisterScriptLibrary("mylib", myLibScript)
+
+// Per-request: clone gives a fresh env with the same libraries available
+handler := func(w http.ResponseWriter, r *http.Request) {
+    p := template.Clone()
+    p.SetVar("request_id", r.Header.Get("X-Request-ID"))
+    result, err := p.EvalFile("handler.py")
+    // ...
+}
+```
+
+Each clone re-evaluates script libraries on first import, so no mutable state (counters, caches) is shared between clones.
 
 ### On-Demand Library Loading
 
