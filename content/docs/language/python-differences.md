@@ -19,7 +19,6 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Walrus operator (`:=`) | Assignment expressions are not supported |
 | Parameter separators (`/` and `*`) | Positional-only and keyword-only parameter syntax |
 | Decorators | `@decorator` syntax is not supported |
-| Context managers (`with`) | The `with` statement is not implemented |
 | Multiple inheritance | Only single inheritance is supported |
 | Nested classes | Classes cannot be defined inside other classes/functions |
 | Metaclasses | Custom metaclasses are not supported |
@@ -83,7 +82,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 Scriptling **does support**:
 
 - ✅ Classes with single inheritance and `super()`
-- ✅ Dunder methods: `__str__`, `__repr__`, `__len__`, `__bool__`, `__eq__`, `__lt__`, `__gt__`, `__le__`, `__ge__`, `__ne__`, `__contains__`, `__iter__`, `__next__`
+- ✅ Dunder methods: `__str__`, `__repr__`, `__len__`, `__bool__`, `__eq__`, `__lt__`, `__gt__`, `__le__`, `__ge__`, `__ne__`, `__contains__`, `__iter__`, `__next__`, `__enter__`, `__exit__`
 - ✅ Lambda functions and closures
 - ✅ List comprehensions
 - ✅ Iterators (`range`, `map`, `filter`, `enumerate`, `zip`)
@@ -105,6 +104,7 @@ Scriptling **does support**:
 - ✅ Bitwise operators (`&`, `|`, `^`, `~`, `<<`, `>>`)
 - ✅ Boolean operators with short-circuit evaluation
 - ✅ Assert statements (`assert condition, "message"`)
+- ✅ Context managers (`with` / `as`, `__enter__` / `__exit__`)
 - ✅ String methods (most Python string methods)
 - ✅ List, dict, set methods (most Python methods)
 
@@ -199,7 +199,7 @@ except:
 
 ### From Python to Scriptling
 
-1. **Replace `open()` with `os` library**:
+1. **Replace `open()` with `os` library** (`with` works for custom context managers, but there is no built-in `open()`):
    ```python
    # Python
    with open("file.txt") as f:

@@ -197,6 +197,63 @@ class Placeholder:
     pass
 ```
 
+## With Statement (Context Managers)
+
+The `with` statement calls `__enter__` on entry and guarantees `__exit__` is called on exit, even if an exception is raised:
+
+```python
+with some_resource() as r:
+    r.do_something()
+# __exit__ is called here automatically
+```
+
+### Implementing a Context Manager
+
+```python
+class ManagedConnection:
+    def __init__(self, host):
+        self.host = host
+        self.conn = None
+
+    def __enter__(self):
+        self.conn = connect(self.host)
+        return self.conn
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.conn:
+            self.conn.close()
+        return False  # don't suppress exceptions
+
+with ManagedConnection("localhost") as conn:
+    conn.send(data)
+# conn.close() is called automatically
+```
+
+### Suppressing Exceptions
+
+If `__exit__` returns a truthy value, the exception is suppressed:
+
+```python
+class Suppress:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return True  # suppress any exception
+
+with Suppress():
+    raise ValueError("ignored")  # suppressed
+print("continues here")
+```
+
+### Without `as` Binding
+
+```python
+with lock_resource():
+    do_critical_work()
+# resource released even if do_critical_work() raises
+```
+
 ## Assert Statement
 
 Assert statements verify conditions and raise an `AssertionError` if the condition is falsy:

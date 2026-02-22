@@ -230,7 +230,17 @@ except IndexError:
     item = None
 ```
 
-### Resource Cleanup with Finally
+### Resource Cleanup with Finally (or `with`)
+
+Use `with` when the resource implements `__enter__`/`__exit__`:
+
+```python
+with open_connection() as conn:
+    process(conn)
+# __exit__ called automatically — no finally needed
+```
+
+Fall back to `try/finally` when no context manager is available:
 
 ```python
 file = None
@@ -240,7 +250,6 @@ try:
 except Exception as e:
     print("Error: " + str(e))
 finally:
-    # Always cleanup, even if exception occurred
     if file:
         file.close()
 ```
