@@ -150,6 +150,22 @@ isinstance(None, "NoneType")  # True
 isinstance((1, 2), "tuple")   # True
 ```
 
+### issubclass()
+
+Check if a class is a subclass of another:
+
+```python
+class Animal:
+    pass
+
+class Dog(Animal):
+    pass
+
+issubclass(Dog, Animal)    # True
+issubclass(Animal, Animal) # True (a class is a subclass of itself)
+issubclass(Animal, Dog)    # False
+```
+
 ### callable()
 
 Check if a value can be called as a function:
@@ -398,6 +414,62 @@ all([True, True, True])           # True
 all([True, False, True])          # False
 ```
 
+## Iterator Protocol
+
+`iter()` and `next()` expose the iterator protocol directly, enabling manual iteration and working with custom iterable classes.
+
+```python
+# iter() — create an iterator from any iterable
+it = iter([10, 20, 30])
+next(it)   # 10
+next(it)   # 20
+next(it)   # 30
+
+# next() with a default — no exception on exhaustion
+next(it, "done")   # "done"
+
+# next() without default raises StopIteration when exhausted
+try:
+    next(it)
+except StopIteration:
+    print("exhausted")
+
+# iter() works on lists, tuples, strings, sets, dicts, and
+# instances with __iter__ or __next__
+it = iter("abc")
+next(it)   # "a"
+
+# Manual iteration pattern
+data = [1, 2, 3]
+it = iter(data)
+while True:
+    val = next(it, None)
+    if val is None:
+        break
+    print(val)
+
+# Custom iterable class
+class Counter:
+    def __init__(self, n):
+        self.n = n
+        self.i = 0
+    def __iter__(self):
+        return self
+    def __next__(self):
+        if self.i >= self.n:
+            raise StopIteration()
+        v = self.i
+        self.i = self.i + 1
+        return v
+
+for x in Counter(3):   # works in for loops too
+    print(x)           # 0, 1, 2
+
+it = iter(Counter(2))
+next(it)   # 0
+next(it)   # 1
+```
+
 ## Range Function
 
 ```python
@@ -423,6 +495,77 @@ print("Hello", name)               # Multiple arguments
 print("Hello", "World", sep="-")   # Custom separator: Hello-World
 
 input("Prompt: ")                  # Read user input (returns string)
+```
+
+## Introspection
+
+### dir()
+
+Returns a sorted list of names for an object:
+
+```python
+# No argument: all builtin names
+names = dir()          # ["abs", "all", "any", ...]
+
+# Instance: fields + methods (including inherited)
+class Dog:
+    def __init__(self, name):
+        self.name = name
+    def bark(self):
+        return "woof"
+
+d = Dog("Rex")
+dir(d)   # ["bark", "name", ...]
+
+# Class: method names
+dir(Dog)   # ["bark", "__init__"]
+
+# Dict: key names
+dir({"x": 1, "y": 2})   # ["x", "y"]
+```
+
+## Copying
+
+### copy()
+
+Returns a shallow copy of an object. Nested objects are not copied — use `copy.deepcopy()` from the `copy` library for that.
+
+```python
+# List copy — mutations don't affect the original
+original = [1, 2, 3]
+c = copy(original)
+c.append(4)
+len(original)   # 3
+len(c)          # 4
+
+# Dict copy
+d = {"a": 1}
+dc = copy(d)
+dc["b"] = 2
+len(d)    # 1
+len(dc)   # 2
+
+# Set copy
+s = set([1, 2, 3])
+sc = copy(s)
+sc.add(4)
+len(s)    # 3
+len(sc)   # 4
+
+# Instance copy — fields are copied, class is shared
+class Box:
+    def __init__(self, v):
+        self.v = v
+
+b = Box(10)
+c = copy(b)
+c.v = 99
+b.v   # 10 (unchanged)
+c.v   # 99
+
+# Tuples and scalars are returned as-is (immutable)
+copy((1, 2, 3))   # (1, 2, 3)
+copy(42)          # 42
 ```
 
 ## See Also
