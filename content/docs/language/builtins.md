@@ -25,10 +25,21 @@ str({"a": 1}) # '{"a": 1}'
 Convert to integer:
 
 ```python
-int("42")     # 42
-int(3.14)     # 3 (truncates toward zero)
-int(-3.9)     # -3 (truncates toward zero)
-int(42)       # 42 (no change)
+int("42")        # 42
+int(3.14)        # 3 (truncates toward zero)
+int(-3.9)        # -3 (truncates toward zero)
+int(42)          # 42 (no change)
+```
+
+Optional `base` argument (2–36) for base conversion from a string:
+
+```python
+int("ff", 16)    # 255
+int("0xff", 16)  # 255 (0x prefix stripped automatically)
+int("1010", 2)   # 10
+int("0b1010", 2) # 10 (0b prefix stripped automatically)
+int("77", 8)     # 63
+int("z", 36)     # 35
 ```
 
 ### float()
