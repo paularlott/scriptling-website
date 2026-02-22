@@ -197,6 +197,33 @@ class Placeholder:
     pass
 ```
 
+## Assert Statement
+
+Assert statements verify conditions and raise an `AssertionError` if the condition is falsy:
+
+```python
+# Basic assert
+assert condition
+
+# Assert with message
+assert condition, "message if condition is false"
+
+# Examples
+x = 10
+assert x > 0, "x must be positive"
+assert isinstance(x, int), f"expected int, got {type(x)}"
+assert len(results) > 0, "no results returned"
+```
+
+The message is only evaluated when the assertion fails. `AssertionError` is catchable by `try/except`:
+
+```python
+try:
+    assert value > 0, "must be positive"
+except:
+    print("assertion failed")
+```
+
 ## Match Statement
 
 Pattern matching for cleaner conditional logic:
@@ -329,3 +356,4 @@ uppercased = [s.upper() for s in ["hello", "world"]]
 
 - [Functions](./functions/) - Function definitions and parameters
 - [Operators](./operators/) - Comparison and boolean operators
+- [Error Handling](./error-handling/) - Try/except and raise

@@ -89,7 +89,7 @@ Scriptling **does support**:
 - ✅ Dictionary views (`keys()`, `values()`, `items()`)
 - ✅ F-strings and `.format()`
 - ✅ True division (`/` always returns float)
-- ✅ Set literals and set operations
+- ✅ Set literals `{1, 2, 3}` and set operations
 - ✅ Try/except/finally error handling
 - ✅ Multiple assignment and tuple unpacking
 - ✅ Extended unpacking with `*`
@@ -103,7 +103,7 @@ Scriptling **does support**:
 - ✅ `in` and `not in` operators
 - ✅ Bitwise operators (`&`, `|`, `^`, `~`, `<<`, `>>`)
 - ✅ Boolean operators with short-circuit evaluation
-- ✅ Match/case statements (simplified pattern matching)
+- ✅ Assert statements (`assert condition, "message"`)
 - ✅ String methods (most Python string methods)
 - ✅ List, dict, set methods (most Python methods)
 

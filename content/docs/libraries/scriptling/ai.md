@@ -567,6 +567,32 @@ while True:
             print(delta.content, end="")
 ```
 
+## ResponseStream Class
+
+Returned by `client.response_stream()`. Iterates over SSE events from the Responses API.
+
+### stream.next()
+
+Advances to the next SSE event and returns it as a dict, or `None` when the stream is complete.
+
+**Returns:** dict - Event dict with a `type` field plus event-specific fields, or null if complete
+
+**Example:**
+
+```python
+import scriptling.ai as ai
+
+client = ai.Client("", api_key="sk-...")
+stream = client.response_stream("gpt-4o", "Hello!")
+while True:
+    event = stream.next()
+    if event is None:
+        break
+    if event.type == "response.output_text.delta":
+        print(event.delta, end="")
+print()
+```
+
 ### client.models()
 
 Lists all models available for this client configuration.
@@ -641,6 +667,63 @@ Retrieves a previously created response by its ID.
 client = ai.Client("", api_key="sk-...")
 response = client.response_get("resp_123")
 print(response.status)
+```
+
+### client.response_stream(model, input, \*\*kwargs)
+
+Streams a response using the OpenAI Responses API, returning a `ResponseStream` object that yields SSE events.
+
+**Parameters:**
+
+- `model` (str): Model identifier (e.g., "gpt-4o", "gpt-4")
+- `input` (str or list): Either a string (user message content) or a list of input items
+- `system_prompt` (str, optional): System prompt to use when input is a string
+
+**Returns:** ResponseStream - A stream object with a `next()` method
+
+**Event types:**
+
+| Event type | Key fields |
+| --- | --- |
+| `response.created` | `response` |
+| `response.output_item.added` | `item`, `output_index` |
+| `response.output_text.delta` | `delta`, `item_id`, `output_index`, `content_index` |
+| `response.output_text.done` | `text`, `item_id`, `output_index`, `content_index` |
+| `response.completed` | `response` (full ResponseObject) |
+| `error` | `message` |
+
+**Examples:**
+
+```python
+import scriptling.ai as ai
+
+client = ai.Client("", api_key="sk-...")
+
+# Stream text deltas
+stream = client.response_stream("gpt-4o", "Count to 5")
+while True:
+    event = stream.next()
+    if event is None:
+        break
+    if event.type == "response.output_text.delta":
+        print(event.delta, end="")
+print()
+
+# With system prompt
+stream = client.response_stream("gpt-4o", "Explain AI", system_prompt="You are a helpful assistant")
+# ... iterate as above
+
+# Access the completed response object
+final_response = None
+stream = client.response_stream("gpt-4o", "Hello!")
+while True:
+    event = stream.next()
+    if event is None:
+        break
+    if event.type == "response.completed":
+        final_response = event.response
+if final_response:
+    print(final_response.status)
 ```
 
 ### client.response_cancel(id)
