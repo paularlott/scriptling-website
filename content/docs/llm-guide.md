@@ -38,6 +38,7 @@ When generating Scriptling code:
 
 ## Key Differences from Python
 
+- **No `del` Statement**: Use slice assignment instead — e.g. `lst = lst[:n]` rather than `del lst[n:]`
 - **No Nested Classes**: Classes must be defined at the top level of a module
 - **Single Inheritance Only**: Multiple inheritance is not supported
 - **HTTP Response Format**: Response object with `status_code`, `body`, `text`, `headers`, `url` fields

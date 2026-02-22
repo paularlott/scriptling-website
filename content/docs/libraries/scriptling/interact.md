@@ -42,29 +42,23 @@ my_agent.interact()
 
 ## Interactive Commands
 
+Commands are registered with the TUI palette via `console.register_command` when `interact()` is called. Type `/` to open the command palette.
+
 | Command | Description |
 |---------|-------------|
-| `/q` or `exit` | Exit the interactive session |
-| `/c` | Clear conversation history |
+| `/clear` | Clear conversation history |
+| `/model <name>` | Switch model (`none` to reset to default) |
+| `/history` | Show conversation history |
+| `/exit` | Exit (registered by the CLI) |
+| Esc | Cancel the current request |
+
+> **Note:** `scriptling.ai.agent.interact` requires `scriptling.console` to be registered and a TUI backend to be active. It is designed for use with the scriptling CLI.
 
 ## Features
 
-### Color-Coded Output
-
-The interface uses ANSI colors for better readability:
-
-- User prompts in blue
-- AI responses in cyan
-- Thinking blocks in purple
-- Code blocks in gray
-
 ### Thinking Block Extraction
 
-When the AI model outputs thinking/reasoning blocks (using `<think/>` or similar tags), they are automatically extracted and displayed separately.
-
-### Code Formatting
-
-Inline code and code blocks are automatically formatted with distinct colors.
+When the AI model outputs thinking/reasoning blocks (using `<think/>` or similar tags), they are automatically extracted and displayed via `console.stream_start/chunk/end`.
 
 ## Example Session
 
@@ -92,13 +86,11 @@ my_agent.tool("run_python", run_python, "Execute Python code and return the resu
 my_agent.interact()
 ```
 
-Session output:
+Session output (TUI rendering):
 ```
---------------------------------------------------------------------------------
 ❯ Write a function to calculate fibonacci numbers
---------------------------------------------------------------------------------
 
-⏺ Here's a recursive Fibonacci function:
+Here's a recursive Fibonacci function:
 
 def fibonacci(n):
     if n <= 1:
@@ -107,12 +99,8 @@ def fibonacci(n):
 
 Would you like me to test it?
 
---------------------------------------------------------------------------------
-❯ /c
-⏺ Cleared conversation
-
---------------------------------------------------------------------------------
-❯ /q
+❯ /clear
+❯ /exit
 ```
 
 ## Configuration
