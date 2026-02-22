@@ -302,6 +302,56 @@ sorted_v = sorted(versions)
 
 The full set of comparison dunder methods supported: `__eq__`, `__ne__`, `__lt__`, `__gt__`, `__le__`, `__ge__`.
 
+### Arithmetic Dunder Methods
+
+Arithmetic operators can be overloaded via dunder methods:
+
+```python
+class Vec:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __add__(self, other):
+        return Vec(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other):
+        return Vec(self.x - other.x, self.y - other.y)
+
+    def __mul__(self, scalar):
+        return Vec(self.x * scalar, self.y * scalar)
+
+v = Vec(1, 2) + Vec(3, 4)  # Vec(4, 6)
+```
+
+Supported: `__add__`, `__sub__`, `__mul__`, `__truediv__`, `__floordiv__`, `__mod__`.
+
+### `__enter__` and `__exit__`
+
+Enable the `with` statement (context manager protocol):
+
+```python
+class ManagedResource:
+    def __init__(self, name):
+        self.name = name
+
+    def __enter__(self):
+        print("opening", self.name)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print("closing", self.name)
+        return False  # don't suppress exceptions
+
+with ManagedResource("db") as r:
+    print("using", r.name)
+# opening db
+# using db
+# closing db
+```
+
+If `__exit__` returns a truthy value the exception is suppressed.
+
 ### `__contains__`
 
 Enables the `in` operator:
@@ -394,6 +444,144 @@ print(str(Dog("Rex")))      # Animal(Rex)
 print(str(Cat("Whiskers"))) # Cat(Whiskers)
 ```
 
+## Decorators
+
+`@property` and `@staticmethod` are supported. `@classmethod` is not.
+
+### `@property`
+
+Turns a method into a read-only attribute:
+
+```python
+class Circle:
+    def __init__(self, radius):
+        self._radius = radius
+
+    @property
+    def radius(self):
+        return self._radius
+
+    @property
+    def area(self):
+        return 3.14159 * self._radius * self._radius
+
+c = Circle(5)
+print(c.radius)  # 5  — no call parens needed
+print(c.area)    # 78.53975
+```
+
+Add a setter with `@<name>.setter`:
+
+```python
+class Temperature:
+    def __init__(self, celsius):
+        self._celsius = celsius
+
+    @property
+    def celsius(self):
+        return self._celsius
+
+    @celsius.setter
+    def celsius(self, value):
+        if value < -273.15:
+            raise ValueError("below absolute zero")
+        self._celsius = value
+
+    @property
+    def fahrenheit(self):          # read-only — no setter
+        return self._celsius * 9 / 5 + 32
+
+t = Temperature(100)
+print(t.celsius)    # 100
+t.celsius = 0       # calls setter
+print(t.fahrenheit) # 32.0
+# t.fahrenheit = 50  # AttributeError: property is read-only
+```
+
+Properties (with or without setters) are inherited:
+
+```python
+class Shape:
+    def __init__(self, name):
+        self._name = name
+
+    @property
+    def name(self):
+        return self._name
+
+class Square(Shape):
+    def __init__(self, side):
+        super().__init__("square")
+        self._side = side
+
+    @property
+    def perimeter(self):
+        return self._side * 4
+
+sq = Square(3)
+print(sq.name)      # "square"  — inherited property
+print(sq.perimeter) # 12
+```
+
+### `@staticmethod`
+
+A method that receives no `self`. Callable on both the class and instances:
+
+```python
+class MathHelper:
+    @staticmethod
+    def square(x):
+        return x * x
+
+print(MathHelper.square(4))  # 16  — called on class
+m = MathHelper()
+print(m.square(5))           # 25  — called on instance
+```
+
+### Custom function decorators
+
+Any callable can be used as a decorator:
+
+```python
+def log_calls(fn):
+    def wrapper(*args):
+        print("calling", fn.__name__)
+        return fn(*args)
+    return wrapper
+
+@log_calls
+def add(a, b):
+    return a + b
+
+add(1, 2)  # prints "calling add", returns 3
+```
+
+Decorators stack — applied bottom-up (innermost first):
+
+```python
+@outer
+@inner
+def fn(): ...
+# equivalent to: fn = outer(inner(fn))
+```
+
+### Class decorators
+
+Decorators can also be applied to classes:
+
+```python
+def add_greeting(cls):
+    cls.greeting = "hi"
+    return cls
+
+@add_greeting
+class Greeter:
+    pass
+
+g = Greeter()
+print(g.greeting)  # "hi"
+```
+
 ## Limitations
 
 ### No Nested Classes
@@ -422,33 +610,9 @@ class C(A, B):  # Error: multiple inheritance
     pass
 ```
 
-### No Property Decorators
+### No `@classmethod`
 
-`@property`, `@staticmethod`, `@classmethod` are not supported:
-
-```python
-# NOT supported
-class MyClass:
-    @property  # Error
-    def value(self):
-        return self._value
-```
-
-### No Arithmetic Operator Overloading
-
-Arithmetic dunder methods (`__add__`, `__sub__`, `__mul__`, etc.) are not supported. Use regular methods instead:
-
-```python
-# NOT supported
-class Point:
-    def __add__(self, other):  # not supported
-        return Point(self.x + other.x, self.y + other.y)
-
-# Use a regular method instead
-class Point:
-    def add(self, other):
-        return Point(self.x + other.x, self.y + other.y)
-```
+`@classmethod` is not supported. Use `@staticmethod` or a module-level factory function instead.
 
 ## Example: Complete Class
 

@@ -209,6 +209,34 @@ result = func_with_all(*args, **kwargs)
 # {"a": 1, "b": 2, "args": [3, 4], "kwargs": {"x": 10, "y": 20}}
 ```
 
+## Decorators
+
+Decorators wrap a function with another callable using `@` syntax:
+
+```python
+def double_result(fn):
+    def wrapper(*args):
+        return fn(*args) * 2
+    return wrapper
+
+@double_result
+def add(a, b):
+    return a + b
+
+print(add(3, 4))  # 14
+```
+
+Decorators stack — applied bottom-up (innermost first):
+
+```python
+@outer
+@inner
+def fn(): ...
+# equivalent to: fn = outer(inner(fn))
+```
+
+See [Classes](./classes/) for `@property` and `@staticmethod`.
+
 ## Lambda Functions
 
 Anonymous functions for simple operations:

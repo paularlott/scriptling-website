@@ -121,6 +121,55 @@ cb.Method("fetch", func(self *object.Instance, ctx context.Context, kwargs objec
 })
 ```
 
+## Properties and Static Methods
+
+### `Property(name, fn)`
+
+Registers a read-only getter as a `@property`. The getter receives `self` only — do **not** include extra parameters:
+
+```go
+cb.Property("area", func(self *object.Instance) float64 {
+    r, _ := self.Fields["radius"].AsFloat()
+    return math.Pi * r * r
+})
+
+// c = Circle(5)
+// print(c.area)  # no parens needed
+// c.area = 10    # error: property is read-only
+```
+
+### `PropertyWithSetter(name, getter, setter)`
+
+Registers a getter and setter. The setter receives `self` and the new value:
+
+```go
+cb.PropertyWithSetter("radius",
+    func(self *object.Instance) float64 {
+        r, _ := self.Fields["_r"].AsFloat()
+        return r
+    },
+    func(self *object.Instance, v float64) {
+        self.Fields["_r"] = &object.Float{Value: v}
+    },
+)
+
+// c.radius = 10  # calls setter
+// print(c.radius) # calls getter
+```
+
+### `StaticMethod(name, fn)`
+
+Registers a `@staticmethod`. The function does **not** receive `self` — do not include `*object.Instance` as the first parameter:
+
+```go
+cb.StaticMethod("from_degrees", func(deg float64) float64 {
+    return deg * math.Pi / 180
+})
+
+// MyClass.from_degrees(180)  # called on class
+// obj.from_degrees(90)       # also callable on instance
+```
+
 ## Inheritance
 
 Set a base class for inheritance:
@@ -316,6 +365,9 @@ print("Inventory:", status["inventory"])
 |--------|-------------|
 | `Method(name, fn)` | Register a typed Go method |
 | `MethodWithHelp(name, fn, help)` | Register method with help text |
+| `Property(name, fn)` | Register a read-only getter as `@property` |
+| `PropertyWithSetter(name, getter, setter)` | Register a getter+setter `@property` |
+| `StaticMethod(name, fn)` | Register a `@staticmethod` (no `self` parameter) |
 | `BaseClass(base)` | Set base class for inheritance |
 | `Environment(env)` | Set environment (usually not needed) |
 | `Build()` | Create and return the Class |
