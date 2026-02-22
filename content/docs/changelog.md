@@ -7,6 +7,48 @@ nav-skip: true
 
 ## February 2026
 
+{{< version "v0.2.0" >}}
+
+{{< changelog-item "added" >}}
+**Language:**
+
+- `with` statement and context managers
+- Decorators (`@decorator`), `@property`, `@staticmethod`, and `@classmethod`
+- Dunder methods: `__str__`, `__repr__`, `__len__`, `__bool__`, `__eq__`, `__lt__`, `__contains__`, `__iter__`
+- Dict comprehensions (`{k: v for k, v in ...}`)
+- Set literals (`{1, 2, 3}`)
+- `for`/`while` `else` clauses
+- `match` or-patterns
+- `int()` now accepts a base argument for base conversion
+
+**New built-in functions:**
+
+- `next()`, `iter()`, `dir()`, `issubclass()`, `copy()`
+
+**New standard libraries:**
+
+- `io` — `StringIO` for in-memory I/O
+- `contextlib` — `suppress` context manager
+- `difflib` — LCS-based sequence comparison, unified diff, `get_close_matches`
+
+**Go API:**
+
+- `GetVarAsSet(name)` — typed getter for set variables
+- `GetVarAsTuple(name)` — typed getter for tuple variables
+- `EvalFile(path)` — read and evaluate a script file directly
+- `ListVars()` — returns a sorted list of variable names in the current environment
+- `UnsetVar(name)` — remove a variable from the environment
+- `Clone()` — create an isolated interpreter that inherits library registrations but starts with a fresh environment
+- `ClassBuilder` gains `Property`, `PropertyWithSetter`, and `StaticMethod` for registering Go-backed class members
+
+**CLI / TUI:**
+
+- Scripts that use `console.run()` now launch a full TUI automatically; no separate flag needed
+- `console.set_labels()` lets scripts customise the user/assistant labels shown in the TUI
+  {{< /changelog-item >}}
+
+---
+
 {{< version "v0.1.0" >}}
 
 Initial pre-release of Scriptling.
