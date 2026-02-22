@@ -11,6 +11,7 @@ Built-in libraries available for import without any registration.
 | Library | Description |
 |---------|-------------|
 | [json](json/) | Parse and generate JSON data |
+| [io](io/) | In-memory I/O streams (StringIO) |
 | [base64](base64/) | Base64 encoding and decoding |
 | [html](html/) | HTML escaping and unescaping |
 | [math](math/) | Mathematical functions and constants |
