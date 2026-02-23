@@ -4,9 +4,9 @@ linkTitle: console
 weight: 1
 ---
 
-The `scriptling.console` library provides console I/O backed by the TUI when running under the scriptling CLI. It is designed for scripts that want to drive the terminal UI — registering commands, handling submissions, streaming output, and controlling the status bar.
+The `scriptling.console` library provides console I/O with a built-in TUI. Scripts can register handlers, stream output, control the status bar, and call `console.run()` to start the interactive event loop — the TUI starts automatically on demand.
 
-> **Note:** `scriptling.console` requires a TUI backend to be active. It is intended for use with the scriptling CLI. In embedded or headless environments the plain fallback is a no-op for most functions.
+> **Note:** When embedded without the scriptling CLI, `input` and `print` fall back to plain stdin/stdout. All other functions are no-ops unless a custom backend is registered via `SetBackend`.
 
 ## Import
 
@@ -16,26 +16,28 @@ import scriptling.console as console
 
 ## Functions
 
-| Function | Description |
-|----------|-------------|
-| `input([prompt])` | Read a line from input |
-| `print(*args, [label=])` | Write a message to the output area, optionally with a custom label |
-| `clear_output()` | Clear the output area |
-| `stream_start([label=])` | Begin a streaming message, optionally with a custom label |
-| `stream_chunk(text)` | Append a chunk to the current stream |
-| `stream_end()` | Finalise the current stream |
-| `spinner_start([text])` | Show a spinner |
-| `spinner_stop()` | Hide the spinner |
-| `set_progress(label, pct)` | Set progress bar (0.0–1.0, or <0 to clear) |
-| `set_labels(user, assistant, system)` | Set default role labels; empty string leaves label unchanged |
-| `set_status(left, right)` | Set both status bar texts |
-| `set_status_left(text)` | Set left status bar text only |
-| `set_status_right(text)` | Set right status bar text only |
-| `register_command(name, desc, fn)` | Register a slash command with the backend |
-| `remove_command(name)` | Remove a registered slash command |
-| `on_submit(fn)` | Register handler called when user submits input |
-| `on_escape(fn)` | Register a callback for Esc key |
-| `run()` | Start the console event loop (blocks until exit) |
+| Function                              | Description                                                        |
+| ------------------------------------- | ------------------------------------------------------------------ |
+| `input([prompt])`                     | Read a line from input                                             |
+| `print(*args, [label=])`              | Write a message to the output area, optionally with a custom label |
+| `styled(color, text)`                 | Apply a color to text; returns the styled string                   |
+| `clear_output()`                      | Clear the output area                                              |
+| `stream_start([label=])`              | Begin a streaming message, optionally with a custom label          |
+| `stream_chunk(text)`                  | Append a chunk to the current stream                               |
+| `stream_end()`                        | Finalise the current stream                                        |
+| `spinner_start([text])`               | Show a spinner                                                     |
+| `spinner_stop()`                      | Hide the spinner                                                   |
+| `set_progress(label, pct)`            | Set progress bar (0.0–1.0, or <0 to clear)                         |
+| `set_labels(user, assistant, system)` | Set default role labels; empty string leaves label unchanged       |
+| `set_status(left, right)`             | Set both status bar texts                                          |
+| `set_status_left(text)`               | Set left status bar text only                                      |
+| `set_status_right(text)`              | Set right status bar text only                                     |
+| `register_command(name, desc, fn)`    | Register a slash command with the backend                          |
+| `remove_command(name)`                | Remove a registered slash command                                  |
+| `on_submit(fn)`                       | Register handler called when user submits input                    |
+| `on_escape(fn)`                       | Register a callback for Esc key                                    |
+| `on_init(fn)`                         | Register a callback invoked once when the console starts           |
+| `run()`                               | Start the console event loop (blocks until exit)                   |
 
 ## Output
 
@@ -44,6 +46,45 @@ console.print("Hello", "world")               # adds a message to the output are
 console.print("result here", label="Tool")    # message with a custom label
 console.clear_output()                         # clears all messages
 ```
+
+## Styling
+
+`console.styled(color, text)` applies a foreground color to text and returns the styled string for use with `console.print` or anywhere text is displayed.
+
+The `color` argument accepts a constant, a theme color name string, or a hex color.
+
+### Color constants
+
+| Constant            | Name string   | Description                        |
+| ------------------- | ------------- | ---------------------------------- |
+| `console.PRIMARY`   | `"primary"`   | Accent color (prompts, highlights) |
+| `console.SECONDARY` | `"secondary"` | Secondary accent                   |
+| `console.ERROR`     | `"error"`     | Error / warning color              |
+| `console.DIM`       | `"dim"`       | Muted / hint text                  |
+| `console.USER`      | `"user"`      | User message text color            |
+| `console.TEXT`      | `"text"`      | Normal content text                |
+
+```python
+# Using constants (recommended)
+console.styled(console.PRIMARY, "ScriptlingCoder")
+console.styled(console.DIM, "type /exit to quit")
+console.styled(console.ERROR, "WARNING: executes AI-generated code")
+
+# Using name strings
+console.styled("primary", "ScriptlingCoder")
+
+# Hex colors (#RRGGBB or RRGGBB)
+console.styled("#ff6600", "orange text")
+console.styled("4eb8c8", "teal text")
+
+# Combine with print
+console.print(
+    console.styled(console.PRIMARY, "MyApp") + " — " +
+    console.styled(console.DIM, "type /exit to quit")
+)
+```
+
+Falls back to plain text when no TUI backend is active.
 
 ## Streaming
 
@@ -102,10 +143,16 @@ def on_submit(text):
     console.stream_chunk("You said: " + text)
     console.stream_end()
 
+def on_ready():
+    console.print(console.styled("primary", "MyApp") + " ready!")
+
 console.on_submit(on_submit)
 console.on_escape(lambda: console.spinner_stop())
+console.on_init(on_ready)  # called once after TUI starts, before blocking
 console.run()  # blocks until /exit or Ctrl+C
 ```
+
+`on_init` is useful for printing a welcome message or setting initial state. It fires after the TUI backend is live so `console.print`, `console.set_status`, etc. all work correctly.
 
 ## Labels
 
@@ -117,21 +164,22 @@ console.set_labels("You", "Assistant", "")  # empty string leaves that label unc
 
 ## Plain fallback behaviour
 
-When no TUI backend is registered:
+When running embedded without the scriptling CLI and no custom backend is registered:
 
-| Function | Behaviour |
-|----------|-----------|
-| `input` | Reads a line from stdin |
-| `print` | Writes to stdout |
-| `stream_start` / `stream_chunk` / `stream_end` | No-op |
-| `spinner_start` / `spinner_stop` | No-op |
-| `set_progress` | No-op |
-| `set_labels` | No-op |
-| `set_status` / `set_status_left` / `set_status_right` | No-op |
-| `register_command` / `remove_command` | No-op |
-| `on_submit` / `on_escape` | No-op |
-| `clear_output` | No-op |
-| `run` | Returns immediately |
+| Function                                              | Behaviour               |
+| ----------------------------------------------------- | ----------------------- |
+| `input`                                               | Reads a line from stdin |
+| `print`                                               | Writes to stdout        |
+| `stream_start` / `stream_chunk` / `stream_end`        | No-op                   |
+| `spinner_start` / `spinner_stop`                      | No-op                   |
+| `set_progress`                                        | No-op                   |
+| `set_labels`                                          | No-op                   |
+| `set_status` / `set_status_left` / `set_status_right` | No-op                   |
+| `register_command` / `remove_command`                 | No-op                   |
+| `on_submit` / `on_escape` / `on_init`                 | No-op                   |
+| `clear_output`                                        | No-op                   |
+| `run`                                                 | Returns immediately     |
+| `styled`                                              | Returns text unchanged  |
 
 ## Go integration
 
