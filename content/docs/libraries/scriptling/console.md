@@ -19,11 +19,9 @@ import scriptling.console as console
 | Function | Description |
 |----------|-------------|
 | `input([prompt])` | Read a line from input |
-| `print(*args)` | Write a message to the output area |
-| `print_as(label, *args)` | Write a message with a custom label |
+| `print(*args, [label=])` | Write a message to the output area, optionally with a custom label |
 | `clear_output()` | Clear the output area |
-| `stream_start()` | Begin a streaming message |
-| `stream_start_as(label)` | Begin a streaming message with a custom label |
+| `stream_start([label=])` | Begin a streaming message, optionally with a custom label |
 | `stream_chunk(text)` | Append a chunk to the current stream |
 | `stream_end()` | Finalise the current stream |
 | `spinner_start([text])` | Show a spinner |
@@ -42,9 +40,9 @@ import scriptling.console as console
 ## Output
 
 ```python
-console.print("Hello", "world")          # adds a message to the output area
-console.print_as("Tool", "result here")  # message with a custom label
-console.clear_output()                    # clears all messages
+console.print("Hello", "world")               # adds a message to the output area
+console.print("result here", label="Tool")    # message with a custom label
+console.clear_output()                         # clears all messages
 ```
 
 ## Streaming
@@ -53,7 +51,7 @@ Use streaming to display text as it arrives (e.g. LLM token output).
 
 ```python
 console.stream_start()                    # default label
-console.stream_start_as("Assistant")      # custom label
+console.stream_start(label="Assistant")   # custom label
 for chunk in response_chunks:
     console.stream_chunk(chunk)
 console.stream_end()
@@ -124,8 +122,8 @@ When no TUI backend is registered:
 | Function | Behaviour |
 |----------|-----------|
 | `input` | Reads a line from stdin |
-| `print` / `print_as` | Writes to stdout |
-| `stream_start` / `stream_start_as` / `stream_chunk` / `stream_end` | No-op |
+| `print` | Writes to stdout |
+| `stream_start` / `stream_chunk` / `stream_end` | No-op |
 | `spinner_start` / `spinner_stop` | No-op |
 | `set_progress` | No-op |
 | `set_labels` | No-op |
@@ -159,7 +157,7 @@ type ConsoleBackend interface {
     Print(text string, env *object.Environment)
     PrintAs(label, text string, env *object.Environment)
     StreamStart()
-    StreamStartAs(label string)
+    StreamStartAs(label string)  // called when label kwarg is provided to stream_start
     StreamChunk(chunk string)
     StreamEnd()
     SpinnerStart(text string)
