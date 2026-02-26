@@ -192,6 +192,7 @@ Creates a new AI client instance for making API calls to supported services.
 - `api_key` (str, optional): API key for authentication
 - `max_tokens` (int, optional): Default max_tokens for all requests. Claude defaults to 4096 if not set
 - `temperature` (float, optional): Default temperature for all requests (0.0-2.0)
+- `top_p` (float, optional): Default nucleus sampling threshold for all requests (0.0-1.0)
 - `remote_servers` (list, optional): List of remote MCP server configs, each a dict with:
   - `base_url` (str, required): URL of the MCP server
   - `namespace` (str, optional): Namespace prefix for tools from this server
@@ -204,7 +205,7 @@ Creates a new AI client instance for making API calls to supported services.
 ```python
 import scriptling.ai as ai
 
-# OpenAI API with defaults
+# OpenAI API with defaults, top_p=0.9
 client = ai.Client("", api_key="sk-...", max_tokens=2048, temperature=0.7)
 
 # Claude (max_tokens defaults to 4096 if not specified)
@@ -227,17 +228,17 @@ client = ai.Client("http://127.0.0.1:1234/v1", remote_servers=[
 ```
 
 **Default Parameters:**
-
-When you set `max_tokens` and `temperature` at the client level, they apply to all requests unless overridden:
+, `temperature`, and `top_p` at the client level, they apply to all requests unless overridden:
 
 ```python
 # Set defaults at client creation
-client = ai.Client("", api_key="sk-...", max_tokens=2048, temperature=0.7)
+client = ai.Client("", api_key="sk-...", max_tokens=2048, temperature=0.7, top_p=0.9)
 
-# Uses client defaults (2048 tokens, 0.7 temperature)
+# Uses client defaults (2048 tokens, 0.7 temperature, 0.9 top_p)
 response = client.completion("gpt-4", "Hello!")
 
 # Override per request
+response = client.completion("gpt-4", "Hello!", max_tokens=4096, temperature=0.9, top_p=1.0
 response = client.completion("gpt-4", "Hello!", max_tokens=4096, temperature=0.9)
 ```
 
@@ -369,6 +370,7 @@ Creates a chat completion using this client's configuration.
 - `messages` (str or list): Either a string (user message) or a list of message dicts with "role" and "content" keys
 - `system_prompt` (str, optional): System prompt to use when messages is a string
 - `tools` (list, optional): List of tool schema dicts from ToolRegistry.build()
+- `top_p` (float, optional): Nucleus sampling threshold (0.0-1.0)
 - `temperature` (float, optional): Sampling temperature (0.0-2.0)
 - `max_tokens` (int, optional): Maximum tokens to generate
 
@@ -421,6 +423,7 @@ Creates a streaming chat completion using this client's configuration. Returns a
 - `messages` (str or list): Either a string (user message) or a list of message dicts with "role" and "content" keys
 - `system_prompt` (str, optional): System prompt to use when messages is a string
 - `tools` (list, optional): List of tool schema dicts from ToolRegistry.build()
+- `top_p` (float, optional): Nucleus sampling threshold (0.0-1.0)
 - `temperature` (float, optional): Sampling temperature (0.0-2.0)
 - `max_tokens` (int, optional): Maximum tokens to generate
 
@@ -476,6 +479,7 @@ Quick completion method that returns text directly, with thinking blocks automat
 - `messages` (str or list): Either a string (user message) or a list of message dicts
 - `system_prompt` (str, optional): System prompt to use when messages is a string
 - `tools` (list, optional): List of tool schema dicts from ToolRegistry.build()
+- `top_p` (float, optional): Nucleus sampling threshold (0.0-1.0)
 - `temperature` (float, optional): Sampling temperature (0.0-2.0)
 - `max_tokens` (int, optional): Maximum tokens to generate
 
@@ -683,14 +687,14 @@ Streams a response using the OpenAI Responses API, returning a `ResponseStream` 
 
 **Event types:**
 
-| Event type | Key fields |
-| --- | --- |
-| `response.created` | `response` |
-| `response.output_item.added` | `item`, `output_index` |
+| Event type                   | Key fields                                          |
+| ---------------------------- | --------------------------------------------------- |
+| `response.created`           | `response`                                          |
+| `response.output_item.added` | `item`, `output_index`                              |
 | `response.output_text.delta` | `delta`, `item_id`, `output_index`, `content_index` |
-| `response.output_text.done` | `text`, `item_id`, `output_index`, `content_index` |
-| `response.completed` | `response` (full ResponseObject) |
-| `error` | `message` |
+| `response.output_text.done`  | `text`, `item_id`, `output_index`, `content_index`  |
+| `response.completed`         | `response` (full ResponseObject)                    |
+| `error`                      | `message`                                           |
 
 **Examples:**
 
