@@ -15,15 +15,41 @@ import sys
 
 ## Available Constants
 
-| Constant   | Description                      |
-| ---------- | -------------------------------- |
-| `platform` | Operating system platform string |
-| `version`  | Scriptling interpreter version   |
-| `maxsize`  | Maximum signed integer value     |
-| `path_sep` | Path separator for OS            |
-| `argv`     | List of command-line arguments   |
+| Constant   | Description                                            |
+| ---------- | ------------------------------------------------------ |
+| `platform` | Operating system platform string                       |
+| `version`  | Scriptling interpreter version                         |
+| `maxsize`  | Maximum signed integer value                           |
+| `path_sep` | Path separator for OS                                  |
+| `argv`     | List of command-line arguments                         |
+| `stdin`    | Standard input stream object (when stdin is available) |
 
 ## Constants
+
+### stdin
+
+A file-like object connected to standard input. Only available when stdin is configured — either when running via the Scriptling CLI with piped input, or when an input is defined during registration of the sys library via the Go API.
+
+| Method       | Description                                                        |
+| ------------ | ------------------------------------------------------------------ |
+| `read()`     | Read all remaining data from stdin                                 |
+| `readline()` | Read one line including the newline character; returns `""` at EOF |
+
+`sys.stdin` is also iterable — each iteration yields one line including its newline:
+
+```python
+import sys
+
+# Read all at once
+data = sys.stdin.read()
+
+# Read line by line
+line = sys.stdin.readline()
+
+# Iterate over lines
+for line in sys.stdin:
+    print("Got:", line.rstrip())
+```
 
 ### platform
 
@@ -71,6 +97,17 @@ print(sys.argv)  # ["script.py", "arg1", "arg2"]
 ```
 
 ## Functions
+
+### input([prompt])
+
+Read a line from stdin, stripping the trailing newline. Only available when the environment is configured with a stdin reader.
+
+```python
+line = input()
+print("You typed:", line)
+```
+
+> **Note:** The optional `prompt` argument is accepted but not printed (no interactive terminal in remote environments).
 
 ### exit([code])
 
@@ -188,15 +225,15 @@ print(f"Processing {input_file}")
 
 This library implements a subset of Python's `sys` module:
 
-| Feature             | Supported       |
-| ------------------- | --------------- |
-| argv                | ✅              |
-| exit()              | ✅              |
-| platform            | ✅              |
-| version             | ✅ (simplified) |
-| maxsize             | ✅              |
-| path                | ❌              |
-| modules             | ❌              |
-| stdin/stdout/stderr | ❌              |
-| executable          | ❌              |
-| version_info        | ❌              |
+| Feature             | Supported                                     |
+| ------------------- | --------------------------------------------- |
+| argv                | ✅                                            |
+| exit()              | ✅                                            |
+| platform            | ✅                                            |
+| version             | ✅ (simplified)                               |
+| maxsize             | ✅                                            |
+| path                | ❌                                            |
+| modules             | ❌                                            |
+| stdin/stdout/stderr | `stdin` ✅ (when available), stdout/stderr ❌ |
+| executable          | ❌                                            |
+| version_info        | ❌                                            |
