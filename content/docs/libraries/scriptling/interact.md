@@ -58,6 +58,29 @@ bot.interact(c)
 
 If no console is passed, `interact()` creates one automatically.
 
+## Max Iterations
+
+The `interact()` method accepts a `max_iterations` parameter to limit the number of tool call rounds per user message. This prevents infinite loops if the agent gets stuck.
+
+```python
+# Default: 25 iterations per message
+bot.interact()
+
+# Custom limit for complex tasks
+bot.interact(max_iterations=50)
+
+# Lower limit for faster responses
+bot.interact(max_iterations=10)
+```
+
+When the iteration limit is reached, a message is displayed:
+
+```
+[Reached max iterations (25). Type 'continue' or ask me to proceed.]
+```
+
+You can then type "continue" or ask the agent to proceed, and it will continue from where it left off.
+
 ## Interactive Commands
 
 Commands are registered with the TUI palette when `interact()` is called. Type `/` to open the command palette.

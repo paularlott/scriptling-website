@@ -8,11 +8,11 @@ Agentic AI loop for building AI agents with automatic tool execution. The agent 
 
 ## Available Classes & Methods
 
-| Class/Method                                 | Description                    |
-| -------------------------------------------- | ------------------------------ |
-| `Agent(client, tools, system_prompt, model)` | Create AI agent                |
-| `agent.trigger(message, max_iterations)`     | One-shot trigger with response |
-| `agent.interact()`                           | Start interactive session      |
+| Class/Method                                        | Description                    |
+| --------------------------------------------------- | ------------------------------ |
+| `Agent(client, tools, system_prompt, model)`        | Create AI agent                |
+| `agent.trigger(message, max_iterations)`            | One-shot trigger with response |
+| `agent.interact(c, max_iterations)`                 | Start interactive session      |
 
 For tool registry documentation, see [AI Library](ai.md#tool-registry).
 
@@ -107,15 +107,21 @@ response = bot.trigger({
 }, max_iterations=5)
 ```
 
-### agent.interact()
+### agent.interact(c=None, max_iterations=25)
 
 Runs an interactive CLI session. Requires `scriptling.console` library.
+
+**Parameters:**
+
+- `c` (Console, optional): Pre-configured console instance
+- `max_iterations` (int, optional): Maximum tool call rounds per message. Default: 25
 
 **Features:**
 
 - Reads user input from stdin
 - Displays thinking blocks in purple (from `<think>...</think>` tags)
 - Strips thinking markers from final output
+- Shows warning when iteration limit is reached
 - Supports commands:
   - `/q` or `exit` - Quit
   - `/c` - Clear conversation history
@@ -124,7 +130,10 @@ Runs an interactive CLI session. Requires `scriptling.console` library.
 
 ```python
 bot = agent.Agent(client, tools=tools, system_prompt="Coding assistant")
-bot.interact()
+bot.interact()  # Default: 25 iterations
+
+# With custom iteration limit
+bot.interact(max_iterations=50)
 ```
 
 **Output:**
