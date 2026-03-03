@@ -309,6 +309,94 @@ print("Distance: " + str(dist))       # 5.0
 }
 ```
 
+## Loading Libraries from Filesystem
+
+The `libloader` package provides a flexible way to load libraries from the filesystem with Python-style folder organization.
+
+### Basic Filesystem Loading
+
+```go
+import (
+    "github.com/paularlott/scriptling"
+    "github.com/paularlott/scriptling/libloader"
+)
+
+func main() {
+    p := scriptling.New()
+
+    // Load libraries from a directory
+    loader := libloader.NewFilesystem("/app/libs")
+    p.SetLibraryLoader(loader)
+
+    // Now scripts can import from the directory
+    p.Eval(`
+import utils           # Loads from /app/libs/utils.py
+import knot.groups     # Loads from /app/libs/knot/groups.py
+`)
+}
+```
+
+### Folder Structure (Python-style)
+
+Organize related libraries in folders for better structure:
+
+```
+libs/
+  utils.py              # import utils
+  knot/
+    __init__.py         # (optional) package initialization
+    groups.py           # import knot.groups
+    roles.py            # import knot.roles
+    users.py            # import knot.users
+    api/
+      v1.py             # import knot.api.v1
+      v2.py             # import knot.api.v2
+```
+
+**Loading Priority:**
+
+For nested imports like `knot.groups`, the loader checks:
+1. `libs/knot/groups.py` (folder structure - preferred)
+2. `libs/knot.groups.py` (flat file - legacy fallback)
+
+This follows Python's module organization conventions.
+
+### Loader Chain
+
+Chain multiple loaders to try different sources in order:
+
+```go
+// Try filesystem first, then fall back to API
+chain := libloader.NewChain(
+    libloader.NewFilesystem("/app/libs"),
+    libloader.NewAPI("https://api.example.com/libs"),
+)
+p.SetLibraryLoader(chain)
+```
+
+### Multiple Directories
+
+Search multiple directories in priority order:
+
+```go
+// User libs override system libs
+loader := libloader.NewMultiFilesystem(
+    "/home/user/libs",  // Highest priority
+    "/app/system/libs", // Fallback
+)
+p.SetLibraryLoader(loader)
+```
+
+### Custom File Extensions
+
+Load libraries with custom extensions:
+
+```go
+loader := libloader.NewFilesystem("/app/libs",
+    libloader.WithExtension(".scriptling"),
+)
+```
+
 ## Using Standard Libraries in Scriptling Libraries
 
 ```go

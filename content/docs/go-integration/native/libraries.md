@@ -202,38 +202,44 @@ print(url.parse.quote("hello world"))                   # hello+world
 `)
 ```
 
-## On-Demand Library Loading
+## Library Loader
 
-Load libraries only when they're first imported:
+For flexible library loading, use the `libloader` package. It supports loading from filesystem with Python-style folder structure, API calls, and chaining multiple loaders.
 
 ```go
+import (
+    "github.com/paularlott/scriptling"
+    "github.com/paularlott/scriptling/libloader"
+)
+
 func main() {
     p := scriptling.New()
 
-    // Set callback for lazy loading
-    p.SetOnDemandLibraryCallback(func(p *scriptling.Scriptling, name string) bool {
-        switch name {
-        case "heavylib":
-            // Only load when first imported
-            p.RegisterLibrary(createHeavyLibrary())
-            return true
-        case "ai":
-            p.RegisterLibrary(createAILibrary())
-            return true
-        case "mcp":
-            p.RegisterLibrary(createMCPLibrary())
-            return true
-        }
-        return false  // Library not found
-    })
+    // Load script libraries from filesystem
+    loader := libloader.NewFilesystem("/app/libs")
+    p.SetLibraryLoader(loader)
 
-    // Library will be loaded when first referenced
+    // Libraries are loaded on first import
     p.Eval(`
-import heavylib  # Triggers callback, loads library
-result = heavylib.process(data)
+import knot.groups  # Loads from /app/libs/knot/groups.py
+import knot.roles   # Loads from /app/libs/knot/roles.py
 `)
 }
 ```
+
+### Loader Chain
+
+Chain multiple loaders to try different sources:
+
+```go
+chain := libloader.NewChain(
+    libloader.NewFilesystem("/app/libs"),           // Try disk first
+    libloader.NewAPI("https://api.example.com"),    // Then API
+)
+p.SetLibraryLoader(chain)
+```
+
+See [Library Loader Chain](../loader-chain/) for full documentation.
 
 ## Complete Library Example
 

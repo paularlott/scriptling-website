@@ -18,7 +18,8 @@ Scriptling-specific libraries that provide functionality not available in Python
 
 | Library | Description |
 |---------|-------------|
-| [scriptling.mcp](mcp/) | MCP (Model Context Protocol) tool interaction |
+| [scriptling.mcp](mcp/) | MCP (Model Context Protocol) client for connecting to MCP servers |
+| [scriptling.mcp.tool](mcp-tool/) | Helper library for authoring MCP tools |
 
 ## Runtime
 

@@ -313,22 +313,26 @@ handler := func(w http.ResponseWriter, r *http.Request) {
 
 Each clone re-evaluates script libraries on first import, so no mutable state (counters, caches) is shared between clones.
 
-### On-Demand Library Loading
+### Library Loading
+
+Use the `libloader` package for flexible library loading:
 
 ```go
-// Set callback for lazy loading
-p.SetOnDemandLibraryCallback(func(p *scriptling.Scriptling, name string) bool {
-    switch name {
-    case "heavylib":
-        p.RegisterLibrary(createHeavyLibrary())
-        return true
-    case "speciallib":
-        p.RegisterLibrary(createSpecialLibrary())
-        return true
-    }
-    return false
-})
+import "github.com/paularlott/scriptling/libloader"
+
+// Load libraries from filesystem (Python-style folder structure)
+loader := libloader.NewFilesystem("/app/libs")
+p.SetLibraryLoader(loader)
+
+// Chain multiple loaders
+chain := libloader.NewChain(
+    libloader.NewFilesystem("/app/libs"),
+    libloader.NewAPI("https://api.example.com/libs"),
+)
+p.SetLibraryLoader(chain)
 ```
+
+See [Library Loader Chain](../loader-chain/) for full documentation.
 
 ## Error Handling
 

@@ -44,6 +44,7 @@ func main() {
 - [Native API](native/) - Direct control with maximum performance
 - [Builder API](builder/) - Type-safe, cleaner syntax
 - [Script Extensions](scripts/) - Extend using Scriptling code
+- [Library Loader Chain](loader-chain/) - Flexible library loading from multiple sources
 - [Documenting Extensions](documentation/) - Add help text to functions and libraries
 - [Linting](lint/) - Code analysis for detecting syntax errors without execution
 
