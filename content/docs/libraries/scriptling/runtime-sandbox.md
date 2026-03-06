@@ -315,7 +315,7 @@ extlibs.SetSandboxFactory(func() extlibs.SandboxInstance {
 - Each `sandbox.create()` call creates a **new Scriptling instance** via the configured factory. Sandboxes do not share state with each other or with the parent.
 - By default, `print()` output from sandbox scripts is **discarded**. Use `capture_output=True` to see output.
 - Errors in `exec()` and `exec_file()` are **captured internally**, not propagated to the caller. Always check `exit_code()` to detect failures.
-- Libraries imported inside a sandbox are resolved through the same import paths configured by the factory (e.g., the `--libdir` flag in CLI mode).
+- Libraries imported inside a sandbox are resolved through the same import paths configured by the factory (e.g., the `--libpath` flag in CLI mode).
 - `SystemExit` exceptions (e.g., from `scriptling.mcp.tool.return_string()`) are captured and reported via `exit_code()` — they do not terminate the parent script.
 - The factory must be configured before `sandbox.create()` is called. If no factory is set, `create()` returns an error.
 - The same factory is used by both `scriptling.runtime.sandbox` and `scriptling.runtime.background()`. Call `extlibs.SetSandboxFactory()` to configure both at once.

@@ -227,4 +227,4 @@ import knot.groups   # Uses loader chain
 
 - [Script Libraries](scripts/) - Write libraries in Scriptling
 - [Native Libraries](native/libraries/) - Create Go libraries
-- [CLI Library Loading](../cli/) - Using --libdir flag
+- [CLI Library Loading](../cli/#library-loading) - Automatic script-dir loading and `--libpath`
