@@ -8,11 +8,11 @@ Agentic AI loop for building AI agents with automatic tool execution. The agent 
 
 ## Available Classes & Methods
 
-| Class/Method                                        | Description                    |
-| --------------------------------------------------- | ------------------------------ |
-| `Agent(client, tools, system_prompt, model)`        | Create AI agent                |
-| `agent.trigger(message, max_iterations)`            | One-shot trigger with response |
-| `agent.interact(c, max_iterations)`                 | Start interactive session      |
+| Class/Method                                 | Description                    |
+| -------------------------------------------- | ------------------------------ |
+| `Agent(client, tools, system_prompt, model)` | Create AI agent                |
+| `agent.trigger(message, max_iterations)`     | One-shot trigger with response |
+| `agent.interact(c, max_iterations)`          | Start interactive session      |
 
 For tool registry documentation, see [AI Library](ai.md#tool-registry).
 
@@ -27,13 +27,13 @@ client = ai.Client("http://127.0.0.1:1234/v1", api_key="sk-...")
 
 # Create tool registry
 tools = ai.ToolRegistry()
-tools.add("read_file", "Read a file", {"path": "string"}, lambda args: os.read_file(args["path"]))
+tools.add("calculate", "Calculate square root", {"number": "number"}, lambda args: str(args["number"] ** 0.5))
 
 # Create agent
 bot = agent.Agent(client, tools=tools, system_prompt="You are a helpful assistant", model="gpt-4")
 
 # One-shot trigger
-response = bot.trigger("What files are in the current directory?", max_iterations=10)
+response = bot.trigger("What is the square root of 144?", max_iterations=10)
 print(response.content)
 
 # Interactive session (requires scriptling.console)
@@ -61,7 +61,7 @@ import scriptling.ai.agent as agent
 
 client = ai.Client("http://127.0.0.1:1234/v1")
 tools = ai.ToolRegistry()
-tools.add("read", "Read file", {"path": "string"}, read_func)
+tools.add("reverse", "Reverse text", {"text": "string"}, lambda args: args["text"][::-1])
 
 bot = agent.Agent(
     client,
@@ -97,14 +97,15 @@ response = bot.trigger("What is 2+2?")
 print(response.content)  # "4"
 
 # Query that uses tools
-response = bot.trigger("List all Python files", max_iterations=10)
+response = bot.trigger("Reverse the word 'hello'", max_iterations=10)
 print(response.content)
 
 # With message dict
 response = bot.trigger({
     "role": "user",
-    "content": "Read config.json"
+    "content": "Calculate the square root of 81"
 }, max_iterations=5)
+print(response.content)
 ```
 
 ### agent.interact(c=None, max_iterations=25)
@@ -140,15 +141,12 @@ bot.interact(max_iterations=50)
 
 ```
 ────────────────────────────────────────────────────────────────────────────────
-❯ List all Python files
+❯ Reverse the word 'greeting'
 ────────────────────────────────────────────────────────────────────────────────
 
-Let me search for Python files...
+Let me reverse that text for you...
 
-⏺ Found 3 Python files:
-- main.py
-- utils.py
-- test.py
+⏺ The reversed text is: gniteerg
 
 ────────────────────────────────────────────────────────────────────────────────
 ❯ /q
@@ -203,33 +201,36 @@ client = ai.Client("http://127.0.0.1:1234/v1", api_key=os.getenv("OPENAI_API_KEY
 # Create tools
 tools = ai.ToolRegistry()
 
-def read_file(args):
-    content = os.read_file(args["path"])
-    lines = content.split("\n")
-    offset = args.get("offset", 0)
-    limit = args.get("limit", len(lines))
-    return "\n".join(lines[offset:offset+limit])
+def calculate(args):
+    """Calculate square root of a number."""
+    import math
+    return str(math.sqrt(args["number"]))
 
-def write_file(args):
-    os.write_file(args["path"], args["content"])
-    return "ok"
+def reverse_text(args):
+    """Reverse a string."""
+    return args["text"][::-1]
 
-tools.add("read", "Read file with optional offset/limit", {
-    "path": "string",
-    "offset": "integer?",
-    "limit": "integer?"
-}, read_file)
+def word_count(args):
+    """Count words in text."""
+    return str(len(args["text"].split()))
 
-tools.add("write", "Write content to file", {
-    "path": "string",
-    "content": "string"
-}, write_file)
+tools.add("sqrt", "Calculate square root of a number", {
+    "number": "number"
+}, calculate)
+
+tools.add("reverse", "Reverse a text string", {
+    "text": "string"
+}, reverse_text)
+
+tools.add("wordcount", "Count words in text", {
+    "text": "string"
+}, word_count)
 
 # Create agent
 bot = agent.Agent(
     client,
     tools=tools,
-    system_prompt="Concise coding assistant. cwd: " + os.getcwd(),
+    system_prompt="You are a helpful math and text assistant.",
     model="gpt-4"
 )
 
@@ -252,16 +253,19 @@ def get_time(args):
     return str(datetime.datetime.now())
 
 # Handler with error handling
-def read_file_safe(args):
+def calculate_safe(args):
     try:
-        return os.read_file(args["path"])
-    except Exception as e:
+        import math
+        return str(math.sqrt(args["number"]))
+    except ValueError as e:
         return f"Error: {e}"
+    except KeyError:
+        return "Error: 'number' parameter required"
 
 # Handler that returns structured data
-def list_files(args):
-    files = os.listdir(args.get("path", "."))
-    return "\n".join(files)
+def analyze_text(args):
+    text = args.get("text", "")
+    return f"Characters: {len(text)}, Words: {len(text.split())}"
 ```
 
 ## Thinking Blocks
@@ -277,25 +281,25 @@ This allows models to show their reasoning process in interactive mode while kee
 
 ```
 <think>
-The user wants to list Python files. I should use the glob tool to search for *.py files.
+The user wants to reverse the word 'hello'. I should use the reverse tool to flip the text.
 </think>
 
-I'll search for Python files in the current directory.
+I'll reverse that text for you.
 ```
 
 **Interactive display:**
 
 ```
-The user wants to list Python files. I should use the glob tool to search for *.py files.
+The user wants to reverse the word 'hello'. I should use the reverse tool to flip the text.
 
-⏺ I'll search for Python files in the current directory.
+⏺ I'll reverse that text for you.
 ```
 
 **Programmatic response:**
 
 ```python
-response = bot.trigger("List Python files")
-print(response.content)  # "I'll search for Python files in the current directory."
+response = bot.trigger("Reverse 'hello'")
+print(response.content)  # "I'll reverse that text for you."
 ```
 
 ### Manual Extraction
