@@ -319,7 +319,7 @@ schemas = tools.build()
 response = client.completion("gpt-4", [{"role": "user", "content": "What time is it?"}], tools=schemas)
 
 # With Agent (recommended - tools handled automatically)
-# See [Agent Library](agent.md) for details
+# See [Agent Library](../agent/) for details
 ```
 
 ### registry.get_handler(name)
@@ -354,7 +354,7 @@ schemas = tools.build()
 response = client.completion("gpt-4", [{"role": "user", "content": "Read file /data/config.txt"}], tools=schemas)
 ```
 
-For automatic tool execution with an agent loop, see [Agent Library](agent.md).
+For automatic tool execution with an agent loop, see [Agent Library](../agent/).
 
 ## AIClient Class
 

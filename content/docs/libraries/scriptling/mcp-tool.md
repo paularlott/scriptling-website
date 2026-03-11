@@ -6,7 +6,7 @@ weight: 3
 
 MCP tool helper library for authoring MCP tools in scriptling. This sub-library provides functions for parameter access and result handling when implementing tool scripts.
 
-For the MCP client library (connecting to MCP servers), see the [MCP Library](mcp.md) documentation.
+For the MCP client library (connecting to MCP servers), see the [MCP Library](../mcp/) documentation.
 
 ## Registration
 
@@ -426,6 +426,6 @@ func RunToolScript(
 
 ## See Also
 
-- [MCP Library](mcp.md) - MCP client for connecting to MCP servers
-- [AI Library](ai.md) - AI client and completion functions
-- [Agent Library](agent.md) - Building AI agents with automatic tool execution
+- [MCP Library](../mcp/) - MCP client for connecting to MCP servers
+- [AI Library](../ai/) - AI client and completion functions
+- [Agent Library](../agent/) - Building AI agents with automatic tool execution

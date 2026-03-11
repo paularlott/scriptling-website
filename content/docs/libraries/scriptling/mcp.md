@@ -6,7 +6,7 @@ weight: 1
 
 MCP (Model Context Protocol) tool interaction library. This library provides functions for interacting with MCP servers that expose tools for AI models to use.
 
-For MCP integration with OpenAI clients, see the [AI Library](ai.md) documentation.
+For MCP integration with OpenAI clients, see the [AI Library](../ai/) documentation.
 
 ## Available Functions
 
@@ -456,6 +456,6 @@ response = ai_client.completion(
 
 ## See Also
 
-- [MCP Tool Helpers](mcp-tool.md) - Helper library for authoring MCP tools
-- [AI Library](ai.md) - AI client and completion functions
-- [Agent Library](agent.md) - Building AI agents with automatic tool execution
+- [MCP Tool Helpers](../mcp-tool/) - Helper library for authoring MCP tools
+- [AI Library](../ai/) - AI client and completion functions
+- [Agent Library](../agent/) - Building AI agents with automatic tool execution

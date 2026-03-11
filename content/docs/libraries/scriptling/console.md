@@ -179,4 +179,4 @@ The `on_submit` callback receives a `context.Context` that is cancelled when the
 
 ## See Also
 
-- [scriptling.ai.agent.interact](interact/) — interactive agent loop using this library
+- [scriptling.ai.agent.interact](../interact/) — interactive agent loop using this library

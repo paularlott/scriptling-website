@@ -14,7 +14,7 @@ Agentic AI loop for building AI agents with automatic tool execution. The agent 
 | `agent.trigger(message, max_iterations)`     | One-shot trigger with response |
 | `agent.interact(c, max_iterations)`          | Start interactive session      |
 
-For tool registry documentation, see [AI Library](ai.md#tool-registry).
+For tool registry documentation, see [AI Library](../ai/#tool-registry).
 
 ## Quick Start
 
@@ -304,7 +304,7 @@ print(response.content)  # "I'll reverse that text for you."
 
 ### Manual Extraction
 
-For cases where you need to manually extract thinking blocks from AI responses (e.g., when not using the agent), use the `ai.extract_thinking()` function from the [AI Library](ai.md#thinking-extractor). This function supports multiple thinking block formats including `<think>`, `<thinking>`, `<Thought>`, `<antThinking>`, and markdown code blocks.
+For cases where you need to manually extract thinking blocks from AI responses (e.g., when not using the agent), use the `ai.extract_thinking()` function from the [AI Library](../ai/#thinking-extractor). This function supports multiple thinking block formats including `<think>`, `<thinking>`, `<Thought>`, `<antThinking>`, and markdown code blocks.
 
 ```python
 import scriptling.ai as ai
@@ -316,6 +316,6 @@ clean_content = result["content"]     # Text with thinking blocks removed
 
 ## See Also
 
-- [AI Library](ai.md) - AI client and completion functions
-- [Thinking Extractor](ai.md#thinking-extractor) - Manual thinking block extraction
+- [AI Library](../ai/) - AI client and completion functions
+- [Thinking Extractor](../ai/#thinking-extractor) - Manual thinking block extraction
 - [scriptlingcoder example](../../examples/openai/scriptlingcoder/) - Complete AI coding assistant

@@ -46,10 +46,10 @@ Background tasks run in separate goroutines alongside the HTTP server. The name 
 
 ## Sub-Libraries
 
-- [scriptling.runtime.http](runtime-http.md) - HTTP route registration and response helpers
-- [scriptling.runtime.kv](runtime-kv.md) - Thread-safe key-value store
-- [scriptling.runtime.sync](runtime-sync.md) - Named cross-environment concurrency primitives
-- [scriptling.runtime.sandbox](runtime-sandbox.md) - Isolated script execution environments
+- [scriptling.runtime.http](../runtime-http/) - HTTP route registration and response helpers
+- [scriptling.runtime.kv](../runtime-kv/) - Thread-safe key-value store
+- [scriptling.runtime.sync](../runtime-sync/) - Named cross-environment concurrency primitives
+- [scriptling.runtime.sandbox](../runtime-sandbox/) - Isolated script execution environments
 
 ## Examples
 
