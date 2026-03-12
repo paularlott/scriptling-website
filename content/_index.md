@@ -98,3 +98,4 @@ Scriptling is an open-source (MIT License) scripting language that bridges the g
 - **REST API Automation** - Built-in HTTP client with JSON handling
 - **Sandboxed Execution** - Run untrusted code with configurable security
 - **MCP Servers** - Build Model Context Protocol servers for LLM tools
+- **Developer Tooling** - [VSCode extension](https://marketplace.visualstudio.com/items?itemName=PaulArlott.scriptling) with syntax highlighting and language support

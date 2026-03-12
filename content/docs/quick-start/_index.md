@@ -47,6 +47,10 @@ make build
 ./bin/scriptling script.py
 ```
 
+## VSCode Extension
+
+Install the [Scriptling language extension](https://marketplace.visualstudio.com/items?itemName=PaulArlott.scriptling) for Visual Studio Code to get syntax highlighting and language support for scriptling libraries.
+
 ## CLI Quick Start
 
 ### Run a Script
