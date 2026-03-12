@@ -44,6 +44,25 @@ extlibs.RegisterOSLibrary(p, nil)
 
 All file operations in the `os` library are restricted to the allowed directories. Path traversal attacks (`../../../etc/passwd`) and symlink attacks are prevented.
 
+## Special Variables
+
+### `__file__`
+
+When a script is run from a file (via `EvalFile`, `SetSourceFile`, or the CLI), `__file__` is set to the absolute path of the script file. This allows scripts to locate resources relative to themselves, just like Python.
+
+```python
+import os.path
+
+# Get the directory containing this script
+script_dir = os.path.dirname(__file__)
+
+# Load a data file next to the script
+data_file = os.path.join(script_dir, "data.json")
+content = os.read_file(data_file)
+```
+
+> **Note:** `__file__` is only set when running from a file. It is not available in `Eval()` calls without a source file set.
+
 ## Constants
 
 ### `os.sep`
@@ -93,18 +112,24 @@ Get an environment variable.
 - `key` (string): Name of the environment variable
 - `default` (optional): Value to return if the variable is not set
 
-**Returns:** String value of the environment variable, or default if not set
+**Returns:** String value of the environment variable, `None` if not set and no default given, or `default` if provided
 
 ```python
 import os
 
-# Get environment variable
+# Get environment variable - returns None if not set
 home = os.getenv("HOME")
-print(home)
+if home:
+    print(home)
 
-# With default
+# With default value
 path = os.getenv("MY_PATH", "/default/path")
 print(path)
+
+# Common pattern: use default when variable may not be set
+base_dir = os.getenv("APP_DIR")
+if not base_dir:
+    base_dir = "/tmp"
 ```
 
 ### os.environ
@@ -400,7 +425,7 @@ This library implements a subset of Python's `os` module:
 
 | Function    | Supported                |
 | ----------- | ------------------------ |
-| getenv      | ✅                       |
+| getenv      | ✅ (returns `None` when unset, matching Python) |
 | environ     | ✅                       |
 | getcwd      | ✅                       |
 | listdir     | ✅                       |
@@ -419,10 +444,12 @@ This library implements a subset of Python's `os` module:
 
 ## Differences from Python
 
+- `os.getenv()` returns `None` when the variable is not set and no default is given (matches Python)
 - File operations use `read_file()`, `write_file()`, and `append_file()` instead of `open()`
 - No file object handles - operations are direct functions
 - All file operations are subject to security restrictions when configured
 - No `os.path` module - use `import os.path` for path operations
+- `__file__` is set automatically when running from a file, enabling `os.path.dirname(__file__)` to work as in Python
 
 ## See Also
 
