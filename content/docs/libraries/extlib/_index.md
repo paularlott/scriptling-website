@@ -62,8 +62,3 @@ p.RegisterLibrary("sys", extlibs.SysLibrary)
 | [secrets](secrets/) | Cryptographically strong random numbers |
     [toml](toml/) | TOML parsing and generation |
 
-## Utilities
-
-| Library | Description |
-|---------|-------------|
-| [wait_for](wait_for/) | Wait for resources to become available |

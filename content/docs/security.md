@@ -87,7 +87,7 @@ These libraries extend functionality but require explicit registration:
 | `sys`         | **SYSTEM ACCESS** - Provides access to system internals                     |
 | `secrets`     | Cryptographically secure random generation                                  |
 | `logging`     | File and console logging - may write to disk                                |
-| `wait_for`    | Network/resource polling - may access network                               |
+| `scriptling.wait_for` | Network/resource polling - may access network                               |
 | `yaml`        | YAML parsing - safe but watch for large files                               |
 | `toml`        | TOML parsing - safe but watch for large files                               |
 | `html.parser` | HTML parsing - safe but watch for large files                               |
@@ -150,7 +150,7 @@ These libraries can make network requests:
 - `scriptling.ai` - AI API client
 - `scriptling.ai.agent` - Agentic AI with tool execution
 - `scriptling.mcp` - MCP protocol client
-- `wait_for` - Resource polling (may check network endpoints)
+- `scriptling.wait_for` - Resource polling (may check network endpoints)
 
 ### Disabling Network Access
 

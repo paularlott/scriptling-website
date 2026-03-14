@@ -1,5 +1,5 @@
 ---
-title: wait_for
+title: scriptling.wait_for
 weight: 1
 ---
 
@@ -7,22 +7,22 @@ Functions for waiting on resources to become available. Useful for coordination 
 
 ## Setup
 
-The `wait_for` library is available by default in the scriptling-cli.
+The `scriptling.wait_for` library is available by default in the scriptling-cli.
 
 ## Available Functions
 
-| Function                              | Description                             |
-| ------------------------------------- | --------------------------------------- |
-| `file(path, timeout=30, poll_rate=1)` | Wait for file to exist                  |
-| `dir(path, timeout=30, poll_rate=1)`  | Wait for directory to exist             |
-| `port(host, port, timeout=30, ...)`   | Wait for TCP port to accept connections |
-| `http(url, timeout=30, ...)`          | Wait for HTTP endpoint to return 200    |
-| `file_content(path, content, ...)`    | Wait for file to contain content        |
-| `process_name(name, timeout=30, ...)` | Wait for process to be running          |
+| Function                                                      | Description                             |
+| ------------------------------------------------------------- | --------------------------------------- |
+| `scriptling.wait_for.file(path, timeout=30, poll_rate=1)`     | Wait for file to exist                  |
+| `scriptling.wait_for.dir(path, timeout=30, poll_rate=1)`      | Wait for directory to exist             |
+| `scriptling.wait_for.port(host, port, timeout=30, ...)`       | Wait for TCP port to accept connections |
+| `scriptling.wait_for.http(url, timeout=30, ...)`              | Wait for HTTP endpoint to return 200    |
+| `scriptling.wait_for.file_content(path, content, ...)`        | Wait for file to contain content        |
+| `scriptling.wait_for.process_name(name, timeout=30, ...)`     | Wait for process to be running          |
 
 ## Functions
 
-### wait_for.file(path, timeout=30, poll_rate=1)
+### scriptling.wait_for.file(path, timeout=30, poll_rate=1)
 
 Waits for a file to exist.
 
@@ -37,7 +37,7 @@ Waits for a file to exist.
 **Example:**
 
 ```python
-import wait_for
+import scriptling.wait_for
 
 # Wait for a file to be created (up to 2 minutes)
 if wait_for.file("/mnt/nas/index_ready", timeout=120):
@@ -46,7 +46,7 @@ else:
     print("Timeout waiting for file")
 ```
 
-### wait_for.dir(path, timeout=30, poll_rate=1)
+### scriptling.wait_for.dir(path, timeout=30, poll_rate=1)
 
 Waits for a directory to exist.
 
@@ -61,14 +61,14 @@ Waits for a directory to exist.
 **Example:**
 
 ```python
-import wait_for
+import scriptling.wait_for
 
 # Wait for a backup directory to be created
 if wait_for.dir("/mnt/nas/backups", timeout=60):
     print("Backup directory exists")
 ```
 
-### wait_for.port(host, port, timeout=30, poll_rate=1)
+### scriptling.wait_for.port(host, port, timeout=30, poll_rate=1)
 
 Waits for a TCP port to accept connections.
 
@@ -84,7 +84,7 @@ Waits for a TCP port to accept connections.
 **Example:**
 
 ```python
-import wait_for
+import scriptling.wait_for
 
 # Wait for PostgreSQL to be ready
 if wait_for.port("localhost", 5432, timeout=60):
@@ -93,7 +93,7 @@ else:
     print("PostgreSQL did not start in time")
 ```
 
-### wait_for.http(url, timeout=30, poll_rate=1, status_code=200)
+### scriptling.wait_for.http(url, timeout=30, poll_rate=1, status_code=200)
 
 Waits for an HTTP endpoint to respond with the expected status code.
 
@@ -109,7 +109,7 @@ Waits for an HTTP endpoint to respond with the expected status code.
 **Example:**
 
 ```python
-import wait_for
+import scriptling.wait_for
 
 # Wait for a health check endpoint
 if wait_for.http("http://localhost:8080/health", timeout=60):
@@ -120,7 +120,7 @@ if wait_for.http("http://api.example.com/ready", timeout=30, status_code=200):
     print("API is ready")
 ```
 
-### wait_for.file_content(path, content, timeout=30, poll_rate=1)
+### scriptling.wait_for.file_content(path, content, timeout=30, poll_rate=1)
 
 Waits for a file to exist and contain specific content.
 
@@ -136,7 +136,7 @@ Waits for a file to exist and contain specific content.
 **Example:**
 
 ```python
-import wait_for
+import scriptling.wait_for
 
 # Wait for a readiness file to contain "ready=true"
 if wait_for.file_content("/tmp/service.status", "ready=true", timeout=120):
@@ -147,7 +147,7 @@ if wait_for.file_content("/var/log/app.log", "Server started", timeout=30):
     print("Application has started")
 ```
 
-### wait_for.process_name(name, timeout=30, poll_rate=1)
+### scriptling.wait_for.process_name(name, timeout=30, poll_rate=1)
 
 Waits for a process with the specified name to be running.
 
@@ -162,7 +162,7 @@ Waits for a process with the specified name to be running.
 **Example:**
 
 ```python
-import wait_for
+import scriptling.wait_for
 
 # Wait for nginx to start
 if wait_for.process_name("nginx", timeout=30):
@@ -178,7 +178,7 @@ if wait_for.process_name("my-app", timeout=60):
 ### Database Migration Coordination
 
 ```python
-import wait_for
+import scriptling.wait_for
 
 # Wait for PostgreSQL to be ready
 if not wait_for.port("localhost", 5432, timeout=60):
@@ -199,7 +199,7 @@ print("Migrations complete, starting application")
 ### Multi-Service Startup Coordination
 
 ```python
-import wait_for
+import scriptling.wait_for
 import time
 
 # Start Redis in background
@@ -229,7 +229,7 @@ print("All services are ready!")
 ### HTTP Service Health Check
 
 ```python
-import wait_for
+import scriptling.wait_for
 
 services = [
     ("http://localhost:8080/health", "API Gateway"),
@@ -251,7 +251,7 @@ print("All services are healthy!")
 ### Waiting for File Changes
 
 ```python
-import wait_for
+import scriptling.wait_for
 
 # Wait for an index build to complete
 # The index_ready file is created when indexing starts
@@ -271,7 +271,7 @@ else:
 ### Custom Poll Rate
 
 ```python
-import wait_for
+import scriptling.wait_for
 
 # Poll more frequently for quick checks (every 0.5 seconds)
 if wait_for.port("localhost", 8080, timeout=10, poll_rate=0.5):

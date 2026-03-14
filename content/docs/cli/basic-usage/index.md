@@ -223,7 +223,7 @@ except Exception as e:
 - `secrets` - Cryptographic random number generation
 - `scriptling.runtime` - Runtime utilities including sandbox and background tasks
 - `subprocess` - Process execution
-- `wait_for` - Process monitoring
+- `scriptling.wait_for` - Process monitoring
 - AI, agent, and MCP libraries
 
 ## Accessing Environment Variables
