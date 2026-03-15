@@ -1,5 +1,6 @@
 ---
 title: scriptling.wait_for
+linkTitle: wait_for
 weight: 1
 ---
 

@@ -262,7 +262,7 @@ func CreateMathLibrary() *object.Library {
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     a, _ := args[0].AsFloat()
                     b, _ := args[1].AsFloat()
-                    return object.NewFloat(a + b)
+                    return &object.Float{Value: a + b}
                 },
                 HelpText: "add(a, b) - Add two numbers",
             },
@@ -270,7 +270,7 @@ func CreateMathLibrary() *object.Library {
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     a, _ := args[0].AsFloat()
                     b, _ := args[1].AsFloat()
-                    return object.NewFloat(a - b)
+                    return &object.Float{Value: a - b}
                 },
                 HelpText: "subtract(a, b) - Subtract b from a",
             },
@@ -278,7 +278,7 @@ func CreateMathLibrary() *object.Library {
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     a, _ := args[0].AsFloat()
                     b, _ := args[1].AsFloat()
-                    return object.NewFloat(a * b)
+                    return &object.Float{Value: a * b}
                 },
                 HelpText: "multiply(a, b) - Multiply two numbers",
             },
@@ -289,7 +289,7 @@ func CreateMathLibrary() *object.Library {
                     if b == 0 {
                         return &object.Error{Message: "division by zero"}
                     }
-                    return object.NewFloat(a / b)
+                    return &object.Float{Value: a / b}
                 },
                 HelpText: "divide(a, b) - Divide a by b",
             },
@@ -299,14 +299,14 @@ func CreateMathLibrary() *object.Library {
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     base, _ := args[0].AsFloat()
                     exp, _ := args[1].AsFloat()
-                    return object.NewFloat(math.Pow(base, exp))
+                    return &object.Float{Value: math.Pow(base, exp)}
                 },
                 HelpText: "power(base, exp) - Raise base to power",
             },
             "sqrt": {
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     x, _ := args[0].AsFloat()
-                    return object.NewFloat(math.Sqrt(x))
+                    return &object.Float{Value: math.Sqrt(x)}
                 },
                 HelpText: "sqrt(x) - Square root of x",
             },
@@ -316,7 +316,7 @@ func CreateMathLibrary() *object.Library {
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     list, _ := args[0].AsList()
                     if len(list) == 0 {
-                        return object.NewFloat(0)
+                        return &object.Float{Value: 0}
                     }
 
                     sum := 0.0
@@ -324,7 +324,7 @@ func CreateMathLibrary() *object.Library {
                         val, _ := item.AsFloat()
                         sum += val
                     }
-                    return object.NewFloat(sum / float64(len(list)))
+                    return &object.Float{Value: sum / float64(len(list))}
                 },
                 HelpText: "mean(numbers) - Calculate arithmetic mean",
             },
@@ -336,16 +336,16 @@ func CreateMathLibrary() *object.Library {
                         val, _ := item.AsFloat()
                         sum += val
                     }
-                    return object.NewFloat(sum)
+                    return &object.Float{Value: sum}
                 },
                 HelpText: "sum(numbers) - Sum all numbers in list",
             },
         },
         map[string]object.Object{
-            "PI":       object.NewFloat(3.14159265359),
-            "E":        object.NewFloat(2.71828182846),
-            "PHI":      object.NewFloat(1.61803398875),  // Golden ratio
-            "VERSION":  &object.String{Value: "1.0.0"},
+            "PI":      &object.Float{Value: 3.14159265359},
+            "E":       &object.Float{Value: 2.71828182846},
+            "PHI":     &object.Float{Value: 1.61803398875}, // Golden ratio
+            "VERSION": &object.String{Value: "1.0.0"},
         },
         "Extended math library with statistical functions",
     )
