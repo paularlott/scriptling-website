@@ -19,7 +19,7 @@ The `kv` sub-library exposes a **default** system store and the ability to open 
 | `ttl(key)`               | Get remaining TTL for a key        |
 | `keys(pattern="*")`      | Get keys matching glob pattern     |
 | `clear()`                | Remove all keys from store         |
-| `close()`                | Release the store (no-op on default) |
+| `close()`                | Close the store immediately (no-op on default) |
 
 ## Library Functions
 
@@ -100,13 +100,13 @@ Remove all keys from the store.
 
 ### close()
 
-Release the store and decrement its reference count. When all references to a named store are closed, the underlying database is closed. Calling `close()` on `kv.default` is a no-op.
+Close the store immediately and remove it from the registry. The next call to `kv.open()` with the same name will reopen it. Calling `close()` on `kv.default` is a no-op.
 
 ## Library Functions
 
 ### kv.open(name)
 
-Open or reuse a named KV store. Stores are shared by name — multiple calls with the same name return separate wrapper objects backed by the same database.
+Open or reuse a named KV store. If a store with the given name is already open, the existing database is returned. If not, a new store is opened and registered.
 
 **Parameters:**
 
@@ -146,7 +146,7 @@ import scriptling.runtime.kv as kv
 scratch = kv.open(":memory:scratch")
 scratch.set("temp", 42)
 val = scratch.get("temp")
-scratch.close()
+# No close() needed — store stays open for subsequent calls
 ```
 
 ### Persistent Store
@@ -157,7 +157,7 @@ import scriptling.runtime.kv as kv
 db = kv.open("/data/agent.db")
 db.set("last_topic", "python async")
 topic = db.get("last_topic", default="")
-db.close()
+# Store remains open between interpreter invocations
 ```
 
 ### Pattern Matching
@@ -200,12 +200,10 @@ import scriptling.runtime as runtime
 def task_a():
     store = kv.open(":memory:shared")
     store.set("result_a", "done")
-    store.close()
 
 def task_b():
     store = kv.open(":memory:shared")
     store.set("result_b", "done")
-    store.close()
 
 runtime.background("a", "task_a")
 runtime.background("b", "task_b")
@@ -218,5 +216,6 @@ runtime.background("b", "task_b")
 - TTL expiration is automatic
 - Supports glob patterns for key matching
 - `kv.default` is always available and its `close()` is a no-op
-- Named stores are reference-counted — the database closes only when all wrappers are closed
+- Named stores persist in the registry until explicitly closed — `kv.open()` with the same name always returns the existing open store
+- Calling `close()` on a named store immediately closes and removes it from the registry; the next `kv.open()` will reopen it
 - In-memory stores use the `":memory:name"` prefix; persistent stores use a filesystem path
