@@ -33,6 +33,11 @@ x % y    # Modulo (remainder)
 "Hello, " + "World"  # "Hello, World"
 "ab" * 3             # "ababab"
 3 * "ab"             # "ababab"
+
+# List operations
+[1, 2] + [3, 4]  # [1, 2, 3, 4]
+[1, 2] * 3       # [1, 2, 1, 2, 1, 2]
+3 * [1, 2]       # [1, 2, 1, 2, 1, 2]
 ```
 
 ## Augmented Assignment

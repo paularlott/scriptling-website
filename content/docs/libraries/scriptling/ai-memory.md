@@ -16,9 +16,9 @@ Long-term memory store for AI agents. Backed by a KV store, memories persist acr
 
 | Method | Description |
 |--------|-------------|
-| `remember(content, type, key, importance)` | Store a memory |
-| `recall(query, limit, type)` | Search memories by keyword against content and key |
-| `forget(id_or_key, by_key)` | Remove a memory |
+| `remember(content, type, importance)` | Store a memory; returns a UUIDv7 ID |
+| `recall(query, limit, type)` | Search memories by keyword |
+| `forget(id)` | Remove a memory by ID |
 | `list(type, limit)` | List all memories |
 | `count()` | Total number of memories |
 | `compact(idle_timeout, exempt_threshold)` | Manually trigger compaction |
@@ -62,7 +62,7 @@ mem = memory.new(db, idle_timeout=48)
 
 ## Store Methods
 
-### remember(content, type="note", key="", importance=0.5)
+### remember(content, type="note", importance=0.5)
 
 Store a memory.
 
@@ -70,17 +70,17 @@ Store a memory.
 
 - `content` (str): What to remember
 - `type` (str, optional): `"fact"`, `"preference"`, `"event"`, or `"note"` (default: `"note"`)
-- `key` (str, optional): Semantic key used to tag the memory (e.g. `"user_name"`, `"api_limit"`). Used as a searchable field by `recall`
 - `importance` (float, optional): `0.0`–`1.0`; memories with importance `>= 0.8` are exempt from compaction (default: `0.5`)
 
-**Returns:** dict with `id`, `content`, `type`, `key`, `importance`, `created_at`, `accessed_at`
+**Returns:** dict with `id`, `content`, `type`, `importance`, `created_at`, `accessed_at`
 
 ```python
-# Store a fact with a key for fast retrieval
-mem.remember("User's name is Alice", type="fact", key="user_name", importance=0.9)
+# Store a fact
+result = mem.remember("User's name is Alice", type="fact", importance=0.9)
+print(result["id"])  # UUIDv7 — use this to forget the memory later
 
 # Store a preference
-mem.remember("User prefers dark mode", type="preference", key="ui_theme", importance=0.7)
+mem.remember("User prefers dark mode", type="preference", importance=0.7)
 
 # Store a note
 mem.remember("Check API rate limits before next run")
@@ -88,23 +88,21 @@ mem.remember("Check API rate limits before next run")
 
 ### recall(query="", limit=10, type="")
 
-Search memories by keyword. Scores results against both the `content` and `key` fields — key matches are weighted higher. Pass a semantic key like `"user_name"` or a natural language phrase like `"dark mode"`.
+Search memories by keyword against content. Pass a natural language phrase like `"dark mode"` or `"user name"`.
 
 **Parameters:**
 
-- `query` (str, optional): Search query matched against both memory content and keys. Empty returns memories ranked by recency and importance
+- `query` (str, optional): Search query matched against memory content. Empty returns memories ranked by recency and importance
 - `limit` (int, optional): Maximum results (default: `10`)
 - `type` (str, optional): Filter by type
 
 **Returns:** list of memory dicts, ranked by relevance
 
 ```python
-# Search by semantic key (fuzzy — "wife_name" matches stored key "user_wife_name")
-results = mem.recall("user_name", limit=1)
+results = mem.recall("user name", limit=1)
 if results:
     print("User is", results[0]["content"])
 
-# Natural language search against content
 results = mem.recall("dark mode")
 for r in results:
     print(r["content"])
@@ -116,20 +114,19 @@ recent = mem.recall(limit=5)
 facts = mem.recall("Alice", type="fact")
 ```
 
-### forget(id_or_key, by_key=False)
+### forget(id)
 
-Remove a memory.
+Remove a memory by ID.
 
 **Parameters:**
 
-- `id_or_key` (str): Memory ID or semantic key
-- `by_key` (bool, optional): If `True`, treat argument as a key. Default `False` tries ID first, then key
+- `id` (str): Memory ID returned by `remember()`
 
 **Returns:** `True` if a memory was removed
 
 ```python
-mem.forget("user_name", by_key=True)   # by key
-mem.forget("abc-123-def")              # by ID (falls back to key if not found)
+result = mem.remember("User's name is Alice", type="fact", importance=0.9)
+mem.forget(result["id"])
 ```
 
 ### list(type="", limit=50)
@@ -217,24 +214,20 @@ mem = memory.new(kv.default, idle_timeout=24)
 tools.add("remember", "Store information in long-term memory", {
     "content": "string",
     "type": "string?",
-    "key": "string?",
     "importance": "float?"
 }, lambda args: mem.remember(
     args["content"],
     type=args.get("type", "note"),
-    key=args.get("key", ""),
     importance=float(args.get("importance", 0.5))
 ))
 
 tools.add("recall", "Search long-term memory", {
-    "query": "string?",
-    "key": "string?"
-}, lambda args: mem.recall((args.get("key") or "") + " " + (args.get("query") or ""), limit=5))
+    "query": "string?"
+}, lambda args: mem.recall(args.get("query", ""), limit=5))
 
-tools.add("forget", "Remove a memory", {
-    "key": "string?",
-    "id": "string?"
-}, lambda args: mem.forget(args["key"], by_key=True) if args.get("key") else mem.forget(args.get("id", "")))
+tools.add("forget", "Remove a memory by ID", {
+    "id": "string"
+}, lambda args: mem.forget(args["id"]))
 
 bot = agent.Agent(client, tools=tools,
     system_prompt="You are a helpful assistant with long-term memory.",
@@ -250,6 +243,14 @@ Memory can be exposed as MCP tools so any LLM client (Claude Desktop, Cursor, et
 ```bash
 # Start the MCP server with memory tools
 ./bin/scriptling --server :8000 --mcp-tools ./examples/mcp-tools/memory-tools
+```
+
+`recall()` serves double duty — called with no arguments at conversation start it returns all preferences plus top memories by recency/importance; called with a query it does keyword search. Add this to your system prompt:
+
+```
+At the start of every new conversation, call recall() with no arguments before responding to
+the user. This loads all your preferences and recent activity so you have full context before
+you begin.
 ```
 
 ## See Also
