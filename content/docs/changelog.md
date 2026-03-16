@@ -5,6 +5,28 @@ layout: changelog
 nav-skip: true
 ---
 
+## March 2026
+
+{{< version "v0.2.23" >}}
+
+{{< changelog-item "added" >}}
+**New standard libraries:**
+
+- `scriptling.ai.memory` — Long-term memory store for AI agents with MinHash-based semantic search, memory types (fact, preference, event, note), importance scoring, decay, and optional LLM-powered compaction
+- `scriptling.runtime.kv` — Persistent key-value store with TTL support, thread-safe operations, and both in-memory and file-backed storage
+
+**Language:**
+
+- Set comprehensions (`{x for x in iterable}`)
+- `__file__` variable provides the current script's path
+
+**AI API:**
+
+- `Agent.interact()` gains `max_iterations` parameter to limit conversation turns
+  {{< /changelog-item >}}
+
+---
+
 ## February 2026
 
 {{< version "v0.2.0" >}}
