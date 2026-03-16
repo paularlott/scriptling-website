@@ -13,6 +13,7 @@ Scriptling-specific libraries that provide functionality not available in Python
 | [scriptling.ai](ai/) | AI and LLM functions for OpenAI-compatible APIs |
 | [scriptling.ai.agent](agent/) | Agentic AI loop with automatic tool execution |
 | [scriptling.ai.agent.interact](interact/) | Interactive terminal interface for AI agents |
+| [scriptling.ai.memory](ai-memory/) | Long-term memory store for AI agents |
 
 ## MCP Protocol
 
