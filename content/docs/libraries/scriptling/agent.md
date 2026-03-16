@@ -183,16 +183,18 @@ The agent appends a `## Memory` block to the system prompt explaining when and h
 
 The original `system_prompt` you pass is always preserved — the memory content is appended after it.
 
-### With LLM Compaction (Mode 2)
+### With LLM-based Deduplication
 
-Pass an AI client to `memory.new()` to enable intelligent compaction (deduplication and summarisation):
+Pass an AI client to `memory.new()` to enable intelligent deduplication. When similar memories are found during `remember()` or `compact()`, the LLM decides whether to merge them or keep them separate:
 
 ```python
 client = ai.Client("http://127.0.0.1:1234/v1")
-mem = memory.new(kv.open("./memory-db"), client, model="qwen3-8b")
+mem = memory.new(kv.open("./memory-db"), ai_client=client, model="qwen3-8b")
 
 bot = agent.Agent(client, model="qwen3-8b", memory=mem)
 ```
+
+Without an AI client, deduplication is rule-based only (MinHash similarity ≥ 85% auto-merges, otherwise keeps separate).
 
 See [ai.memory](../ai-memory/) for full memory store documentation.
 

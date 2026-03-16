@@ -4,7 +4,7 @@ linkTitle: ai.memory
 weight: 3
 ---
 
-Long-term memory store for AI agents. Backed by a KV store, memories persist across sessions and are automatically compacted using importance decay — older, less-accessed memories fade over time while important ones survive.
+Long-term memory store for AI agents. Backed by a KV store, memories persist across sessions and are automatically deduplicated using MinHash similarity. Compaction (pruning old/decayed memories) runs on-demand via `compact()`.
 
 ## Functions
 
@@ -17,11 +17,11 @@ Long-term memory store for AI agents. Backed by a KV store, memories persist acr
 | Method | Description |
 |--------|-------------|
 | `remember(content, type, importance)` | Store a memory; returns a dict with `id` |
-| `recall(query, limit, type)` | Search memories by keyword |
+| `recall(query, limit, type)` | Search memories by keyword and semantic similarity |
 | `forget(id)` | Remove a memory by ID |
 | `list(type, limit)` | List all memories |
 | `count()` | Total number of memories |
-| `compact()` | Manually trigger compaction; returns `removed` and `remaining` counts |
+| `compact()` | Run compaction (prune old/decayed memories); returns dict with `removed` and `remaining` counts |
 
 ## Go Registration
 
@@ -42,8 +42,8 @@ Creates a memory store backed by the given KV store.
 **Parameters:**
 
 - `kv_store`: A KV store object (`kv.default` or `kv.open(...)`)
-- `ai_client` (AIClient, optional): AI client for Mode 2 LLM compaction — see [Compaction](#compaction)
-- `model` (str, optional): Model name for LLM compaction (required if `ai_client` provided)
+- `ai_client` (AIClient, optional): AI client for resolving ambiguous duplicates during `remember()` — see [Deduplication](#deduplication)
+- `model` (str, optional): Model name for LLM resolution (required if `ai_client` provided)
 
 **Returns:** Memory store object
 
@@ -58,7 +58,7 @@ mem = memory.new(kv.default)
 db = kv.open("/data/agent-memory.db")
 mem = memory.new(db)
 
-# With LLM compaction (Mode 2)
+# With LLM-based deduplication resolution
 import scriptling.ai as ai
 client = ai.Client("http://127.0.0.1:1234/v1")
 mem = memory.new(kv.open("./memory-db"), ai_client=client, model="qwen3-8b")
@@ -68,7 +68,11 @@ mem = memory.new(kv.open("./memory-db"), ai_client=client, model="qwen3-8b")
 
 ### remember(content, type="note", importance=0.5)
 
-Store a memory.
+Store a memory. Before saving, performs a pre-flight similarity check against existing memories of the same type:
+
+- **Similarity ≥ 0.85**: Updates the existing memory in place (no new entry)
+- **Similarity 0.50–0.85** (with AI client): Asks LLM whether to merge or keep separate
+- **Similarity < 0.50**: Creates a new memory
 
 **Parameters:**
 
@@ -88,7 +92,7 @@ mem.remember("Check API rate limits before next run")
 
 ### recall(query="", limit=10, type="")
 
-Search memories by keyword. Each recall resets the memory's age clock, protecting it from compaction.
+Search memories using **hybrid scoring**: keyword matching + semantic similarity (MinHash). Each recall updates the memory's `accessed_at`, protecting it from compaction.
 
 **Parameters:**
 
@@ -97,6 +101,11 @@ Search memories by keyword. Each recall resets the memory's age clock, protectin
 - `type` (str, optional): Filter by type
 
 **Returns:** list of memory dicts, ranked by relevance
+
+**Scoring formula:**
+```
+score = keyword_hits×0.3 + semantic_similarity×0.3 + importance×0.2 + recency×0.2
+```
 
 ```python
 results = mem.recall("user name", limit=1)
@@ -141,14 +150,12 @@ print(f"Stored memories: {mem.count()}")
 
 ### compact()
 
-Manually triggers compaction synchronously. Resets the auto-compaction timer and activity counter. Returns a dict with `removed` and `remaining` counts.
+Manually trigger compaction. Returns a dict with `removed` and `remaining` counts.
 
 ```python
 result = mem.compact()
 print(f"Removed {result['removed']}, {result['remaining']} remaining")
 ```
-
-If a background compaction is already running, `compact()` returns immediately with `removed=0`.
 
 ## Memory Types
 
@@ -161,23 +168,36 @@ If a background compaction is already running, `compact()` returns immediately w
 
 `preference` memories are the only type that never decay regardless of importance. They are only removed after the 180-day hard age cap (based on last access).
 
+## Deduplication
+
+### Pre-flight Check
+
+When `remember()` is called, the store checks for similar existing memories of the same type using **MinHash similarity** (estimated Jaccard similarity):
+
+1. **Similarity ≥ 0.85**: Auto-merge — updates existing memory content
+2. **Similarity 0.50–0.85** (with AI client): LLM decides whether to merge or keep separate
+3. **Similarity < 0.50**: Creates new memory
+
+This prevents duplicate memories from accumulating while allowing the LLM to make nuanced decisions about borderline cases.
+
+### During Compaction
+
+If an AI client is configured, `compact()` also runs pairwise similarity deduplication across all memories. Similar pairs with scores in the ambiguous range (0.50–0.85) are sent to the LLM for merge/keep decisions.
+
 ## Compaction
 
-Compaction runs automatically in the background after every 10 new memories (with a minimum 5-minute gap between runs). It never blocks normal operations.
+Compaction is **manual only** — call `compact()` when appropriate (e.g., on a schedule, during idle time, or after bulk imports). It performs two phases:
 
-### Mode 1 — Rule-based (always active)
+**Phase 1 — Prune:** Removes memories based on:
+- Hard age cap: 180 days since last access
+- Importance decay: `effective_importance = importance × 0.5^(age / half_life)`
+  - Pruned when effective importance drops below 0.1
 
-Memories are pruned using exponential importance decay based on time since last access:
+**Phase 2 — Deduplicate** (if AI client configured):
+- Finds similar memory pairs using MinHash
+- Sends ambiguous pairs to LLM for merge/keep decisions
 
-```
-effective_importance = importance × 0.5^(age / half_life)
-```
-
-A memory is pruned when its effective importance drops below `0.1`. Accessing a memory via `recall()` resets its age clock, restoring full effective importance.
-
-**Hard age cap:** any memory not accessed in 180 days is removed regardless of type or importance.
-
-**Examples:**
+### Decay Examples
 
 | Memory | Importance | Age | Effective | Pruned? |
 |--------|-----------|-----|-----------|---------|
@@ -187,20 +207,13 @@ A memory is pruned when its effective importance drops below `0.1`. Accessing a 
 | note | 0.8 | 21 days | 0.1 | Yes (at threshold) |
 | event | 0.5 | 30 days | 0.25 | No |
 
-### Mode 2 — LLM compaction (optional)
+## MinHash Similarity
 
-When an AI client is passed to `memory.new()`, Mode 2 runs after Mode 1. The LLM reviews remaining memories and can:
+The store uses **MinHash signatures** (64 hash values, 256 bytes per memory) for fast similarity estimation:
 
-- Merge duplicates or semantically similar memories into one
-- Delete outdated memories that contradict newer ones
-- Re-score importance based on actual relevance
-
-Mode 2 only runs on types that have at least 5 memories remaining after Mode 1 (configurable via `WithMinMemoriesForLLM`).
-
-```python
-client = ai.Client("http://127.0.0.1:1234/v1")
-mem = memory.new(kv.open("./memory-db"), ai_client=client, model="qwen3-8b")
-```
+- **Pre-flight deduplication**: ~15ns per comparison
+- **Hybrid search**: combines keyword hits with semantic similarity
+- **Automatic recomputation**: Memories loaded from legacy databases without MinHash have it computed on first access
 
 ## Agent Integration
 
@@ -213,7 +226,7 @@ import scriptling.ai.memory as memory
 import scriptling.runtime.kv as kv
 
 client = ai.Client("http://127.0.0.1:1234/v1")
-mem = memory.new(kv.open("./memory-db"), ai_client=client, model="qwen3-8b")
+mem = memory.new(kv.open("./memory-db"))
 
 bot = agent.Agent(client, model="gpt-4", memory=mem)
 bot.interact()
@@ -230,29 +243,22 @@ Memory can be exposed as MCP tools so any LLM client (Claude Desktop, Cursor, et
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `SCRIPTLING_MEMORY_DB` | Path to the memory KV store directory | `./memory-db` |
-| `SCRIPTLING_AI_BASE_URL` | Base URL of the AI provider for Mode 2 compaction | (disabled) |
+| `SCRIPTLING_AI_BASE_URL` | Base URL of the AI provider for LLM deduplication | (disabled) |
 | `SCRIPTLING_AI_PROVIDER` | Provider type: `openai`, `claude`, `gemini`, `ollama`, `zai`, `mistral` | `openai` |
-| `SCRIPTLING_AI_MODEL` | Model name for Mode 2 compaction | (disabled) |
+| `SCRIPTLING_AI_MODEL` | Model name for LLM deduplication | (disabled) |
 | `SCRIPTLING_AI_TOKEN` | API key / bearer token for the AI provider | (empty) |
 
-Mode 2 LLM compaction is enabled when both `SCRIPTLING_AI_BASE_URL` and `SCRIPTLING_AI_MODEL` are set.
+LLM-based deduplication is enabled when both `SCRIPTLING_AI_BASE_URL` and `SCRIPTLING_AI_MODEL` are set.
 
 ```bash
-# Mode 1 only (rule-based)
+# Basic (rule-based deduplication only)
 SCRIPTLING_MEMORY_DB=~/.scriptling/memory \
   ./bin/scriptling --server :8000 --mcp-tools ./examples/mcp-tools/memory-tools
 
-# With Mode 2 LLM compaction
+# With LLM deduplication
 SCRIPTLING_MEMORY_DB=~/.scriptling/memory \
 SCRIPTLING_AI_BASE_URL=http://127.0.0.1:1234/v1 \
 SCRIPTLING_AI_MODEL=qwen3-8b \
-  ./bin/scriptling --server :8000 --mcp-tools ./examples/mcp-tools/memory-tools
-
-# With a hosted provider
-SCRIPTLING_MEMORY_DB=~/.scriptling/memory \
-SCRIPTLING_AI_BASE_URL=https://api.openai.com/v1 \
-SCRIPTLING_AI_MODEL=gpt-4o-mini \
-SCRIPTLING_AI_TOKEN=sk-... \
   ./bin/scriptling --server :8000 --mcp-tools ./examples/mcp-tools/memory-tools
 ```
 
@@ -261,7 +267,7 @@ SCRIPTLING_AI_TOKEN=sk-... \
 | Tool | Description |
 |------|-------------|
 | `remember` | Store information with optional type and importance |
-| `recall` | Keyword search, or no args for full context load |
+| `recall` | Hybrid keyword + semantic search, or no args for full context load |
 | `forget` | Remove a memory by ID |
 | `list_memories` | List all memories, optionally filtered by type |
 | `compact` | Manually trigger compaction |
