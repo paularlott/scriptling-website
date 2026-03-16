@@ -4,27 +4,25 @@ linkTitle: ai.memory
 weight: 3
 ---
 
-Long-term memory store for AI agents. Backed by a KV store, memories persist across sessions and are automatically compacted when they go unaccessed for too long.
+Long-term memory store for AI agents. Backed by a KV store, memories persist across sessions and are automatically compacted using importance decay — older, less-accessed memories fade over time while important ones survive.
 
 ## Functions
 
 | Function | Description |
 |----------|-------------|
-| `memory.new(kv_store, idle_timeout=24)` | Create a memory store |
+| `memory.new(kv_store, ai_client?, model?)` | Create a memory store |
 
 ## Memory Object Methods
 
 | Method | Description |
 |--------|-------------|
-| `remember(content, type, importance)` | Store a memory; returns a UUIDv7 ID |
+| `remember(content, type, importance)` | Store a memory; returns a dict with `id` |
 | `recall(query, limit, type)` | Search memories by keyword |
 | `forget(id)` | Remove a memory by ID |
 | `list(type, limit)` | List all memories |
 | `count()` | Total number of memories |
-| `compact(idle_timeout, exempt_threshold)` | Manually trigger compaction |
-| `close()` | Stop background compaction goroutine |
 
-## Setup
+## Go Registration
 
 ```go
 import (
@@ -32,19 +30,19 @@ import (
     aimemory "github.com/paularlott/scriptling/extlibs/ai/memory"
 )
 
-// Register the KV and memory libraries
 extlibs.RegisterRuntimeKVLibrary(p)
 aimemory.Register(p)
 ```
 
-## memory.new(kv_store, idle_timeout=24)
+## memory.new(kv_store, ai_client=None, model="")
 
-Creates a memory store backed by the given KV store. The KV store manages persistence — use `kv.default` for the system store or `kv.open()` for a dedicated store.
+Creates a memory store backed by the given KV store.
 
 **Parameters:**
 
 - `kv_store`: A KV store object (`kv.default` or `kv.open(...)`)
-- `idle_timeout` (float, optional): Hours before unaccessed memories are automatically removed. Memories with `importance >= 0.8` are exempt. Pass `0` to disable automatic compaction. Default: `24`
+- `ai_client` (AIClient, optional): AI client for Mode 2 LLM compaction — see [Compaction](#compaction)
+- `model` (str, optional): Model name for LLM compaction (required if `ai_client` provided)
 
 **Returns:** Memory store object
 
@@ -57,7 +55,12 @@ mem = memory.new(kv.default)
 
 # Use a dedicated persistent store
 db = kv.open("/data/agent-memory.db")
-mem = memory.new(db, idle_timeout=48)
+mem = memory.new(db)
+
+# With LLM compaction (Mode 2)
+import scriptling.ai as ai
+client = ai.Client("http://127.0.0.1:1234/v1")
+mem = memory.new(kv.open("./memory-db"), client, model="qwen3-8b")
 ```
 
 ## Store Methods
@@ -70,29 +73,25 @@ Store a memory.
 
 - `content` (str): What to remember
 - `type` (str, optional): `"fact"`, `"preference"`, `"event"`, or `"note"` (default: `"note"`)
-- `importance` (float, optional): `0.0`–`1.0`; memories with importance `>= 0.8` are exempt from compaction (default: `0.5`)
+- `importance` (float, optional): `0.0`–`1.0` — controls how long the memory survives compaction (default: `0.5`)
 
 **Returns:** dict with `id`, `content`, `type`, `importance`, `created_at`, `accessed_at`
 
 ```python
-# Store a fact
 result = mem.remember("User's name is Alice", type="fact", importance=0.9)
 print(result["id"])  # UUIDv7 — use this to forget the memory later
 
-# Store a preference
 mem.remember("User prefers dark mode", type="preference", importance=0.7)
-
-# Store a note
 mem.remember("Check API rate limits before next run")
 ```
 
 ### recall(query="", limit=10, type="")
 
-Search memories by keyword against content. Pass a natural language phrase like `"dark mode"` or `"user name"`.
+Search memories by keyword. Each recall resets the memory's age clock, protecting it from compaction.
 
 **Parameters:**
 
-- `query` (str, optional): Search query matched against memory content. Empty returns memories ranked by recency and importance
+- `query` (str, optional): Keyword search against memory content. Empty returns memories ranked by recency and importance
 - `limit` (int, optional): Maximum results (default: `10`)
 - `type` (str, optional): Filter by type
 
@@ -103,26 +102,19 @@ results = mem.recall("user name", limit=1)
 if results:
     print("User is", results[0]["content"])
 
-results = mem.recall("dark mode")
-for r in results:
-    print(r["content"])
-
 # Most recent/important memories
 recent = mem.recall(limit=5)
 
 # Facts only
 facts = mem.recall("Alice", type="fact")
+
+# All preferences (used by agent at startup)
+prefs = mem.recall("", limit=50, type="preference")
 ```
 
 ### forget(id)
 
 Remove a memory by ID.
-
-**Parameters:**
-
-- `id` (str): Memory ID returned by `remember()`
-
-**Returns:** `True` if a memory was removed
 
 ```python
 result = mem.remember("User's name is Alice", type="fact", importance=0.9)
@@ -131,14 +123,7 @@ mem.forget(result["id"])
 
 ### list(type="", limit=50)
 
-List stored memories.
-
-**Parameters:**
-
-- `type` (str, optional): Filter by type
-- `limit` (int, optional): Maximum results (default: `50`)
-
-**Returns:** list of memory dicts
+List stored memories without updating their access time.
 
 ```python
 all_memories = mem.list()
@@ -153,108 +138,88 @@ Returns the total number of stored memories.
 print(f"Stored memories: {mem.count()}")
 ```
 
-### compact(idle_timeout=24, exempt_threshold=0.8)
-
-Manually trigger compaction. Removes memories not accessed within `idle_timeout` hours, except those with `importance >= exempt_threshold`.
-
-**Returns:** int — number of memories removed
-
-```python
-removed = mem.compact(idle_timeout=12, exempt_threshold=0.7)
-print(f"Compacted {removed} memories")
-```
-
-### close()
-
-Stops the background compaction goroutine. Does not close the underlying KV store.
-
-```python
-mem.close()
-db.close()  # close the kv store separately if needed
-```
-
 ## Memory Types
 
-| Type | Use for |
-|------|---------|
-| `fact` | Objective information — names, IDs, limits |
-| `preference` | User preferences — themes, formats, styles |
-| `event` | Things that happened — deployments, meetings |
-| `note` | Agent's own notes (default) |
+| Type | Decay behaviour | Use for |
+|------|----------------|---------|
+| `preference` | **Never decays** | User preferences — themes, formats, styles |
+| `fact` | Half-life 90 days | Objective information — names, IDs, limits |
+| `event` | Half-life 30 days | Things that happened — deployments, meetings |
+| `note` | Half-life 7 days | Agent's own notes (default) |
+
+`preference` memories are the only type that never decay regardless of importance. They are only removed after the 180-day hard age cap (based on last access).
 
 ## Compaction
 
-Memories are automatically removed when they have not been accessed for longer than `idle_timeout` hours. This keeps the store from growing indefinitely without any manual intervention.
+Compaction runs automatically in the background after every 10 new memories (with a minimum 5-minute gap between runs). It never blocks normal operations.
 
-**Exempt from compaction:** memories with `importance >= 0.8` (configurable via `compact()`).
+### Mode 1 — Rule-based (always active)
 
-**Accessing a memory** (via `recall`) resets its idle timer.
+Memories are pruned using exponential importance decay based on time since last access:
+
+```
+effective_importance = importance × 0.5^(age / half_life)
+```
+
+A memory is pruned when its effective importance drops below `0.1`. Accessing a memory via `recall()` resets its age clock, restoring full effective importance.
+
+**Hard age cap:** any memory not accessed in 180 days is removed regardless of type or importance.
+
+**Examples:**
+
+| Memory | Importance | Age | Effective | Pruned? |
+|--------|-----------|-----|-----------|---------|
+| preference | 0.9 | 60 days | 0.9 (no decay) | No |
+| fact | 0.9 | 90 days | 0.45 | No |
+| fact | 0.9 | 270 days | 0.11 | No (but near threshold) |
+| note | 0.8 | 21 days | 0.1 | Yes (at threshold) |
+| event | 0.5 | 30 days | 0.25 | No |
+
+### Mode 2 — LLM compaction (optional)
+
+When an AI client is passed to `memory.new()`, Mode 2 runs after Mode 1. The LLM reviews remaining memories and can:
+
+- Merge duplicates or semantically similar memories into one
+- Delete outdated memories that contradict newer ones
+- Re-score importance based on actual relevance
+
+Mode 2 only runs when there are at least 20 memories remaining after Mode 1.
 
 ```python
-# 24h idle timeout, memories with importance >= 0.8 are kept forever
-mem = memory.new(kv.default, idle_timeout=24)
-
-# Disable automatic compaction, manage manually
-mem = memory.new(kv.default, idle_timeout=0)
-mem.compact(idle_timeout=48)  # run manually when needed
+client = ai.Client("http://127.0.0.1:1234/v1")
+mem = memory.new(kv.open("./memory-db"), client, model="qwen3-8b")
 ```
 
 ## Agent Integration
 
+The simplest way to give an agent memory is to pass `memory=` to `Agent()`. The agent wires up the tools and augments the system prompt automatically — see [ai.agent Memory Integration](../agent/#memory-integration).
+
 ```python
-import scriptling.runtime.kv as kv
-import scriptling.ai.memory as memory
 import scriptling.ai as ai
 import scriptling.ai.agent as agent
+import scriptling.ai.memory as memory
+import scriptling.runtime.kv as kv
 
 client = ai.Client("http://127.0.0.1:1234/v1")
-tools = ai.ToolRegistry()
-mem = memory.new(kv.default, idle_timeout=24)
+mem = memory.new(kv.open("./memory-db"))
 
-tools.add("remember", "Store information in long-term memory", {
-    "content": "string",
-    "type": "string?",
-    "importance": "float?"
-}, lambda args: mem.remember(
-    args["content"],
-    type=args.get("type", "note"),
-    importance=float(args.get("importance", 0.5))
-))
-
-tools.add("recall", "Search long-term memory", {
-    "query": "string?"
-}, lambda args: mem.recall(args.get("query", ""), limit=5))
-
-tools.add("forget", "Remove a memory by ID", {
-    "id": "string"
-}, lambda args: mem.forget(args["id"]))
-
-bot = agent.Agent(client, tools=tools,
-    system_prompt="You are a helpful assistant with long-term memory.",
-    model="gpt-4")
-
+bot = agent.Agent(client, model="gpt-4", memory=mem)
 bot.interact()
 ```
 
+The agent automatically registers `memory_remember`, `memory_recall`, and `memory_forget` as tools, appends memory usage instructions to the system prompt, and pre-loads all stored `preference` memories into the system prompt for immediate context.
+
 ## MCP Tools
 
-Memory can be exposed as MCP tools so any LLM client (Claude Desktop, Cursor, etc.) can use it. See the [memory MCP tools example](https://github.com/paularlott/scriptling/tree/main/examples/mcp-tools/memory-tools) for ready-to-use `.toml`/`.py` tool definitions.
+Memory can be exposed as MCP tools so any LLM client (Claude Desktop, Cursor, etc.) can use it. See the [memory MCP tools example](https://github.com/paularlott/scriptling/tree/main/examples/mcp-tools/memory-tools) for ready-to-use tool definitions.
 
 ```bash
-# Start the MCP server with memory tools
-./bin/scriptling --server :8000 --mcp-tools ./examples/mcp-tools/memory-tools
-```
-
-`recall()` serves double duty — called with no arguments at conversation start it returns all preferences plus top memories by recency/importance; called with a query it does keyword search. Add this to your system prompt:
-
-```
-At the start of every new conversation, call recall() with no arguments before responding to
-the user. This loads all your preferences and recent activity so you have full context before
-you begin.
+SCRIPTLING_MEMORY_DB=~/.scriptling/memory \
+  ./bin/scriptling --server :8000 --mcp-tools ./examples/mcp-tools/memory-tools
 ```
 
 ## See Also
 
 - [runtime.kv](../runtime-kv/) — KV store backing the memory system
-- [ai.agent](../agent/) — Agentic loop that memory integrates with
+- [ai.agent](../agent/) — Agent with automatic memory integration
 - [Memory MCP Tools Example](https://github.com/paularlott/scriptling/tree/main/examples/mcp-tools/memory-tools)
