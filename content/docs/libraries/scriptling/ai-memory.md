@@ -17,9 +17,8 @@ Long-term memory store for AI agents. Backed by a KV store, memories persist acr
 | Method | Description |
 |--------|-------------|
 | `remember(content, type, importance)` | Store a memory; returns a dict with `id` |
-| `recall(query, limit, type)` | Search memories by keyword and semantic similarity |
+| `recall(query, limit, type)` | Search memories by keyword and semantic similarity; `limit=-1` for all |
 | `forget(id)` | Remove a memory by ID |
-| `list(type, limit)` | List all memories |
 | `count()` | Total number of memories |
 | `compact()` | Run compaction (prune old/decayed memories); returns dict with `removed` and `remaining` counts |
 
@@ -97,7 +96,7 @@ Search memories using **hybrid scoring**: keyword matching + semantic similarity
 **Parameters:**
 
 - `query` (str, optional): Keyword search against memory content. Empty returns memories ranked by recency and importance
-- `limit` (int, optional): Maximum results (default: `10`)
+- `limit` (int, optional): Maximum results (default: `10`, `-1` for unlimited)
 - `type` (str, optional): Filter by type
 
 **Returns:** list of memory dicts, ranked by relevance
@@ -129,15 +128,6 @@ Remove a memory by ID.
 ```python
 result = mem.remember("User's name is Alice", type="fact", importance=0.9)
 mem.forget(result["id"])
-```
-
-### list(type="", limit=50)
-
-List stored memories without updating their access time.
-
-```python
-all_memories = mem.list()
-facts = mem.list(type="fact")
 ```
 
 ### count()
@@ -269,7 +259,6 @@ SCRIPTLING_AI_MODEL=qwen3-8b \
 | `remember` | Store information with optional type and importance |
 | `recall` | Hybrid keyword + semantic search, or no args for full context load |
 | `forget` | Remove a memory by ID |
-| `list_memories` | List all memories, optionally filtered by type |
 | `compact` | Manually trigger compaction |
 
 ## See Also
