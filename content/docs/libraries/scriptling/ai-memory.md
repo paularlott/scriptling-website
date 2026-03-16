@@ -97,7 +97,7 @@ Search memories using **hybrid scoring**: keyword matching + semantic similarity
 
 - `query` (str, optional): Keyword search against memory content. Empty returns memories ranked by recency and importance
 - `limit` (int, optional): Maximum results (default: `10`, `-1` for unlimited)
-- `type` (str, optional): Filter by type
+- `type` (str, optional): Filter by type. Use `!xxx` to exclude a type (e.g., `!preference` returns all non-preferences)
 
 **Returns:** list of memory dicts, ranked by relevance
 
@@ -111,14 +111,14 @@ results = mem.recall("user name", limit=1)
 if results:
     print("User is", results[0]["content"])
 
-# Most recent/important memories
-recent = mem.recall(limit=5)
+# All preferences
+prefs = mem.recall(type="preference", limit=-1)
+
+# Top 10 non-preferences (for context load)
+others = mem.recall(type="!preference", limit=10)
 
 # Facts only
 facts = mem.recall("Alice", type="fact")
-
-# All preferences (used by agent at startup)
-prefs = mem.recall("", limit=50, type="preference")
 ```
 
 ### forget(id)
