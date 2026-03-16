@@ -21,6 +21,7 @@ Long-term memory store for AI agents. Backed by a KV store, memories persist acr
 | `forget(id)` | Remove a memory by ID |
 | `list(type, limit)` | List all memories |
 | `count()` | Total number of memories |
+| `compact()` | Manually trigger compaction; returns `removed` and `remaining` counts |
 
 ## Go Registration
 
@@ -60,7 +61,7 @@ mem = memory.new(db)
 # With LLM compaction (Mode 2)
 import scriptling.ai as ai
 client = ai.Client("http://127.0.0.1:1234/v1")
-mem = memory.new(kv.open("./memory-db"), client, model="qwen3-8b")
+mem = memory.new(kv.open("./memory-db"), ai_client=client, model="qwen3-8b")
 ```
 
 ## Store Methods
@@ -138,6 +139,17 @@ Returns the total number of stored memories.
 print(f"Stored memories: {mem.count()}")
 ```
 
+### compact()
+
+Manually triggers compaction synchronously. Resets the auto-compaction timer and activity counter. Returns a dict with `removed` and `remaining` counts.
+
+```python
+result = mem.compact()
+print(f"Removed {result['removed']}, {result['remaining']} remaining")
+```
+
+If a background compaction is already running, `compact()` returns immediately with `removed=0`.
+
 ## Memory Types
 
 | Type | Decay behaviour | Use for |
@@ -183,11 +195,11 @@ When an AI client is passed to `memory.new()`, Mode 2 runs after Mode 1. The LLM
 - Delete outdated memories that contradict newer ones
 - Re-score importance based on actual relevance
 
-Mode 2 only runs when there are at least 20 memories remaining after Mode 1.
+Mode 2 only runs on types that have at least 5 memories remaining after Mode 1 (configurable via `WithMinMemoriesForLLM`).
 
 ```python
 client = ai.Client("http://127.0.0.1:1234/v1")
-mem = memory.new(kv.open("./memory-db"), client, model="qwen3-8b")
+mem = memory.new(kv.open("./memory-db"), ai_client=client, model="qwen3-8b")
 ```
 
 ## Agent Integration
@@ -201,7 +213,7 @@ import scriptling.ai.memory as memory
 import scriptling.runtime.kv as kv
 
 client = ai.Client("http://127.0.0.1:1234/v1")
-mem = memory.new(kv.open("./memory-db"))
+mem = memory.new(kv.open("./memory-db"), ai_client=client, model="qwen3-8b")
 
 bot = agent.Agent(client, model="gpt-4", memory=mem)
 bot.interact()
@@ -213,10 +225,46 @@ The agent automatically registers `memory_remember`, `memory_recall`, and `memor
 
 Memory can be exposed as MCP tools so any LLM client (Claude Desktop, Cursor, etc.) can use it. See the [memory MCP tools example](https://github.com/paularlott/scriptling/tree/main/examples/mcp-tools/memory-tools) for ready-to-use tool definitions.
 
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SCRIPTLING_MEMORY_DB` | Path to the memory KV store directory | `./memory-db` |
+| `SCRIPTLING_AI_BASE_URL` | Base URL of the AI provider for Mode 2 compaction | (disabled) |
+| `SCRIPTLING_AI_PROVIDER` | Provider type: `openai`, `claude`, `gemini`, `ollama`, `zai`, `mistral` | `openai` |
+| `SCRIPTLING_AI_MODEL` | Model name for Mode 2 compaction | (disabled) |
+| `SCRIPTLING_AI_TOKEN` | API key / bearer token for the AI provider | (empty) |
+
+Mode 2 LLM compaction is enabled when both `SCRIPTLING_AI_BASE_URL` and `SCRIPTLING_AI_MODEL` are set.
+
 ```bash
+# Mode 1 only (rule-based)
 SCRIPTLING_MEMORY_DB=~/.scriptling/memory \
   ./bin/scriptling --server :8000 --mcp-tools ./examples/mcp-tools/memory-tools
+
+# With Mode 2 LLM compaction
+SCRIPTLING_MEMORY_DB=~/.scriptling/memory \
+SCRIPTLING_AI_BASE_URL=http://127.0.0.1:1234/v1 \
+SCRIPTLING_AI_MODEL=qwen3-8b \
+  ./bin/scriptling --server :8000 --mcp-tools ./examples/mcp-tools/memory-tools
+
+# With a hosted provider
+SCRIPTLING_MEMORY_DB=~/.scriptling/memory \
+SCRIPTLING_AI_BASE_URL=https://api.openai.com/v1 \
+SCRIPTLING_AI_MODEL=gpt-4o-mini \
+SCRIPTLING_AI_TOKEN=sk-... \
+  ./bin/scriptling --server :8000 --mcp-tools ./examples/mcp-tools/memory-tools
 ```
+
+### Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `remember` | Store information with optional type and importance |
+| `recall` | Keyword search, or no args for full context load |
+| `forget` | Remove a memory by ID |
+| `list_memories` | List all memories, optionally filtered by type |
+| `compact` | Manually trigger compaction |
 
 ## See Also
 
