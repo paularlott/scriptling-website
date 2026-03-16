@@ -147,6 +147,13 @@ numbers = set([1, 2, 3])
 unique = set([1, 2, 2, 3])  # {1, 2, 3}
 empty = set()
 
+# Set literal syntax
+colors = {"red", "green", "blue"}
+
+# Set comprehension
+evens = {x for x in range(10) if x % 2 == 0}  # {0, 2, 4, 6, 8}
+ids = {item["id"] for item in records}
+
 # Set operations
 s1 = set([1, 2, 3])
 s2 = set([2, 3, 4])

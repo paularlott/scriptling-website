@@ -81,7 +81,7 @@ Scriptling **does support**:
 - ✅ Classes with single inheritance and `super()`
 - ✅ Dunder methods: `__str__`, `__repr__`, `__len__`, `__bool__`, `__eq__`, `__lt__`, `__gt__`, `__le__`, `__ge__`, `__ne__`, `__contains__`, `__iter__`, `__next__`, `__enter__`, `__exit__`
 - ✅ Lambda functions and closures
-- ✅ List comprehensions and dict comprehensions
+- ✅ List comprehensions, dict comprehensions, and set comprehensions
 - ✅ Iterators (`range`, `map`, `filter`, `enumerate`, `zip`)
 - ✅ Dictionary views (`keys()`, `values()`, `items()`)
 - ✅ F-strings and `.format()`
