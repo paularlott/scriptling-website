@@ -93,29 +93,32 @@ mem.remember("Check API rate limits before next run")
 
 Search memories using **hybrid scoring**: keyword matching + semantic similarity (MinHash). Each recall updates the memory's `accessed_at`, protecting it from compaction.
 
+When called with no `query` and no `type` filter, `recall()` enters **context load mode**: it returns all `preference` memories (unlimited) plus the top `limit` non-preference memories, deduplicated by ID. This is the recommended way to prime an agent's context at the start of a session.
+
 **Parameters:**
 
-- `query` (str, optional): Keyword search against memory content. Empty returns memories ranked by recency and importance
-- `limit` (int, optional): Maximum results (default: `10`, `-1` for unlimited)
-- `type` (str, optional): Filter by type. Use `!xxx` to exclude a type (e.g., `!preference` returns all non-preferences)
+- `query` (str, optional): Keyword search against memory content. Empty string with no `type` triggers context load mode
+- `limit` (int, optional): Maximum results (default: `10`, `-1` for unlimited). In context load mode, applies only to non-preference memories
+- `type` (str, optional): Filter by type. Use `!xxx` to exclude a type (e.g., `!preference`). Setting this disables context load mode
 
 **Returns:** list of memory dicts, ranked by relevance
 
-**Scoring formula:**
+**Scoring formula (when querying):**
 ```
 score = keyword_hits×0.3 + semantic_similarity×0.3 + importance×0.2 + recency×0.2
 ```
 
 ```python
+# Context load — all preferences + top 10 non-preferences (recommended for session start)
+memories = mem.recall()
+
+# Keyword search
 results = mem.recall("user name", limit=1)
 if results:
     print("User is", results[0]["content"])
 
 # All preferences
 prefs = mem.recall(type="preference", limit=-1)
-
-# Top 10 non-preferences (for context load)
-others = mem.recall(type="!preference", limit=10)
 
 # Facts only
 facts = mem.recall("Alice", type="fact")
@@ -257,7 +260,7 @@ SCRIPTLING_AI_MODEL=qwen3-8b \
 | Tool | Description |
 |------|-------------|
 | `remember` | Store information with optional type and importance |
-| `recall` | Hybrid keyword + semantic search, or no args for full context load |
+| `recall` | Keyword + semantic search; no args triggers context load (all preferences + top N others) |
 | `forget` | Remove a memory by ID |
 | `compact` | Manually trigger compaction |
 
