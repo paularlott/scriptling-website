@@ -4,7 +4,7 @@ linkTitle: ai.memory
 weight: 3
 ---
 
-Long-term memory store for AI agents. Backed by a KV store, memories persist across sessions and are automatically deduplicated using MinHash similarity. Compaction (pruning old/decayed memories) runs on-demand via `compact()`.
+Long-term memory store for AI agents. Backed by a KV store, memories persist across sessions and are automatically deduplicated using MinHash similarity. Pruning of old/decayed memories runs automatically in the background after every `remember()` call. Full compaction (including LLM deduplication) can be triggered manually via `compact()`.
 
 ## Functions
 
@@ -20,7 +20,7 @@ Long-term memory store for AI agents. Backed by a KV store, memories persist acr
 | `recall(query, limit, type)` | Search memories by keyword and semantic similarity; `limit=-1` for all |
 | `forget(id)` | Remove a memory by ID |
 | `count()` | Total number of memories |
-| `compact()` | Run compaction (prune old/decayed memories); returns dict with `removed` and `remaining` counts |
+| `compact()` | Run full compaction (prune + LLM deduplication if AI client configured); returns dict with `removed` and `remaining` counts |
 
 ## Go Registration
 
@@ -143,7 +143,7 @@ print(f"Stored memories: {mem.count()}")
 
 ### compact()
 
-Manually trigger compaction. Returns a dict with `removed` and `remaining` counts.
+Manually trigger full compaction (prune + LLM deduplication). Pruning alone runs automatically in the background after every `remember()` — call `compact()` when you also want LLM-based deduplication.
 
 ```python
 result = mem.compact()
@@ -179,14 +179,18 @@ If an AI client is configured, `compact()` also runs pairwise similarity dedupli
 
 ## Compaction
 
-Compaction is **manual only** — call `compact()` when appropriate (e.g., on a schedule, during idle time, or after bulk imports). It performs two phases:
+Pruning runs **automatically in the background** after every `remember()` call. A single background goroutine (started when the store is created) waits for a signal, runs `prune()`, then goes back to sleep. The signal channel is buffered at size 1, so if a prune is already queued or running, subsequent `remember()` calls simply skip the signal — no blocking, no overlapping runs.
 
-**Phase 1 — Prune:** Removes memories based on:
+Automatic pruning only runs **Phase 1** (age cap + decay). It never calls the LLM.
+
+Call `compact()` manually when you also want **Phase 2** (LLM deduplication), for example after a bulk import or on a maintenance schedule.
+
+**Phase 1 — Prune** (automatic after every `remember()`):
 - Hard age cap: 180 days since last access
 - Importance decay: `effective_importance = importance × 0.5^(age / half_life)`
   - Pruned when effective importance drops below 0.1
 
-**Phase 2 — Deduplicate** (if AI client configured):
+**Phase 2 — Deduplicate** (manual `compact()` only, requires AI client):
 - Finds similar memory pairs using MinHash
 - Sends ambiguous pairs to LLM for merge/keep decisions
 
