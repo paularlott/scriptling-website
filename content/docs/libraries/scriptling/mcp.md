@@ -17,13 +17,15 @@ For MCP integration with OpenAI clients, see the [AI Library](../ai/) documentat
 
 ## MCPClient Methods
 
-| Method                                       | Description               |
-| -------------------------------------------- | ------------------------- |
-| `client.tools()`                             | List available tools      |
-| `client.call_tool(name, arguments)`          | Execute a tool by name    |
-| `client.refresh_tools()`                     | Refresh cached tool list  |
-| `client.tool_search(query, **kwargs)`        | Search for tools by query |
-| `client.execute_discovered(name, arguments)` | Execute a discovered tool |
+| Method                                       | Description                                    |
+| -------------------------------------------- | ---------------------------------------------- |
+| `client.tools()`                             | List available tools                           |
+| `client.call_tool(name, arguments)`          | Execute a tool by name                         |
+| `client.call_tools_parallel(calls)`          | Execute multiple tools concurrently            |
+| `client.refresh_tools()`                     | Refresh cached tool list                       |
+| `client.tool_search(query, **kwargs)`        | Search for tools by query                      |
+| `client.execute_discovered(name, arguments)` | Execute a discovered tool                      |
+| `client.execute_discovered_parallel(calls)`  | Execute multiple discovered tools concurrently |
 
 ## Module Functions
 
@@ -168,6 +170,33 @@ for tool in results:
     print(f"{tool.name}: {tool.description}")
 ```
 
+### client.call_tools_parallel(calls)
+
+Executes multiple tools concurrently and returns results in the same order as the input.
+
+**Parameters:**
+
+- `calls` (list): List of dicts, each with `name` (str) and `arguments` (dict) keys
+
+**Returns:** list - List of result dicts with `name`, `result`, and `error` keys. `error` is an empty string on success.
+
+**Example:**
+
+```python
+client = mcp.Client("https://api.example.com/mcp")
+
+results = client.call_tools_parallel([
+    {"name": "search", "arguments": {"query": "golang"}},
+    {"name": "weather", "arguments": {"city": "London"}},
+])
+
+for r in results:
+    if r.error:
+        print(f"{r.name} failed: {r.error}")
+    else:
+        print(f"{r.name}: {r.result}")
+```
+
 ### client.execute_discovered(name, arguments)
 
 Executes a tool by name using the execute_tool MCP tool. This is the only way to call tools that were discovered via tool_search.
@@ -192,6 +221,33 @@ if results:
         "location": "San Francisco"
     })
     print(result)
+```
+
+### client.execute_discovered_parallel(calls)
+
+Executes multiple discovered tools concurrently and returns results in the same order as the input.
+
+**Parameters:**
+
+- `calls` (list): List of dicts, each with `name` (str) and `arguments` (dict) keys
+
+**Returns:** list - List of result dicts with `name`, `result`, and `error` keys. `error` is an empty string on success.
+
+**Example:**
+
+```python
+client = mcp.Client("https://api.example.com/mcp")
+
+results = client.execute_discovered_parallel([
+    {"name": "tool_a", "arguments": {"x": 1}},
+    {"name": "tool_b", "arguments": {"y": 2}},
+])
+
+for r in results:
+    if r.error:
+        print(f"{r.name} failed: {r.error}")
+    else:
+        print(f"{r.name}: {r.result}")
 ```
 
 ## Usage Examples
@@ -260,6 +316,27 @@ for tool in db_tools:
             "sql": "SELECT * FROM users LIMIT 10"
         })
         print(result)
+```
+
+### Parallel Tool Execution
+
+```python
+import scriptling.mcp as mcp
+
+client = mcp.Client("https://api.example.com/mcp")
+
+# Execute multiple tools at the same time
+results = client.call_tools_parallel([
+    {"name": "search", "arguments": {"query": "golang"}},
+    {"name": "weather", "arguments": {"city": "London"}},
+    {"name": "translate", "arguments": {"text": "hello", "lang": "fr"}},
+])
+
+for r in results:
+    if r.error:
+        print(f"{r.name} failed: {r.error}")
+    else:
+        print(f"{r.name}: {r.result}")
 ```
 
 ## Authentication
@@ -342,7 +419,7 @@ print(decoded)  # {"temp": 15}
 
 ## Tool Schema
 
-Tools may include an input schema defining their parameters:
+Tools may include an input schema defining their parameters, and an output schema describing the response structure:
 
 ```python
 import scriptling.mcp as mcp
@@ -362,6 +439,8 @@ for tool in tools:
         #     },
         #     "required": ["query"]
         # }
+        if "output_schema" in tool:
+            print(f"Output schema: {tool.output_schema}")
 ```
 
 ## Using MCP Tools with AI
