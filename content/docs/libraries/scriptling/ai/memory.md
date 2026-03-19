@@ -270,6 +270,6 @@ SCRIPTLING_AI_MODEL=qwen3-8b \
 
 ## See Also
 
-- [runtime.kv](../runtime-kv/) — KV store backing the memory system
-- [ai.agent](../agent/) — Agent with automatic memory integration
+- [runtime.kv](../runtime/kv/) — KV store backing the memory system
+- [ai.agent](agent/) — Agent with automatic memory integration
 - [Memory MCP Tools Example](https://github.com/paularlott/scriptling/tree/main/examples/mcp-tools/memory-tools)

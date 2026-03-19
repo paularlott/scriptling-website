@@ -1,6 +1,6 @@
 ---
 title: Scriptling Libraries
-description: Scriptling-specific libraries for AI, MCP, and runtime functionality.
+description: Scriptling-specific libraries for AI, MCP, messaging, and runtime functionality.
 weight: 2
 ---
 
@@ -10,27 +10,37 @@ Scriptling-specific libraries that provide functionality not available in Python
 
 | Library | Description |
 |---------|-------------|
-| [scriptling.ai](ai/) | AI and LLM functions for OpenAI-compatible APIs |
-| [scriptling.ai.agent](agent/) | Agentic AI loop with automatic tool execution |
-| [scriptling.ai.agent.interact](interact/) | Interactive terminal interface for AI agents |
-| [scriptling.ai.memory](ai-memory/) | Long-term memory store for AI agents |
+| [scriptling.ai](ai/ai/) | AI and LLM functions for OpenAI-compatible APIs |
+| [scriptling.ai.agent](ai/agent/) | Agentic AI loop with automatic tool execution |
+| [scriptling.ai.agent.interact](ai/interact/) | Interactive terminal interface for AI agents |
+| [scriptling.ai.memory](ai/memory/) | Long-term memory store for AI agents |
 
 ## MCP Protocol
 
 | Library | Description |
 |---------|-------------|
-| [scriptling.mcp](mcp/) | MCP (Model Context Protocol) client for connecting to MCP servers |
-| [scriptling.mcp.tool](mcp-tool/) | Helper library for authoring MCP tools |
+| [scriptling.mcp](mcp/client/) | MCP (Model Context Protocol) client for connecting to MCP servers |
+| [scriptling.mcp.tool](mcp/tool/) | Helper library for authoring MCP tools |
+| [Writing MCP Tools](mcp/writing-mcp-tools/) | Guide for creating MCP tools |
+
+## Messaging
+
+| Library | Description |
+|---------|-------------|
+| [scriptling.messaging.telegram](messaging/telegram/) | Telegram Bot API client |
+| [scriptling.messaging.discord](messaging/discord/) | Discord Bot API client |
+| [scriptling.messaging.slack](messaging/slack/) | Slack Bot API client |
+| [scriptling.messaging.console](messaging/console/) | Console-based messaging client |
 
 ## Runtime
 
 | Library | Description |
 |---------|-------------|
-| [scriptling.runtime](runtime/) | Background tasks and async execution |
-| [scriptling.runtime.http](runtime-http/) | HTTP route registration and response helpers |
-| [scriptling.runtime.kv](runtime-kv/) | Thread-safe key-value store |
-| [scriptling.runtime.sync](runtime-sync/) | Named cross-environment concurrency primitives |
-| [scriptling.runtime.sandbox](sandbox/) | Isolated script execution environments |
+| [scriptling.runtime](runtime/runtime/) | Background tasks and async execution |
+| [scriptling.runtime.http](runtime/http/) | HTTP route registration and response helpers |
+| [scriptling.runtime.kv](runtime/kv/) | Thread-safe key-value store |
+| [scriptling.runtime.sync](runtime/sync/) | Named cross-environment concurrency primitives |
+| [scriptling.runtime.sandbox](runtime/sandbox/) | Isolated script execution environments |
 
 ## Utilities
 

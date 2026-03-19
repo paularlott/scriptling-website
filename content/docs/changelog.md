@@ -7,6 +7,30 @@ nav-skip: true
 
 ## March 2026
 
+{{< version "v0.3.0" >}}
+
+{{< changelog-item "added" >}}
+**New messaging libraries:**
+
+Platform-agnostic bot framework for building chat bots with a unified API:
+
+- `scriptling.messaging.telegram` — Telegram Bot API client
+- `scriptling.messaging.discord` — Discord Bot API client
+- `scriptling.messaging.slack` — Slack Bot API client
+- `scriptling.messaging.console` — Console-based messaging client for testing
+
+All platforms share a common interface with:
+- Command handlers (`/command` syntax)
+- Button callbacks with keyboard support
+- Message send/edit/delete operations
+- File upload/download
+- Typing indicators
+- Rich message support (title, body, color, images)
+- Authentication handlers for access control
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.2.23" >}}
 
 {{< changelog-item "added" >}}

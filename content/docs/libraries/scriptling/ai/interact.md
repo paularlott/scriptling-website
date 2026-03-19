@@ -97,6 +97,6 @@ Commands are registered with the TUI palette when `interact()` is called. Type `
 
 ## See Also
 
-- [scriptling.ai](../ai/) - AI client and tool registry
-- [scriptling.ai.agent](../agent/) - Agent class and tool execution
+- [scriptling.ai](./) - AI client and tool registry
+- [scriptling.ai.agent](agent/) - Agent class and tool execution
 - [scriptling.console](../console/) - Console TUI library

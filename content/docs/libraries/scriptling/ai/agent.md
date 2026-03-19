@@ -16,7 +16,7 @@ Agentic AI loop for building AI agents with automatic tool execution. The agent 
 | `agent.get_messages()` | Get conversation history |
 | `agent.set_messages(messages)` | Set conversation history |
 
-For tool registry documentation, see [AI Library](../ai/#tool-registry).
+For tool registry documentation, see [AI Library](./#tool-registry).
 
 ## Quick Start
 
@@ -266,6 +266,6 @@ clean_content = result["content"]
 
 ## See Also
 
-- [AI Library](../ai/) — AI client and completion functions
-- [ai.memory](../ai-memory/) — Long-term memory store
-- [ai.agent.interact](../interact/) — Interactive terminal session
+- [AI Library](./) — AI client and completion functions
+- [ai.memory](memory/) — Long-term memory store
+- [ai.agent.interact](interact/) — Interactive terminal session
