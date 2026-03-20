@@ -16,8 +16,54 @@ import functools
 | Function                                    | Description                     |
 | ------------------------------------------- | ------------------------------- |
 | `reduce(function, iterable[, initializer])` | Reduce iterable to single value |
+| `partial(func, *args, **kwargs)`            | Create a partial function application |
 
 ## Functions
+
+### partial(func, *args, **kwargs)
+
+Create a new function with some arguments pre-filled.
+
+**Parameters:**
+
+- `func` - The function to partially apply
+- `*args` - Positional arguments to pre-fill
+- `**kwargs` - Keyword arguments to pre-fill
+
+**Returns:** A new callable with the pre-filled arguments
+
+**Examples:**
+
+```python
+import functools
+
+def add(x, y):
+    return x + y
+
+add_five = functools.partial(add, 5)
+print(add_five(3))   # 8
+print(add_five(10))  # 15
+```
+
+```python
+# Pre-fill keyword arguments
+def greet(name, greeting="Hello"):
+    return greeting + ", " + name + "!"
+
+say_hi = functools.partial(greet, greeting="Hi")
+print(say_hi("Alice"))  # Hi, Alice!
+```
+
+```python
+# Works with built-in functions too
+def power(base, exp):
+    return base ** exp
+
+square = functools.partial(power, exp=2)
+cube   = functools.partial(power, exp=3)
+print(square(4))  # 16
+print(cube(3))    # 27
+```
 
 ### reduce(function, iterable[, initializer])
 
@@ -166,7 +212,7 @@ This library implements a subset of Python's `functools` module:
 | Function        | Supported |
 | --------------- | --------- |
 | reduce          | ✅        |
-| partial         | ❌        |
+| partial         | ✅        |
 | partialmethod   | ❌        |
 | lru_cache       | ❌        |
 | cache           | ❌        |
