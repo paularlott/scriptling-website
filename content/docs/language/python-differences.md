@@ -88,7 +88,7 @@ Scriptling **does support**:
 - ✅ F-strings and `.format()`
 - ✅ True division (`/` always returns float)
 - ✅ Set literals `{1, 2, 3}` and set operations
-- ✅ Try/except/finally error handling
+- ✅ Try/except/else/finally error handling
 - ✅ Multiple assignment and tuple unpacking
 - ✅ Extended unpacking with `*`
 - ✅ Variadic arguments (`*args`)

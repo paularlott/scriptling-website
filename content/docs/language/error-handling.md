@@ -1,6 +1,6 @@
 ---
 title: Error Handling
-description: try/except/finally, raise, assert, and exception types in Scriptling.
+description: try/except/else/finally, raise, assert, and exception types in Scriptling.
 weight: 6
 ---
 
@@ -31,6 +31,35 @@ except ZeroDivisionError:
 finally:
     # Always executes (optional)
     print("Cleanup code here")
+```
+
+### Try/Except/Else
+
+The `else` clause runs only when the `try` block completes without raising an exception. This is distinct from placing code after the `try/except` block — the `else` body is skipped if an exception was caught:
+
+```python
+try:
+    result = int(user_input)
+except ValueError:
+    print("Not a valid number")
+else:
+    # Only runs if no exception was raised
+    print("Parsed successfully:", result)
+finally:
+    # Always runs regardless
+    print("Done")
+```
+
+A common pattern is to keep the `try` block minimal and put the success-path logic in `else`:
+
+```python
+try:
+    data = fetch_data(url)
+except Exception as e:
+    log_error(e)
+    data = None
+else:
+    process(data)  # Only runs when fetch_data() succeeded
 ```
 
 ### Multiple Exception Types
@@ -446,7 +475,8 @@ if ex, ok := result.(*object.Exception); ok {
 
 ## Summary
 
-- Use `try/except/finally` for structured error handling
+- Use `try/except/else/finally` for structured error handling
+- Use `else` to run code only when no exception was raised
 - Catch specific exception types when possible
 - Use exceptions for exceptional cases, not control flow
 - Always preserve original exceptions when wrapping errors
