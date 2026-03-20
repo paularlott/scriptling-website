@@ -140,7 +140,7 @@ items(person)     # [["name", "Alice"], ["age", 31], ...]
 
 ## Set
 
-Unordered collections of unique elements:
+Unordered collections of unique elements. Only **hashable** types can be stored in a set: integers, floats, booleans, strings, `None`, and tuples of hashable elements. Attempting to add a list, dict, set, or instance raises `TypeError`.
 
 ```python
 numbers = set([1, 2, 3])
@@ -166,6 +166,18 @@ s1.difference(s2)           # {1}
 s1.add(5)
 s1.remove(1)
 s1.discard(99)  # No error if not found
+
+# TypeError for unhashable types
+try:
+    s = {[1, 2]}            # TypeError: unhashable type: 'LIST'
+except TypeError:
+    pass
+
+# Tuples are hashable (if their elements are)
+point_set = {(1, 2), (3, 4), (1, 2)}  # {(1, 2), (3, 4)}
+
+# int/float/bool hash equality (matches Python)
+s = set([1, 1.0, True])  # All three map to the same key → len == 1
 ```
 
 ## Tuple
@@ -174,19 +186,62 @@ Immutable ordered sequences:
 
 ```python
 coords = (10, 20)
-single = (42,)  # Single element tuple needs trailing comma
 nested = ((1, 2), (3, 4))
+empty  = ()
+
+# Single-element tuple — trailing comma is required
+# Without it, parentheses are just grouping, not a tuple
+single = (42,)   # tuple of length 1
+not_tuple = (42) # just the integer 42
 
 # Access by index
 x = coords[0]  # 10
 y = coords[1]  # 20
 
-# Cannot modify - tuples are immutable
+# Cannot modify — tuples are immutable
 # coords[0] = 5  # Error!
+
+# Slicing returns a tuple
+coords[0:1]  # (10,)
 
 # Tuple unpacking
 x, y = coords
 a, b, c = (1, 2, 3)
+
+# Implicit packing — parentheses are optional
+t = 1, 2, 3      # (1, 2, 3)
+s = 42,          # (42,)  — trailing comma makes it a tuple
+
+# Multiple return values use implicit packing
+def min_max(lst):
+    return min(lst), max(lst)
+
+lo, hi = min_max([3, 1, 4, 1, 5])
+
+# Membership
+2 in (1, 2, 3)      # True
+9 not in (1, 2, 3)  # True
+
+# Slicing returns a tuple
+t = (10, 20, 30, 40)
+t[1:3]    # (20, 30)
+t[::-1]   # (40, 30, 20, 10)
+
+# Methods
+t = (1, 2, 2, 3)
+t.count(2)   # 2
+t.index(3)   # 3
+t.index(2, 2)  # 2  (search from index 2)
+
+# Concatenation and repetition
+(1, 2) + (3, 4)   # (1, 2, 3, 4)
+(1, 2) * 3        # (1, 2, 1, 2, 1, 2)
+3 * (1, 2)        # (1, 2, 1, 2, 1, 2)
+
+# Tuples are hashable (if all elements are hashable)
+# so they can be used as dict keys or set elements
+d = {(0, 0): "origin", (1, 0): "right"}
+point_set = {(1, 2), (3, 4), (1, 2)}  # {(1, 2), (3, 4)}
 ```
 
 ## None

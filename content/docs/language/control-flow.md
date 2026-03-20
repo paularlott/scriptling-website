@@ -456,6 +456,35 @@ inverted = {v: k for k, v in original.items()}  # {1: "a", 2: "b", 3: "c"}
 doubled = {k: v * 2 for k, v in original.items()}  # {"a": 2, "b": 4, "c": 6}
 ```
 
+### Set Comprehensions
+
+```python
+evens = {x for x in range(10) if x % 2 == 0}  # {0, 2, 4, 6, 8}
+ids = {item["id"] for item in records}
+```
+
+### Multiple `for` Clauses
+
+All comprehension types support multiple `for` clauses, equivalent to nested loops:
+
+```python
+# List — cartesian product
+pairs = [(x, y) for x in [1, 2, 3] for y in ["a", "b"]]
+# [(1, "a"), (1, "b"), (2, "a"), (2, "b"), (3, "a"), (3, "b")]
+
+# With condition on the second clause
+filtered = [x + y for x in range(3) for y in range(3) if x != y]
+
+# Dict — flatten nested structure
+flat = {k: v for row in rows for k, v in row.items()}
+
+# Set — unique pairs
+unique = {(x, y) for x in [1, 2] for y in [2, 3]}
+
+# Generator expression
+total = sum(x * y for x in range(4) for y in range(4))
+```
+
 ## See Also
 
 - [Functions](./functions/) - Function definitions and parameters

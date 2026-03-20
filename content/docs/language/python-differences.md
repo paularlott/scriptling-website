@@ -21,7 +21,6 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Nested classes | Classes cannot be defined inside other classes/functions |
 | Metaclasses | Custom metaclasses are not supported |
 | Descriptors | The descriptor protocol is not implemented |
-| Arithmetic operator overloading | `__add__`, `__sub__`, `__mul__`, etc. are not supported |
 | Regex backreferences (`\1`, `\2`) | RE2 engine used; no backreferences, lookaheads, or lookbehinds — see [regex docs](../libraries/stdlib/regex/) |
 
 ### Built-in Functions NOT Supported
@@ -38,6 +37,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | `memoryview()`, `bytearray()`, `bytes()` | Advanced byte manipulation not supported |
 | `complex()` | Complex numbers not implemented |
 | `frozenset()` | Use regular `set()` |
+| `del` statement | Use slice assignment — e.g. `lst = lst[:n]` rather than `del lst[n:]` |
 
 ### Standard Library NOT Included
 
@@ -65,7 +65,8 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Exception hierarchy | Simplified error model |
 | Exception groups (Python 3.11+) | Not supported |
 | `except*` syntax | Not supported |
-| Custom exception classes | Can raise string messages only |
+| `raise X from Y` | Exception chaining not supported; use `raise ExcType(msg)` directly |
+| Custom exception classes | Cannot inherit from built-in exception types |
 
 ### Other Differences
 
@@ -82,12 +83,18 @@ Scriptling **does support**:
 - ✅ Classes with single inheritance and `super()`
 - ✅ Dunder methods: `__str__`, `__repr__`, `__len__`, `__bool__`, `__eq__`, `__lt__`, `__gt__`, `__le__`, `__ge__`, `__ne__`, `__contains__`, `__iter__`, `__next__`, `__enter__`, `__exit__`
 - ✅ Lambda functions and closures
-- ✅ List comprehensions, dict comprehensions, and set comprehensions
+- ✅ List comprehensions, dict comprehensions, set comprehensions, and generator expressions
+- ✅ Multiple `for` clauses in comprehensions (`[x for x in a for y in b]`)
 - ✅ Iterators (`range`, `map`, `filter`, `enumerate`, `zip`)
 - ✅ Dictionary views (`keys()`, `values()`, `items()`)
 - ✅ F-strings and `.format()`
 - ✅ True division (`/` always returns float)
 - ✅ Set literals `{1, 2, 3}` and set operations
+- ✅ Set hashability: `TypeError` raised for unhashable types (lists, dicts, instances) matching Python semantics
+- ✅ Bool arithmetic: `True + True == 2`, `True == 1`, `False == 0`
+- ✅ String comparison operators (`<`, `>`, `<=`, `>=`)
+- ✅ Implicit tuple packing (`x = 1, 2`, `return a, b`, `t = 42,`)
+- ✅ Chained assignment (`a = b = 5`)
 - ✅ Try/except/else/finally error handling
 - ✅ Multiple assignment and tuple unpacking
 - ✅ Extended unpacking with `*`
@@ -95,7 +102,7 @@ Scriptling **does support**:
 - ✅ Keyword arguments (`**kwargs`)
 - ✅ Default parameter values
 - ✅ Conditional expressions (ternary operator)
-- ✅ Augmented assignment (`+=`, `-=`, etc.)
+- ✅ Augmented assignment (`+=`, `-=`, `**=`, etc.)
 - ✅ Slice notation with step (`[start:stop:step]`)
 - ✅ `is` and `is not` operators
 - ✅ `in` and `not in` operators

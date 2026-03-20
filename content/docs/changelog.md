@@ -7,6 +7,23 @@ nav-skip: true
 
 ## March 2026
 
+{{< version "v0.3.2" >}}
+
+{{< changelog-item "added" >}}
+**Language:**
+
+- Multiple `for` clauses in list, dict, set comprehensions and generator expressions (`[x for x in a for y in b]`)
+- `__getitem__` and `__setitem__` dunder methods for custom bracket access (`obj[key]`) — dot access (`obj.attr`) no longer triggers `__getitem__`
+- `__hash__` dunder method — instances that define `__hash__` can be used as dict keys and set elements; `hash()` builtin calls it
+- Arithmetic dunder methods: `__add__`, `__sub__`, `__mul__`, `__truediv__`, `__floordiv__`, `__mod__`
+- Set and dict entry points raise `TypeError` for unhashable types (lists, dicts, instances without `__hash__`), matching Python semantics
+- Tuple `in`/`not in` operator
+- Tuple slicing (`t[1:3]`, `t[::-1]`) returns a tuple
+- Tuple `count()` and `index()` methods
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.3.0" >}}
 
 {{< changelog-item "added" >}}

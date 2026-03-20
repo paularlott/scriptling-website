@@ -124,6 +124,8 @@ Exception (base class)
 | `IndexError` | Sequence index out of range |
 | `KeyError` | Dictionary key not found |
 | `AttributeError` | Attribute not found on object |
+| `OSError` | OS-level errors (file not found, permission denied, etc.) |
+| `RuntimeError` | General runtime errors |
 
 ### Automatic Exception Type Inference
 

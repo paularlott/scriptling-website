@@ -38,6 +38,11 @@ x % y    # Modulo (remainder)
 [1, 2] + [3, 4]  # [1, 2, 3, 4]
 [1, 2] * 3       # [1, 2, 1, 2, 1, 2]
 3 * [1, 2]       # [1, 2, 1, 2, 1, 2]
+
+# Tuple operations
+(1, 2) + (3, 4)  # (1, 2, 3, 4)
+(1, 2) * 3       # (1, 2, 1, 2, 1, 2)
+3 * (1, 2)       # (1, 2, 1, 2, 1, 2)
 ```
 
 ## Augmented Assignment
@@ -204,6 +209,10 @@ x not in y   # True if x is not contained in y
 # Lists
 3 in [1, 2, 3]       # True
 5 not in [1, 2, 3]   # True
+
+# Tuples
+3 in (1, 2, 3)       # True
+5 not in (1, 2, 3)   # True
 
 # Strings
 "ll" in "hello"      # True
