@@ -22,6 +22,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Metaclasses | Custom metaclasses are not supported |
 | Descriptors | The descriptor protocol is not implemented |
 | Arithmetic operator overloading | `__add__`, `__sub__`, `__mul__`, etc. are not supported |
+| Regex backreferences (`\1`, `\2`) | RE2 engine used; no backreferences, lookaheads, or lookbehinds — see [regex docs](../libraries/stdlib/regex/) |
 
 ### Built-in Functions NOT Supported
 

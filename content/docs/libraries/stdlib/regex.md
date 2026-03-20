@@ -516,3 +516,32 @@ if m:
 - Backslashes in patterns need to be escaped in Scriptling strings
 - The `count` parameter in `re.sub()` limits the number of replacements (0 = replace all)
 - The `maxsplit` parameter in `re.split()` limits the number of splits
+
+## RE2 Limitations (Differences from Python `re`)
+
+Scriptling uses Go's RE2 engine, which intentionally omits some features found in Python's `re` module (which uses a backtracking engine):
+
+| Feature | Python `re` | Scriptling (RE2) | Workaround |
+|---------|-------------|------------------|------------|
+| Backreferences (`\1`, `\2`) | ✅ | ❌ | Restructure pattern to avoid them |
+| Lookahead (`(?=...)`) | ✅ | ❌ | Restructure pattern or post-filter results |
+| Lookbehind (`(?<=...)`) | ✅ | ❌ | Restructure pattern or post-filter results |
+| Negative lookahead (`(?!...)`) | ✅ | ❌ | Restructure pattern or post-filter results |
+| Negative lookbehind (`(?<!...)`) | ✅ | ❌ | Restructure pattern or post-filter results |
+| Atomic groups (`(?>...)`) | ✅ | ❌ | Not needed with RE2 (no backtracking) |
+| Possessive quantifiers (`*+`, `++`) | ✅ | ❌ | Not needed with RE2 (no backtracking) |
+| Named backreferences (`(?P=name)`) | ✅ | ❌ | Restructure pattern to avoid them |
+
+The most common issue is **backreferences** — patterns like `r'<(h\d)>.*?</\1>'` that use `\1` to match the same text as a capturing group will fail with a compile error. Rewrite them to repeat the pattern explicitly:
+
+```python
+import re
+
+# Python - uses backreference \1 to match closing tag
+# pattern = r'<(h\d)>(.*?)</\1>'  # Does NOT work in Scriptling
+
+# Scriptling - repeat the pattern instead
+matches = re.findall(r'<(h\d)>(.*?)</(?:h\d)>', html, re.IGNORECASE | re.DOTALL)
+for tag, content in matches:
+    print(tag, content)
+```

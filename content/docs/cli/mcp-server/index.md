@@ -70,9 +70,27 @@ scriptling --server :8000 --mcp-exec-script setup.py
 
 ### Return Behavior
 
-- Output from `print()` statements is automatically captured and returned
-- For structured data (JSON), use `import scriptling.mcp.tool` and call `tool.return_object(data)`
-- For text output, use `tool.return_string(text)`
+The `execute_script` tool captures output in the following order of priority:
+
+1. **Explicit return functions** - If you use `tool.return_string()`, `tool.return_object()`, etc., that value is returned
+2. **Script return value** - If the script returns a value (e.g., calling a function that returns a string), it's automatically captured and returned
+3. **Print output** - Output from `print()` statements is captured and returned if no other return method is used
+
+```python
+# Example: Direct return value
+def greet():
+    return "Hello, World!"
+greet()  # Returns: "Hello, World!"
+
+# Example: Print output
+print("Hello, World!")  # Returns: "Hello, World!"
+
+# Example: Explicit return (stops execution)
+import scriptling.mcp.tool as tool
+tool.return_string("Hello, World!")  # Returns immediately
+```
+
+For structured data (JSON), use `tool.return_object(data)`. For complex types returned directly (dict, list), they're automatically converted to JSON.
 
 ### Example: Using the Tool
 
