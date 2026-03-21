@@ -75,6 +75,41 @@ Use `--insecure` (or `-k`) to allow self-signed HTTPS certificates:
 scriptling --insecure --package https://self-signed.local/lib.zip script.py
 ```
 
+### Hash Verification
+
+Verify package integrity by specifying an expected SHA256 hash:
+
+```bash
+# Verify package hash before loading
+scriptling --package mylib.zip#sha256:abc123... script.py
+
+# With URL (download and verify)
+scriptling --package https://example.com/lib.zip#sha256:abc123... script.py
+```
+
+**How it works:**
+- Append `#sha256:<hash>` to the package path or URL
+- Scriptling computes the SHA256 hash after fetching
+- If the hash doesn't match, loading fails with an error
+- For local files, the hash is optional (no hash = no verification)
+- For remote URLs, this ensures the package hasn't been tampered with
+
+**Getting the hash:**
+
+When you create a package, the hash is printed:
+
+```bash
+scriptling pack ./mylib -o mylib.zip
+# Output includes: SHA256: abc123def456...
+```
+
+Or use the `manifest` command:
+
+```bash
+scriptling manifest mylib.zip
+# Shows: Hash: abc123def456...
+```
+
 ### Custom Cache Directory
 
 Remote packages are cached locally. Override the cache location with `--cache-dir`:
@@ -143,6 +178,14 @@ scriptling pack ./mylib -o mylib.zip
 scriptling pack ./mylib -o mylib.zip -f
 ```
 
+Output includes the SHA256 hash for verification:
+```
+Package created: mylib.zip
+SHA256: abc123def456789...
+```
+
+Use this hash with `--package mylib.zip#sha256:abc123...` to verify integrity.
+
 Only `manifest.toml`, `lib/`, and `docs/` are included in the package.
 
 ### Unpack Command
@@ -181,6 +224,15 @@ scriptling manifest ./mylib
 
 # JSON output
 scriptling manifest mylib.zip --json
+```
+
+Output includes:
+```
+Name:        mylib
+Version:     1.0.0
+Description: A useful library
+Main:        app.main
+Hash:        abc123def456...
 ```
 
 ### Help Command
