@@ -36,6 +36,10 @@ Running Scriptling as an HTTP server with custom routes, TLS, and authentication
 
 Running Scriptling as a Model Context Protocol server for AI integration, including the script execution tool.
 
+### [Packages](./packages/)
+
+Create, distribute, and load Scriptling packages from local files or URLs.
+
 ## Features
 
 - **File execution**: Run Scriptling scripts from files
@@ -45,6 +49,7 @@ Running Scriptling as a Model Context Protocol server for AI integration, includ
 - **HTTP Server**: Start HTTP server with custom routes via `--server`
 - **MCP Server**: Serve tools via Model Context Protocol with `--mcp-tools`
 - **MCP Script Execution**: Allow LLMs to execute Scriptling code via `--mcp-exec-script`
+- **Packages**: Load libraries from local or remote ZIP packages with `--package`
 - **Path restrictions**: Restrict filesystem access with `--allowed-paths`
 - **Custom libraries**: Libraries are loaded automatically from the script's directory
 - **Environment configuration**: Auto-load settings from `.env` file
@@ -66,4 +71,13 @@ scriptling --allowed-paths "/tmp,./data" script.py
 
 # Start HTTPS server with self-signed cert
 scriptling --server :8443 --tls-generate setup.py
+
+# Load a package and run
+scriptling --package ./libs/utils.zip script.py
+
+# Load package from URL
+scriptling --package https://example.com/lib.zip script.py
+
+# Create a package
+scriptling pack ./mylib -o mylib.zip
 ```
