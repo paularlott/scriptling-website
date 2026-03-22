@@ -78,14 +78,14 @@ Verify package integrity by specifying an expected SHA256 hash:
 
 ```bash
 # Verify package hash before loading
-scriptling --package mylib.zip#sha256:abc123... script.py
+scriptling --package mylib.zip#sha256=abc123... script.py
 
 # With URL (download and verify)
-scriptling --package https://example.com/lib.zip#sha256:abc123... script.py
+scriptling --package https://example.com/lib.zip#sha256=abc123... script.py
 ```
 
 **How it works:**
-- Append `#sha256:<hash>` to the package path or URL
+- Append `#sha256=<hash>` to the package path or URL
 - Scriptling computes the SHA256 hash after fetching
 - If the hash doesn't match, loading fails with an error
 - For local files, the hash is optional (no hash = no verification)
@@ -175,7 +175,7 @@ scriptling pack ./mylib -o mylib.zip
 scriptling pack ./mylib -o mylib.zip -f
 ```
 
-The SHA256 hash is printed on success — use it with `#sha256:...` to verify integrity on load.
+The SHA256 hash is printed on success — use it with `#sha256=...` to verify integrity on load.
 
 ### Unpack Command
 
