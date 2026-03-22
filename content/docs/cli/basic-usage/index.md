@@ -76,7 +76,7 @@ The linter exits with code 0 if no errors are found, and code 1 if any errors ex
 | `-c`, `--code`        | -                          | Execute inline code string                           | -                |
 | `-l`, `--lint`        | -                          | Lint script files without executing                  | false            |
 | `--lint-format`       | `SCRIPTLING_LINT_FORMAT`   | Output format for lint (text/json)                   | text             |
-| `-p`, `--package`     | -                          | Package (.zip) or file (.py) to load (repeatable)    | (none)           |
+| `-p`, `--package`     | -                          | Package (.zip) path or URL to load (repeatable)      | (none)           |
 | `-k`, `--insecure`    | -                          | Allow self-signed HTTPS certificates                 | false            |
 | `--cache-dir`         | `SCRIPTLING_CACHE_DIR`     | Cache directory for remote packages                  | OS default       |
 | `-L`, `--libpath`     | `SCRIPTLING_LIBPATH`       | Extra library search directory (repeatable)          | (none)           |
