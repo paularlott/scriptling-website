@@ -53,9 +53,6 @@ scriptling --package https://example.com/libs/mylib.zip script.py
 
 # Load multiple packages
 scriptling --package core.zip --package utils.zip script.py
-
-# Load single Python file
-scriptling --package ./helper.py script.py
 ```
 
 ### Package Priority
@@ -178,15 +175,7 @@ scriptling pack ./mylib -o mylib.zip
 scriptling pack ./mylib -o mylib.zip -f
 ```
 
-Output includes the SHA256 hash for verification:
-```
-Package created: mylib.zip
-SHA256: abc123def456789...
-```
-
-Use this hash with `--package mylib.zip#sha256:abc123...` to verify integrity.
-
-Only `manifest.toml`, `lib/`, and `docs/` are included in the package.
+The SHA256 hash is printed on success — use it with `#sha256:...` to verify integrity on load.
 
 ### Unpack Command
 
@@ -214,34 +203,34 @@ View package metadata:
 
 ```bash
 # From local package
-scriptling manifest mylib.zip
+scriptling pack manifest mylib.zip
 
 # From URL
-scriptling manifest https://example.com/lib.zip
+scriptling pack manifest https://example.com/lib.zip
 
 # From source directory
-scriptling manifest ./mylib
+scriptling pack manifest ./mylib
 
 # JSON output
-scriptling manifest mylib.zip --json
+scriptling pack manifest mylib.zip --json
 ```
 
-Output includes:
-```
-Name:        mylib
-Version:     1.0.0
-Description: A useful library
-Main:        app.main
-Hash:        abc123def456...
-```
+### Docs Command
 
-### Help Command
-
-Query built-in help for functions:
+Browse package documentation interactively:
 
 ```bash
-# Help for package function
-scriptling help mylib.utils.helper
+# Launch TUI browser
+scriptling pack docs mylib.zip
+
+# From URL
+scriptling pack docs https://example.com/lib.zip
+
+# From unpacked directory
+scriptling pack docs ./mylib-dev
+
+# List docs without TUI
+scriptling pack docs mylib.zip --list
 ```
 
 ## Cache Management
