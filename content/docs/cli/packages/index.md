@@ -235,12 +235,46 @@ scriptling pack docs mylib.zip --list
 
 ## Cache Management
 
-Remote packages are cached with ETag/Last-Modified validation:
+Remote packages (http:// and https://) are cached locally to avoid redundant downloads. Scriptling uses HTTP conditional requests to check for updates efficiently.
+
+### How Caching Works
+
+When loading a remote package:
+
+1. **First download** - Package is cached to disk along with its `ETag` and `Last-Modified` headers
+2. **Subsequent loads** - Scriptling sends a conditional `GET` request with:
+   - `If-None-Match: <etag>` - if the server provided an ETag
+   - `If-Modified-Since: <last-modified>` - if the server provided Last-Modified
+3. **If server responds `304 Not Modified`** - Uses cached copy (no body transferred)
+4. **If server responds `200 OK`** - Downloads and caches the updated package
+
+This means:
+- **Single request** - One GET request, whether cached or not
+- **Automatic updates** - New versions are fetched immediately when available
+- **Bandwidth efficient** - No body transferred when unchanged
+
+### Cache Location
+
+Default cache directory:
+
+| Platform | Location |
+|----------|----------|
+| macOS | `~/Library/Caches/scriptling/packages/` |
+| Linux | `~/.cache/scriptling/packages/` |
+| Windows | `%LOCALAPPDATA%\scriptling\packages\` |
+
+Override with `--cache-dir` or `SCRIPTLING_CACHE_DIR` environment variable.
+
+### Cache Commands
 
 ```bash
 # Clear all cached packages
 scriptling cache clear
 ```
+
+### Cache TTL
+
+Cached packages are automatically pruned after 7 days of non-use. Each access resets the TTL, so frequently used packages stay cached indefinitely.
 
 ## Using Packages in Code
 
