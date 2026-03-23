@@ -7,6 +7,29 @@ nav-skip: true
 
 ## March 2026
 
+{{< version "v0.4.0" >}}
+
+{{< changelog-item "added" >}}
+**Package System:**
+
+- Packed library files — distribute Scriptling libraries as `.zip` packages with automatic download and caching
+- `scriptling pack` command — create packages from directories with `# sha256=<hash>` integrity verification
+- Package cache with ETag/Last-Modified validation and automatic pruning (7-day TTL)
+- Documentation support in packages for `help` command integration
+
+**Language:**
+
+- Relative imports — `from .module import name` and `from ..package import name` for hierarchical module organization
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**CLI:**
+
+- `help` command now works in TUI mode with topic lookup support
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.3.2" >}}
 
 {{< changelog-item "added" >}}
