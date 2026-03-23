@@ -7,6 +7,26 @@ nav-skip: true
 
 ## March 2026
 
+{{< version "v0.4.1" >}}
+
+{{< changelog-item "added" >}}
+**WebSocket Support:**
+
+- `scriptling.websocket` library — WebSocket client for connecting to servers
+  - `connect(url, timeout, headers)` — Connect to a WebSocket server
+  - `send(message)`, `send_binary(data)` — Send text (auto-JSON for dicts) or binary
+  - `receive(timeout)` — Receive a message (None on timeout/disconnect)
+  - `connected()`, `close()` — Connection lifecycle
+  - `is_text(msg)`, `is_binary(msg)` — Check message type
+
+- `runtime.http.websocket(path, handler)` — Server-side WebSocket endpoints
+  - Handler receives a `WebSocketClient` object for the connection lifetime
+  - `client.send()`, `client.receive()`, `client.connected()`, `client.close()`
+  - `client.remote_addr` — Client's remote address
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.4.0" >}}
 
 {{< changelog-item "added" >}}
