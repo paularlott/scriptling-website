@@ -306,6 +306,28 @@ url = "https://example.com/api?" + query_string
 
 ## Common Patterns
 
+### Main Module Pattern
+
+Use `__name__` to create modules that can be both imported and run directly:
+
+```python
+# mymodule.py
+
+def main():
+    print("Running main function")
+
+# Only runs when executed directly, not when imported
+if __name__ == "__main__":
+    main()
+```
+
+```python
+# main.py
+import mymodule  # main() is NOT called
+
+mymodule.main()  # Explicitly call it
+```
+
 ### HTTP Error Handling
 
 ```python

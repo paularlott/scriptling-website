@@ -72,7 +72,6 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 
 | Feature | Notes |
 |---------|-------|
-| `__name__ == "__main__"` | Not supported; scripts execute top-to-bottom |
 | Module `__all__` | Export lists are not used |
 | `__future__` imports | Not applicable |
 
@@ -115,6 +114,7 @@ Scriptling **does support**:
 - ✅ `@property`, `@staticmethod`, `@classmethod` decorators
 - ✅ `for/else` and `while/else`
 - ✅ `match`/`case` with OR patterns (`case 1 | 2 | 3:`)
+- ✅ `__name__` variable with `"__main__"` for main scripts and module name for imports
 
 ## Key Behavioral Differences
 

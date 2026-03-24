@@ -133,6 +133,14 @@ if x < 0:
 assert x > 0, "x must be positive"
 ```
 
+### Modules and `__name__`
+
+```python
+# __name__ is "__main__" when run directly, module name when imported
+if __name__ == "__main__":
+    print("Running as main script")
+```
+
 ### Classes
 
 ```python
