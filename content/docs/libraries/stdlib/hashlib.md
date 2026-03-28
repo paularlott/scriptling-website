@@ -12,7 +12,6 @@ Cryptographic hash functions.
 | `md5(string)`    | Compute MD5 hash of a string     |
 | `sha1(string)`   | Compute SHA-1 hash of a string   |
 | `sha256(string)` | Compute SHA-256 hash of a string |
-| `sha512(string)` | Compute SHA-512 hash of a string |
 
 ## Functions
 

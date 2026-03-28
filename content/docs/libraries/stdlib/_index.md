@@ -10,45 +10,23 @@ Built-in libraries available for import without any registration.
 |---------|-------------|
 | [base64](base64/) | Base64 encoding and decoding |
 | [collections](collections/) | Specialized container datatypes |
-| [contextlib](contextlib) | Utilities for the `with` statement (`suppress`) |
-| [datetime](datetime) | Date and time formatting |
-    [difflib](difflib) | Sequence comparison and diff generation |
-    [functools](functools) | Higher-order functions and decorators |
-    [hashlib](hashlib) | Secure hash algorithms |
-    [html](html) | HTML escaping and unescaping |
-    [io](io) | In-memory I/O streams (StringIO) |
-    [itertools](itertools) | Iterator functions |
-    [json](json) | Parse and generate JSON data |
-    [math](math) | Mathematical functions and constants |
-    [platform](platform/) | Platform identifying data |
-    [random](random) | Random number generation |
-    [re](regex) | Regular expression operations |
-    [statistics](statistics) | Statistical functions |
-    [string](string) | String constants |
-    [textwrap](textwrap) | Text wrapping and filling |
-    [time](time) | Time access and conversions |
-    [urllib](urllib) | URL handling |
-    [uuid](uuid/) | UUID generation || Library | Description |
-|---------|-------------|
 | [contextlib](contextlib/) | Utilities for the `with` statement (`suppress`) |
-| [difflib](difflib/) | Sequence comparison and diff generation |
-| [json](json/) | Parse and generate JSON data |
-| [io](io/) | In-memory I/O streams (StringIO) |
-| [base64](base64/) | Base64 encoding and decoding |
-| [html](html/) | HTML escaping and unescaping |
-| [math](math/) | Mathematical functions and constants |
-| [random](random/) | Random number generation |
-| [statistics](statistics/) | Statistical functions |
-| [time](time/) | Time access and conversions |
 | [datetime](datetime/) | Date and time formatting |
+| [difflib](difflib/) | Sequence comparison and diff generation |
+| [functools](functools/) | Higher-order functions and decorators |
+| [hashlib](hashlib/) | Secure hash algorithms |
+| [html](html/) | HTML escaping and unescaping |
+| [io](io/) | In-memory I/O streams (StringIO) |
+| [itertools](itertools/) | Iterator functions |
+| [json](json/) | Parse and generate JSON data |
+| [math](math/) | Mathematical functions and constants |
+| [platform](platform/) | Platform identifying data |
+| [random](random/) | Random number generation |
 | [re](regex/) | Regular expression operations |
+| [statistics](statistics/) | Statistical functions |
 | [string](string/) | String constants |
 | [textwrap](textwrap/) | Text wrapping and filling |
-| [functools](functools/) | Higher-order functions |
-| [itertools](itertools/) | Iterator functions |
-| [collections](collections/) | Specialized container datatypes |
-| [hashlib](hashlib/) | Secure hash algorithms |
-| [platform](platform/) | Platform identifying data |
+| [time](time/) | Time access and conversions |
 | [urllib](urllib/) | URL handling |
 | [uuid](uuid/) | UUID generation |
 

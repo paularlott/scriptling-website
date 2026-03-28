@@ -7,15 +7,19 @@ Random number generation functions. Python-compatible.
 
 ## Available Functions
 
-| Function                | Description                                |
-| ----------------------- | ------------------------------------------ |
-| `seed([a])`             | Initialize the random number generator     |
-| `randint(a, b)`         | Random integer between a and b (inclusive) |
-| `random()`              | Random float between 0.0 and 1.0           |
-| `uniform(a, b)`         | Random float between a and b               |
-| `choice(seq)`           | Random element from a sequence             |
-| `shuffle(list)`         | Shuffle a list in place                    |
-| `sample(population, k)` | k unique random elements from population   |
+| Function                       | Description                                    |
+| ------------------------------ | ---------------------------------------------- |
+| `seed([a])`                    | Initialize the random number generator         |
+| `randint(a, b)`                | Random integer between a and b (inclusive)     |
+| `randrange(start, stop[, step])` | Random element from range                    |
+| `random()`                     | Random float between 0.0 and 1.0               |
+| `uniform(a, b)`                | Random float between a and b                   |
+| `gauss(mu, sigma)`             | Gaussian distribution random float             |
+| `normalvariate(mu, sigma)`     | Gaussian distribution (alias for gauss)        |
+| `expovariate(lambd)`           | Exponential distribution random float          |
+| `choice(seq)`                  | Random element from a sequence                 |
+| `shuffle(list)`                | Shuffle a list in place                        |
+| `sample(population, k)`        | k unique random elements from population       |
 
 ## Functions
 
@@ -152,6 +156,83 @@ import random
 numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 sample = random.sample(numbers, 3)
 print(sample)  # [4, 7, 2] (3 random unique elements)
+```
+
+### random.randrange(start, stop[, step])
+
+Returns a randomly selected element from a range.
+
+**Parameters:**
+
+- `start`: Start of range (or stop if only one argument)
+- `stop`: End of range (exclusive)
+- `step` (optional): Step value. Default: 1
+
+**Returns:** Integer
+
+**Example:**
+
+```python
+import random
+
+# Single argument (0 to stop)
+num = random.randrange(100)  # 0-99
+
+# With start and stop
+num = random.randrange(10, 20)  # 10-19
+
+# With step
+num = random.randrange(0, 100, 5)  # 0, 5, 10, ..., 95
+```
+
+### random.gauss(mu, sigma)
+
+Returns a random float from a Gaussian (normal) distribution.
+
+**Parameters:**
+
+- `mu`: Mean of the distribution
+- `sigma`: Standard deviation
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import random
+
+# Generate values from normal distribution (mean=0, std=1)
+value = random.gauss(0, 1)
+```
+
+### random.normalvariate(mu, sigma)
+
+Alias for `gauss()`. Returns a random float from a Gaussian distribution.
+
+**Parameters:**
+
+- `mu`: Mean of the distribution
+- `sigma`: Standard deviation
+
+**Returns:** Float
+
+### random.expovariate(lambd)
+
+Returns a random float from an exponential distribution.
+
+**Parameters:**
+
+- `lambd`: Rate parameter (1.0 divided by the desired mean)
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import random
+
+# Exponential with mean 5 (lambd = 1/5)
+wait_time = random.expovariate(0.2)
 ```
 
 ## Usage Example

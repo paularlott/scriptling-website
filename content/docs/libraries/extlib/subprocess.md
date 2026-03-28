@@ -37,6 +37,10 @@ Run a command and return a CompletedProcess instance.
 - `cwd` (string): Working directory for command
 - `timeout` (integer): Timeout in seconds
 - `check` (boolean): Raise exception if returncode is non-zero. Default: `false`
+- `text` (boolean): Return stdout/stderr as strings. Default: `true`
+- `encoding` (string): Encoding for stdout/stderr (default: "utf-8")
+- `input` (string): String to pipe to stdin
+- `env` (dict): Environment variables for the command
 
 **Returns:** CompletedProcess instance
 

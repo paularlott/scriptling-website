@@ -36,6 +36,7 @@ Makes a GET request to the specified URL.
 - `**kwargs`: Optional arguments
   - `timeout` (int): Request timeout in seconds (default: 5)
   - `headers` (dict): HTTP headers to send
+  - `params` (dict): Query parameters to append to the URL
   - `auth` (tuple/list): Basic authentication as (username, password)
 
 **Returns:** Response object
@@ -51,6 +52,8 @@ Makes a POST request to the specified URL.
 - `**kwargs`: Optional arguments
   - `timeout` (int): Request timeout in seconds (default: 5)
   - `headers` (dict): HTTP headers to send
+  - `params` (dict): Query parameters to append to the URL
+  - `json` (dict/list): JSON-encode as request body and set Content-Type
   - `auth` (tuple/list): Basic authentication as (username, password)
 
 **Returns:** Response object
@@ -66,6 +69,7 @@ Makes a PUT request to the specified URL.
 - `**kwargs`: Optional arguments
   - `timeout` (int): Request timeout in seconds (default: 5)
   - `headers` (dict): HTTP headers to send
+  - `params` (dict): Query parameters to append to the URL
   - `auth` (tuple/list): Basic authentication as (username, password)
 
 **Returns:** Response object
@@ -80,6 +84,7 @@ Makes a DELETE request to the specified URL.
 - `**kwargs`: Optional arguments
   - `timeout` (int): Request timeout in seconds (default: 5)
   - `headers` (dict): HTTP headers to send
+  - `params` (dict): Query parameters to append to the URL
   - `auth` (tuple/list): Basic authentication as (username, password)
 
 **Returns:** Response object
@@ -95,6 +100,7 @@ Makes a PATCH request to the specified URL.
 - `**kwargs`: Optional arguments
   - `timeout` (int): Request timeout in seconds (default: 5)
   - `headers` (dict): HTTP headers to send
+  - `params` (dict): Query parameters to append to the URL
   - `auth` (tuple/list): Basic authentication as (username, password)
 
 **Returns:** Response object
@@ -105,6 +111,7 @@ All HTTP functions return a response object with these attributes:
 
 - `status_code` or `["status_code"]`: HTTP status code (integer)
 - `text` or `["text"]`: Response body (string)
+- `body` or `["body"]`: Response body (string, alias for text)
 - `headers` or `["headers"]`: Response headers (dictionary)
 - `url` or `["url"]`: The URL of the response
 
@@ -112,6 +119,27 @@ All HTTP functions return a response object with these attributes:
 
 - `json()`: Parse response body as JSON
 - `raise_for_status()`: Raise exception if status code >= 400
+
+## Exceptions
+
+The requests library provides the following exception types for error handling:
+
+- `RequestException`: Base exception for all request errors
+- `HTTPError`: Exception for HTTP error responses (4xx, 5xx)
+
+**Example:**
+
+```python
+import requests
+
+try:
+    response = requests.get("https://api.example.com/data")
+    response.raise_for_status()
+except requests.HTTPError as e:
+    print("HTTP error:", e)
+except requests.RequestException as e:
+    print("Request failed:", e)
+```
 
 ## Examples
 

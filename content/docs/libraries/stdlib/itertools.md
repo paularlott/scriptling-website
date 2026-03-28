@@ -27,7 +27,13 @@ import itertools
 | `compress(data, selectors)`               | Filter data based on selectors           |
 | `permutations(iterable[, r])`             | Generate all permutations                |
 | `combinations(iterable, r)`               | Generate all combinations                |
+| `combinations_with_replacement(iterable, r)` | Combinations with repetition          |
 | `product(*iterables)`                     | Cartesian product of iterables           |
+| `groupby(iterable[, key])`                | Group consecutive elements by key        |
+| `accumulate(iterable[, func])`            | Running totals/accumulation              |
+| `pairwise(iterable)`                      | Successive overlapping pairs             |
+| `batched(iterable, n)`                    | Group elements into batches              |
+| `starmap(func, iterable)`                 | Apply function to argument tuples        |
 
 ## Functions
 

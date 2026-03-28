@@ -4,13 +4,13 @@ linkTitle: runtime
 weight: 1
 ---
 
-Background tasks for HTTP servers.
+Background tasks and concurrency for scripts and HTTP servers.
 
 ## Available Functions
 
-| Function                    | Description                |
-| --------------------------- | -------------------------- |
-| `background(name, handler)` | Register a background task |
+| Function                                   | Description                                      |
+| ------------------------------------------ | ------------------------------------------------ |
+| `background(name, handler, *args, **kwargs)` | Start a background task, returns a Promise |
 
 ## Setup
 
@@ -31,29 +31,76 @@ extlibs.RegisterRuntimeLibraryAll(p)
 
 ## Functions
 
-### scriptling.runtime.background(name, handler)
+### scriptling.runtime.background(name, handler, *args, **kwargs)
 
-Register a background task.
+Start a background task in a goroutine. Returns a `Promise` that can be used to wait for the result.
 
 **Parameters:**
 
-- `name` (string): Unique name for the task (used in logs and error messages)
-- `handler` (string): Handler function as "library.function"
-- `*args`: Positional arguments to pass to the function
-- `**kwargs`: Keyword arguments to pass to the function
+- `name` (string): Unique name for the task
+- `handler` (string): Function name to execute — either a local function (`"my_func"`) or a library function (`"lib.func"`)
+- `*args`: Positional arguments passed to the function
+- `**kwargs`: Keyword arguments passed to the function
 
-Background tasks run in separate goroutines alongside the HTTP server. The name is used to identify the task in server logs.
+**Returns:** A `Promise` object (in script mode) or `None` (in server mode, where tasks are fire-and-forget).
+
+**Promise methods:**
+
+| Method   | Description                                      |
+| -------- | ------------------------------------------------ |
+| `get()`  | Block until the task completes and return its result |
+| `wait()` | Block until the task completes, discard the result |
+
+Background tasks run in isolated environments. Use `runtime.sync` primitives (`Shared`, `Atomic`, `Queue`, `WaitGroup`) to coordinate between tasks.
 
 ## Sub-Libraries
 
-- [scriptling.runtime.http](../runtime-http/) - HTTP route registration and response helpers
-- [scriptling.runtime.kv](../runtime-kv/) - Thread-safe key-value store
-- [scriptling.runtime.sync](../runtime-sync/) - Named cross-environment concurrency primitives
-- [scriptling.runtime.sandbox](../runtime-sandbox/) - Isolated script execution environments
+- [scriptling.runtime.http](../http/) - HTTP route registration and response helpers
+- [scriptling.runtime.kv](../kv/) - Thread-safe key-value store
+- [scriptling.runtime.sync](../sync/) - Named cross-environment concurrency primitives
+- [scriptling.runtime.sandbox](../sandbox/) - Isolated script execution environments
 
 ## Examples
 
-### Background Task
+### Concurrent calculations with Promises
+
+```python
+import scriptling.runtime as runtime
+
+def calculate(x, y, operation="add"):
+    if operation == "add":
+        return x + y
+    elif operation == "multiply":
+        return x * y
+
+p1 = runtime.background("calc1", "calculate", 10, 5, operation="add")
+p2 = runtime.background("calc2", "calculate", 10, 5, operation="multiply")
+
+print(p1.get())  # 15
+print(p2.get())  # 50
+```
+
+### Coordinating tasks with WaitGroup
+
+```python
+import scriptling.runtime as runtime
+
+wg = runtime.sync.WaitGroup("tasks")
+
+def worker(id):
+    print(f"Worker {id} done")
+    wg.done()
+
+wg.add(3)
+runtime.background("w1", "worker", 1)
+runtime.background("w2", "worker", 2)
+runtime.background("w3", "worker", 3)
+
+wg.wait()
+print("All workers finished")
+```
+
+### Background task in server mode
 
 ```python
 # setup.py
@@ -72,12 +119,13 @@ def increment_counter():
     counter = runtime.sync.Atomic("request_counter", 0)
     while True:
         counter.add(1)
-        print(f"Counter: {counter.get()}")
         time.sleep(1)
 ```
 
 ## Notes
 
-- Background tasks run in isolated environments
-- Use named sync primitives to share state between tasks and handlers
-- Background tasks start automatically when the server starts
+- In script mode, `background()` starts the task immediately and returns a `Promise`
+- In server mode, tasks are queued during script execution and started after setup completes; `background()` returns `None`
+- Background tasks run in isolated environments — use named sync primitives to share state
+- **Always look up sync primitives by name inside the task** — do not rely on closure variables from the outer script. The task runs in a clean environment where only functions, sibling functions, and library imports (`import ... as ...`) are available
+- Local function handlers copy sibling functions and library imports from the caller's global scope into the clean environment

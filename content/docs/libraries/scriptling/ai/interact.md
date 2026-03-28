@@ -16,7 +16,7 @@ import scriptling.ai.agent.interact
 
 The `interact` library enhances the `scriptling.ai.agent.Agent` class with an interactive terminal session. After importing, your Agent instances will have an additional `interact()` method.
 
-When `interact()` is called it creates a `console.Console()` instance internally (or uses one you provide), registers commands and handlers, then calls `c.run()` to start the TUI event loop.
+When `interact()` is called it uses the shared console singleton, registers commands and handlers, then calls `console.run()` to start the TUI event loop.
 
 ## Usage
 
@@ -37,26 +37,26 @@ my_agent = agent.Agent(
 my_agent.interact()
 ```
 
-## Passing a pre-configured Console
+## Pre-configuring the console
 
-You can create a `Console` instance yourself and pass it to `interact()`. This lets you add a welcome message, set status, or configure the console before the event loop starts:
+You can set up the console before calling `interact()` using module-level functions:
 
 ```python
 import scriptling.console as console
 import scriptling.ai.agent.interact as agent
 
-c = console.Console()
-c.set_status("MyApp", "v1.0")
-c.add_message(
-    c.styled(console.PRIMARY, "MyApp") + " — type your requests.\n" +
-    c.styled(console.DIM, "Type '/exit' to quit.")
+console.set_status("MyApp", "v1.0")
+main = console.main_panel()
+main.add_message(
+    console.styled(console.PRIMARY, "MyApp") + " — type your requests.\n" +
+    console.styled(console.DIM, "Type '/exit' to quit.")
 )
 
 bot = agent.Agent(client, model="gpt-4o", system_prompt="You are helpful.")
-bot.interact(c)
+bot.interact()
 ```
 
-If no console is passed, `interact()` creates one automatically.
+The console is a singleton, so any configuration applied before `interact()` will be preserved.
 
 ## Max Iterations
 

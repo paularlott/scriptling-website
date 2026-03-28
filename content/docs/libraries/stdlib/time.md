@@ -13,6 +13,7 @@ import time
 
 | Function                   | Description                                   |
 | -------------------------- | --------------------------------------------- |
+| `now()`                    | Returns current date/time as ISO 8601 string  |
 | `time()`                   | Returns the current Unix timestamp            |
 | `perf_counter()`           | Returns a high-resolution monotonic timer     |
 | `sleep(seconds)`           | Pauses execution for the specified seconds    |
@@ -25,6 +26,20 @@ import time
 | `ctime([secs])`            | Converts timestamp to standard format string  |
 
 ## Functions
+
+### time.now()
+
+Returns the current date and time as an ISO 8601 formatted string.
+
+**Returns:** String (format: `YYYY-MM-DDTHH:MM:SS.ffffff`)
+
+**Example:**
+
+```python
+import time
+
+ts = time.now()  # "2025-11-26T11:58:18.123456"
+```
 
 ### time.time()
 

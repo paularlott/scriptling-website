@@ -30,8 +30,8 @@ p.RegisterLibrary("secrets", extlibs.SecretsLibrary)
 extlibs.RegisterOSLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterPathlibLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterWaitForLibrary(p)
- extlibs.RegisterKVLibrary(p)
- p.RegisterLibrary("subprocess", extlibs.SubprocessLibrary)
+extlibs.RegisterKVLibrary(p)
+p.RegisterLibrary("subprocess", extlibs.SubprocessLibrary)
 p.RegisterLibrary("sys", extlibs.SysLibrary)
 ```
 
@@ -39,26 +39,35 @@ p.RegisterLibrary("sys", extlibs.SysLibrary)
 
 | Library | Description |
 |---------|-------------|
+| [requests](requests/) | HTTP library for sending requests |
+
+## Parsing & Data
+
+| Library | Description |
+|---------|-------------|
 | [glob](glob/) | Unix shell-style wildcards |
 | [html.parser](html.parser/) | HTML/XHTML parser |
-| [logging](logging/) | Logging functionality |
-| [requests](requests/) | HTTP library for sending requests |
-| [subprocess](subprocess/) | Spawn and manage subprocesses |
-    [yaml](yaml/) | YAML parsing and generation |
+| [yaml](yaml/) | YAML parsing and generation |
+| [toml](toml/) | TOML parsing and generation |
 
 ## System & Files
 
 | Library | Description |
 |---------|-------------|
-    [os](os/) | Operating system interfaces |
-    [os.path](os.path/) | Pathname manipulations |
-    [pathlib](pathlib/) | Object-oriented filesystem paths |
-    [sys](sys/) | System-specific parameters |
+| [os](os/) | Operating system interfaces |
+| [os.path](os.path/) | Pathname manipulations |
+| [pathlib](pathlib/) | Object-oriented filesystem paths |
+| [sys](sys/) | System-specific parameters |
+| [subprocess](subprocess/) | Spawn and manage subprocesses |
 
 ## Security
 
 | Library | Description |
 |---------|-------------|
 | [secrets](secrets/) | Cryptographically strong random numbers |
-    [toml](toml/) | TOML parsing and generation |
 
+## Logging
+
+| Library | Description |
+|---------|-------------|
+| [logging](logging/) | Logging functionality |

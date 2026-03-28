@@ -14,6 +14,7 @@ The `kv` sub-library exposes a **default** system store and the ability to open 
 | ------------------------ | ---------------------------------- |
 | `set(key, value, ttl=0)` | Store value with optional TTL      |
 | `get(key, default=None)` | Retrieve value by key              |
+| `incr(key, delta=1)`     | Atomically increment integer value, returns new value |
 | `delete(key)`            | Remove a key from the store        |
 | `exists(key)`            | Check if key exists                |
 | `ttl(key)`               | Get remaining TTL for a key        |
@@ -56,6 +57,17 @@ Store a value with optional TTL.
 - `key` (string): Key to store under
 - `value`: Value to store (string, int, float, bool, list, dict)
 - `ttl` (int, optional): Time-to-live in seconds (0 = no expiration)
+
+### incr(key, delta=1)
+
+Atomically increment an integer value stored at `key` by `delta`. If the key does not exist, it is initialised to `0` before incrementing.
+
+**Parameters:**
+
+- `key` (string): Key to increment
+- `delta` (int, optional): Amount to add (default: 1)
+
+**Returns:** New integer value after increment
 
 ### get(key, default=None)
 
