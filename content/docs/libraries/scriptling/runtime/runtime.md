@@ -51,7 +51,14 @@ Start a background task in a goroutine. Returns a `Promise` that can be used to 
 | `get()`  | Block until the task completes and return its result |
 | `wait()` | Block until the task completes, discard the result |
 
-Background tasks run in isolated environments. Use `runtime.sync` primitives (`Shared`, `Atomic`, `Queue`, `WaitGroup`) to coordinate between tasks.
+**Argument cloning:** Arguments must be transferable types and are deep-copied before the task starts to prevent data races between the caller and background task:
+
+- Scalars (`None`, `bool`, `int`, `float`, `str`) are passed by value
+- Containers (`list`, `dict`, `set`, `tuple`) are recursively validated and deep-copied — all elements must also be transferable
+- Not allowed: instances, classes, functions, builtins, or any other runtime-backed objects
+- Circular references in containers are rejected
+
+For ongoing coordination between tasks, use `runtime.sync` primitives (`Shared`, `Atomic`, `Queue`, `WaitGroup`).
 
 ## Sub-Libraries
 
@@ -127,5 +134,5 @@ def increment_counter():
 - In script mode, `background()` starts the task immediately and returns a `Promise`
 - In server mode, tasks are queued during script execution and started after setup completes; `background()` returns `None`
 - Background tasks run in isolated environments — use named sync primitives to share state
-- **Always look up sync primitives by name inside the task** — do not rely on closure variables from the outer script. The task runs in a clean environment where only functions, sibling functions, and library imports (`import ... as ...`) are available
-- Local function handlers copy sibling functions and library imports from the caller's global scope into the clean environment
+- **Always look up sync primitives by name inside the task** — do not rely on closure variables from the outer script. The task runs in a clean environment with only sibling functions; libraries must be re-imported inside the task
+- Local function handlers copy only sibling functions (not other globals) from the caller's scope — data must be passed via args or `runtime.sync` primitives
