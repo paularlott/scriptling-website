@@ -57,7 +57,7 @@ These libraries provide Scriptling-specific functionality:
 | `scriptling.ai.agent` | **NETWORK + CODE EXECUTION** - Agentic AI with tool execution |
 | `scriptling.mcp`      | **NETWORK ACCESS** - MCP protocol communication               |
 | `scriptling.console`  | Console I/O, safe for interactive use                         |
-| `scriptling.fuzzy`    | Pure computation, no external access                          |
+| `scriptling.similarity` | Pure computation, no external access                        |
 | `scriptling.toon`     | Pure computation, no external access                          |
 
 ### Runtime Libraries

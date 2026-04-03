@@ -5,6 +5,34 @@ layout: changelog
 nav-skip: true
 ---
 
+
+## March 2026
+
+{{< version "v0.5.3" >}}
+
+{{< changelog-item "added" >}}
+**Developer experience:**
+
+- New `scriptling.similarity` library with fuzzy matching plus `tokenize()`, `minhash()`, and `minhash_similarity()`
+- Richer console capabilities, including panel-based output and new examples for building interactive terminal experiences
+- Python-style string formatting support for more natural text rendering in scripts
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**Runtime and tooling:**
+
+- Background tasks and runtime synchronization are more robust, including safer argument handling and better thread/task behavior
+- MCP tool execution now captures script output more cleanly
+- Dictionary and set behavior is more consistent, with improved hashing and copying semantics for complex values
+- `__name__` is now available to scripts for module-aware behavior
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**Language fixes:**
+
+- Fixed tuple exception matching in `except (TypeError, ValueError):` clauses
+{{< /changelog-item >}}
+
 ## March 2026
 
 {{< version "v0.4.1" >}}
