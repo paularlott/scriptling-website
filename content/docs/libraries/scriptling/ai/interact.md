@@ -18,6 +18,14 @@ The `interact` library enhances the `scriptling.ai.agent.Agent` class with an in
 
 When `interact()` is called it uses the shared console singleton, registers commands and handlers, then calls `console.run()` to start the TUI event loop.
 
+During each turn, the interactive loop:
+
+- Streams reasoning and assistant text into the main panel as it arrives
+- Keeps the spinner running until the turn is fully complete
+- Shows tool call and result messages with status and preview
+- Uses `ai.collect_stream()` for streaming with configurable timeouts
+- Preserves conversation state for follow-up requests
+
 ## Usage
 
 ```python
@@ -25,7 +33,7 @@ import scriptling.ai as ai
 import scriptling.ai.agent as agent
 import scriptling.ai.agent.interact  # Adds interact() to Agent
 
-client = ai.client("https://api.openai.com/v1", api_key="your-key")
+client = ai.Client("https://api.openai.com/v1", api_key="your-key")
 
 my_agent = agent.Agent(
     client=client,

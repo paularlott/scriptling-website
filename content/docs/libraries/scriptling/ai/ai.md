@@ -18,6 +18,11 @@ AI and LLM functions for interacting with OpenAI-compatible APIs. This library p
 | `text(response)`             | Extract text content from response        |
 | `thinking(response)`         | Extract thinking blocks from response     |
 | `extract_thinking(text)`     | Extract thinking blocks from text string  |
+| `tool_calls(input)`          | Extract normalized tool calls             |
+| `execute_tool_calls(...)`    | Execute tool calls with a tool registry   |
+| `collect_stream(...)`        | Aggregate a chat stream into one result   |
+| `tool_round(...)`            | Run one tool-enabled completion round     |
+| `estimate_tokens(req, resp)` | Estimate token counts for request/response|
 | `ToolRegistry()`             | Create tool registry for building schemas |
 
 ## Creating an AI Client
@@ -168,6 +173,47 @@ if result["thinking"]:
 print("=== Response ===")
 print(result["content"])
 ```
+
+## Token Estimation
+
+### ai.estimate_tokens(request, response)
+
+Estimates the number of tokens in request messages and a completion response using a character-based heuristic (~4 characters per token). This provides a fast, reproducible approximation useful for cost estimation and context window management.
+
+**Parameters:**
+
+- `request` (str, list, or dict): The messages sent to the AI. Can be:
+  - A string (user message)
+  - A list of message dicts with "role" and "content" keys
+  - A completion request dict with a "messages" key
+- `response` (dict): The completion response from `client.completion()` or `client.response_create()`
+
+**Returns:** dict - Token usage estimates with keys:
+
+- `prompt_tokens` (int): Estimated tokens in the request messages
+- `completion_tokens` (int): Estimated tokens in the response
+- `total_tokens` (int): Sum of prompt and completion tokens
+
+**Example:**
+
+```python
+import scriptling.ai as ai
+
+client = ai.Client("", api_key="sk-...")
+
+# With messages array
+messages = [{"role": "user", "content": "Hello!"}]
+response = client.completion("gpt-4", messages)
+usage = ai.estimate_tokens(messages, response)
+print(f"Prompt: {usage.prompt_tokens}, Completion: {usage.completion_tokens}")
+
+# With string shorthand
+response = client.completion("gpt-4", "What is 2+2?")
+usage = ai.estimate_tokens("What is 2+2?", response)
+print(f"Total: {usage.total_tokens} tokens")
+```
+
+**Performance:** Character-based estimation is ~70x faster than using tiktoken and provides reasonable approximations across model families (GPT, Claude, Gemini).
 
 ## AI Client Reference
 
@@ -356,6 +402,146 @@ response = client.completion("gpt-4", [{"role": "user", "content": "Read file /d
 
 For automatic tool execution with an agent loop, see [Agent Library](../agent/).
 
+## Tool Round Helpers
+
+These helpers make it easier to build manual tool-calling loops without rewriting
+the same response parsing and stream aggregation logic each time.
+
+### ai.tool_calls(response_or_message)
+
+Extracts normalized tool calls from a completion response, assistant message dict,
+or raw tool call list.
+
+**Parameters:**
+
+- `response_or_message` (dict or list): Completion response, assistant message, or tool call list
+
+**Returns:** list - Normalized tool call dicts with `id`, `type`, and `function` fields
+
+**Example:**
+
+```python
+import scriptling.ai as ai
+
+client = ai.Client("http://127.0.0.1:11434/v1")
+
+tools = ai.ToolRegistry()
+tools.add("echo_tool", "Echo a message", {"message": "string"}, lambda args: args["message"])
+schemas = tools.build()
+
+response = client.completion("gemma4:e4b", "Call echo_tool with the message hello", tools=schemas)
+tool_calls = ai.tool_calls(response)
+
+for tool_call in tool_calls:
+    print(tool_call["function"]["name"])
+    print(tool_call["function"]["arguments"].get("message", "missing"))
+```
+
+### ai.execute_tool_calls(registry, tool_calls)
+
+Executes normalized tool calls using handlers from a `ToolRegistry`.
+
+**Parameters:**
+
+- `registry` (ToolRegistry): Tool registry containing handlers
+- `tool_calls` (list): Tool call dicts, typically from `ai.tool_calls(...)`
+
+**Returns:** list - Tool result message dicts with `role`, `tool_call_id`, and `content`
+
+**Example:**
+
+```python
+import scriptling.ai as ai
+
+tools = ai.ToolRegistry()
+tools.add("echo_tool", "Echo a message", {"message": "string"}, lambda args: "echo:" + args["message"])
+
+tool_calls = [{
+    "id": "call_1",
+    "type": "function",
+    "function": {
+        "name": "echo_tool",
+        "arguments": {"message": "hello"}
+    }
+}]
+
+tool_results = ai.execute_tool_calls(tools, tool_calls)
+print(tool_results[0]["content"])  # "echo:hello"
+```
+
+### ai.collect_stream(stream, \*\*kwargs)
+
+Consumes a `ChatStream`, aggregates reasoning, content, tool calls, and finish
+status, and optionally emits events while chunks are processed.
+
+**Parameters:**
+
+- `stream` (ChatStream): Stream returned by `client.completion_stream()`
+- `chunk_timeout_ms` (int, optional): Per-chunk timeout in milliseconds. Default: `0`
+- `first_chunk_timeout_ms` (int, optional): Timeout for the first chunk only (models may need time to load). Falls back to `chunk_timeout_ms`. Default: `0`
+- `on_event` (callable, optional): Callback invoked with event dicts during collection
+
+**Returns:** dict - Aggregated result with `content`, `reasoning`, `tool_calls`, `finish_reason`, `timed_out`, `assistant_message`, and `error` (only present when `timed_out` is true)
+
+**Example:**
+
+```python
+import scriptling.ai as ai
+
+events = []
+
+def on_event(event):
+    events.append(event["type"])
+
+client = ai.Client("http://127.0.0.1:11434/v1")
+stream = client.completion_stream("gemma4:e4b", "hello")
+result = ai.collect_stream(stream, first_chunk_timeout_ms=30000, chunk_timeout_ms=4000, on_event=on_event)
+
+print(result["content"])
+print(events)
+```
+
+### ai.tool_round(client, model, messages, registry, \*\*kwargs)
+
+Runs one non-streaming or streaming completion round with tools, extracts normalized
+tool calls, executes them, and returns the round state needed for a manual agent loop.
+
+**Parameters:**
+
+- `client` (OpenAIClient): AI client instance
+- `model` (str): Model identifier
+- `messages` (str or list): User message string or message list
+- `registry` (ToolRegistry): Tool registry containing schemas and handlers
+- `stream` (bool, optional): Use `completion_stream()` instead of `completion()`. Default: `False`
+- `chunk_timeout_ms` (int, optional): Per-chunk timeout for streaming mode. Default: `0`
+- `on_event` (callable, optional): Callback invoked with event dicts during streaming
+- `system_prompt` (str, optional): System prompt when `messages` is a string
+- `temperature` (float, optional): Sampling temperature
+- `top_p` (float, optional): Nucleus sampling threshold
+- `max_tokens` (int, optional): Maximum tokens to generate
+- `timeout_ms` (int, optional): Overall request timeout in milliseconds
+
+**Returns:** dict - Round result with `assistant_message`, `content`, `reasoning`, `tool_calls`, `tool_results`, `finish_reason`, and `timed_out`. Non-streaming mode also includes `response`.
+
+**Example:**
+
+```python
+import scriptling.ai as ai
+
+client = ai.Client("http://127.0.0.1:11434/v1")
+
+tools = ai.ToolRegistry()
+tools.add("echo_tool", "Echo a message", {"message": "string"}, lambda args: "echo:" + args["message"])
+
+messages = [{"role": "user", "content": "Call echo_tool with hello"}]
+result = ai.tool_round(client, "gemma4:e4b", messages, tools, timeout_ms=30000)
+
+if result["tool_calls"]:
+    messages.append(result["assistant_message"])
+    for tool_result in result["tool_results"]:
+        messages.append(tool_result)
+```
+
 ## AIClient Class
 
 All client methods are instance methods on the client object returned by ai.Client() or ai.WrapClient().
@@ -373,6 +559,7 @@ Creates a chat completion using this client's configuration.
 - `top_p` (float, optional): Nucleus sampling threshold (0.0-1.0)
 - `temperature` (float, optional): Sampling temperature (0.0-2.0)
 - `max_tokens` (int, optional): Maximum tokens to generate
+- `timeout_ms` (int, optional): Request timeout in milliseconds
 
 **Returns:** dict - Response containing id, choices, usage, etc.
 
@@ -413,6 +600,8 @@ schemas = tools.build()
 response = client.completion("gpt-4", [{"role": "user", "content": "What time is it?"}], tools=schemas)
 ```
 
+**Note:** In non-streaming completion responses, `tool_call.function.arguments` is exposed as a dict, so you can access fields with `args["name"]` or `args.get("name", default)`.
+
 ### client.completion_stream(model, messages, \*\*kwargs)
 
 Creates a streaming chat completion using this client's configuration. Returns a ChatStream object that can be iterated over.
@@ -426,6 +615,7 @@ Creates a streaming chat completion using this client's configuration. Returns a
 - `top_p` (float, optional): Nucleus sampling threshold (0.0-1.0)
 - `temperature` (float, optional): Sampling temperature (0.0-2.0)
 - `max_tokens` (int, optional): Maximum tokens to generate
+- `timeout_ms` (int, optional): Overall request timeout in milliseconds
 
 **Returns:** ChatStream - A stream object with a `next()` method
 
@@ -601,14 +791,14 @@ print()
 
 Lists all models available for this client configuration.
 
-**Returns:** list - List of model dicts with id, created, owned_by, etc.
+**Returns:** dict - Response object with `object` and `data` fields. `data` contains the list of model objects.
 
 **Example:**
 
 ```python
 client = ai.Client("", api_key="sk-...")
-models = client.models()
-for model in models:
+models_response = client.models()
+for model in models_response.data:
     print(model.id)
 ```
 

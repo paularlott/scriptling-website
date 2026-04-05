@@ -10,9 +10,9 @@ Agentic AI loop for building AI agents with automatic tool execution. The agent 
 
 | Class/Method | Description |
 | --- | --- |
-| `Agent(client, tools, system_prompt, model, memory)` | Create AI agent |
+| `Agent(client, tools, system_prompt, model, memory, max_tokens, compaction_threshold)` | Create AI agent |
 | `agent.trigger(message, max_iterations)` | One-shot trigger with response |
-| `agent.interact(c, max_iterations)` | Start interactive session |
+| `agent.interact(max_iterations)` | Start interactive session |
 | `agent.get_messages()` | Get conversation history |
 | `agent.set_messages(messages)` | Set conversation history |
 
@@ -44,7 +44,7 @@ bot.interact()
 
 ## Agent Class
 
-### Agent(client, tools=None, system_prompt="", model="", memory=None)
+### Agent(client, tools=None, system_prompt="", model="", memory=None, max_tokens=32000, compaction_threshold=80)
 
 Creates an AI agent with automatic tool execution.
 
@@ -55,6 +55,8 @@ Creates an AI agent with automatic tool execution.
 - `system_prompt` (str, optional): System prompt for the agent
 - `model` (str, optional): Model to use
 - `memory` (memory object, optional): Memory store from `memory.new()` — see [Memory Integration](#memory-integration)
+- `max_tokens` (int, optional): Maximum token budget for the conversation. When estimated token usage reaches the compaction threshold, the conversation history is automatically compacted (summarized). Default: 32000
+- `compaction_threshold` (int, optional): Percentage of `max_tokens` at which auto-compaction triggers (0-100). For example, with `max_tokens=32000` and `compaction_threshold=80`, compaction triggers at ~25600 tokens. Default: 80
 
 **Example:**
 
@@ -71,6 +73,14 @@ bot = agent.Agent(
     tools=tools,
     system_prompt="You are a coding assistant",
     model="gpt-4"
+)
+
+# With custom compaction settings (compact at 50% of 16k tokens)
+bot = agent.Agent(
+    client,
+    tools=tools,
+    max_tokens=16000,
+    compaction_threshold=50
 )
 ```
 
@@ -90,6 +100,7 @@ Processes a message with the agent, executing tools as needed.
 - Strips `<think>...</think>` blocks from responses
 - Executes tools automatically
 - Maintains conversation history
+- Uses automatic request timeouts for model calls
 - Stops after max_iterations or when no more tool calls
 
 **Example:**
@@ -102,14 +113,21 @@ response = bot.trigger("Reverse the word 'hello'", max_iterations=10)
 print(response.content)
 ```
 
-### agent.interact(c=None, max_iterations=25)
+### agent.interact(max_iterations=25)
 
 Runs an interactive CLI session. Requires `scriptling.console` library.
 
 **Parameters:**
 
-- `c` (Console, optional): Pre-configured console instance
 - `max_iterations` (int, optional): Maximum tool call rounds per message. Default: 25
+
+**Behavior:**
+
+- Streams reasoning and assistant text into the main console panel as it arrives
+- Keeps the spinner active for the full request lifecycle
+- Shows tool call and result messages with status and preview
+- Uses streaming via `ai.collect_stream()` with configurable timeouts
+- Preserves conversation history between turns
 
 **Example:**
 
@@ -182,6 +200,41 @@ When `memory=` is provided, the following tools are registered automatically:
 The agent appends a `## Memory` block to the system prompt explaining when and how to use the memory tools. It also injects a `## Remembered Preferences` block containing all stored `preference` memories, so the LLM has user preferences available immediately.
 
 The original `system_prompt` you pass is always preserved — the memory content is appended after it.
+
+## Auto-Compaction
+
+The agent automatically compacts conversation history when it grows too large, preventing context window overflow and reducing API costs.
+
+**How it works:**
+
+1. Before each completion call, the agent estimates the token count of the current messages
+2. If the estimated tokens reach the compaction threshold (percentage of `max_tokens`), the conversation is compacted
+3. Compaction asks the AI to summarize the conversation so far, preserving key facts and context
+4. The history is rebuilt as: system prompt + summary + protected recent context
+5. Active tool rounds are preserved so assistant tool calls remain paired with their tool results
+6. The agent continues normally with the compacted history
+
+**Parameters:**
+
+- `max_tokens` (int): Maximum token budget. Default: 32000
+- `compaction_threshold` (int): Percentage of `max_tokens` at which compaction triggers. Default: 80
+
+**Example:**
+
+```python
+import scriptling.ai as ai
+import scriptling.ai.agent as agent
+
+client = ai.Client("http://127.0.0.1:1234/v1")
+
+# Default: compact at 80% of 32000 tokens (25600 tokens)
+bot = agent.Agent(client, model="gpt-4")
+
+# Custom: compact at 50% of 16000 tokens (8000 tokens)
+bot = agent.Agent(client, model="gpt-4", max_tokens=16000, compaction_threshold=50)
+```
+
+**Note:** Set `max_tokens=0` or `compaction_threshold=0` to disable auto-compaction entirely.
 
 ### With LLM-based Deduplication
 

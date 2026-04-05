@@ -378,8 +378,8 @@ if console.has_panels():
 | `set_title(title)`              | Set the panel border title                            |
 | `set_color(color)`              | Set border/accent color (name or hex)                 |
 | `set_scrollable(bool)`          | Set whether content scrolls                           |
-| `add_message(*args, [label=])`  | Add a message to the panel                            |
-| `stream_start([label=])`        | Begin a streaming message                             |
+| `add_message(*args, [label=], [role=])`  | Add a message to the panel                            |
+| `stream_start([label=], [role=])`        | Begin a streaming message                             |
 | `stream_chunk(text)`            | Append a chunk to the current stream                  |
 | `stream_end()`                  | Finalise the current stream                           |
 | `add_row(panel)`                | Add a child panel as a vertical row                   |
