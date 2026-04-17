@@ -408,4 +408,4 @@ for batch in itertools.batched(items, 100):
 
 - [Language Guide](../language/) - Complete language reference
 - [Standard Libraries](stdlib/) - Standard library documentation
-- [Extended Libraries](extlib/) - Extended library documentation
+- [Extended Libraries](../extlib/) - Extended library documentation
