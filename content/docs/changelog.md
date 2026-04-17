@@ -6,6 +6,46 @@ nav-skip: true
 ---
 
 
+## April 2026
+
+{{< version "v0.5.5" >}}
+
+{{< changelog-item "added" >}}
+**Language:**
+
+- `del` statement for removing list indices, slices, dict keys, and object attributes (`del items[0]`, `del cache["key"]`, `del obj.attr`)
+
+**AI library:**
+
+- `ai.tool_calls(response)` — Extract and normalize tool calls from a completion response, message dict, or raw list
+- `ai.execute_tool_calls(registry, tool_calls)` — Execute tool calls using a `ToolRegistry` and return result messages
+- `ai.collect_stream(stream, **kwargs)` — Collect a chat stream into a single aggregated result with optional per-chunk callbacks
+- `ai.tool_round(client, model, messages, registry)` — Perform a single tool-use round: complete, execute tool calls, return results
+- `ai.estimate_tokens(messages, model)` — Estimate token count for a message list
+
+**Agent framework:**
+
+- Agent constructor gains `max_tokens` and `compaction_threshold` parameters
+- Automatic message compaction for long conversations, with configurable threshold
+- Improved streaming support with reasoning and content chunk helpers
+
+**Console:**
+
+- Panel `add_message()` now accepts a `role` parameter (`user`, `system`, `thinking`, `tool`, `assistant`) for richer TUI output
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**Runtime and tooling:**
+
+- `isinstance()` now accepts a tuple or list of types, matching Python semantics (`isinstance(x, (int, float))`)
+- Lexer keyword lookup refactored from map-based to switch-based dispatch for improved performance
+- Better concurrency handling in `ChatStreamInstance` with caller cancellation support
+- Improved error handling in variadic function calls
+- Parser refactored with cleaner initialization and improved regex handling
+{{< /changelog-item >}}
+
+---
+
 ## March 2026
 
 {{< version "v0.5.3" >}}
