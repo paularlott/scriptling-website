@@ -37,7 +37,6 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | `memoryview()`, `bytearray()`, `bytes()` | Advanced byte manipulation not supported |
 | `complex()` | Complex numbers not implemented |
 | `frozenset()` | Use regular `set()` |
-| `del` statement | Use slice assignment — e.g. `lst = lst[:n]` rather than `del lst[n:]` |
 
 ### Standard Library NOT Included
 
@@ -103,6 +102,7 @@ Scriptling **does support**:
 - ✅ Conditional expressions (ternary operator)
 - ✅ Augmented assignment (`+=`, `-=`, `**=`, etc.)
 - ✅ Slice notation with step (`[start:stop:step]`)
+- ✅ `del` for variables, list indexes, list slices, dict keys, and attributes
 - ✅ `is` and `is not` operators
 - ✅ `in` and `not in` operators
 - ✅ Bitwise operators (`&`, `|`, `^`, `~`, `<<`, `>>`)
@@ -128,9 +128,10 @@ response.json()  # Method call
 response.text    # Attribute
 
 # Scriptling
-json.loads(response.body)  # Parse manually
+response.json()            # Method call
+response.text              # Attribute
+response.body              # Alias for response.text
 response.status_code       # Attribute
-response.body              # Attribute (not response.text)
 ```
 
 ### Library Import

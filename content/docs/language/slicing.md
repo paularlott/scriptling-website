@@ -164,6 +164,18 @@ lst[2:4] = []
 print(lst)  # [1, 100, 20, 5]
 ```
 
+Lists can also remove elements directly with `del`:
+
+```python
+lst = [1, 2, 3, 4, 5]
+
+del lst[1]
+print(lst)  # [1, 3, 4, 5]
+
+del lst[1:4:2]
+print(lst)  # [1, 4]
+```
+
 ## Slice Assignment with Step
 
 ```python
