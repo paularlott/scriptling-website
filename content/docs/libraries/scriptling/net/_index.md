@@ -1,5 +1,6 @@
 ---
 title: Networking Libraries
+linkTitle: networking
 description: Networking libraries for cluster membership, multicast, point-to-point messaging, and WebSocket communication.
 weight: 1
 ---
