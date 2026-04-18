@@ -42,13 +42,21 @@ Scriptling-specific libraries that provide functionality not available in Python
 | [scriptling.runtime.sync](runtime/sync/) | Named cross-environment concurrency primitives |
 | [scriptling.runtime.sandbox](runtime/sandbox/) | Isolated script execution environments |
 
+## Networking
+
+| Library | Description |
+|---------|-------------|
+| [scriptling.net.gossip](net/gossip/) | Gossip protocol cluster membership and messaging |
+| [scriptling.net.multicast](net/multicast/) | UDP multicast group messaging |
+| [scriptling.net.unicast](net/unicast/) | UDP and TCP point-to-point messaging |
+| [scriptling.net.websocket](net/websocket/) | WebSocket client for connecting to WebSocket servers |
+
 ## Utilities
 
 | Library | Description |
 |---------|-------------|
 | [scriptling.console](console/) | Console input/output functions |
 | [scriptling.wait_for](wait_for/) | Wait for resources to become available |
-| [scriptling.websocket](websocket/) | WebSocket client for connecting to WebSocket servers |
 | [scriptling.toon](toon/) | TOON (Token-Oriented Object Notation) encoding/decoding |
 | [scriptling.similarity](similarity/) | Text similarity utilities including fuzzy search and MinHash |
 

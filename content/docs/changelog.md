@@ -15,6 +15,12 @@ nav-skip: true
 
 - `del` statement for removing list indices, slices, dict keys, and object attributes (`del items[0]`, `del cache["key"]`, `del obj.attr`)
 
+**Networking libraries:**
+
+- `scriptling.net.gossip` — Gossip protocol cluster membership and messaging with failure detection, metadata propagation, tag-based routing, encryption, and compression
+- `scriptling.net.multicast` — UDP multicast group messaging for one-to-many communication
+- `scriptling.net.unicast` — UDP and TCP point-to-point messaging with client and server support
+
 **AI library:**
 
 - `ai.tool_calls(response)` — Extract and normalize tool calls from a completion response, message dict, or raw list
@@ -42,6 +48,7 @@ nav-skip: true
 - Better concurrency handling in `ChatStreamInstance` with caller cancellation support
 - Improved error handling in variadic function calls
 - Parser refactored with cleaner initialization and improved regex handling
+- `scriptling.websocket` moved to `scriptling.net.websocket` to consolidate all networking libraries under the `scriptling.net` namespace
 {{< /changelog-item >}}
 
 ---
