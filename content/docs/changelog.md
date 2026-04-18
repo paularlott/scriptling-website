@@ -8,18 +8,30 @@ nav-skip: true
 
 ## April 2026
 
+{{< version "v0.5.6" >}}
+
+{{< changelog-item "added" >}}
+**Networking libraries:**
+
+- `scriptling.net.gossip` — Gossip protocol cluster membership and messaging with failure detection, metadata propagation, tag-based routing, encryption, and compression
+- `scriptling.net.multicast` — UDP multicast group messaging for one-to-many communication
+- `scriptling.net.unicast` — UDP and TCP point-to-point messaging with client and server support
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**Runtime and tooling:**
+
+- `scriptling.websocket` moved to `scriptling.net.websocket` to consolidate all networking libraries under the `scriptling.net` namespace
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.5.5" >}}
 
 {{< changelog-item "added" >}}
 **Language:**
 
 - `del` statement for removing list indices, slices, dict keys, and object attributes (`del items[0]`, `del cache["key"]`, `del obj.attr`)
-
-**Networking libraries:**
-
-- `scriptling.net.gossip` — Gossip protocol cluster membership and messaging with failure detection, metadata propagation, tag-based routing, encryption, and compression
-- `scriptling.net.multicast` — UDP multicast group messaging for one-to-many communication
-- `scriptling.net.unicast` — UDP and TCP point-to-point messaging with client and server support
 
 **AI library:**
 
@@ -48,7 +60,6 @@ nav-skip: true
 - Better concurrency handling in `ChatStreamInstance` with caller cancellation support
 - Improved error handling in variadic function calls
 - Parser refactored with cleaner initialization and improved regex handling
-- `scriptling.websocket` moved to `scriptling.net.websocket` to consolidate all networking libraries under the `scriptling.net` namespace
 {{< /changelog-item >}}
 
 ---
@@ -80,7 +91,7 @@ nav-skip: true
 - Fixed tuple exception matching in `except (TypeError, ValueError):` clauses
 {{< /changelog-item >}}
 
-## March 2026
+---
 
 {{< version "v0.4.1" >}}
 
