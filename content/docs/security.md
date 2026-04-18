@@ -56,6 +56,7 @@ These libraries provide Scriptling-specific functionality:
 | `scriptling.ai`       | **NETWORK ACCESS** - Makes HTTP requests to AI APIs           |
 | `scriptling.ai.agent` | **NETWORK + CODE EXECUTION** - Agentic AI with tool execution |
 | `scriptling.mcp`      | **NETWORK ACCESS** - MCP protocol communication               |
+| `scriptling.secret`   | Host-controlled secret access; scripts see aliases, not credentials |
 | `scriptling.console`  | Console I/O, safe for interactive use                         |
 | `scriptling.similarity` | Pure computation, no external access                        |
 | `scriptling.toon`     | Pure computation, no external access                          |
@@ -163,6 +164,20 @@ stdlib.RegisterAll(p)
 // Unsafe: Registers network-enabled library
 extlibs.RegisterRequestsLibrary(p)
 ```
+
+## Secret Provider Security
+
+Use `scriptling.secret` when scripts need secrets but should not receive provider URLs, tokens, or other private configuration.
+
+**Recommended pattern:** Register providers in the host application and expose only aliases to scripts.
+
+```python
+import scriptling.secret as secret
+
+db_password = secret.get("prod_vault", "secret/data/app", "password")
+```
+
+The script only sees `prod_vault`, the logical path, and the optional field name. The host owns the real provider configuration.
 
 ## Resource Limits
 

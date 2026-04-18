@@ -16,6 +16,11 @@ nav-skip: true
 - `scriptling.net.gossip` — Gossip protocol cluster membership and messaging with failure detection, metadata propagation, tag-based routing, encryption, and compression
 - `scriptling.net.multicast` — UDP multicast group messaging for one-to-many communication
 - `scriptling.net.unicast` — UDP and TCP point-to-point messaging with client and server support
+
+**Secrets:**
+
+- `scriptling.secret` — Provider-agnostic secret access through host-configured aliases
+- `--secret-config` — CLI support for loading Vault and 1Password provider aliases from TOML
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
