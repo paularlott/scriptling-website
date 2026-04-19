@@ -30,6 +30,7 @@ This keeps provider URLs, access tokens, namespaces, and similar private data ou
 | Function | Description |
 | -------- | ----------- |
 | `scriptling.secret.get(alias, path, field="")` | Resolve a secret using a host-configured provider alias |
+| `scriptling.secret.list(alias, path)` | List keys/items at a path |
 
 ## Functions
 
@@ -52,6 +53,31 @@ import scriptling.secret as secret
 
 db_password = secret.get("prod_vault", "secret/data/app", "password")
 api_key = secret.get("op", "Engineering/api-key", "credential")
+```
+
+### scriptling.secret.list(alias, path)
+
+List keys at a path using the provider alias registered by the host. For Vault, returns the key names at a secret path. For 1Password, returns item titles in a vault.
+
+**Parameters:**
+
+- `alias` (string): Registered provider alias such as `prod_vault` or `op`.
+- `path` (string): Provider-specific path. For Vault, a secret engine path (e.g., `secret/data/app`). For 1Password, a vault name or UUID.
+
+**Returns:** `list[string]` - List of key or item name strings.
+
+**Example:**
+
+```python
+import scriptling.secret as secret
+
+keys = secret.list("prod_vault", "secret/data/app")
+for key in keys:
+    print(key, "=", secret.get("prod_vault", "secret/data/app/" + key))
+
+items = secret.list("op", "Engineering")
+for item in items:
+    print(item)
 ```
 
 ## CLI Usage

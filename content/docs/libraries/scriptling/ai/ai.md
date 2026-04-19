@@ -477,8 +477,8 @@ status, and optionally emits events while chunks are processed.
 **Parameters:**
 
 - `stream` (ChatStream): Stream returned by `client.completion_stream()`
-- `chunk_timeout_ms` (int, optional): Per-chunk timeout in milliseconds. Default: `0`
-- `first_chunk_timeout_ms` (int, optional): Timeout for the first chunk only (models may need time to load). Falls back to `chunk_timeout_ms`. Default: `0`
+- `chunk_timeout` (int, optional): Per-chunk timeout in seconds. Default: `0`
+- `first_chunk_timeout` (int, optional): Timeout for the first chunk only (models may need time to load). Falls back to `chunk_timeout`. Default: `0`
 - `on_event` (callable, optional): Callback invoked with event dicts during collection
 
 **Returns:** dict - Aggregated result with `content`, `reasoning`, `tool_calls`, `finish_reason`, `timed_out`, `assistant_message`, and `error` (only present when `timed_out` is true)
@@ -495,7 +495,7 @@ def on_event(event):
 
 client = ai.Client("http://127.0.0.1:11434/v1")
 stream = client.completion_stream("gemma4:e4b", "hello")
-result = ai.collect_stream(stream, first_chunk_timeout_ms=30000, chunk_timeout_ms=4000, on_event=on_event)
+result = ai.collect_stream(stream, first_chunk_timeout=30, chunk_timeout=4, on_event=on_event)
 
 print(result["content"])
 print(events)
@@ -513,13 +513,13 @@ tool calls, executes them, and returns the round state needed for a manual agent
 - `messages` (str or list): User message string or message list
 - `registry` (ToolRegistry): Tool registry containing schemas and handlers
 - `stream` (bool, optional): Use `completion_stream()` instead of `completion()`. Default: `False`
-- `chunk_timeout_ms` (int, optional): Per-chunk timeout for streaming mode. Default: `0`
+- `chunk_timeout` (int, optional): Per-chunk timeout in seconds for streaming mode. Default: `0`
 - `on_event` (callable, optional): Callback invoked with event dicts during streaming
 - `system_prompt` (str, optional): System prompt when `messages` is a string
 - `temperature` (float, optional): Sampling temperature
 - `top_p` (float, optional): Nucleus sampling threshold
 - `max_tokens` (int, optional): Maximum tokens to generate
-- `timeout_ms` (int, optional): Overall request timeout in milliseconds
+- `timeout` (int, optional): Overall request timeout in seconds
 
 **Returns:** dict - Round result with `assistant_message`, `content`, `reasoning`, `tool_calls`, `tool_results`, `finish_reason`, and `timed_out`. Non-streaming mode also includes `response`.
 
@@ -534,7 +534,7 @@ tools = ai.ToolRegistry()
 tools.add("echo_tool", "Echo a message", {"message": "string"}, lambda args: "echo:" + args["message"])
 
 messages = [{"role": "user", "content": "Call echo_tool with hello"}]
-result = ai.tool_round(client, "gemma4:e4b", messages, tools, timeout_ms=30000)
+result = ai.tool_round(client, "gemma4:e4b", messages, tools, timeout=30)
 
 if result["tool_calls"]:
     messages.append(result["assistant_message"])
@@ -559,7 +559,7 @@ Creates a chat completion using this client's configuration.
 - `top_p` (float, optional): Nucleus sampling threshold (0.0-1.0)
 - `temperature` (float, optional): Sampling temperature (0.0-2.0)
 - `max_tokens` (int, optional): Maximum tokens to generate
-- `timeout_ms` (int, optional): Request timeout in milliseconds
+- `timeout` (int, optional): Request timeout in seconds
 
 **Returns:** dict - Response containing id, choices, usage, etc.
 
@@ -615,7 +615,7 @@ Creates a streaming chat completion using this client's configuration. Returns a
 - `top_p` (float, optional): Nucleus sampling threshold (0.0-1.0)
 - `temperature` (float, optional): Sampling temperature (0.0-2.0)
 - `max_tokens` (int, optional): Maximum tokens to generate
-- `timeout_ms` (int, optional): Overall request timeout in milliseconds
+- `timeout` (int, optional): Overall request timeout in seconds
 
 **Returns:** ChatStream - A stream object with a `next()` method
 
