@@ -1,5 +1,5 @@
 ---
-title: scriptling.websocket
+title: scriptling.net.websocket
 linkTitle: websocket
 weight: 5
 ---
@@ -8,7 +8,7 @@ WebSocket client library for connecting to WebSocket servers.
 
 ## Overview
 
-The `scriptling.websocket` library provides a simple, synchronous WebSocket client API. It allows Scriptling scripts to connect to WebSocket servers, send and receive messages, and handle both text and binary data.
+The `scriptling.net.websocket` library provides a simple, synchronous WebSocket client API. It allows Scriptling scripts to connect to WebSocket servers, send and receive messages, and handle both text and binary data.
 
 ## Available Functions
 
@@ -41,7 +41,7 @@ extlibs.RegisterWebSocketLibrary(p)
 
 ## Functions
 
-### scriptling.websocket.connect(url, timeout=10, headers={})
+### scriptling.net.websocket.connect(url, timeout=10, headers={})
 
 Connect to a WebSocket server.
 
@@ -55,7 +55,7 @@ Connect to a WebSocket server.
 
 **Example:**
 ```python
-import scriptling.websocket as ws
+import scriptling.net.websocket as ws
 
 conn = ws.connect("wss://echo.websocket.org", timeout=5)
 ```
@@ -137,7 +137,7 @@ Close the WebSocket connection.
 conn.close()
 ```
 
-### scriptling.websocket.is_text(message)
+### scriptling.net.websocket.is_text(message)
 
 Check if a received message is a text message.
 
@@ -154,7 +154,7 @@ if ws.is_text(msg):
     print(f"Text: {msg}")
 ```
 
-### scriptling.websocket.is_binary(message)
+### scriptling.net.websocket.is_binary(message)
 
 Check if a received message is a binary message.
 
@@ -180,7 +180,7 @@ The remote address of the connection (string).
 ### Basic Echo Client
 
 ```python
-import scriptling.websocket as ws
+import scriptling.net.websocket as ws
 
 # Connect to echo server
 conn = ws.connect("wss://echo.websocket.org", timeout=10)
@@ -199,7 +199,7 @@ conn.close()
 ### JSON Messaging
 
 ```python
-import scriptling.websocket as ws
+import scriptling.net.websocket as ws
 
 conn = ws.connect("wss://api.example.com/ws", timeout=10)
 
@@ -225,7 +225,7 @@ conn.close()
 ### Binary Data
 
 ```python
-import scriptling.websocket as ws
+import scriptling.net.websocket as ws
 
 conn = ws.connect("wss://binary.example.com/ws", timeout=10)
 
@@ -245,7 +245,7 @@ conn.close()
 ### Handling Mixed Text and Binary
 
 ```python
-import scriptling.websocket as ws
+import scriptling.net.websocket as ws
 
 conn = ws.connect("wss://mixed.example.com/ws", timeout=10)
 
@@ -265,7 +265,7 @@ conn.close()
 ### With Custom Headers
 
 ```python
-import scriptling.websocket as ws
+import scriptling.net.websocket as ws
 
 conn = ws.connect(
     "wss://api.example.com/ws",
@@ -344,7 +344,7 @@ The client object passed to server handlers has:
 To check message type in server handlers, use the module-level functions:
 
 ```python
-import scriptling.websocket as ws
+import scriptling.net.websocket as ws
 
 def handler(client):
     while client.connected():
@@ -359,7 +359,7 @@ def handler(client):
 ## Error Handling
 
 ```python
-import scriptling.websocket as ws
+import scriptling.net.websocket as ws
 
 conn = ws.connect("wss://example.com/ws", timeout=10)
 

@@ -51,6 +51,7 @@ Create, distribute, and load Scriptling packages from local files or URLs.
 - **MCP Script Execution**: Allow LLMs to execute Scriptling code via `--mcp-exec-script`
 - **Packages**: Load libraries from local or remote ZIP packages with `--package`
 - **Path restrictions**: Restrict filesystem access with `--allowed-paths`
+- **Secret aliases**: Load host-owned secret providers with `--secret-config`
 - **Custom libraries**: Libraries are loaded automatically from the script's directory
 - **Environment configuration**: Auto-load settings from `.env` file
 - **Configurable logging**: Set log level with `--log-level`
@@ -74,6 +75,9 @@ scriptling --server :8443 --tls-generate setup.py
 
 # Load a package and run
 scriptling --package ./libs/utils.zip script.py
+
+# Load host-owned secret providers for scriptling.secret
+scriptling --secret-config ./secrets.toml script.py
 
 # Load package from URL
 scriptling --package https://example.com/lib.zip script.py

@@ -104,7 +104,7 @@ These are powerful, but they may not exist unless the embedding app enables them
 | `sys`                                  | Runtime info            |
 | `scriptling.mcp`                       | MCP tools and responses |
 | `scriptling.ai`, `scriptling.ai.agent` | AI integration          |
-| `scriptling.websocket`                 | WebSockets              |
+| `scriptling.net.websocket`             | WebSockets              |
 | `scriptling.similarity`                | Similarity search       |
 
 If a script depends on one of these modules, import it explicitly and assume it may be unavailable in some hosts. This matters most for `requests`, `os`, `os.path`, `pathlib`, `subprocess`, `yaml`, `toml`, and the `scriptling.*` libraries.
@@ -125,7 +125,7 @@ Prefer standard libraries for general scripting; use `scriptling.*` only when th
 | `scriptling.runtime.kv` | Key-value storage |
 | `scriptling.runtime.sync` | Atomics, queues, wait groups, and shared state |
 | `scriptling.runtime.sandbox` | Runtime sandbox helpers |
-| `scriptling.websocket` | WebSocket connections |
+| `scriptling.net.websocket` | WebSocket connections |
 | `scriptling.similarity` | Fuzzy matching, ranking, and similarity search |
 | `scriptling.toon` | Toon encoding and decoding |
 
