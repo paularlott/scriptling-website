@@ -14,11 +14,13 @@ nav-skip: true
 **Search:**
 
 - `scriptling.grep` — Fast file content search with concurrent worker pool, glob filtering, binary file detection, and path restriction support
-  - `pattern(regex, path, ...)` — Regex search; path can be a file or directory
-  - `string(text, path, ...)` — Literal string search; path can be a file or directory
-  - Both support `recursive`, `ignore_case`, `glob`, `follow_links`, `max_size` kwargs
-  - Returns `{"file", "line", "text"}` match dicts
-  - Symlinks followed only when `follow_links=True` and target is within allowed paths
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+
+**Gossip library updates:**
+
+- Request/reply messaging, node groups, and leader election
 {{< /changelog-item >}}
 
 ---
