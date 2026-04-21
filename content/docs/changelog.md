@@ -14,6 +14,7 @@ nav-skip: true
 **Search:**
 
 - `scriptling.grep` — Fast file content search with concurrent worker pool, glob filtering, binary file detection, and path restriction support
+- `scriptling.text` — In-place file content replacement with atomic temp-file rename, concurrent worker pool, and path restriction support
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
