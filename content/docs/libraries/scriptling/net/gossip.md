@@ -17,7 +17,6 @@ Advanced features include request/reply messaging, metadata-criteria-based node 
 | Function | Description |
 |----------|-------------|
 | `create(bind_addr, ...)` | Create a gossip cluster node |
-| `decode_json(json_string)` | Decode a JSON string to a scriptling value |
 
 ## Constants
 
@@ -571,16 +570,6 @@ election.on_event("became_leader", lambda e, n: print("I'm leader!"))
 election.on_event("stepped_down", lambda e, n: print("Stepped down"))
 election.start()
 ```
-
-### scriptling.net.gossip.decode_json(json_string)
-
-Decode a JSON string to a scriptling value.
-
-**Parameters:**
-
-- `json_string` (string): JSON string to decode
-
-**Returns:** Decoded value (dict, list, string, int, float, bool, or None)
 
 ## Examples
 

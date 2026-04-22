@@ -11,6 +11,10 @@ nav-skip: true
 {{< version "v0.5.7" >}}
 
 {{< changelog-item "added" >}}
+**Container management:**
+
+- `scriptling.container` — Container lifecycle management for Docker, Podman, and Apple Containers
+
 **Search:**
 
 - `scriptling.grep` — Fast file content search with concurrent worker pool, glob filtering, binary file detection, and path restriction support
