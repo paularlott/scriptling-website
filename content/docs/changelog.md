@@ -11,6 +11,13 @@ nav-skip: true
 {{< version "v0.5.7" >}}
 
 {{< changelog-item "added" >}}
+**Configuration file:**
+
+- Optional `scriptling.toml` configuration file with search paths (`.`, `$HOME/`, `$HOME/.config/scriptling/`)
+- `-C`/`--config` flag to specify a custom config file path
+- All flags with a config path column can be set in the file
+- Priority order: command-line flag > environment variable > config file > default
+
 **Container management:**
 
 - `scriptling.container` — Container lifecycle management for Docker, Podman, and Apple Containers
