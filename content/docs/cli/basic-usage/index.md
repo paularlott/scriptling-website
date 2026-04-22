@@ -70,30 +70,94 @@ The linter exits with code 0 if no errors are found, and code 1 if any errors ex
 
 ## Command Line Options
 
-| Flag                  | Environment Variable       | Description                                          | Default          |
-| --------------------- | -------------------------- | ---------------------------------------------------- | ---------------- |
-| `-i`, `--interactive` | -                          | Start interactive mode                               | false            |
-| `-c`, `--code`        | -                          | Execute inline code string                           | -                |
-| `-l`, `--lint`        | -                          | Lint script files without executing                  | false            |
-| `--lint-format`       | `SCRIPTLING_LINT_FORMAT`   | Output format for lint (text/json)                   | text             |
-| `-p`, `--package`     | -                          | Package (.zip) path or URL to load (repeatable)      | (none)           |
-| `-k`, `--insecure`    | -                          | Allow self-signed HTTPS certificates                 | false            |
-| `--cache-dir`         | `SCRIPTLING_CACHE_DIR`     | Cache directory for remote packages                  | OS default       |
-| `-L`, `--libpath`     | `SCRIPTLING_LIBPATH`       | Extra library search directory (repeatable)          | (none)           |
-| `--log-level`         | `SCRIPTLING_LOG_LEVEL`     | Log level (trace/debug/info/warn/error)              | info             |
-| `--log-format`        | `SCRIPTLING_LOG_FORMAT`    | Log format (console/json)                            | console          |
-| `-S`, `--server`      | `SCRIPTLING_SERVER`        | HTTP server address (host:port)                      | (disabled)       |
-| `--mcp-tools`         | `SCRIPTLING_MCP_TOOLS`     | Directory containing MCP tools                       | (disabled)       |
-| `--mcp-exec-script`   | -                          | Enable MCP script execution tool                     | false            |
-| `--bearer-token`      | `SCRIPTLING_BEARER_TOKEN`  | Bearer token for authentication                      | none             |
-| `--allowed-paths`     | `SCRIPTLING_ALLOWED_PATHS` | Comma-separated allowed filesystem paths             | (no restriction) |
-| `--tls-cert`          | `SCRIPTLING_TLS_CERT`      | TLS certificate file                                 | none             |
-| `--tls-key`           | `SCRIPTLING_TLS_KEY`       | TLS key file                                         | none             |
-| `--tls-generate`      | -                          | Generate self-signed certificate                     | false            |
-| `--docker-host`       | `DOCKER_HOST`              | Docker endpoint (socket path or URI)                 | `/var/run/docker.sock` |
-| `--podman-host`       | `CONTAINER_HOST`           | Podman endpoint (socket path or URI)                 | `/var/run/podman.sock` |
-| `--disable-lib`       | `SCRIPTLING_DISABLE_LIB`   | Disable a built-in library by name (repeatable)      | (none)                 |
-| `--list-libs`         | -                          | List available built-in libraries and exit            | false                  |
+| Flag                  | Env Variable               | Config Path                  | Description                                          | Default          |
+| --------------------- | -------------------------- | ---------------------------- | ---------------------------------------------------- | ---------------- |
+| `-C`, `--config`      | `SCRIPTLING_CONFIG`        | -                            | Path to configuration file                           | see below        |
+| `-i`, `--interactive` | -                          | -                            | Start interactive mode                               | -            |
+| `-c`, `--code`        | -                          | -                            | Execute inline code string                           | -                |
+| `-l`, `--lint`        | -                          | -                            | Lint script files without executing                  | -            |
+| `--lint-format`       | `SCRIPTLING_LINT_FORMAT`   | `lint.format`                | Output format for lint (text/json)                   | text             |
+| `-p`, `--package`     | -                          | `packages`                   | Package (.zip) path or URL to load (repeatable)      | (none)           |
+| `-k`, `--insecure`    | -                          | `insecure`                   | Allow self-signed HTTPS certificates                 | false            |
+| `--cache-dir`         | `SCRIPTLING_CACHE_DIR`     | `cache.dir`                  | Cache directory for remote packages                  | OS default       |
+| `-L`, `--libpath`     | `SCRIPTLING_LIBPATH`       | `libpath`                    | Extra library search directory (repeatable)          | (none)           |
+| `--log-level`         | `SCRIPTLING_LOG_LEVEL`     | `log.level`                  | Log level (trace/debug/info/warn/error)              | info             |
+| `--log-format`        | `SCRIPTLING_LOG_FORMAT`    | `log.format`                 | Log format (console/json)                            | console          |
+| `-S`, `--server`      | `SCRIPTLING_SERVER`        | `server.address`             | HTTP server address (host:port)                      | (disabled)       |
+| `--mcp-tools`         | `SCRIPTLING_MCP_TOOLS`     | `mcp.tools`                  | Directory containing MCP tools                       | (disabled)       |
+| `--mcp-exec-script`   | `SCRIPTLING_MCP_EXEC_SCRIPT` | `mcp.exec_script`          | Enable MCP script execution tool                     | false            |
+| `--bearer-token`      | `SCRIPTLING_BEARER_TOKEN`  | `server.bearer_token`        | Bearer token for authentication                      | none             |
+| `--allowed-paths`     | `SCRIPTLING_ALLOWED_PATHS` | `security.allowed_paths`     | Comma-separated allowed filesystem paths             | (no restriction) |
+| `--disable-lib`       | `SCRIPTLING_DISABLE_LIB`   | `security.disable_libs`      | Disable a built-in library by name (repeatable)      | (none)           |
+| `--list-libs`         | -                          | -                            | List available built-in libraries and exit           | -            |
+| `--kv-storage`        | `SCRIPTLING_KV_STORAGE`    | `kv.storage`                 | Directory for persistent KV store                    | (in-memory)      |
+| `--docker-host`       | `DOCKER_HOST`              | `container.docker_host`      | Docker endpoint (socket path, tcp://, https://)      | `/var/run/docker.sock` |
+| `--podman-host`       | `CONTAINER_HOST`           | `container.podman_host`      | Podman endpoint (socket path or unix:// URI)         | `/var/run/podman.sock` |
+| `--secret-config`     | `SCRIPTLING_SECRET_CONFIG` | `secret.config`              | TOML file for secret provider aliases                | none             |
+| `--tls-cert`          | `SCRIPTLING_TLS_CERT`      | `tls.cert`                   | TLS certificate file                                 | none             |
+| `--tls-key`           | `SCRIPTLING_TLS_KEY`       | `tls.key`                    | TLS key file                                         | none             |
+| `--tls-generate`      | -                          | `tls.generate`               | Generate self-signed certificate                     | -            |
+
+## Configuration File
+
+Scriptling looks for `scriptling.toml` in the following locations (in order):
+
+1. Current directory (`.`)
+2. `$HOME/`
+3. `$HOME/.config/scriptling/`
+4. `/etc/scriptling/`
+
+Use `--config` (or `-C`) to specify a different path explicitly.
+
+All flags that have a config path can be set in the file. The TOML structure mirrors the config paths shown in the flags table above:
+
+```toml
+# scriptling.toml
+
+[log]
+level = "debug"
+format = "console"
+
+libpath = ["/shared/libs", "/company/libs"]
+
+packages = ["./mypackage.zip", "https://example.com/lib.zip"]
+insecure = false
+
+[server]
+address = ":8000"
+bearer_token = "secret"
+
+[mcp]
+tools = "./tools"
+exec_script = false
+
+[security]
+allowed_paths = "/tmp/data,./uploads"
+disable_libs = ["subprocess", "os"]
+
+[kv]
+storage = "/var/lib/scriptling/kv"
+
+[container]
+docker_host = "unix:///Users/paul/.lima/docker/sock/docker.sock"
+podman_host = "unix:///run/user/1000/podman/podman.sock"
+
+[secret]
+config = "/etc/scriptling/secrets.toml"
+
+[tls]
+cert = "/etc/scriptling/tls.crt"
+key = "/etc/scriptling/tls.key"
+generate = false
+
+[cache]
+dir = "/var/cache/scriptling"
+
+[lint]
+format = "text"
+```
+
+Priority order (highest to lowest): **command-line flag** > **environment variable** > **config file** > **default**.
 
 ## Container Endpoints {#container-endpoints}
 
@@ -114,9 +178,9 @@ scriptling --docker-host tcp://192.168.1.10:2375 script.py
 scriptling --podman-host unix:///run/user/1000/podman/podman.sock script.py
 ```
 
-## Environment Configuration
+## Environment Variables and .env Files
 
-The CLI automatically loads environment variables from a `.env` file in the current directory (if it exists). This is useful for setting default values for flags without typing them on the command line.
+The CLI automatically loads environment variables from a `.env` file in the current directory (if it exists). For persistent configuration, prefer `scriptling.toml` — the `.env` file is useful for secrets or environment-specific overrides that shouldn't be committed to version control.
 
 **Example `.env` file:**
 
