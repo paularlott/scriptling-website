@@ -8,6 +8,35 @@ nav-skip: true
 
 ## April 2026
 
+{{< version "v0.5.7" >}}
+
+{{< changelog-item "added" >}}
+**Configuration file:**
+
+- Optional `scriptling.toml` configuration file with search paths (`.`, `$HOME/`, `$HOME/.config/scriptling/`)
+- `-C`/`--config` flag to specify a custom config file path
+- All flags with a config path column can be set in the file
+- Priority order: command-line flag > environment variable > config file > default
+
+**Container management:**
+
+- `scriptling.container` — Container lifecycle management for Docker, Podman, and Apple Containers
+
+**Search:**
+
+- `scriptling.grep` — Fast file content search with concurrent worker pool, glob filtering, binary file detection, and path restriction support
+- `scriptling.text` — In-place file content replacement with atomic temp-file rename, concurrent worker pool, and path restriction support
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+
+**Gossip library updates:**
+
+- Request/reply messaging, node groups, and leader election
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.5.6" >}}
 
 {{< changelog-item "added" >}}
