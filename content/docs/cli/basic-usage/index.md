@@ -90,6 +90,29 @@ The linter exits with code 0 if no errors are found, and code 1 if any errors ex
 | `--tls-cert`          | `SCRIPTLING_TLS_CERT`      | TLS certificate file                                 | none             |
 | `--tls-key`           | `SCRIPTLING_TLS_KEY`       | TLS key file                                         | none             |
 | `--tls-generate`      | -                          | Generate self-signed certificate                     | false            |
+| `--docker-host`       | `DOCKER_HOST`              | Docker endpoint (socket path or URI)                 | `/var/run/docker.sock` |
+| `--podman-host`       | `CONTAINER_HOST`           | Podman endpoint (socket path or URI)                 | `/var/run/podman.sock` |
+| `--disable-lib`       | `SCRIPTLING_DISABLE_LIB`   | Disable a built-in library by name (repeatable)      | (none)                 |
+| `--list-libs`         | -                          | List available built-in libraries and exit            | false                  |
+
+## Container Endpoints {#container-endpoints}
+
+When using the `scriptling.container` library, Docker and Podman endpoints can be configured via flags or environment variables. Both accept any of the following forms:
+
+| Form | Example |
+|---|---|
+| Unix socket path | `/var/run/docker.sock` |
+| Unix socket URI | `unix:///var/run/docker.sock` |
+| TCP (Docker only) | `tcp://192.168.1.10:2375` or `192.168.1.10:2375` |
+| TLS TCP (Docker only) | `https://192.168.1.10:2376` |
+
+Podman does not expose a plain TCP endpoint — use a Unix socket path or URI. For remote Podman, use `podman system service` with SSH tunnelling and point the socket at the local tunnel endpoint.
+
+```bash
+scriptling --docker-host unix:///Users/paul/.lima/docker/sock/docker.sock script.py
+scriptling --docker-host tcp://192.168.1.10:2375 script.py
+scriptling --podman-host unix:///run/user/1000/podman/podman.sock script.py
+```
 
 ## Environment Configuration
 
@@ -159,6 +182,39 @@ import knot.groups     # Loads from myproject/knot/groups.py
 For nested imports like `knot.groups`, the loader checks:
 1. `dir/knot/groups.py` (folder structure — preferred)
 2. `dir/knot.groups.py` (flat file — legacy fallback)
+
+## Disabling and Listing Libraries
+
+### List Available Libraries
+
+Use `--list-libs` to print all built-in library names and exit:
+
+```bash
+scriptling --list-libs
+```
+
+When combined with `--disable-lib`, disabled libraries are excluded from the output:
+
+```bash
+scriptling --disable-lib subprocess --list-libs
+```
+
+### Disable Specific Libraries
+
+Use `--disable-lib` (repeatable) to prevent specific built-in libraries from loading:
+
+```bash
+# Disable a single library
+scriptling --disable-lib subprocess script.py
+
+# Disable multiple libraries
+scriptling --disable-lib subprocess --disable-lib os script.py
+
+# Via environment variable
+SCRIPTLING_DISABLE_LIB=subprocess scriptling script.py
+```
+
+If a script attempts to import a disabled library, it will raise an import error.
 
 ## Script Execution Modes
 

@@ -16,31 +16,7 @@ container.Register(p)
 
 ## Endpoint Configuration
 
-Docker and Podman endpoints are configured via environment variables or the `--docker-sock` / `--podman-sock` CLI flags. Both accept any of the following forms:
-
-| Form | Example |
-|---|---|
-| Unix socket path | `/var/run/docker.sock` |
-| Unix socket URI | `unix:///var/run/docker.sock` |
-| TCP (Docker only) | `tcp://192.168.1.10:2375` or `192.168.1.10:2375` |
-| TLS TCP (Docker only) | `https://192.168.1.10:2376` |
-
-Podman does not expose a plain TCP endpoint — use a Unix socket path or URI. For remote Podman, use `podman system service` with SSH tunnelling and point the socket at the local tunnel endpoint.
-
-### Environment Variables
-
-| Variable | Default | Description |
-|---|---|---|
-| `DOCKER_HOST` | `/var/run/docker.sock` | Docker endpoint (standard Docker env var) |
-| `CONTAINER_HOST` | `/var/run/podman.sock` | Podman endpoint (standard Podman env var) |
-
-### CLI Flags
-
-```bash
-scriptling --docker-host unix:///Users/paul/.lima/docker/sock/docker.sock script.py
-scriptling --docker-host tcp://192.168.1.10:2375 script.py
-scriptling --podman-host unix:///run/user/1000/podman/podman.sock script.py
-```
+Docker and Podman endpoints are configured via the `--docker-host` / `--podman-host` CLI flags or the `DOCKER_HOST` / `CONTAINER_HOST` environment variables. See [CLI Basic Usage](../../../cli/basic-usage/#container-endpoints) for details.
 
 ## Module Functions
 
