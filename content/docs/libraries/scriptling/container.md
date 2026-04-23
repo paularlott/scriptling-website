@@ -30,6 +30,7 @@ Docker and Podman endpoints are configured via the `--docker-host` / `--podman-h
 | Method | Description |
 |---|---|
 | `driver()` | Return the active runtime name |
+| `login(registry, username, password)` | Authenticate with a container registry |
 | `image_pull(image)` | Pull an image from a registry |
 | `image_list()` | List locally available images |
 | `image_remove(image)` | Remove a local image |
@@ -94,6 +95,30 @@ c = container.Client("apple")
 ```
 
 ## ContainerClient
+
+### login(server, username, password)
+
+Authenticates with a container registry. For Docker/Podman the credentials are stored on the client and injected automatically as `X-Registry-Auth` on subsequent `image_pull` calls for the same registry. For Apple Containers the host CLI credential store is updated via `container registry login`.
+
+**Parameters:**
+
+- `registry` (string): Registry hostname e.g. `"ghcr.io"` or `"registry.example.com"`. Pass `""` to target Docker Hub.
+- `username` (string): Registry username
+- `password` (string): Registry password or access token
+
+```python
+# Docker Hub
+c.login("", "myuser", "mytoken")
+c.image_pull("myuser/myimage:latest")
+
+# GitHub Container Registry
+c.login("ghcr.io", "myuser", "ghp_token")
+c.image_pull("ghcr.io/myorg/myimage:latest")
+
+# Private registry
+c.login("registry.example.com", "user", "pass")
+c.image_pull("registry.example.com/myimage:1.0")
+```
 
 ### driver()
 
