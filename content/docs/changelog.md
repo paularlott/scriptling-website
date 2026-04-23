@@ -8,6 +8,15 @@ nav-skip: true
 
 ## April 2026
 
+{{< version "v0.5.8" >}}
+
+{{< changelog-item "changed" >}}
+
+**Gossip library updates:**
+
+- `scriptling.text` renamed to `scriptling.sed` to better reflect its in-place editing capabilities
+{{< /changelog-item >}}
+
 {{< version "v0.5.7" >}}
 
 {{< changelog-item "added" >}}
