@@ -4,8 +4,6 @@ description: One-page guidance for generating accurate, Python-like Scriptling c
 weight: 7
 ---
 
-# LLM Script Generation Guide
-
 Use this page as a compact reference for generating high-quality Scriptling scripts.
 
 ## Overview
