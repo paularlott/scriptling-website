@@ -8,6 +8,17 @@ nav-skip: true
 
 ## April 2026
 
+{{< version "v0.5.10" >}}
+
+{{< changelog-item "added" >}}
+**HTTP server:**
+
+- `runtime.http.not_found(handler)` — Register a custom 404 handler, called when no route matches or a web root file is not found
+- `--web-root <dir>` CLI flag (`SCRIPTLING_WEB_ROOT` / `server.web_root`) — Serve static files (HTML, CSS, JS, images) from a directory; requests fall through to the `not_found` handler if no file is found
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.5.8" >}}
 
 {{< changelog-item "changed" >}}
