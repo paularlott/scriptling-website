@@ -22,7 +22,7 @@ The setup script is executed when the server starts and typically registers rout
 | Flag                | Environment Variable      | Description                      | Default    |
 | ------------------- | ------------------------- | -------------------------------- | ---------- |
 | `--server`          | `SCRIPTLING_SERVER`       | HTTP server address (host:port)  | (disabled) |
-| `--web-root`        | `SCRIPTLING_WEB_ROOT`     | Directory to serve static files  | none       |
+| `--web-root`        | `SCRIPTLING_WEB_ROOT`     | Directory or zip to serve static files from | none       |
 | `--bearer-token`    | `SCRIPTLING_BEARER_TOKEN` | Bearer token for authentication  | none       |
 | `--allowed-paths`   | `SCRIPTLING_ALLOWED_PATHS`| Allowed filesystem paths         | (none)     |
 | `--tls-cert`        | `SCRIPTLING_TLS_CERT`     | TLS certificate file             | none       |
@@ -31,11 +31,17 @@ The setup script is executed when the server starts and typically registers rout
 
 ## Static Assets
 
-Use `--web-root` to serve static files (HTML, CSS, JS, images) from a directory. When a request doesn't match any registered route, the server looks for a matching file in the web root. If no file is found either, the `not_found` handler is called (if registered).
+Use `--web-root` to serve static files (HTML, CSS, JS, images) from a directory or a zip archive. When a request doesn't match any registered route, the server looks for a matching file in the web root. If no file is found either, the `not_found` handler is called (if registered).
 
 ```bash
+# Serve from a directory
 scriptling --server :8000 --web-root ./public setup.py
+
+# Serve from a zip archive
+scriptling --server :8000 --web-root ./public.zip setup.py
 ```
+
+Requests for `/` automatically serve `index.html` from the web root if present.
 
 In your setup script, register a custom 404 handler for unmatched requests:
 

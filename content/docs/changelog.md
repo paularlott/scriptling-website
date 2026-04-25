@@ -8,13 +8,18 @@ nav-skip: true
 
 ## April 2026
 
-{{< version "v0.5.10" >}}
+{{< version "v0.6.0" >}}
 
 {{< changelog-item "added" >}}
 **HTTP server:**
 
 - `runtime.http.not_found(handler)` — Register a custom 404 handler, called when no route matches or a web root file is not found
-- `--web-root <dir>` CLI flag (`SCRIPTLING_WEB_ROOT` / `server.web_root`) — Serve static files (HTML, CSS, JS, images) from a directory; requests fall through to the `not_found` handler if no file is found
+- `--web-root <dir|zip>` CLI flag (`SCRIPTLING_WEB_ROOT` / `server.web_root`) — Serve static files from a directory or zip archive; requests fall through to the `not_found` handler if no file is found
+
+**Template library:**
+
+- `scriptling.template.html` — `html/template` rendering with automatic HTML escaping
+- `scriptling.template.text` — `text/template` rendering with no escaping
 {{< /changelog-item >}}
 
 ---

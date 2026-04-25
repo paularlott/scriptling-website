@@ -579,16 +579,56 @@ Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) objec
 }
 ```
 
-### 2. Use `instance.Fields` for State
+### 2. Use `instance.Fields` for User-Visible State
 
-Store instance data in the Fields map:
+Store data that scripts can read as fields:
 
 ```go
 instance.Fields["name"] = &object.String{Value: name}
 instance.Fields["count"] = object.NewInteger(count)
 ```
 
-### 3. Return `object.None` for Void Methods
+### 3. Use `instance.NativeData` for Go-Only State
+
+When your class wraps a Go value (a connection, file handle, parsed template, etc.) that scripts should never access directly, store it in `NativeData` instead of `Fields`. This avoids polluting the field namespace and removes the need for a wrapper type that implements `object.Object`:
+
+```go
+type myConn struct {
+    conn net.Conn
+    id   string
+}
+
+var MyClass = &object.Class{
+    Name: "MyClient",
+    Methods: map[string]object.Object{
+        "send": &object.Builtin{
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                instance := args[0].(*object.Instance)
+                c, ok := instance.NativeData.(*myConn)
+                if !ok {
+                    return errors.NewError("invalid client")
+                }
+                msg, _ := args[1].AsString()
+                c.conn.Write([]byte(msg))
+                return &object.Null{}
+            },
+        },
+    },
+}
+
+// Create instance with NativeData
+func newClientInstance(conn net.Conn) *object.Instance {
+    return &object.Instance{
+        Class:      MyClass,
+        Fields:     map[string]object.Object{},
+        NativeData: &myConn{conn: conn},
+    }
+}
+```
+
+Use `Fields` for data scripts can read; use `NativeData` for internal Go state. Shallow and deep copies of an instance do not copy `NativeData`, so native-backed objects should be treated as handles rather than copyable data containers.
+
+### 4. Return `object.None` for Void Methods
 
 Methods without return values should return None:
 
@@ -599,7 +639,7 @@ Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) objec
 }
 ```
 
-### 4. Use Type Assertions Safely
+### 5. Use Type Assertions Safely
 
 Check types before casting:
 

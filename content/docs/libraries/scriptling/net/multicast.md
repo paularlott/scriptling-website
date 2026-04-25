@@ -14,7 +14,7 @@ The `scriptling.net.multicast` library provides UDP multicast support for sendin
 
 | Function | Description |
 |----------|-------------|
-| `join(group_addr, port, interface="")` | Join a multicast group |
+| `join(group_addr, port, interface="", ttl=1)` | Join a multicast group |
 
 ## Group Object Methods
 
@@ -44,7 +44,7 @@ scriptlingmulticast.Register(p)
 
 ## Functions
 
-### scriptling.net.multicast.join(group_addr, port, interface="")
+### scriptling.net.multicast.join(group_addr, port, interface="", ttl=1)
 
 Join a multicast group.
 
@@ -53,6 +53,7 @@ Join a multicast group.
 - `group_addr` (string): Multicast group address (e.g., `"239.1.1.1"`)
 - `port` (int): Port number for the multicast group
 - `interface` (string, optional): Network interface to bind to (default: auto-select)
+- `ttl` (int, optional): Multicast TTL / hop limit (default: `1`, local network only; increase to route across subnets)
 
 **Returns:** Group object with `send()`, `receive()`, `close()` methods and `group_addr`, `port`, `local_addr` properties
 
@@ -61,6 +62,12 @@ Join a multicast group.
 import scriptling.net.multicast as mc
 
 group = mc.join("239.1.1.1", 9999)
+```
+
+To route across subnets, increase the TTL:
+
+```python
+group = mc.join("239.1.1.1", 9999, ttl=4)
 ```
 
 ## Group Methods
@@ -204,4 +211,5 @@ finally:
 - UDP multicast is inherently unreliable - messages may be lost
 - Maximum message size is limited by UDP (approximately 65KB)
 - Use `interface` parameter on multi-homed hosts to select the correct NIC
+- Default TTL is `1` (local network only); set `ttl` higher to cross router hops
 - Always call `close()` when done to release the socket
