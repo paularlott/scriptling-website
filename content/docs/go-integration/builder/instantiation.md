@@ -126,6 +126,11 @@ template := builder.Build()
 ### Step 3: Implement Constructor Helper
 
 ```go
+type pathData struct {
+    config FSConfig
+    path   string
+}
+
 func createPath(config FSConfig, ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
     if len(args) < 1 {
         return &object.Error{Message: "Path() requires a path argument"}
@@ -141,31 +146,34 @@ func createPath(config FSConfig, ctx context.Context, kwargs object.Kwargs, args
         return &object.Error{Message: "access denied"}
     }
 
-    // Create instance
-    instance := &object.Instance{
+    // Create instance. Script-visible properties go in Fields;
+    // internal Go-only state goes in NativeData.
+    return &object.Instance{
         Class:  PathClass,
-        Fields: make(map[string]object.Object),
+        Fields: map[string]object.Object{},
+        NativeData: &pathData{
+            config: config,
+            path:   pathStr,
+        },
     }
-
-    // Store config in instance for methods to access
-    instance.Fields["__config__"] = config
-    instance.Fields["__path__"] = &object.String{Value: pathStr}
-
-    return instance
 }
 ```
 
 ### Step 4: Implement Class Methods
 
-Methods retrieve config from `self.Fields["__config__"]`:
+Methods retrieve internal state from `self.NativeData`:
 
 ```go
 func pathExists(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
     self := args[0].(*object.Instance)
 
-    // Retrieve config from instance
-    config := self.Fields["__config__"].(FSConfig)
-    pathStr := self.Fields["__path__"].(*object.String).Value
+    // Retrieve Go-only state from instance
+    data, ok := self.NativeData.(*pathData)
+    if !ok {
+        return errors.NewError("invalid Path instance")
+    }
+    config := data.config
+    pathStr := data.path
 
     // Validate access
     if !config.IsPathAllowed(pathStr) {
@@ -179,8 +187,12 @@ func pathExists(ctx context.Context, kwargs object.Kwargs, args ...object.Object
 
 func pathJoinpath(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
     self := args[0].(*object.Instance)
-    config := self.Fields["__config__"].(FSConfig)
-    basePath := self.Fields["__path__"].(*object.String).Value
+    data, ok := self.NativeData.(*pathData)
+    if !ok {
+        return errors.NewError("invalid Path instance")
+    }
+    config := data.config
+    basePath := data.path
 
     // Join path segments
     segments := []string{basePath}
@@ -206,8 +218,9 @@ Alternatively, use ClassBuilder for type-safe class creation:
 ```go
 classBuilder := object.NewClassBuilder("Path")
 classBuilder.Method("exists", func(self *object.Instance) bool {
-    config := self.Fields["__config__"].(FSConfig)
-    pathStr := self.Fields["__path__"].(*object.String).Value
+    data := self.NativeData.(*pathData)
+    config := data.config
+    pathStr := data.path
 
     if !config.IsPathAllowed(pathStr) {
         panic("access denied")

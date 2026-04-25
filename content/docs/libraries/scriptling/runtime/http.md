@@ -16,6 +16,7 @@ HTTP server route registration and response helpers.
 | `delete(path, handler)`            | Register a DELETE route             |
 | `route(path, handler, methods=[])` | Register route for multiple methods |
 | `middleware(handler)`              | Register global middleware          |
+| `not_found(handler)`               | Register custom 404 handler         |
 | `static(path, directory)`          | Register static file serving        |
 | `json(status_code, data)`          | Create JSON response                |
 | `html(status_code, content)`       | Create HTML response                |
@@ -63,6 +64,18 @@ Register a route for multiple HTTP methods.
 - `path` (string): URL path
 - `handler` (string): Handler function
 - `methods` (list, optional): HTTP methods (default: all)
+
+### scriptling.runtime.http.not_found(handler)
+
+Register a custom 404 Not Found handler.
+
+**Parameters:**
+
+- `handler` (string): Handler function as "library.function"
+
+The handler receives the request object and should return a response. It is called when:
+- No route matches the request path, or
+- The `--web-root` directory is configured but the requested file is not found
 
 ### scriptling.runtime.http.middleware(handler)
 
@@ -158,7 +171,7 @@ Handlers receive a Request object with these fields:
 
 ## Examples
 
-### Basic Routes
+### Basic Routes with 404 Handler
 
 ```python
 # setup.py
@@ -167,6 +180,7 @@ import scriptling.runtime as runtime
 runtime.http.get("/users", "handlers.list_users")
 runtime.http.post("/users", "handlers.create_user")
 runtime.http.middleware("handlers.auth")
+runtime.http.not_found("handlers.not_found")
 ```
 
 ### Handler with Response
@@ -198,8 +212,19 @@ def auth(request):
     return None  # Continue to handler
 ```
 
+### Custom 404 Handler
+
+```python
+import scriptling.runtime as runtime
+
+def not_found(request):
+    return runtime.http.html(404, f"<h1>404 - {request.path} not found</h1>")
+```
+
 ## Notes
 
 - Routes are registered during setup script execution
 - Response helpers return dicts compatible with the server
 - Middleware can short-circuit requests by returning a response
+- The `not_found` handler is called when no route matches or a static asset is not found
+- Use `--web-root <dir>` CLI flag to serve static files; unmatched requests fall through to the `not_found` handler

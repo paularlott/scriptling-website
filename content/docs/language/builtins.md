@@ -528,7 +528,7 @@ dir({"x": 1, "y": 2})   # ["x", "y"]
 
 ### copy()
 
-Returns a shallow copy of an object. Nested objects are not copied — use `copy.deepcopy()` from the `copy` library for that.
+Returns a shallow copy of an object. Nested objects are not copied — use `copy.deepcopy()` from the `copy` library for that. For native-backed instances, hidden Go-only state is not copied.
 
 ```python
 # List copy — mutations don't affect the original

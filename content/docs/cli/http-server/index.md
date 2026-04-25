@@ -22,11 +22,51 @@ The setup script is executed when the server starts and typically registers rout
 | Flag                | Environment Variable      | Description                      | Default    |
 | ------------------- | ------------------------- | -------------------------------- | ---------- |
 | `--server`          | `SCRIPTLING_SERVER`       | HTTP server address (host:port)  | (disabled) |
+| `--web-root`        | `SCRIPTLING_WEB_ROOT`     | Directory or zip to serve static files from | none       |
 | `--bearer-token`    | `SCRIPTLING_BEARER_TOKEN` | Bearer token for authentication  | none       |
 | `--allowed-paths`   | `SCRIPTLING_ALLOWED_PATHS`| Allowed filesystem paths         | (none)     |
 | `--tls-cert`        | `SCRIPTLING_TLS_CERT`     | TLS certificate file             | none       |
 | `--tls-key`         | `SCRIPTLING_TLS_KEY`      | TLS key file                     | none       |
 | `--tls-generate`    | -                         | Generate self-signed certificate | false      |
+
+## Static Assets
+
+Use `--web-root` to serve static files (HTML, CSS, JS, images) from a directory or a zip archive. When a request doesn't match any registered route, the server looks for a matching file in the web root. If no file is found either, the `not_found` handler is called (if registered).
+
+```bash
+# Serve from a directory
+scriptling --server :8000 --web-root ./public setup.py
+
+# Serve from a zip archive
+scriptling --server :8000 --web-root ./public.zip setup.py
+```
+
+Requests for `/` automatically serve `index.html` from the web root if present.
+
+In your setup script, register a custom 404 handler for unmatched requests:
+
+```python
+# setup.py
+import scriptling.runtime as runtime
+
+runtime.http.get("/api/hello", "handlers.hello")
+runtime.http.not_found("handlers.not_found")
+```
+
+```python
+# handlers.py
+import scriptling.runtime as runtime
+
+def not_found(request):
+    return runtime.http.html(404, f"<h1>404 - {request.path} not found</h1>")
+```
+
+Priority order for incoming requests:
+1. Registered script routes (exact match)
+2. Registered static routes (`runtime.http.static()`)
+3. Web root directory (`--web-root`)
+4. `not_found` handler (if registered)
+5. Plain `404 Not Found`
 
 ## TLS/HTTPS
 
