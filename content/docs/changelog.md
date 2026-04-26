@@ -8,6 +8,16 @@ nav-skip: true
 
 ## April 2026
 
+{{< version "v0.6.1" >}}
+
+{{< changelog-item "added" >}}
+**Container library:**
+
+- `volume_create(name, size=...)` — optional `size` kwarg (e.g. `"20G"`, `"512M"`) sets the volume size on Apple Containers; silently ignored for Docker and Podman
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.6.0" >}}
 
 {{< changelog-item "added" >}}

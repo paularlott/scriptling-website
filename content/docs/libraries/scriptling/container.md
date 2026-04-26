@@ -41,7 +41,7 @@ Docker and Podman endpoints are configured via the `--docker-host` / `--podman-h
 | `remove(name_or_id)` | Remove a stopped container |
 | `inspect(name_or_id)` | Get container details |
 | `list()` | List all containers |
-| `volume_create(name)` | Create a named volume |
+| `volume_create(name, **kwargs)` | Create a named volume |
 | `volume_remove(name)` | Remove a named volume |
 | `volume_list()` | List named volumes |
 
@@ -297,16 +297,18 @@ for item in c.list():
     print(item["name"], item["status"])
 ```
 
-### volume_create(name)
+### volume_create(name, **kwargs)
 
 Creates a named volume.
 
 **Parameters:**
 
 - `name` (string): Volume name
+- `size` (string, optional): Volume size e.g. `"20G"` or `"512M"`. Supported by Apple Containers only; silently ignored for Docker and Podman.
 
 ```python
 c.volume_create("mydata")
+c.volume_create("mydata", size="20G")
 ```
 
 ### volume_remove(name)
