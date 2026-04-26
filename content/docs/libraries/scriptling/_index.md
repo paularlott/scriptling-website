@@ -63,6 +63,7 @@ Scriptling-specific libraries that provide functionality not available in Python
 | [scriptling.wait_for](wait_for/) | Wait for resources to become available |
 | [scriptling.toon](toon/) | TOON (Token-Oriented Object Notation) encoding/decoding |
 | [scriptling.similarity](similarity/) | Text similarity utilities including fuzzy search and MinHash |
+| [scriptling.template](template/) | Go-powered template rendering (HTML and text) |
 
 ## Usage
 
