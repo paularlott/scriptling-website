@@ -8,6 +8,50 @@ nav-skip: true
 
 ## April 2026
 
+{{< version "v0.6.2" >}}
+
+{{< changelog-item "added" >}}
+**Math library:**
+
+- `tanh(x)` — Hyperbolic tangent
+- `erf(x)` / `erfc(x)` — Error function and complementary error function
+- `gamma(x)` / `lgamma(x)` — Gamma function and log-gamma
+- `cbrt(x)` — Cube root
+- `nextafter(x, y)` — Next floating-point value
+- `remainder(x, y)` — IEEE 754-style remainder
+- `log1p(x)` / `expm1(x)` — Accurate log(1+x) and exp(x)-1 for small x
+- `comb(n, k)` — Binomial coefficient
+- `perm(n[, k])` — Permutations
+- `prod(iterable, start=1)` — Product of all elements
+- `dist(p, q)` — Euclidean distance between two points
+- `softmax(x)` — Numerically stable softmax
+- `dot(a, b)` — Dot product of two vectors
+- `matmul(a, b)` — Matrix multiplication
+- `transpose(m)` — Matrix transpose
+- `mat_add(a, b)` — Element-wise matrix addition
+- `tau` constant — 2π (6.283185...)
+
+**Random library:**
+
+- `choices(population, weights, k)` — Weighted random sampling with replacement
+- `betavariate(alpha, beta)` — Beta distribution
+- `gammavariate(alpha, beta)` — Gamma distribution
+- `triangular(low, high[, mode])` — Triangular distribution
+- `paretovariate(alpha)` — Pareto distribution
+- `weibullvariate(alpha, beta)` — Weibull distribution
+
+**fs extension library:**
+
+- `read_bytes(path, offset, length)` — Read bytes from a file
+- `write_bytes(path, offset, data)` — Write bytes to a file
+- `unpack(format, data)` / `pack(format, values)` — Binary struct packing/unpacking
+- `byte_at(data, index)` — Get unsigned byte value
+- `len(data)` — Byte length (not Unicode code points)
+- `slice(data, start[, end])` — Byte-safe slicing
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.6.1" >}}
 
 {{< changelog-item "added" >}}

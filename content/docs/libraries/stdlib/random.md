@@ -20,6 +20,12 @@ Random number generation functions. Python-compatible.
 | `choice(seq)`                  | Random element from a sequence                 |
 | `shuffle(list)`                | Shuffle a list in place                        |
 | `sample(population, k)`        | k unique random elements from population       |
+| `choices(population, weights, k)` | Weighted random sampling with replacement  |
+| `betavariate(alpha, beta)`     | Random float from beta distribution            |
+| `gammavariate(alpha, beta)`    | Random float from gamma distribution           |
+| `triangular(low, high[, mode])` | Random float from triangular distribution     |
+| `paretovariate(alpha)`         | Random float from Pareto distribution          |
+| `weibullvariate(alpha, beta)`  | Random float from Weibull distribution         |
 
 ## Functions
 
@@ -233,6 +239,135 @@ import random
 
 # Exponential with mean 5 (lambd = 1/5)
 wait_time = random.expovariate(0.2)
+```
+
+### random.choices(population, weights=None, k=1)
+
+Weighted random sampling with replacement. Select k items from population with the given weights.
+
+**Parameters:**
+
+- `population`: List to sample from
+- `weights` (optional): List of weights matching population length. Can be positional or keyword.
+- `k` (optional): Number of items to select. Default: 1. Can be keyword only.
+
+**Returns:** List of k selected items
+
+**Example:**
+
+```python
+import random
+
+# Weighted selection
+colors = ["red", "green", "blue"]
+result = random.choices(colors, weights=[5, 3, 2], k=10)
+print(result)  # 10 selections, red more likely
+
+# Uniform selection (no weights)
+result = random.choices(colors, k=5)
+```
+
+### random.betavariate(alpha, beta)
+
+Returns a random float from a beta distribution.
+
+**Parameters:**
+
+- `alpha`: Shape parameter (must be positive)
+- `beta`: Shape parameter (must be positive)
+
+**Returns:** Float in range [0, 1]
+
+**Example:**
+
+```python
+import random
+
+# Beta distribution skewed toward 0
+result = random.betavariate(0.5, 2.0)
+```
+
+### random.gammavariate(alpha, beta)
+
+Returns a random float from a gamma distribution.
+
+**Parameters:**
+
+- `alpha`: Shape parameter (must be positive)
+- `beta`: Scale parameter (must be positive)
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import random
+
+# Gamma distribution with shape=2, scale=3
+result = random.gammavariate(2.0, 3.0)
+```
+
+### random.triangular(low, high[, mode])
+
+Returns a random float from a triangular distribution.
+
+**Parameters:**
+
+- `low`: Minimum value
+- `high`: Maximum value
+- `mode` (optional): Peak value. Defaults to the midpoint of low and high.
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import random
+
+# Triangular between 0 and 10, peak at 7
+result = random.triangular(0, 10, 7)
+
+# Triangular between 0 and 1, peak at midpoint (0.5)
+result = random.triangular(0, 1)
+```
+
+### random.paretovariate(alpha)
+
+Returns a random float from a Pareto distribution.
+
+**Parameters:**
+
+- `alpha`: Shape parameter (must be positive)
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import random
+
+# Pareto distribution with shape parameter 2
+result = random.paretovariate(2.0)
+```
+
+### random.weibullvariate(alpha, beta)
+
+Returns a random float from a Weibull distribution.
+
+**Parameters:**
+
+- `alpha`: Scale parameter (must be positive)
+- `beta`: Shape parameter (must be positive)
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import random
+
+# Weibull distribution with scale=1, shape=1.5
+result = random.weibullvariate(1.0, 1.5)
 ```
 
 ## Usage Example

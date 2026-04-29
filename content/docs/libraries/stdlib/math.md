@@ -36,6 +36,25 @@ Mathematical functions and constants.
 | `isnan(x)`         | Returns true if x is NaN (Not a Number)            |
 | `isinf(x)`         | Returns true if x is positive or negative infinity |
 | `isfinite(x)`      | Returns true if x is neither NaN nor infinite      |
+| `tanh(x)`          | Returns the hyperbolic tangent of x                |
+| `erf(x)`           | Returns the error function of x                    |
+| `erfc(x)`          | Returns the complementary error function of x      |
+| `gamma(x)`         | Returns the gamma function of x                    |
+| `lgamma(x)`        | Returns the natural log of the absolute gamma      |
+| `cbrt(x)`          | Returns the cube root of x                         |
+| `nextafter(x, y)`  | Returns the next float after x towards y           |
+| `remainder(x, y)`  | Returns the IEEE 754-style remainder of x/y        |
+| `log1p(x)`         | Returns log(1+x) accurately for small x            |
+| `expm1(x)`         | Returns exp(x)-1 accurately for small x            |
+| `comb(n, k)`       | Returns the number of ways to choose k from n      |
+| `perm(n[, k])`     | Returns permutations of k items from n             |
+| `prod(iterable)`   | Returns the product of all elements in a list      |
+| `dist(p, q)`       | Returns the Euclidean distance between two points  |
+| `softmax(x)`       | Returns the softmax of a vector                    |
+| `dot(a, b)`        | Returns the dot product of two vectors             |
+| `matmul(a, b)`     | Matrix-matrix multiply                             |
+| `transpose(m)`     | Transpose a 2D matrix                              |
+| `mat_add(a, b)`    | Element-wise addition of two matrices              |
 
 ## Constants
 
@@ -45,6 +64,7 @@ Mathematical functions and constants.
 | `e`      | The mathematical constant e            |
 | `inf`    | Positive infinity                      |
 | `nan`    | NaN (Not a Number)                     |
+| `tau`    | The mathematical constant τ (2π)      |
 
 ## Functions
 
@@ -543,6 +563,358 @@ result = math.isfinite(math.inf)  # False
 result = math.isfinite(math.nan)  # False
 ```
 
+### math.tanh(x)
+
+Returns the hyperbolic tangent of x.
+
+**Parameters:**
+
+- `x`: Number
+
+**Returns:** Float in range [-1, 1]
+
+**Example:**
+
+```python
+import math
+result = math.tanh(0)    # 0.0
+result = math.tanh(1)    # 0.7615941559557649
+```
+
+### math.erf(x)
+
+Returns the error function of x.
+
+**Parameters:**
+
+- `x`: Number
+
+**Returns:** Float in range [-1, 1]
+
+**Example:**
+
+```python
+import math
+result = math.erf(0)    # 0.0
+result = math.erf(1)    # 0.8427007929497149
+```
+
+### math.erfc(x)
+
+Returns the complementary error function of x.
+
+**Parameters:**
+
+- `x`: Number
+
+**Returns:** Float in range [0, 2]
+
+**Example:**
+
+```python
+import math
+result = math.erfc(0)    # 1.0
+result = math.erfc(1)    # 0.1572992070502851
+```
+
+### math.gamma(x)
+
+Returns the gamma function of x.
+
+**Parameters:**
+
+- `x`: Number
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import math
+result = math.gamma(1)    # 1.0
+result = math.gamma(5)    # 24.0 (4!)
+```
+
+### math.lgamma(x)
+
+Returns the natural log of the absolute value of the gamma function.
+
+**Parameters:**
+
+- `x`: Number
+
+**Returns:** List `[log_abs_gamma, sign]`
+
+**Example:**
+
+```python
+import math
+result = math.lgamma(5)  # [3.1780538303479458, 1]
+```
+
+### math.cbrt(x)
+
+Returns the cube root of x.
+
+**Parameters:**
+
+- `x`: Number
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import math
+result = math.cbrt(27)   # 3.0
+result = math.cbrt(-8)   # -2.0
+```
+
+### math.nextafter(x, y)
+
+Returns the next floating-point value after x towards y.
+
+**Parameters:**
+
+- `x`: Starting value
+- `y`: Direction value
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import math
+result = math.nextafter(1.0, 2.0)  # 1.0000000000000002
+result = math.nextafter(1.0, 0.0)  # 0.9999999999999999
+```
+
+### math.remainder(x, y)
+
+Returns the IEEE 754-style remainder of x/y.
+
+**Parameters:**
+
+- `x`: Dividend
+- `y`: Divisor
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import math
+result = math.remainder(7, 3)   # 1.0
+result = math.remainder(7.5, 2) # -0.5
+```
+
+### math.log1p(x)
+
+Returns log(1+x) accurately for small x.
+
+**Parameters:**
+
+- `x`: Number
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import math
+result = math.log1p(0)    # 0.0
+result = math.log1p(1e-15)  # 9.999999999999995e-16
+```
+
+### math.expm1(x)
+
+Returns exp(x)-1 accurately for small x.
+
+**Parameters:**
+
+- `x`: Number
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import math
+result = math.expm1(0)    # 0.0
+result = math.expm1(1e-10)  # 1.00000000005e-10
+```
+
+### math.comb(n, k)
+
+Returns the number of ways to choose k items from n (binomial coefficient).
+
+**Parameters:**
+
+- `n`: Non-negative integer
+- `k`: Non-negative integer
+
+**Returns:** Integer
+
+**Example:**
+
+```python
+import math
+result = math.comb(5, 2)   # 10
+result = math.comb(10, 3)  # 120
+```
+
+### math.perm(n[, k])
+
+Returns the number of ways to choose k items from n with order.
+
+**Parameters:**
+
+- `n`: Non-negative integer
+- `k` (optional): Non-negative integer. If omitted, returns n!
+
+**Returns:** Integer
+
+**Example:**
+
+```python
+import math
+result = math.perm(5)    # 120 (5!)
+result = math.perm(5, 2) # 20
+```
+
+### math.prod(iterable, start=1)
+
+Returns the product of all elements in a list.
+
+**Parameters:**
+
+- `iterable`: List of numbers
+- `start` (keyword-only, optional): Starting value for multiplication. Default: 1
+
+**Returns:** Integer for all-integer inputs, float otherwise
+
+**Example:**
+
+```python
+import math
+result = math.prod([1, 2, 3, 4])  # 24
+result = math.prod([1.5, 2.0])    # 3.0
+result = math.prod([1, 2], start=5) # 10
+```
+
+### math.dist(p, q)
+
+Returns the Euclidean distance between two points.
+
+**Parameters:**
+
+- `p`: List of numbers (first point)
+- `q`: List of numbers (second point, same dimension)
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import math
+result = math.dist([0, 0], [3, 4])  # 5.0
+result = math.dist([1, 2, 3], [4, 6, 3])  # 5.0
+```
+
+### math.softmax(x)
+
+Returns the numerically stable softmax of a vector.
+
+**Parameters:**
+
+- `x`: List of numbers
+
+**Returns:** List of floats (probability distribution summing to 1.0)
+
+**Example:**
+
+```python
+import math
+result = math.softmax([1.0, 2.0, 3.0])
+print(result)  # [0.0900..., 0.2447..., 0.6652...]
+```
+
+### math.dot(a, b)
+
+Returns the dot product of two vectors.
+
+**Parameters:**
+
+- `a`: List of numbers
+- `b`: List of numbers (same length)
+
+**Returns:** Float
+
+**Example:**
+
+```python
+import math
+result = math.dot([1, 2, 3], [4, 5, 6])  # 32.0
+```
+
+### math.matmul(a, b)
+
+Matrix-matrix multiply. a is (M x K), b is (K x N). Returns (M x N) matrix.
+
+**Parameters:**
+
+- `a`: Matrix as list of lists (M x K)
+- `b`: Matrix as list of lists (K x N)
+
+**Returns:** Matrix as list of lists (M x N)
+
+**Example:**
+
+```python
+import math
+a = [[1, 2], [3, 4]]
+b = [[5, 6], [7, 8]]
+result = math.matmul(a, b)  # [[19.0, 22.0], [43.0, 50.0]]
+```
+
+### math.transpose(m)
+
+Transpose a 2D matrix. Rows become columns.
+
+**Parameters:**
+
+- `m`: Matrix as list of lists
+
+**Returns:** New transposed matrix
+
+**Example:**
+
+```python
+import math
+m = [[1, 2, 3], [4, 5, 6]]
+result = math.transpose(m)  # [[1.0, 4.0], [2.0, 5.0], [3.0, 6.0]]
+```
+
+### math.mat_add(a, b)
+
+Element-wise addition of two matrices.
+
+**Parameters:**
+
+- `a`: Matrix as list of lists
+- `b`: Matrix as list of lists (same shape)
+
+**Returns:** New matrix with element-wise sums
+
+**Example:**
+
+```python
+import math
+a = [[1, 2], [3, 4]]
+b = [[5, 6], [7, 8]]
+result = math.mat_add(a, b)  # [[6.0, 8.0], [10.0, 12.0]]
+```
+
 ## Constants
 
 ### math.pi
@@ -597,6 +969,19 @@ NaN (Not a Number).
 import math
 result = math.nan  # nan
 result = math.isnan(math.nan)  # True
+```
+
+### math.tau
+
+The mathematical constant τ (tau), equal to 2π.
+
+**Value:** Float (6.283185307179586)
+
+**Example:**
+
+```python
+import math
+tau = math.tau  # 6.283185307179586
 ```
 
 ## Usage Example

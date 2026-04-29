@@ -29,6 +29,7 @@ p.RegisterLibrary("secrets", extlibs.SecretsLibrary)
 // Register os/pathlib with security restrictions
 extlibs.RegisterOSLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterPathlibLibrary(p, []string{"/tmp", "/data"})
+extlibs.RegisterFSLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterWaitForLibrary(p)
 extlibs.RegisterKVLibrary(p)
 p.RegisterLibrary("subprocess", extlibs.SubprocessLibrary)
@@ -59,6 +60,12 @@ p.RegisterLibrary("sys", extlibs.SysLibrary)
 | [pathlib](pathlib/) | Object-oriented filesystem paths |
 | [sys](sys/) | System-specific parameters |
 | [subprocess](subprocess/) | Spawn and manage subprocesses |
+
+## Binary I/O
+
+| Library | Description |
+|---------|-------------|
+| [fs](fs/) | Binary file reading, writing, and struct packing/unpacking |
 
 ## Security
 
