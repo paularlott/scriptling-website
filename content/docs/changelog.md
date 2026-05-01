@@ -6,6 +6,44 @@ nav-skip: true
 ---
 
 
+## May 2026
+
+{{< version "v0.6.3" >}}
+
+{{< changelog-item "changed" >}}
+
+**Performance improvements**
+
+**Language:**
+
+- `rf"..."` and `fr"..."` raw f-string prefixes now supported (previously only `r` and `f` separately)
+- Triple-quoted f-strings: `f"""..."""` and `f'''...'''`
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**FloatArray type:**
+
+- New `FloatArray` type for efficient numerical operations, avoiding per-element boxing overhead
+- 1D and 2D arrays with row-major storage
+- Supports indexing, slicing, assignment, iteration, equality, `in` operator, `for` loops, `len()`, `list()` conversion
+- `math.array(data)` — Create a FloatArray from a list of numbers or list of lists
+- `math.shape(a)` — Return the shape of a FloatArray as a list of ints
+
+**Math library:**
+
+- `softmax`, `dot`, `matmul`, `transpose`, `mat_add` now accept `FloatArray` inputs
+- Functions return `FloatArray` when given `FloatArray` input, preserving type
+
+**Built-in functions:**
+
+- `sum()`, `min()`, `max()` accept `FloatArray`
+- `enumerate()`, `zip()`, `reversed()` accept `FloatArray`
+- `list()` converts `FloatArray` to a list of floats
+- `for` loop iterates over `FloatArray` elements (1D) or rows (2D)
+{{< /changelog-item >}}
+
+---
+
 ## April 2026
 
 {{< version "v0.6.2" >}}

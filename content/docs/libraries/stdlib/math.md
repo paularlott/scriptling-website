@@ -55,6 +55,8 @@ Mathematical functions and constants.
 | `matmul(a, b)`     | Matrix-matrix multiply                             |
 | `transpose(m)`     | Transpose a 2D matrix                              |
 | `mat_add(a, b)`    | Element-wise addition of two matrices              |
+| `array(data)`      | Create an efficient FloatArray from a list         |
+| `shape(a)`         | Return the shape of a FloatArray as a list of ints |
 
 ## Constants
 
@@ -827,9 +829,9 @@ Returns the numerically stable softmax of a vector.
 
 **Parameters:**
 
-- `x`: List of numbers
+- `x`: List of numbers or 1D FloatArray
 
-**Returns:** List of floats (probability distribution summing to 1.0)
+**Returns:** List of floats or FloatArray (probability distribution summing to 1.0). Returns FloatArray when input is FloatArray.
 
 **Example:**
 
@@ -837,6 +839,10 @@ Returns the numerically stable softmax of a vector.
 import math
 result = math.softmax([1.0, 2.0, 3.0])
 print(result)  # [0.0900..., 0.2447..., 0.6652...]
+
+# With FloatArray input
+a = math.array([1.0, 2.0, 3.0])
+result = math.softmax(a)  # Returns FloatArray
 ```
 
 ### math.dot(a, b)
@@ -845,8 +851,8 @@ Returns the dot product of two vectors.
 
 **Parameters:**
 
-- `a`: List of numbers
-- `b`: List of numbers (same length)
+- `a`: List of numbers or 1D FloatArray
+- `b`: List of numbers or 1D FloatArray (same length)
 
 **Returns:** Float
 
@@ -855,6 +861,11 @@ Returns the dot product of two vectors.
 ```python
 import math
 result = math.dot([1, 2, 3], [4, 5, 6])  # 32.0
+
+# With FloatArray inputs
+a = math.array([1.0, 2.0, 3.0])
+b = math.array([4.0, 5.0, 6.0])
+result = math.dot(a, b)  # 32.0
 ```
 
 ### math.matmul(a, b)
@@ -863,10 +874,10 @@ Matrix-matrix multiply. a is (M x K), b is (K x N). Returns (M x N) matrix.
 
 **Parameters:**
 
-- `a`: Matrix as list of lists (M x K)
-- `b`: Matrix as list of lists (K x N)
+- `a`: Matrix as list of lists or 2D FloatArray (M x K)
+- `b`: Matrix as list of lists or 2D FloatArray (K x N)
 
-**Returns:** Matrix as list of lists (M x N)
+**Returns:** Matrix as list of lists or 2D FloatArray (M x N). Returns FloatArray when either input is FloatArray.
 
 **Example:**
 
@@ -875,6 +886,11 @@ import math
 a = [[1, 2], [3, 4]]
 b = [[5, 6], [7, 8]]
 result = math.matmul(a, b)  # [[19.0, 22.0], [43.0, 50.0]]
+
+# With FloatArray inputs
+fa = math.array([[1.0, 2.0], [3.0, 4.0]])
+fb = math.array([[5.0, 6.0], [7.0, 8.0]])
+result = math.matmul(fa, fb)  # Returns 2D FloatArray
 ```
 
 ### math.transpose(m)
@@ -883,9 +899,9 @@ Transpose a 2D matrix. Rows become columns.
 
 **Parameters:**
 
-- `m`: Matrix as list of lists
+- `m`: Matrix as list of lists or 2D FloatArray
 
-**Returns:** New transposed matrix
+**Returns:** New transposed matrix. Returns FloatArray when input is FloatArray.
 
 **Example:**
 
@@ -893,6 +909,10 @@ Transpose a 2D matrix. Rows become columns.
 import math
 m = [[1, 2, 3], [4, 5, 6]]
 result = math.transpose(m)  # [[1.0, 4.0], [2.0, 5.0], [3.0, 6.0]]
+
+# With FloatArray input
+fa = math.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+result = math.transpose(fa)  # Returns 2D FloatArray with shape [3, 2]
 ```
 
 ### math.mat_add(a, b)
@@ -901,10 +921,10 @@ Element-wise addition of two matrices.
 
 **Parameters:**
 
-- `a`: Matrix as list of lists
-- `b`: Matrix as list of lists (same shape)
+- `a`: Matrix as list of lists or 2D FloatArray
+- `b`: Matrix as list of lists or 2D FloatArray (same shape)
 
-**Returns:** New matrix with element-wise sums
+**Returns:** New matrix with element-wise sums. Returns FloatArray when either input is FloatArray.
 
 **Example:**
 
@@ -913,6 +933,61 @@ import math
 a = [[1, 2], [3, 4]]
 b = [[5, 6], [7, 8]]
 result = math.mat_add(a, b)  # [[6.0, 8.0], [10.0, 12.0]]
+```
+
+### math.array(data)
+
+Create an efficient FloatArray from a list. Accepts a 1D list of numbers or a 2D list of lists. Returns a FloatArray that avoids per-element boxing overhead.
+
+**Parameters:**
+
+- `data`: List of numbers (1D) or list of lists of numbers (2D), or an existing FloatArray
+
+**Returns:** FloatArray
+
+**Example:**
+
+```python
+import math
+
+# 1D array
+a = math.array([1.0, 2.0, 3.0])
+print(a[0])      # 1.0
+print(len(a))    # 3
+
+# 2D array
+m = math.array([[1.0, 2.0], [3.0, 4.0]])
+print(m[0])      # [1.0, 2.0]
+print(m[0][1])   # 2.0
+print(len(m))    # 2 (number of rows)
+
+# Assignment
+m[0][1] = 9.0
+m[1] = [5.0, 6.0]
+
+# Works with math operations
+result = math.matmul(m, math.array([[1.0], [2.0]]))
+```
+
+### math.shape(a)
+
+Return the shape of a FloatArray as a list of integers.
+
+**Parameters:**
+
+- `a`: FloatArray
+
+**Returns:** List of integers representing dimensions
+
+**Example:**
+
+```python
+import math
+a = math.array([1.0, 2.0, 3.0])
+print(math.shape(a))  # [3]
+
+m = math.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+print(math.shape(m))  # [2, 3]
 ```
 
 ## Constants

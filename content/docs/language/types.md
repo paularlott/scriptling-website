@@ -244,6 +244,68 @@ d = {(0, 0): "origin", (1, 0): "right"}
 point_set = {(1, 2), (3, 4), (1, 2)}  # {(1, 2), (3, 4)}
 ```
 
+## FloatArray
+
+Efficient numerical arrays with 1D and 2D support, avoiding per-element boxing overhead. Created with `math.array()`.
+
+```python
+import math
+
+# 1D array
+a = math.array([1.0, 2.0, 3.0])
+print(a[0])       # 1.0
+print(len(a))     # 3
+print(2.0 in a)   # True
+
+# 2D array
+m = math.array([[1.0, 2.0], [3.0, 4.0]])
+print(m[0])       # [1.0, 2.0]
+print(m[0][1])    # 2.0
+print(len(m))     # 2 (number of rows)
+print(math.shape(m))  # [2, 2]
+
+# Slicing
+sub = m[0:2]      # Returns a 2D FloatArray
+
+# Assignment
+a[0] = 10.0
+m[0][1] = 9.0
+m[1] = [5.0, 6.0]
+
+# Iteration
+for v in math.array([1.0, 2.0, 3.0]):
+    print(v)      # Float values
+
+for row in math.array([[1.0, 2.0], [3.0, 4.0]]):
+    print(row)    # 1D FloatArray rows
+
+# Equality
+a = math.array([1.0, 2.0])
+b = math.array([1.0, 2.0])
+print(a == b)     # True
+
+# Convert to list
+lst = list(math.array([1.0, 2.0, 3.0]))  # [1.0, 2.0, 3.0]
+
+# Works with math operations
+result = math.matmul(m, m)
+t = math.transpose(m)
+probs = math.softmax(math.array([1.0, 2.0, 3.0]))
+```
+
+**Supported operations:**
+
+- Indexing: `a[i]`, negative indices, `m[row][col]`
+- Slicing: `a[1:3]`, `m[0:2]`
+- Assignment: `a[i] = val`, `m[i] = [row]`, `m[i][j] = val`
+- Iteration: `for v in a`, `for row in m`
+- Membership: `val in a`
+- Length: `len(a)` (element count for 1D, row count for 2D)
+- Equality: `a == b`, `a != b`
+- Truthiness: truthy if non-empty
+- Conversion: `list(a)`, `str(a)`
+- Built-in functions: `sum()`, `min()`, `max()`, `enumerate()`, `zip()`, `reversed()`
+
 ## None
 
 Represents the absence of a value:
@@ -275,6 +337,7 @@ type({"a": 1})  # "DICT"
 type(True)      # "BOOLEAN"
 type(None)      # "NONE"
 type((1, 2))    # "TUPLE"
+type(math.array([1.0]))  # "FLOAT_ARRAY"
 
 # isinstance() checks type
 isinstance(42, "int")       # True

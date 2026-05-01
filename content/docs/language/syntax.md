@@ -56,6 +56,23 @@ import re
 pattern = r"\d+\.\d+"  # Matches decimal numbers
 ```
 
+### Raw F-Strings
+
+Combine `r` and `f` prefixes (in either order) to create raw f-strings that preserve backslashes while supporting expression interpolation:
+
+```python
+# Raw f-string: backslashes are literal, {expr} still works
+name = "world"
+greeting = rf"hello {name}"  # "hello world"
+
+# Useful for regex patterns with interpolation
+digit_pattern = r"\d+"
+pattern = rf"{digit_pattern}\.{digit_pattern}"  # \d+\.\d+
+
+# Both prefix orders work: rf, fr, RF, FR, rF, fR, etc.
+path = fr"C:\Users\{name}"  # Backslashes preserved
+```
+
 ## F-Strings
 
 F-strings (formatted string literals) embed expressions directly in strings using `{expr}` syntax:
