@@ -969,6 +969,100 @@ m[1] = [5.0, 6.0]
 result = math.matmul(m, math.array([[1.0], [2.0]]))
 ```
 
+## FloatArray
+
+The `FloatArray` type is returned by `math.array()`. It provides efficient storage and operations for numerical data.
+
+### FloatArray Methods
+
+#### .tolist()
+
+Convert a FloatArray to a plain list. For 1D arrays, returns a list of floats. For 2D arrays, returns a list of lists.
+
+**Parameters:** None
+
+**Returns:** List of floats (1D) or list of lists of floats (2D)
+
+**Example:**
+
+```python
+import math
+
+# 1D
+a = math.array([1.0, 2.0, 3.0])
+plain = a.tolist()  # [1.0, 2.0, 3.0]
+
+# 2D
+m = math.array([[1.0, 2.0], [3.0, 4.0]])
+rows = m.tolist()   # [[1.0, 2.0], [3.0, 4.0]]
+```
+
+#### .shape()
+
+Return the shape of the FloatArray as a list of integers. This is the method equivalent of `math.shape()`.
+
+**Parameters:** None
+
+**Returns:** List of integers representing dimensions
+
+**Example:**
+
+```python
+import math
+
+a = math.array([1.0, 2.0, 3.0])
+print(a.shape())  # [3]
+
+m = math.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+print(m.shape())  # [2, 3]
+```
+
+### FloatArray Operators
+
+#### `+` (concatenation)
+
+Concatenate two FloatArrays. For 1D arrays, joins the elements. For 2D arrays with matching column counts, stacks the rows.
+
+**Parameters:**
+
+- `other`: FloatArray (must have same number of columns for 2D)
+
+**Returns:** FloatArray
+
+**Example:**
+
+```python
+import math
+
+# 1D concatenation
+a = math.array([1.0, 2.0])
+b = math.array([3.0, 4.0])
+c = a + b  # math.array([1.0, 2.0, 3.0, 4.0])
+
+# 2D row stacking
+m = math.array([[1.0, 2.0], [3.0, 4.0]])
+row = math.array([[5.0, 6.0]])
+result = m + row  # shape [3, 2]
+```
+
+### FloatArray List Comprehensions
+
+FloatArray supports list comprehensions for both 1D and 2D arrays:
+
+```python
+import math
+
+# 1D: iterate over values
+a = math.array([1.0, 2.0, 3.0, 4.0])
+doubled = [v * 2 for v in a]          # [2.0, 4.0, 6.0, 8.0]
+big = [v for v in a if v > 2.5]       # [3.0, 4.0, 5.0]
+
+# 2D: iterate over rows (each row is a 1D FloatArray)
+m = math.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+firsts = [row[0] for row in m]        # [1.0, 4.0]
+rows_as_lists = [row.tolist() for row in m]
+```
+
 ### math.shape(a)
 
 Return the shape of a FloatArray as a list of integers.

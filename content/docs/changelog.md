@@ -8,6 +8,23 @@ nav-skip: true
 
 ## May 2026
 
+{{< version "v0.6.4" >}}
+
+{{< changelog-item "added" >}}
+**FloatArray enhancements:**
+
+- `.tolist()` method — Convert FloatArray to a plain list (1D returns list of floats, 2D returns list of lists)
+- `.shape()` method — Return shape as a list of integers (method equivalent of `math.shape()`)
+- `+` operator — Concatenate FloatArrays (1D joins elements, 2D stacks rows with matching columns)
+- List comprehension support — Iterate FloatArray in comprehensions with optional filtering (`[v * 2 for v in a]`, `[row[0] for row in m]`)
+
+**Go API:**
+
+- `GetFloatMatrix(obj)` — Typed getter that extracts data, rows, and cols from a 2D FloatArray
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.6.3" >}}
 
 {{< changelog-item "changed" >}}
