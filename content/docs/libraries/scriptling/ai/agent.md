@@ -10,7 +10,7 @@ Agentic AI loop for building AI agents with automatic tool execution. The agent 
 
 | Class/Method | Description |
 | --- | --- |
-| `Agent(client, tools, system_prompt, model, memory, max_tokens, compaction_threshold, request_timeout)` | Create AI agent |
+| `Agent(client, tools, system_prompt, model, memory, max_tokens, compaction_threshold, request_timeout, extra_body)` | Create AI agent |
 | `agent.trigger(message, max_iterations)` | One-shot trigger with response |
 | `agent.interact(max_iterations)` | Start interactive session |
 | `agent.get_messages()` | Get conversation history |
@@ -44,7 +44,7 @@ bot.interact()
 
 ## Agent Class
 
-### Agent(client, tools=None, system_prompt="", model="", memory=None, max_tokens=32000, compaction_threshold=80, request_timeout=300)
+### Agent(client, tools=None, system_prompt="", model="", memory=None, max_tokens=32000, compaction_threshold=80, request_timeout=300, extra_body=None)
 
 Creates an AI agent with automatic tool execution.
 
@@ -58,6 +58,7 @@ Creates an AI agent with automatic tool execution.
 - `max_tokens` (int, optional): Maximum token budget for the conversation. When estimated token usage reaches the compaction threshold, the conversation history is automatically compacted (summarized). Default: 32000
 - `compaction_threshold` (int, optional): Percentage of `max_tokens` at which auto-compaction triggers (0-100). For example, with `max_tokens=32000` and `compaction_threshold=80`, compaction triggers at ~25600 tokens. Default: 80
 - `request_timeout` (int, optional): Timeout in seconds for each LLM completion request. LLM calls can be slow, especially with tool-calling loops or large contexts. Default: 300
+- `extra_body` (dict, optional): Provider-specific fields to merge into every request body
 
 **Example:**
 
@@ -82,6 +83,19 @@ bot = agent.Agent(
     tools=tools,
     max_tokens=16000,
     compaction_threshold=50
+)
+
+# With provider-specific request body fields
+bot = agent.Agent(
+    client,
+    tools=tools,
+    model="glm-4.7",
+    extra_body={
+        "thinking": {
+            "type": "enabled",
+            "clear_thinking": False
+        }
+    }
 )
 ```
 
