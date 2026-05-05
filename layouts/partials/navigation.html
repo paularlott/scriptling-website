@@ -18,6 +18,9 @@
 {{- $includeSections := $.context.Site.Params.includeSections | default (slice) -}}
 {{- $filteredSections := slice -}}
 {{- $currentSection := $.context.Section -}}
+{{- if eq $currentSection "changelog-archive" -}}
+  {{- $currentSection = "docs" -}}
+{{- end -}}
 
 {{- if $includeSections -}}
   {{- range $.context.Site.Sections -}}
@@ -43,12 +46,13 @@
     {{- $filteredSections = $.context.Site.Sections -}}
   {{- end -}}
 {{- end -}}
-{{ template "nav-tree" (dict "context" $.context "sections" $filteredSections "mobile" $.mobile "level" 0) }}
+{{ template "nav-tree" (dict "context" $.context "sections" $filteredSections "mobile" $.mobile "level" 0 "currentSection" $currentSection) }}
 
 {{- define "nav-tree" -}}
   {{- $context := .context -}}
   {{- $sections := .sections -}}
   {{- $mobile := .mobile -}}
+  {{- $currentSection := .currentSection -}}
   {{- $maxDepth := 4 -}}
   {{- if $sections -}}
     <ul class="{{ if $mobile }}space-y-0{{ else }}space-y-1{{ end }}">
@@ -62,7 +66,7 @@
         {{- /* Check if this section has content or should be skipped */ -}}
         {{- $hasContent := or .Content .Summary (not (eq .Kind "section")) -}}
         {{- $skipTopLevel := and (not $hasContent) $hasChildren -}}
-        {{- $isCurrentSection := eq $context.Section .Section -}}
+        {{- $isCurrentSection := eq $currentSection .Section -}}
 
         {{- if or $skipTopLevel $isCurrentSection -}}
           {{- /* Render children directly without the parent wrapper */ -}}

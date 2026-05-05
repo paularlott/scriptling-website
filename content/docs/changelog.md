@@ -8,19 +8,29 @@ nav-skip: true
 
 ## May 2026
 
+{{< version "v0.6.5" >}}
+
+{{< changelog-item "changed" >}}
+**AI library:**
+
+- `scriptling.ai.Client(..., headers={...})` — Add custom HTTP headers to every AI API request made by that client
+- `client.completion(..., extra_body={...})` and `client.completion_stream(..., extra_body={...})` — Merge provider-specific fields into chat completion request bodies, such as Z.ai thinking-mode options
+- `scriptling.ai.estimate_tokens(request, response=None)` — Allow request-only and response-only token estimates by omitting `response` or passing `None` for either side
+{{< /changelog-item >}}
+
 {{< version "v0.6.4" >}}
 
 {{< changelog-item "added" >}}
 **FloatArray enhancements:**
 
-- `.tolist()` method — Convert FloatArray to a plain list (1D returns list of floats, 2D returns list of lists)
-- `.shape()` method — Return shape as a list of integers (method equivalent of `math.shape()`)
-- `+` operator — Concatenate FloatArrays (1D joins elements, 2D stacks rows with matching columns)
-- List comprehension support — Iterate FloatArray in comprehensions with optional filtering (`[v * 2 for v in a]`, `[row[0] for row in m]`)
+- `.tolist()` method - Convert FloatArray to a plain list (1D returns list of floats, 2D returns list of lists)
+- `.shape()` method - Return shape as a list of integers (method equivalent of `math.shape()`)
+- `+` operator - Concatenate FloatArrays (1D joins elements, 2D stacks rows with matching columns)
+- List comprehension support - Iterate FloatArray in comprehensions with optional filtering (`[v * 2 for v in a]`, `[row[0] for row in m]`)
 
 **Go API:**
 
-- `GetFloatMatrix(obj)` — Typed getter that extracts data, rows, and cols from a 2D FloatArray
+- `GetFloatMatrix(obj)` - Typed getter that extracts data, rows, and cols from a 2D FloatArray
 {{< /changelog-item >}}
 
 ---
@@ -43,8 +53,8 @@ nav-skip: true
 - New `FloatArray` type for efficient numerical operations, avoiding per-element boxing overhead
 - 1D and 2D arrays with row-major storage
 - Supports indexing, slicing, assignment, iteration, equality, `in` operator, `for` loops, `len()`, `list()` conversion
-- `math.array(data)` — Create a FloatArray from a list of numbers or list of lists
-- `math.shape(a)` — Return the shape of a FloatArray as a list of ints
+- `math.array(data)` - Create a FloatArray from a list of numbers or list of lists
+- `math.shape(a)` - Return the shape of a FloatArray as a list of ints
 
 **Math library:**
 
@@ -68,41 +78,41 @@ nav-skip: true
 {{< changelog-item "added" >}}
 **Math library:**
 
-- `tanh(x)` — Hyperbolic tangent
-- `erf(x)` / `erfc(x)` — Error function and complementary error function
-- `gamma(x)` / `lgamma(x)` — Gamma function and log-gamma
-- `cbrt(x)` — Cube root
-- `nextafter(x, y)` — Next floating-point value
-- `remainder(x, y)` — IEEE 754-style remainder
-- `log1p(x)` / `expm1(x)` — Accurate log(1+x) and exp(x)-1 for small x
-- `comb(n, k)` — Binomial coefficient
-- `perm(n[, k])` — Permutations
-- `prod(iterable, start=1)` — Product of all elements
-- `dist(p, q)` — Euclidean distance between two points
-- `softmax(x)` — Numerically stable softmax
-- `dot(a, b)` — Dot product of two vectors
-- `matmul(a, b)` — Matrix multiplication
-- `transpose(m)` — Matrix transpose
-- `mat_add(a, b)` — Element-wise matrix addition
-- `tau` constant — 2π (6.283185...)
+- `tanh(x)` - Hyperbolic tangent
+- `erf(x)` / `erfc(x)` - Error function and complementary error function
+- `gamma(x)` / `lgamma(x)` - Gamma function and log-gamma
+- `cbrt(x)` - Cube root
+- `nextafter(x, y)` - Next floating-point value
+- `remainder(x, y)` - IEEE 754-style remainder
+- `log1p(x)` / `expm1(x)` - Accurate log(1+x) and exp(x)-1 for small x
+- `comb(n, k)` - Binomial coefficient
+- `perm(n[, k])` - Permutations
+- `prod(iterable, start=1)` - Product of all elements
+- `dist(p, q)` - Euclidean distance between two points
+- `softmax(x)` - Numerically stable softmax
+- `dot(a, b)` - Dot product of two vectors
+- `matmul(a, b)` - Matrix multiplication
+- `transpose(m)` - Matrix transpose
+- `mat_add(a, b)` - Element-wise matrix addition
+- `tau` constant - 2π (6.283185...)
 
 **Random library:**
 
-- `choices(population, weights, k)` — Weighted random sampling with replacement
-- `betavariate(alpha, beta)` — Beta distribution
-- `gammavariate(alpha, beta)` — Gamma distribution
-- `triangular(low, high[, mode])` — Triangular distribution
-- `paretovariate(alpha)` — Pareto distribution
-- `weibullvariate(alpha, beta)` — Weibull distribution
+- `choices(population, weights, k)` - Weighted random sampling with replacement
+- `betavariate(alpha, beta)` - Beta distribution
+- `gammavariate(alpha, beta)` - Gamma distribution
+- `triangular(low, high[, mode])` - Triangular distribution
+- `paretovariate(alpha)` - Pareto distribution
+- `weibullvariate(alpha, beta)` - Weibull distribution
 
 **fs extension library:**
 
-- `read_bytes(path, offset, length)` — Read bytes from a file
-- `write_bytes(path, offset, data)` — Write bytes to a file
-- `unpack(format, data)` / `pack(format, values)` — Binary struct packing/unpacking
-- `byte_at(data, index)` — Get unsigned byte value
-- `len(data)` — Byte length (not Unicode code points)
-- `slice(data, start[, end])` — Byte-safe slicing
+- `read_bytes(path, offset, length)` - Read bytes from a file
+- `write_bytes(path, offset, data)` - Write bytes to a file
+- `unpack(format, data)` / `pack(format, values)` - Binary struct packing/unpacking
+- `byte_at(data, index)` - Get unsigned byte value
+- `len(data)` - Byte length (not Unicode code points)
+- `slice(data, start[, end])` - Byte-safe slicing
 {{< /changelog-item >}}
 
 ---
@@ -112,7 +122,7 @@ nav-skip: true
 {{< changelog-item "added" >}}
 **Container library:**
 
-- `volume_create(name, size=...)` — optional `size` kwarg (e.g. `"20G"`, `"512M"`) sets the volume size on Apple Containers; silently ignored for Docker and Podman
+- `volume_create(name, size=...)` - optional `size` kwarg (e.g. `"20G"`, `"512M"`) sets the volume size on Apple Containers; silently ignored for Docker and Podman
 {{< /changelog-item >}}
 
 ---
@@ -122,13 +132,13 @@ nav-skip: true
 {{< changelog-item "added" >}}
 **HTTP server:**
 
-- `runtime.http.not_found(handler)` — Register a custom 404 handler, called when no route matches or a web root file is not found
-- `--web-root <dir|zip>` CLI flag (`SCRIPTLING_WEB_ROOT` / `server.web_root`) — Serve static files from a directory or zip archive; requests fall through to the `not_found` handler if no file is found
+- `runtime.http.not_found(handler)` - Register a custom 404 handler, called when no route matches or a web root file is not found
+- `--web-root <dir|zip>` CLI flag (`SCRIPTLING_WEB_ROOT` / `server.web_root`) - Serve static files from a directory or zip archive; requests fall through to the `not_found` handler if no file is found
 
 **Template library:**
 
-- `scriptling.template.html` — `html/template` rendering with automatic HTML escaping
-- `scriptling.template.text` — `text/template` rendering with no escaping
+- `scriptling.template.html` - `html/template` rendering with automatic HTML escaping
+- `scriptling.template.text` - `text/template` rendering with no escaping
 {{< /changelog-item >}}
 
 ---
@@ -154,12 +164,12 @@ nav-skip: true
 
 **Container management:**
 
-- `scriptling.container` — Container lifecycle management for Docker, Podman, and Apple Containers
+- `scriptling.container` - Container lifecycle management for Docker, Podman, and Apple Containers
 
 **Search:**
 
-- `scriptling.grep` — Fast file content search with concurrent worker pool, glob filtering, binary file detection, and path restriction support
-- `scriptling.text` — In-place file content replacement with atomic temp-file rename, concurrent worker pool, and path restriction support
+- `scriptling.grep` - Fast file content search with concurrent worker pool, glob filtering, binary file detection, and path restriction support
+- `scriptling.text` - In-place file content replacement with atomic temp-file rename, concurrent worker pool, and path restriction support
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
@@ -176,14 +186,14 @@ nav-skip: true
 {{< changelog-item "added" >}}
 **Networking libraries:**
 
-- `scriptling.net.gossip` — Gossip protocol cluster membership and messaging with failure detection, metadata propagation, tag-based routing, encryption, and compression
-- `scriptling.net.multicast` — UDP multicast group messaging for one-to-many communication
-- `scriptling.net.unicast` — UDP and TCP point-to-point messaging with client and server support
+- `scriptling.net.gossip` - Gossip protocol cluster membership and messaging with failure detection, metadata propagation, tag-based routing, encryption, and compression
+- `scriptling.net.multicast` - UDP multicast group messaging for one-to-many communication
+- `scriptling.net.unicast` - UDP and TCP point-to-point messaging with client and server support
 
 **Secrets:**
 
-- `scriptling.secret` — Provider-agnostic secret access through host-configured aliases
-- `--secret-config` — CLI support for loading Vault and 1Password provider aliases from TOML
+- `scriptling.secret` - Provider-agnostic secret access through host-configured aliases
+- `--secret-config` - CLI support for loading Vault and 1Password provider aliases from TOML
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
@@ -203,11 +213,11 @@ nav-skip: true
 
 **AI library:**
 
-- `ai.tool_calls(response)` — Extract and normalize tool calls from a completion response, message dict, or raw list
-- `ai.execute_tool_calls(registry, tool_calls)` — Execute tool calls using a `ToolRegistry` and return result messages
-- `ai.collect_stream(stream, **kwargs)` — Collect a chat stream into a single aggregated result with optional per-chunk callbacks
-- `ai.tool_round(client, model, messages, registry)` — Perform a single tool-use round: complete, execute tool calls, return results
-- `ai.estimate_tokens(messages, model)` — Estimate token count for a message list
+- `ai.tool_calls(response)` - Extract and normalize tool calls from a completion response, message dict, or raw list
+- `ai.execute_tool_calls(registry, tool_calls)` - Execute tool calls using a `ToolRegistry` and return result messages
+- `ai.collect_stream(stream, **kwargs)` - Collect a chat stream into a single aggregated result with optional per-chunk callbacks
+- `ai.tool_round(client, model, messages, registry)` - Perform a single tool-use round: complete, execute tool calls, return results
+- `ai.estimate_tokens(messages, model)` - Estimate token count for a message list
 
 **Agent framework:**
 
@@ -229,204 +239,3 @@ nav-skip: true
 - Improved error handling in variadic function calls
 - Parser refactored with cleaner initialization and improved regex handling
 {{< /changelog-item >}}
-
----
-
-## March 2026
-
-{{< version "v0.5.3" >}}
-
-{{< changelog-item "added" >}}
-**Developer experience:**
-
-- New `scriptling.similarity` library with fuzzy matching plus `tokenize()`, `minhash()`, and `minhash_similarity()`
-- Richer console capabilities, including panel-based output and new examples for building interactive terminal experiences
-- Python-style string formatting support for more natural text rendering in scripts
-{{< /changelog-item >}}
-
-{{< changelog-item "changed" >}}
-**Runtime and tooling:**
-
-- Background tasks and runtime synchronization are more robust, including safer argument handling and better thread/task behavior
-- MCP tool execution now captures script output more cleanly
-- Dictionary and set behavior is more consistent, with improved hashing and copying semantics for complex values
-- `__name__` is now available to scripts for module-aware behavior
-{{< /changelog-item >}}
-
-{{< changelog-item "fixed" >}}
-**Language fixes:**
-
-- Fixed tuple exception matching in `except (TypeError, ValueError):` clauses
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.4.1" >}}
-
-{{< changelog-item "added" >}}
-**WebSocket Support:**
-
-- `scriptling.websocket` library — WebSocket client for connecting to servers
-  - `connect(url, timeout, headers)` — Connect to a WebSocket server
-  - `send(message)`, `send_binary(data)` — Send text (auto-JSON for dicts) or binary
-  - `receive(timeout)` — Receive a message (None on timeout/disconnect)
-  - `connected()`, `close()` — Connection lifecycle
-  - `is_text(msg)`, `is_binary(msg)` — Check message type
-
-- `runtime.http.websocket(path, handler)` — Server-side WebSocket endpoints
-  - Handler receives a `WebSocketClient` object for the connection lifetime
-  - `client.send()`, `client.receive()`, `client.connected()`, `client.close()`
-  - `client.remote_addr` — Client's remote address
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.4.0" >}}
-
-{{< changelog-item "added" >}}
-**Package System:**
-
-- Packed library files — distribute Scriptling libraries as `.zip` packages with automatic download and caching
-- `scriptling pack` command — create packages from directories with `# sha256=<hash>` integrity verification
-- Package cache with ETag/Last-Modified validation and automatic pruning (7-day TTL)
-- Documentation support in packages for `help` command integration
-
-**Language:**
-
-- Relative imports — `from .module import name` and `from ..package import name` for hierarchical module organization
-{{< /changelog-item >}}
-
-{{< changelog-item "changed" >}}
-**CLI:**
-
-- `help` command now works in TUI mode with topic lookup support
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.3.2" >}}
-
-{{< changelog-item "added" >}}
-**Language:**
-
-- Multiple `for` clauses in list, dict, set comprehensions and generator expressions (`[x for x in a for y in b]`)
-- `__getitem__` and `__setitem__` dunder methods for custom bracket access (`obj[key]`) — dot access (`obj.attr`) no longer triggers `__getitem__`
-- `__hash__` dunder method — instances that define `__hash__` can be used as dict keys and set elements; `hash()` builtin calls it
-- Arithmetic dunder methods: `__add__`, `__sub__`, `__mul__`, `__truediv__`, `__floordiv__`, `__mod__`
-- Set and dict entry points raise `TypeError` for unhashable types (lists, dicts, instances without `__hash__`), matching Python semantics
-- Tuple `in`/`not in` operator
-- Tuple slicing (`t[1:3]`, `t[::-1]`) returns a tuple
-- Tuple `count()` and `index()` methods
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.3.0" >}}
-
-{{< changelog-item "added" >}}
-**New messaging libraries:**
-
-Platform-agnostic bot framework for building chat bots with a unified API:
-
-- `scriptling.messaging.telegram` — Telegram Bot API client
-- `scriptling.messaging.discord` — Discord Bot API client
-- `scriptling.messaging.slack` — Slack Bot API client
-- `scriptling.messaging.console` — Console-based messaging client for testing
-
-All platforms share a common interface with:
-- Command handlers (`/command` syntax)
-- Button callbacks with keyboard support
-- Message send/edit/delete operations
-- File upload/download
-- Typing indicators
-- Rich message support (title, body, color, images)
-- Authentication handlers for access control
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.2.23" >}}
-
-{{< changelog-item "added" >}}
-**New standard libraries:**
-
-- `scriptling.ai.memory` — Long-term memory store for AI agents with MinHash-based semantic search, memory types (fact, preference, event, note), importance scoring, decay, and optional LLM-powered compaction
-- `scriptling.runtime.kv` — Persistent key-value store with TTL support, thread-safe operations, and both in-memory and file-backed storage
-
-**Language:**
-
-- Set comprehensions (`{x for x in iterable}`)
-- `__file__` variable provides the current script's path
-
-**AI API:**
-
-- `Agent.interact()` gains `max_iterations` parameter to limit conversation turns
-  {{< /changelog-item >}}
-
----
-
-## February 2026
-
-{{< version "v0.2.0" >}}
-
-{{< changelog-item "added" >}}
-**Language:**
-
-- `with` statement and context managers
-- Decorators (`@decorator`), `@property`, `@staticmethod`, and `@classmethod`
-- Dunder methods: `__str__`, `__repr__`, `__len__`, `__bool__`, `__eq__`, `__lt__`, `__contains__`, `__iter__`
-- Dict comprehensions (`{k: v for k, v in ...}`)
-- Set literals (`{1, 2, 3}`)
-- `for`/`while` `else` clauses
-- `match` or-patterns
-- `int()` now accepts a base argument for base conversion
-
-**New built-in functions:**
-
-- `next()`, `iter()`, `dir()`, `issubclass()`, `copy()`
-
-**New standard libraries:**
-
-- `io` — `StringIO` for in-memory I/O
-- `contextlib` — `suppress` context manager
-- `difflib` — LCS-based sequence comparison, unified diff, `get_close_matches`
-
-**Go API:**
-
-- `GetVarAsSet(name)` — typed getter for set variables
-- `GetVarAsTuple(name)` — typed getter for tuple variables
-- `EvalFile(path)` — read and evaluate a script file directly
-- `ListVars()` — returns a sorted list of variable names in the current environment
-- `UnsetVar(name)` — remove a variable from the environment
-- `Clone()` — create an isolated interpreter that inherits library registrations but starts with a fresh environment
-- `ClassBuilder` gains `Property`, `PropertyWithSetter`, and `StaticMethod` for registering Go-backed class members
-
-**CLI / TUI:**
-
-- Scripts that use `console.run()` now launch a full TUI automatically; no separate flag needed
-- `console.set_labels()` lets scripts customise the user/assistant labels shown in the TUI
-  {{< /changelog-item >}}
-
----
-
-{{< version "v0.1.0" >}}
-
-Initial pre-release of Scriptling.
-
-**Features:**
-
-- Python-like syntax with indentation-based blocks
-- Core types: integers, floats, strings, booleans, lists, dictionaries, sets
-- Control flow: if/elif/else, while, for loops, break, continue, match statements
-- Object-oriented: Classes with single inheritance, methods, and constructors
-- Functions, lambda, list comprehensions, error handling
-- Background tasks with `scriptling.runtime` for concurrent execution
-- 25+ built-in libraries including JSON, regex, math, HTTP requests, subprocess
-- Go integration with direct type mapping
-- AI/LLM integration with OpenAI-compatible API support
-- MCP (Model Context Protocol) server and client
-- HTTP server with route registration
-- Sandboxed execution with configurable security
-- CLI tool with interactive mode, HTTP/MCP server, and built-in linter
-- Extensible: create custom functions, libraries, and classes in Go or Scriptling
-- Cross-platform binaries for Linux, macOS, and Windows

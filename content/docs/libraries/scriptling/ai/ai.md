@@ -22,7 +22,7 @@ AI and LLM functions for interacting with OpenAI-compatible APIs. This library p
 | `execute_tool_calls(...)`    | Execute tool calls with a tool registry   |
 | `collect_stream(...)`        | Aggregate a chat stream into one result   |
 | `tool_round(...)`            | Run one tool-enabled completion round     |
-| `estimate_tokens(req, resp)` | Estimate token counts for request/response|
+| `estimate_tokens(req, resp=None)` | Estimate token counts for request/response|
 | `ToolRegistry()`             | Create tool registry for building schemas |
 
 ## Creating an AI Client
@@ -176,17 +176,18 @@ print(result["content"])
 
 ## Token Estimation
 
-### ai.estimate_tokens(request, response)
+### ai.estimate_tokens(request, response=None)
 
-Estimates the number of tokens in request messages and a completion response using a character-based heuristic (~4 characters per token). This provides a fast, reproducible approximation useful for cost estimation and context window management.
+Estimates the number of tokens in request messages and/or a completion response using a character-based heuristic (~4 characters per token). This provides a fast, reproducible approximation useful for cost estimation and context window management.
 
 **Parameters:**
 
-- `request` (str, list, or dict): The messages sent to the AI. Can be:
+- `request` (str, list, dict, or None): The messages sent to the AI. Can be:
   - A string (user message)
   - A list of message dicts with "role" and "content" keys
   - A completion request dict with a "messages" key
-- `response` (dict): The completion response from `client.completion()` or `client.response_create()`
+  - `None` to estimate only response tokens
+- `response` (dict or None, optional): The completion response from `client.completion()` or `client.response_create()`. Use `None` or omit it to estimate only request tokens.
 
 **Returns:** dict - Token usage estimates with keys:
 
@@ -206,6 +207,14 @@ messages = [{"role": "user", "content": "Hello!"}]
 response = client.completion("gpt-4", messages)
 usage = ai.estimate_tokens(messages, response)
 print(f"Prompt: {usage.prompt_tokens}, Completion: {usage.completion_tokens}")
+
+# Estimate a request before sending it
+usage = ai.estimate_tokens(messages)
+print(f"Prompt: {usage.prompt_tokens}")
+
+# Estimate only a response
+usage = ai.estimate_tokens(None, response)
+print(f"Completion: {usage.completion_tokens}")
 
 # With string shorthand
 response = client.completion("gpt-4", "What is 2+2?")
@@ -239,6 +248,7 @@ Creates a new AI client instance for making API calls to supported services.
 - `max_tokens` (int, optional): Default max_tokens for all requests. Claude defaults to 4096 if not set
 - `temperature` (float, optional): Default temperature for all requests (0.0-2.0)
 - `top_p` (float, optional): Default nucleus sampling threshold for all requests (0.0-1.0)
+- `headers` (dict, optional): Extra HTTP headers to include with every AI API request
 - `remote_servers` (list, optional): List of remote MCP server configs, each a dict with:
   - `base_url` (str, required): URL of the MCP server
   - `namespace` (str, optional): Namespace prefix for tools from this server
@@ -266,6 +276,13 @@ client = ai.Client(
 # LM Studio / Local LLM
 client = ai.Client("http://127.0.0.1:1234/v1")
 
+# With custom request headers
+client = ai.Client(
+    "",
+    api_key="sk-...",
+    headers={"X-Project": "docs-bot"}
+)
+
 # With MCP servers configured
 client = ai.Client("http://127.0.0.1:1234/v1", remote_servers=[
     {"base_url": "http://127.0.0.1:8080/mcp", "namespace": "scriptling"},
@@ -284,8 +301,7 @@ client = ai.Client("", api_key="sk-...", max_tokens=2048, temperature=0.7, top_p
 response = client.completion("gpt-4", "Hello!")
 
 # Override per request
-response = client.completion("gpt-4", "Hello!", max_tokens=4096, temperature=0.9, top_p=1.0
-response = client.completion("gpt-4", "Hello!", max_tokens=4096, temperature=0.9)
+response = client.completion("gpt-4", "Hello!", max_tokens=4096, temperature=0.9, top_p=1.0)
 ```
 
 ## Tool Registry
@@ -559,6 +575,7 @@ Creates a chat completion using this client's configuration.
 - `top_p` (float, optional): Nucleus sampling threshold (0.0-1.0)
 - `temperature` (float, optional): Sampling temperature (0.0-2.0)
 - `max_tokens` (int, optional): Maximum tokens to generate
+- `extra_body` (dict, optional): Provider-specific fields to merge into the request body
 - `timeout` (int, optional): Request timeout in seconds
 
 **Returns:** dict - Response containing id, choices, usage, etc.
@@ -581,6 +598,18 @@ print(response.choices[0].message.content)
 # Full messages array
 response = client.completion("gpt-4", [{"role": "user", "content": "What is 2+2?"}])
 print(response.choices[0].message.content)
+
+# Provider-specific request body fields
+response = client.completion(
+    "glm-4.7",
+    "Think through this task",
+    extra_body={
+        "thinking": {
+            "type": "enabled",
+            "clear_thinking": False
+        }
+    }
+)
 ```
 
 **With Tool Calling:**
@@ -615,6 +644,7 @@ Creates a streaming chat completion using this client's configuration. Returns a
 - `top_p` (float, optional): Nucleus sampling threshold (0.0-1.0)
 - `temperature` (float, optional): Sampling temperature (0.0-2.0)
 - `max_tokens` (int, optional): Maximum tokens to generate
+- `extra_body` (dict, optional): Provider-specific fields to merge into the request body
 - `timeout` (int, optional): Overall request timeout in seconds
 
 **Returns:** ChatStream - A stream object with a `next()` method
