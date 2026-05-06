@@ -333,15 +333,19 @@ Adds a tool to the registry.
 
 **Parameter Types:**
 
-- `string` - String parameter (required)
-- `integer` - Integer parameter (required)
-- `number` - Number parameter (required, mapped to integer)
-- `boolean` - Boolean parameter (required)
-- `array` - Array parameter (required)
-- `object` - Object parameter (required)
-- `string?` - Optional string (add `?` suffix for optional)
-- `integer?` - Optional integer
-- etc.
+The value for each parameter is a JSON Schema type name. Append `?` to mark
+the parameter as optional.
+
+| Type      | Aliases | Description       |
+| --------- | ------- | ----------------- |
+| `string`  | `str`   | Text value        |
+| `integer` | `int`   | Whole number      |
+| `number`  | `float` | Integer or float  |
+| `boolean` | `bool`  | `true` or `false` |
+| `array`   | `list`  | List of values    |
+| `object`  | `dict`  | Key/value mapping |
+
+Unknown type names raise an error at `registry.add()` time.
 
 **Example:**
 
@@ -842,6 +846,7 @@ Creates a response using the OpenAI Responses API (new structured API).
 - `input` (str or list): Either a string (user message content) or a list of input items (messages)
 - `system_prompt` (str, optional): System prompt to use when input is a string
 - `background` (bool, optional): If true, runs asynchronously and returns immediately with `in_progress` status
+- `extra_body` (dict, optional): Provider-specific fields to merge into the request body
 
 **Returns:** dict - Response object with id, status, output, usage, etc.
 
@@ -873,6 +878,18 @@ response = client.response_create("gpt-4o", [
     {"type": "message", "role": "user", "content": "Hello!"}
 ])
 print(response.output)
+
+# Provider-specific request body fields
+response = client.response_create(
+    "glm-4.7",
+    "Think through this task",
+    extra_body={
+        "thinking": {
+            "type": "enabled",
+            "clear_thinking": False
+        }
+    }
+)
 ```
 
 ### client.response_get(id)
@@ -902,6 +919,7 @@ Streams a response using the OpenAI Responses API, returning a `ResponseStream` 
 - `model` (str): Model identifier (e.g., "gpt-4o", "gpt-4")
 - `input` (str or list): Either a string (user message content) or a list of input items
 - `system_prompt` (str, optional): System prompt to use when input is a string
+- `extra_body` (dict, optional): Provider-specific fields to merge into the request body
 
 **Returns:** ResponseStream - A stream object with a `next()` method
 

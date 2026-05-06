@@ -8,6 +8,29 @@ nav-skip: true
 
 ## May 2026
 
+{{< version "v0.7.0" >}}
+
+{{< changelog-item "added" >}}
+**AI Tool Registry - type aliases:**
+
+- `registry.add()` now accepts Python-style type aliases: `int` → `integer`, `float` → `number`, `str` → `string`, `bool` → `boolean`, `dict` → `object`, `list` → `array`
+
+**MCP Go library:**
+
+- New `mcp.Integer()` and `mcp.IntegerArray()` parameter constructors for tools that require whole numbers
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+- `str.upper()` and `str.lower()` now correctly handle strings that mix ASCII letters with non-ASCII Unicode characters (e.g. `"naïve résumé".upper()` now returns `"NAÏVE RÉSUMÉ"`)
+- AI Tool Registry: `"number"` is now emitted as JSON Schema `number` (was silently downgraded to `integer`)
+- AI Tool Registry: unknown type strings now raise an error at `registry.add()` time instead of producing invalid schemas silently
+- MCP tool metadata: `int` / `integer` now emit JSON Schema `integer`; `float` / `number` emit `number` (previously both mapped to `number`)
+- MCP tool metadata: `array:int` / `array:integer` now emit array items of type `integer`; `array:float` / `array:number` emit items of type `number`
+- MCP tool metadata: unknown type strings in `.toml` tool definitions now produce a registration error instead of silently defaulting to `string`
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.6.5" >}}
 
 {{< changelog-item "changed" >}}
