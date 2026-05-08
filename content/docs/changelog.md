@@ -10,6 +10,14 @@ nav-skip: true
 
 {{< version "v0.7.0" >}}
 
+{{< changelog-item "changed" >}}
+**Improved Performance**
+{{< /changelog-item >}}
+
+---
+
+{{< version "v0.7.0" >}}
+
 {{< changelog-item "added" >}}
 **AI Tool Registry - type aliases:**
 
