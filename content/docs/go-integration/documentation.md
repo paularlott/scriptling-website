@@ -80,7 +80,7 @@ var MyLibrary = object.NewLibrary("mylib",
     map[string]*object.Builtin{
         "process": {
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
-                return &object.String{Value: "processed"}
+                return object.NewString("processed")
             },
             HelpText: `process(data) - Process the input data
 
@@ -149,7 +149,7 @@ p.RegisterLibrary(library)
 ```go
 classBuilder := object.NewClassBuilder("MyClass")
 classBuilder.MethodWithHelp("__init__", func(self *object.Instance, name string) {
-    self.Fields["name"] = &object.String{Value: name}
+    self.Fields["name"] = object.NewString(name)
 }, `__init__(name) - Initialize MyClass
 
   Parameters:

@@ -58,7 +58,7 @@ Direct control with maximum performance:
 p.RegisterFunc("add", func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
     a, _ := args[0].AsInt()
     b, _ := args[1].AsInt()
-    return &object.Integer{Value: a + b}
+    return object.NewInteger(a + b)
 })
 ```
 

@@ -8,6 +8,19 @@ nav-skip: true
 
 ## May 2026
 
+{{< version "v0.8.0" >}}
+
+{{< changelog-item "changed" >}}
+**Go API — Private Value fields:**
+
+- `Integer.Value`, `Float.Value`, `Boolean.Value`, and `String.Value` are now private
+- Use `object.NewInteger()`, `object.NewFloat()`, `object.NewBoolean()`, `object.NewString()` constructors instead of struct literals
+- Use `.IntValue()`, `.FloatValue()`, `.BoolValue()`, `.StringValue()` getters instead of `.Value`
+- Small integer caching now prevents accidental mutation of shared singletons
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.7.0" >}}
 
 {{< changelog-item "changed" >}}

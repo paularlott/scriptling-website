@@ -26,7 +26,7 @@ func main() {
         }
 
         if intObj, ok := args[0].(*object.Integer); ok {
-            return &object.Integer{Value: intObj.Value * 2}
+            return object.NewInteger(intObj.IntValue() * 2)
         }
 
         return &object.Error{Message: "argument must be integer"}
@@ -67,7 +67,7 @@ p.RegisterFunc("make_duration", func(ctx context.Context, kwargs object.Kwargs, 
     }
 
     totalSeconds := hours*3600 + minutes*60 + seconds
-    return &object.Float{Value: totalSeconds}
+    return object.NewFloat(totalSeconds)
 })
 
 p.Eval(`
@@ -100,7 +100,7 @@ p.RegisterFunc("format_greeting", func(ctx context.Context, kwargs object.Kwargs
         return &object.Error{Message: err.Error()}
     }
 
-    return &object.String{Value: prefix + ", " + name + suffix}
+    return object.NewString(prefix + ", " + name + suffix)
 })
 
 p.Eval(`
@@ -162,7 +162,7 @@ p.RegisterFunc("add_tax", func(ctx context.Context, kwargs object.Kwargs, args .
     }
 
     result := price * (1 + rate)
-    return &object.Float{Value: result}
+    return object.NewFloat(result)
 })
 ```
 
@@ -211,7 +211,7 @@ p.RegisterFunc("debug_print", func(ctx context.Context, kwargs object.Kwargs, ar
         fmt.Fprintf(writer, "[DEBUG] Arg %d: %s\n", i, arg.Inspect())
     }
 
-    return &object.String{Value: "logged"}
+    return object.NewString("logged")
 })
 ```
 
@@ -220,7 +220,7 @@ p.RegisterFunc("debug_print", func(ctx context.Context, kwargs object.Kwargs, ar
 ```go
 p.RegisterFunc("calculate", func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
     // Implementation
-    return &object.Integer{Value: 42}
+    return object.NewInteger(42)
 }, `calculate(x, y) - Perform calculation
 
   Parameters:
@@ -252,27 +252,25 @@ p.RegisterFunc("my_func", func(...) object.Object {
 ### Integers
 
 ```go
-return &object.Integer{Value: 42}
 return object.NewInteger(42)
 ```
 
 ### Floats
 
 ```go
-return &object.Float{Value: 3.14}
 return object.NewFloat(3.14)
 ```
 
 ### Strings
 
 ```go
-return &object.String{Value: "hello"}
+return object.NewString("hello")
 ```
 
 ### Booleans
 
 ```go
-return &object.Boolean{Value: true}
+return object.NewBoolean(true)
 return object.True
 return object.False
 ```
@@ -281,8 +279,8 @@ return object.False
 
 ```go
 return &object.List{Elements: []object.Object{
-    &object.Integer{Value: 1},
-    &object.String{Value: "two"},
+    object.NewInteger(1),
+    object.NewString("two"),
 }}
 ```
 
@@ -290,8 +288,8 @@ return &object.List{Elements: []object.Object{
 
 ```go
 return object.NewStringDict(map[string]object.Object{
-    "name":  &object.String{Value: "Alice"},
-    "count": &object.Integer{Value: 42},
+    "name":  object.NewString("Alice"),
+    "count": object.NewInteger(42),
 })
 ```
 
@@ -322,7 +320,7 @@ p.RegisterFunc("long_operation", func(ctx context.Context, kwargs object.Kwargs,
             // Continue processing
         }
     }
-    return &object.Integer{Value: 1}
+    return object.NewInteger(1)
 })
 ```
 
@@ -368,7 +366,7 @@ p.RegisterFunc("divide", func(ctx context.Context, kwargs object.Kwargs, args ..
         return &object.Error{Message: "division by zero"}
     }
 
-    return &object.Float{Value: a / b}
+    return object.NewFloat(a / b)
 })
 ```
 

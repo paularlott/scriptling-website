@@ -46,7 +46,7 @@ builder.Function("do_something", func(ctx context.Context, kwargs object.Kwargs,
         return &object.Error{Message: "access denied"}
     }
 
-    return &object.String{Value: "success"}
+    return object.NewString("success")
 })
 
 template := builder.Build()
@@ -182,7 +182,7 @@ func pathExists(ctx context.Context, kwargs object.Kwargs, args ...object.Object
 
     // Check if path exists
     _, err := os.Stat(pathStr)
-    return &object.Boolean{Value: err == nil}
+    return object.NewBoolean(err == nil)
 }
 
 func pathJoinpath(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
@@ -207,7 +207,7 @@ func pathJoinpath(ctx context.Context, kwargs object.Kwargs, args ...object.Obje
     newPath := filepath.Join(segments...)
 
     // Create new Path instance with same config
-    return createPath(config, ctx, kwargs, []object.Object{&object.String{Value: newPath}})
+    return createPath(config, ctx, kwargs, []object.Object{object.NewString(newPath)})
 }
 ```
 
@@ -300,14 +300,14 @@ var PathClass = &object.Class{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 self := args[0].(*object.Instance)
                 config := self.Fields["__config__"].(FSConfig)
-                pathStr := self.Fields["__path__"].(*object.String).Value
+                pathStr := self.Fields["__path__"].(*object.String).StringValue()
 
                 if !config.IsPathAllowed(pathStr) {
                     return &object.Error{Message: "access denied"}
                 }
 
                 _, err := os.Stat(pathStr)
-                return &object.Boolean{Value: err == nil}
+                return object.NewBoolean(err == nil)
             },
             HelpText: "exists() - Check if path exists",
         },
@@ -333,7 +333,7 @@ func createPath(config FSConfig, ctx context.Context, kwargs object.Kwargs, args
         Fields: make(map[string]object.Object),
     }
     instance.Fields["__config__"] = config
-    instance.Fields["__path__"] = &object.String{Value: pathStr}
+    instance.Fields["__path__"] = object.NewString(pathStr)
 
     return instance
 }
@@ -461,7 +461,7 @@ func pathJoinpath(ctx context.Context, kwargs object.Kwargs, args ...object.Obje
     // ... compute newPath ...
 
     // Create new instance with same config
-    return createPath(config, ctx, kwargs, []object.Object{&object.String{Value: newPath}})
+    return createPath(config, ctx, kwargs, []object.Object{object.NewString(newPath)})
 }
 ```
 

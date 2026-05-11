@@ -149,7 +149,7 @@ cb.PropertyWithSetter("radius",
         return r
     },
     func(self *object.Instance, v float64) {
-        self.Fields["_r"] = &object.Float{Value: v}
+        self.Fields["_r"] = object.NewFloat(v)
     },
 )
 
@@ -217,8 +217,8 @@ personClass := &object.Class{
                 instance := args[0].(*object.Instance)
                 name, _ := args[1].AsString()
                 age, _ := args[2].AsInt()
-                instance.Fields["name"] = &object.String{Value: name}
-                instance.Fields["age"] = &object.Integer{Value: age}
+                instance.Fields["name"] = object.NewString(name)
+                instance.Fields["age"] = object.NewInteger(age)
                 return object.NULL
             },
         },
@@ -226,7 +226,7 @@ personClass := &object.Class{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 instance := args[0].(*object.Instance)
                 name, _ := instance.Fields["name"].AsString()
-                return &object.String{Value: "Hello, I'm " + name}
+                return object.NewString("Hello, I'm " + name)
             },
         },
     },
@@ -239,10 +239,10 @@ cb.BaseClass(personClass)  // Inherit from native class
 cb.Method("__init__", func(self *object.Instance, name string, age int, department string) {
     // Call parent __init__ using native API
     parentInit := personClass.Methods["__init__"].(*object.Builtin)
-    parentInit.Fn(nil, nil, self, &object.String{Value: name}, &object.Integer{Value: int64(age)})
+    parentInit.Fn(nil, nil, self, object.NewString(name), object.NewInteger(int64(age)))
 
     // Add employee-specific field
-    self.Fields["department"] = &object.String{Value: department}
+    self.Fields["department"] = object.NewString(department)
 })
 
 employeeClass := cb.Build()

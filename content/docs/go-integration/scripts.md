@@ -450,7 +450,7 @@ func main() {
                     return &object.Error{Message: "sqrt requires 1 argument"}
                 }
                 if num, ok := args[0].(*object.Float); ok {
-                    return &object.Float{Value: math.Sqrt(num.Value)}
+                    return object.NewFloat(math.Sqrt(num.FloatValue()))
                 }
                 return &object.Error{Message: "argument must be float"}
             },

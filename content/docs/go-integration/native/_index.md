@@ -54,7 +54,7 @@ func main() {
         }
         a, _ := args[0].AsInt()
         b, _ := args[1].AsInt()
-        return &object.Integer{Value: a + b}
+        return object.NewInteger(a + b)
     })
 
     p.Eval(`result = add(10, 20)`)  // result = 30

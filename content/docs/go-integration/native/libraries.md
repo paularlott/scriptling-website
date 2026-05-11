@@ -24,23 +24,23 @@ var MyLibrary = object.NewLibrary("mylib",
                 port, _ := args[1].AsInt()
 
                 fmt.Printf("Connecting to %s:%d\n", host, port)
-                return &object.Boolean{Value: true}
+                return object.NewBoolean(true)
             },
             HelpText: "connect(host, port) - Connect to a host and port",
         },
         "disconnect": {
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 fmt.Println("Disconnecting...")
-                return &object.Boolean{Value: false}
+                return object.NewBoolean(false)
             },
             HelpText: "disconnect() - Disconnect from current connection",
         },
     },
     // Constants
     map[string]object.Object{
-        "MAX_CONNECTIONS": &object.Integer{Value: 100},
-        "VERSION":         &object.String{Value: "1.0.0"},
-        "DEBUG":           &object.Boolean{Value: true},
+        "MAX_CONNECTIONS": object.NewInteger(100),
+        "VERSION":         object.NewString("1.0.0"),
+        "DEBUG":           object.NewBoolean(true),
     },
     // Description
     "My custom library with connection utilities",
@@ -92,7 +92,7 @@ func (l *Logger) CreateLibrary() map[string]*object.Builtin {
                     return &object.Error{Message: "level must be string"}
                 }
                 l.level = level
-                return &object.String{Value: "Level set to " + l.level}
+                return object.NewString("Level set to " + l.level)
             },
             HelpText: "set_level(level) - Set the logging level",
         },
@@ -114,7 +114,7 @@ func (l *Logger) CreateLibrary() map[string]*object.Builtin {
                 l.messages = append(l.messages, logMsg)
                 fmt.Fprintln(writer, logMsg)
 
-                return &object.String{Value: "logged"}
+                return object.NewString("logged")
             },
             HelpText: "log(message) - Log a message",
         },
@@ -122,7 +122,7 @@ func (l *Logger) CreateLibrary() map[string]*object.Builtin {
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 elements := make([]object.Object, len(l.messages))
                 for i, msg := range l.messages {
-                    elements[i] = &object.String{Value: msg}
+                    elements[i] = object.NewString(msg)
                 }
                 return &object.List{Elements: elements}
             },
@@ -157,7 +157,7 @@ parseLib := object.NewLibrary("parse",
         "quote": {
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 s, _ := args[0].AsString()
-                return &object.String{Value: url.QueryEscape(s)}
+                return object.NewString(url.QueryEscape(s))
             },
             HelpText: "quote(s) - URL encode a string",
         },
@@ -165,7 +165,7 @@ parseLib := object.NewLibrary("parse",
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 s, _ := args[0].AsString()
                 val, _ := url.QueryUnescape(s)
-                return &object.String{Value: val}
+                return object.NewString(val)
             },
             HelpText: "unquote(s) - URL decode a string",
         },
@@ -181,7 +181,7 @@ urlLib := object.NewLibrary("url",
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 base, _ := args[0].AsString()
                 path, _ := args[1].AsString()
-                return &object.String{Value: strings.TrimSuffix(base, "/") + "/" + strings.TrimPrefix(path, "/")}
+                return object.NewString(strings.TrimSuffix(base, "/") + "/" + strings.TrimPrefix(path, "/"))
             },
             HelpText: "join(base, path) - Join URL path segments",
         },
@@ -262,7 +262,7 @@ func CreateMathLibrary() *object.Library {
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     a, _ := args[0].AsFloat()
                     b, _ := args[1].AsFloat()
-                    return &object.Float{Value: a + b}
+                    return object.NewFloat(a + b)
                 },
                 HelpText: "add(a, b) - Add two numbers",
             },
@@ -270,7 +270,7 @@ func CreateMathLibrary() *object.Library {
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     a, _ := args[0].AsFloat()
                     b, _ := args[1].AsFloat()
-                    return &object.Float{Value: a - b}
+                    return object.NewFloat(a - b)
                 },
                 HelpText: "subtract(a, b) - Subtract b from a",
             },
@@ -278,7 +278,7 @@ func CreateMathLibrary() *object.Library {
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     a, _ := args[0].AsFloat()
                     b, _ := args[1].AsFloat()
-                    return &object.Float{Value: a * b}
+                    return object.NewFloat(a * b)
                 },
                 HelpText: "multiply(a, b) - Multiply two numbers",
             },
@@ -289,7 +289,7 @@ func CreateMathLibrary() *object.Library {
                     if b == 0 {
                         return &object.Error{Message: "division by zero"}
                     }
-                    return &object.Float{Value: a / b}
+                    return object.NewFloat(a / b)
                 },
                 HelpText: "divide(a, b) - Divide a by b",
             },
@@ -299,14 +299,14 @@ func CreateMathLibrary() *object.Library {
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     base, _ := args[0].AsFloat()
                     exp, _ := args[1].AsFloat()
-                    return &object.Float{Value: math.Pow(base, exp)}
+                    return object.NewFloat(math.Pow(base, exp))
                 },
                 HelpText: "power(base, exp) - Raise base to power",
             },
             "sqrt": {
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     x, _ := args[0].AsFloat()
-                    return &object.Float{Value: math.Sqrt(x)}
+                    return object.NewFloat(math.Sqrt(x))
                 },
                 HelpText: "sqrt(x) - Square root of x",
             },
@@ -316,7 +316,7 @@ func CreateMathLibrary() *object.Library {
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     list, _ := args[0].AsList()
                     if len(list) == 0 {
-                        return &object.Float{Value: 0}
+                        return object.NewFloat(0)
                     }
 
                     sum := 0.0
@@ -324,7 +324,7 @@ func CreateMathLibrary() *object.Library {
                         val, _ := item.AsFloat()
                         sum += val
                     }
-                    return &object.Float{Value: sum / float64(len(list))}
+                    return object.NewFloat(sum / float64(len(list)))
                 },
                 HelpText: "mean(numbers) - Calculate arithmetic mean",
             },
@@ -336,16 +336,16 @@ func CreateMathLibrary() *object.Library {
                         val, _ := item.AsFloat()
                         sum += val
                     }
-                    return &object.Float{Value: sum}
+                    return object.NewFloat(sum)
                 },
                 HelpText: "sum(numbers) - Sum all numbers in list",
             },
         },
         map[string]object.Object{
-            "PI":      &object.Float{Value: 3.14159265359},
-            "E":       &object.Float{Value: 2.71828182846},
-            "PHI":     &object.Float{Value: 1.61803398875}, // Golden ratio
-            "VERSION": &object.String{Value: "1.0.0"},
+            "PI":      object.NewFloat(3.14159265359),
+            "E":       object.NewFloat(2.71828182846),
+            "PHI":     object.NewFloat(1.61803398875), // Golden ratio
+            "VERSION": object.NewString("1.0.0"),
         },
         "Extended math library with statistical functions",
     )
@@ -413,9 +413,9 @@ configLib := object.NewLibrary(
         "get_config": {...},
     },
     map[string]object.Object{
-        "API_VERSION": &object.String{Value: "v1"},
-        "TIMEOUT":     &object.Integer{Value: 30},
-        "DEBUG":       &object.Boolean{Value: false},
+        "API_VERSION": object.NewString("v1"),
+        "TIMEOUT":     object.NewInteger(30),
+        "DEBUG":       object.NewBoolean(false),
     },
     "Configuration library",
 )
@@ -443,7 +443,7 @@ func TestLibrary(t *testing.T) {
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 a, _ := args[0].(*object.Integer)
                 b, _ := args[1].(*object.Integer)
-                return &object.Integer{Value: a.Value + b.Value}
+                return object.NewInteger(a.IntValue() + b.IntValue())
             },
         },
     }, nil, "Test library")
