@@ -21,7 +21,6 @@ AI and LLM functions for interacting with OpenAI-compatible APIs. This library p
 | `tool_calls(input)`          | Extract normalized tool calls             |
 | `execute_tool_calls(...)`    | Execute tool calls with a tool registry   |
 | `collect_stream(...)`        | Aggregate a chat stream into one result   |
-| `tool_round(...)`            | Run one tool-enabled completion round     |
 | `estimate_tokens(req, resp=None)` | Estimate token counts for request/response|
 | `ToolRegistry()`             | Create tool registry for building schemas |
 
@@ -422,7 +421,7 @@ response = client.completion("gpt-4", [{"role": "user", "content": "Read file /d
 
 For automatic tool execution with an agent loop, see [Agent Library](../agent/).
 
-## Tool Round Helpers
+## Tool Call Helpers
 
 These helpers make it easier to build manual tool-calling loops without rewriting
 the same response parsing and stream aggregation logic each time.
@@ -519,47 +518,6 @@ result = ai.collect_stream(stream, first_chunk_timeout=30, chunk_timeout=4, on_e
 
 print(result["content"])
 print(events)
-```
-
-### ai.tool_round(client, model, messages, registry, \*\*kwargs)
-
-Runs one non-streaming or streaming completion round with tools, extracts normalized
-tool calls, executes them, and returns the round state needed for a manual agent loop.
-
-**Parameters:**
-
-- `client` (OpenAIClient): AI client instance
-- `model` (str): Model identifier
-- `messages` (str or list): User message string or message list
-- `registry` (ToolRegistry): Tool registry containing schemas and handlers
-- `stream` (bool, optional): Use `completion_stream()` instead of `completion()`. Default: `False`
-- `chunk_timeout` (int, optional): Per-chunk timeout in seconds for streaming mode. Default: `0`
-- `on_event` (callable, optional): Callback invoked with event dicts during streaming
-- `system_prompt` (str, optional): System prompt when `messages` is a string
-- `temperature` (float, optional): Sampling temperature
-- `top_p` (float, optional): Nucleus sampling threshold
-- `max_tokens` (int, optional): Maximum tokens to generate
-- `timeout` (int, optional): Overall request timeout in seconds
-
-**Returns:** dict - Round result with `assistant_message`, `content`, `reasoning`, `tool_calls`, `tool_results`, `finish_reason`, and `timed_out`. Non-streaming mode also includes `response`.
-
-**Example:**
-
-```python
-import scriptling.ai as ai
-
-client = ai.Client("http://127.0.0.1:11434/v1")
-
-tools = ai.ToolRegistry()
-tools.add("echo_tool", "Echo a message", {"message": "string"}, lambda args: "echo:" + args["message"])
-
-messages = [{"role": "user", "content": "Call echo_tool with hello"}]
-result = ai.tool_round(client, "gemma4:e4b", messages, tools, timeout=30)
-
-if result["tool_calls"]:
-    messages.append(result["assistant_message"])
-    for tool_result in result["tool_results"]:
-        messages.append(tool_result)
 ```
 
 ## AIClient Class
@@ -729,6 +687,70 @@ answer = client.ask("gpt-4", [{"role": "user", "content": "Hello!"}])
 print(answer)
 ```
 
+### client.completion_parallel(model, messages_list, \*\*kwargs)
+
+Runs multiple chat completions concurrently and returns a list of responses in the same
+order as the input `messages_list`. Each element of `messages_list` is passed to `completion()`.
+
+**Parameters:**
+
+- `model` (str): Model identifier (e.g., "gpt-4", "gpt-3.5-turbo")
+- `messages_list` (list): List of messages, where each element is a string or list of message dicts
+- `max_parallel` (int, optional): Maximum number of concurrent requests. Default: `1`
+- `system_prompt` (str, optional): System prompt to use when messages is a string
+- `tools` (list, optional): List of tool schema dicts from ToolRegistry.build()
+- `temperature` (float, optional): Sampling temperature (0.0-2.0)
+- `top_p` (float, optional): Nucleus sampling threshold (0.0-1.0)
+- `max_tokens` (int, optional): Maximum tokens to generate
+- `extra_body` (dict, optional): Provider-specific fields to merge into the request body
+- `timeout` (int, optional): Request timeout in seconds
+
+**Returns:** list - List of response dicts in the same order as `messages_list`
+
+**Example:**
+
+```python
+import scriptling.ai as ai
+
+client = ai.Client("", api_key="sk-...")
+
+questions = ["What is 2+2?", "What is the capital of France?", "Explain gravity"]
+results = client.completion_parallel("gpt-4", questions, max_parallel=3)
+for result in results:
+    print(result.choices[0].message.content)
+```
+
+### client.ask_parallel(model, messages_list, \*\*kwargs)
+
+Runs multiple chat completions concurrently and returns a list of text responses in the
+same order as the input `messages_list`. Thinking blocks are automatically removed.
+
+**Parameters:**
+
+- `model` (str): Model identifier (e.g., "gpt-4", "gpt-3.5-turbo")
+- `messages_list` (list): List of messages, where each element is a string or list of message dicts
+- `max_parallel` (int, optional): Maximum number of concurrent requests. Default: `1`
+- `system_prompt` (str, optional): System prompt to use when messages is a string
+- `tools` (list, optional): List of tool schema dicts from ToolRegistry.build()
+- `temperature` (float, optional): Sampling temperature (0.0-2.0)
+- `top_p` (float, optional): Nucleus sampling threshold (0.0-1.0)
+- `max_tokens` (int, optional): Maximum tokens to generate
+
+**Returns:** list - List of response text strings in the same order as `messages_list`
+
+**Example:**
+
+```python
+import scriptling.ai as ai
+
+client = ai.Client("", api_key="sk-...")
+
+questions = ["What is 2+2?", "What is the capital of France?", "Explain gravity"]
+answers = client.ask_parallel("gpt-4", questions, max_parallel=3)
+for answer in answers:
+    print(answer)
+```
+
 ### client.embedding(model, input)
 
 Creates an embedding vector for the given input text(s) using the specified model.
@@ -753,72 +775,6 @@ print(response.data[0].embedding)
 response = client.embedding("text-embedding-3-small", ["Hello", "World"])
 for emb in response.data:
     print(emb.embedding)
-
-# Using embeddings for similarity search
-texts = ["cat", "dog", "car", "bicycle"]
-response = client.embedding("text-embedding-3-small", texts)
-
-# Query similarity
-query_resp = client.embedding("text-embedding-3-small", "vehicle")
-query_emb = query_resp.data[0].embedding
-
-# Find most similar (simplified - in practice use proper cosine similarity)
-import math
-for i, text_emb in enumerate(response.data):
-    # Simple dot product as example (use cosine similarity in production)
-    similarity = sum(a * b for a, b in zip(query_emb, text_emb.embedding))
-    print(f"{texts[i]}: {similarity}")
-```
-
-## ChatStream Class
-
-### stream.next()
-
-Advances to the next response chunk and returns it.
-
-**Returns:** dict - The next response chunk, or null if the stream is complete
-
-**Example:**
-
-```python
-import scriptling.ai as ai
-
-client = ai.Client("", api_key="sk-...")
-stream = client.completion_stream("gpt-4", [{"role": "user", "content": "Hello!"}])
-while True:
-    chunk = stream.next()
-    if chunk is None:
-        break
-    if chunk.choices and len(chunk.choices) > 0:
-        delta = chunk.choices[0].delta
-        if delta.content:
-            print(delta.content, end="")
-```
-
-## ResponseStream Class
-
-Returned by `client.response_stream()`. Iterates over SSE events from the Responses API.
-
-### stream.next()
-
-Advances to the next SSE event and returns it as a dict, or `None` when the stream is complete.
-
-**Returns:** dict - Event dict with a `type` field plus event-specific fields, or null if complete
-
-**Example:**
-
-```python
-import scriptling.ai as ai
-
-client = ai.Client("", api_key="sk-...")
-stream = client.response_stream("gpt-4o", "Hello!")
-while True:
-    event = stream.next()
-    if event is None:
-        break
-    if event.type == "response.output_text.delta":
-        print(event.delta, end="")
-print()
 ```
 
 ### client.models()
@@ -1025,27 +981,21 @@ compacted = client.response_compact(response.id)
 print(compacted.output)  # Output without reasoning blocks
 ```
 
-## Usage Examples
+## ChatStream Class
 
-### String Shorthand (Simple Queries)
+### stream.next()
 
-For simple queries, you can pass a string directly instead of building a messages array:
+Advances to the next response chunk and returns it.
+
+**Returns:** dict - The next response chunk, or null if the stream is complete
+
+**Example:**
 
 ```python
 import scriptling.ai as ai
 
 client = ai.Client("", api_key="sk-...")
-
-# Simple user message
-response = client.completion("gpt-4", "What is 2+2?")
-print(response.choices[0].message.content)
-
-# With system prompt
-response = client.completion("gpt-4", "Explain quantum physics", system_prompt="You are a physics professor")
-print(response.choices[0].message.content)
-
-# Works with streaming too
-stream = client.completion_stream("gpt-4", "Tell me a story")
+stream = client.completion_stream("gpt-4", [{"role": "user", "content": "Hello!"}])
 while True:
     chunk = stream.next()
     if chunk is None:
@@ -1054,76 +1004,32 @@ while True:
         delta = chunk.choices[0].delta
         if delta.content:
             print(delta.content, end="")
-print()
 ```
 
-### Basic Chat Completion
+## ResponseStream Class
+
+Returned by `client.response_stream()`. Iterates over SSE events from the Responses API.
+
+### stream.next()
+
+Advances to the next SSE event and returns it as a dict, or `None` when the stream is complete.
+
+**Returns:** dict - Event dict with a `type` field plus event-specific fields, or null if complete
+
+**Example:**
 
 ```python
 import scriptling.ai as ai
 
 client = ai.Client("", api_key="sk-...")
-response = client.completion("gpt-4", [{"role": "user", "content": "Hello!"}])
-print(response.choices[0].message.content)
-```
-
-### Conversation with Multiple Messages
-
-```python
-client = ai.Client("", api_key="sk-...")
-
-response = client.completion(
-    "gpt-4",
-    [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "What is the capital of France?"},
-        {"role": "assistant", "content": "The capital of France is Paris."},
-        {"role": "user", "content": "And what about Germany?"}
-    ]
-)
-
-print(response.choices[0].message.content)
-```
-
-### Streaming Chat Completion
-
-```python
-client = ai.Client("", api_key="sk-...")
-
-stream = client.completion_stream("gpt-4", [{"role": "user", "content": "Count to 10"}])
+stream = client.response_stream("gpt-4o", "Hello!")
 while True:
-    chunk = stream.next()
-    if chunk is None:
+    event = stream.next()
+    if event is None:
         break
-    if chunk.choices and len(chunk.choices) > 0:
-        delta = chunk.choices[0].delta
-        if delta.content:
-            print(delta.content, end="")
+    if event.type == "response.output_text.delta":
+        print(event.delta, end="")
 print()
-```
-
-### Using Custom Base URL
-
-```python
-# For OpenAI-compatible services like LM Studio, local LLMs, etc.
-client = ai.Client("http://127.0.0.1:1234/v1")
-
-response = client.completion("mistralai/ministral-3-3b", [{"role": "user", "content": "Hello!"}])
-```
-
-### Using MCP Tools with AI
-
-MCP servers can be configured during client creation using the `remote_servers` parameter:
-
-```python
-import scriptling.ai as ai
-
-client = ai.Client("http://127.0.0.1:1234/v1", remote_servers=[
-    {"base_url": "http://127.0.0.1:8080/mcp", "namespace": "scriptling"},
-])
-
-# Tools from MCP servers are automatically available to AI calls
-response = client.completion("gpt-4", [{"role": "user", "content": "Search for recent news"}])
 ```
 
 ## Error Handling

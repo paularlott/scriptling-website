@@ -8,6 +8,25 @@ nav-skip: true
 
 ## May 2026
 
+{{< version "v0.8.2" >}}
+
+{{< changelog-item "added" >}}
+**AI Library — Parallel Completions:**
+
+- New `client.completion_parallel(model, messages_list, max_parallel=1, **kwargs)` — run multiple chat completions concurrently
+- New `client.ask_parallel(model, messages_list, max_parallel=1, **kwargs)` — run multiple ask completions concurrently
+- The `max_parallel` parameter controls the number of concurrent API requests (default: 1, sequential)
+{{< /changelog-item >}}
+
+{{< changelog-item "removed" >}}
+**AI Library — Removed `tool_round` and `tool_round_parallel`:**
+
+- Removed `ai.tool_round()` — use `client.completion()` with `ai.tool_calls()` and `ai.execute_tool_calls()` directly, or use the `Agent` class for full tool loops
+- Removed `ai.tool_round_parallel()` — use `client.completion_parallel()` with `ai.execute_tool_calls()` directly
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.8.0" >}}
 
 {{< changelog-item "changed" >}}
