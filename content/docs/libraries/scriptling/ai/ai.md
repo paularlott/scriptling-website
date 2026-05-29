@@ -252,6 +252,10 @@ Creates a new AI client instance for making API calls to supported services.
   - `base_url` (str, required): URL of the MCP server
   - `namespace` (str, optional): Namespace prefix for tools from this server
   - `bearer_token` (str, optional): Bearer token for authentication
+- `max_retries` (int, optional): Max retries for retryable errors (429, 5xx). Default: `3`. Set `-1` to disable
+- `retry_backoff` (float, optional): Base backoff in seconds between retries (doubles each attempt). Default: `1.0`
+- `retry_on_rate_limit` (bool, optional): Retry on 429 rate limit errors. Default: `True`
+- `retry_on_server_error` (bool, optional): Retry on 5xx server errors. Default: `True`
 
 **Returns:** AIClient - A client instance with methods for API calls
 
@@ -692,6 +696,11 @@ print(answer)
 Runs multiple chat completions concurrently and returns a list of responses in the same
 order as the input `messages_list`. Each element of `messages_list` is passed to `completion()`.
 
+Includes **adaptive concurrency**: when a rate limit (429) is detected, the parallelism is
+automatically halved and workers pause briefly before continuing. This reduces pressure on
+the API without manual intervention. Rate limit retries are handled automatically by the
+client (see `max_retries` on `ai.Client`).
+
 **Parameters:**
 
 - `model` (str): Model identifier (e.g., "gpt-4", "gpt-3.5-turbo")
@@ -705,25 +714,32 @@ order as the input `messages_list`. Each element of `messages_list` is passed to
 - `extra_body` (dict, optional): Provider-specific fields to merge into the request body
 - `timeout` (int, optional): Request timeout in seconds
 
-**Returns:** list - List of response dicts in the same order as `messages_list`
+**Returns:** list - List of response dicts in the same order as `messages_list`. Each response
+may include a `retry` dict if the client retried the request: `{"attempts": 2, "rate_limit_hit": true, "total_backoff": 1.0}`
 
 **Example:**
 
 ```python
 import scriptling.ai as ai
 
-client = ai.Client("", api_key="sk-...")
+client = ai.Client("", api_key="sk-...", max_retries=3)
 
 questions = ["What is 2+2?", "What is the capital of France?", "Explain gravity"]
 results = client.completion_parallel("gpt-4", questions, max_parallel=3)
 for result in results:
-    print(result.choices[0].message.content)
+    if "retry" in result:
+        print(f"  (retried {result['retry']['attempts']}x)")
+    print(result["choices"][0]["message"]["content"])
 ```
 
 ### client.ask_parallel(model, messages_list, \*\*kwargs)
 
 Runs multiple chat completions concurrently and returns a list of text responses in the
 same order as the input `messages_list`. Thinking blocks are automatically removed.
+
+Includes **adaptive concurrency**: when a rate limit (429) is detected, the parallelism is
+automatically halved and workers pause briefly before continuing. Rate limit retries are
+handled automatically by the client (see `max_retries` on `ai.Client`).
 
 **Parameters:**
 
@@ -735,6 +751,8 @@ same order as the input `messages_list`. Thinking blocks are automatically remov
 - `temperature` (float, optional): Sampling temperature (0.0-2.0)
 - `top_p` (float, optional): Nucleus sampling threshold (0.0-1.0)
 - `max_tokens` (int, optional): Maximum tokens to generate
+- `extra_body` (dict, optional): Provider-specific fields to merge into the request body
+- `timeout` (int, optional): Request timeout in seconds
 
 **Returns:** list - List of response text strings in the same order as `messages_list`
 
@@ -750,6 +768,102 @@ answers = client.ask_parallel("gpt-4", questions, max_parallel=3)
 for answer in answers:
     print(answer)
 ```
+
+### client.Pipeline(model, \*\*kwargs)
+
+Creates a **Pipeline** that starts processing requests immediately as they are added via
+`add()`, overlapping prompt generation with inference. Call `complete()` to wait for all
+results. The Pipeline is the more general primitive behind `completion_parallel` and
+`ask_parallel`.
+
+Includes the same **adaptive concurrency** as the parallel methods: on a rate limit (429)
+the concurrency is automatically halved and workers pause before continuing.
+
+**Parameters:**
+
+- `model` (str): Model identifier (e.g., "gpt-4", "gpt-3.5-turbo")
+- `max_parallel` (int, optional): Maximum concurrent requests. Default: `1`
+- `ask` (bool, optional): If `True`, return plain text strings instead of response dicts. Default: `False`
+- `system_prompt` (str, optional): System prompt applied to each string message
+- `tools` (list, optional): List of tool schema dicts from `ToolRegistry.build()`
+- `temperature` (float, optional): Sampling temperature (0.0-2.0)
+- `top_p` (float, optional): Nucleus sampling threshold (0.0-1.0)
+- `max_tokens` (int, optional): Maximum tokens to generate
+- `extra_body` (dict, optional): Provider-specific fields merged into every request body
+- `timeout` (int, optional): Request timeout in seconds
+
+**Returns:** `Pipeline` — a pipeline object with `add()` and `complete()` methods.
+
+**Example:**
+
+```python
+import scriptling.ai as ai
+
+client = ai.Client("http://localhost:1234/v1")
+
+# Completion pipeline (ask=False, default) — results are full response dicts
+pipe = client.Pipeline("gpt-4", max_parallel=4)
+for row in dataset:
+    pipe.add(build_prompt(row))            # string shorthand; inference starts immediately
+pipe.add([                                 # or a full message list
+    {"role": "system", "content": "Be concise."},
+    {"role": "user",   "content": "Explain gravity."},
+])
+results = pipe.complete()                  # ordered list of response dicts
+for r in results:
+    print(r["choices"][0]["message"]["content"])
+
+# Ask pipeline (ask=True) — results are plain text strings
+pipe = client.Pipeline("gpt-4", max_parallel=4, ask=True)
+for q in questions:
+    pipe.add(q)
+answers = pipe.complete()                  # ordered list of str
+for answer in answers:
+    print(answer)
+```
+
+### Pipeline.add(message)
+
+Queues a message for completion. Processing starts immediately as concurrency slots are
+available — you do not need to wait until `complete()` is called.
+
+`add()` accepts exactly the same message formats as `completion()` and `ask()`:
+
+| Format | When to use |
+|---|---|
+| `str` | Simple user question; the pipeline's `system_prompt` (if set) is applied automatically |
+| `list` of message dicts | Full conversation turn with explicit `role`/`content` keys; `system_prompt` is ignored |
+
+**Parameters:**
+
+- `message` (str or list): User message string, or list of message dicts with `role` and `content` keys
+
+**Returns:** `None`
+
+**Example:**
+
+```python
+# String shorthand
+pipe.add("What is the capital of France?")
+
+# Full message list
+pipe.add([
+    {"role": "system", "content": "You are a geography expert."},
+    {"role": "user",   "content": "What is the capital of France?"},
+])
+```
+
+### Pipeline.complete()
+
+Closes the pipeline to new additions, waits for all in-flight requests to finish, and
+returns results in the same order as the `add()` calls.
+
+`complete()` may only be called once. Calling `add()` after `complete()` raises an error.
+
+**Returns:** list
+
+- When `ask=False` (default — **completion mode**): ordered list of response dicts, identical in structure to a single `completion()` response. Access content with `result["choices"][0]["message"]["content"]`.
+- When `ask=True` (**ask mode**): ordered list of plain text strings with thinking blocks already removed, identical to what `ask()` returns.
 
 ### client.embedding(model, input)
 
@@ -1004,6 +1118,30 @@ while True:
         delta = chunk.choices[0].delta
         if delta.content:
             print(delta.content, end="")
+```
+
+### stream.retry()
+
+Returns retry metadata if the connection was retried before streaming began, or `None` if no retries occurred. Blocks until retry metadata is available.
+
+**Returns:** dict or None - Retry metadata with keys:
+
+- `attempts` (int): Total number of connection attempts (including the initial one)
+- `rate_limit_hit` (bool): Whether a 429 rate limit error was encountered
+- `total_backoff` (float): Total seconds spent waiting between retries
+
+**Example:**
+
+```python
+import scriptling.ai as ai
+
+client = ai.Client("", api_key="sk-...", max_retries=3)
+stream = client.completion_stream("gpt-4", "Hello!")
+result = ai.collect_stream(stream)
+
+retry = stream.retry()
+if retry:
+    print(f"Retried {retry['attempts']}x, backoff: {retry['total_backoff']:.1f}s")
 ```
 
 ## ResponseStream Class
