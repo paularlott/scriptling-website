@@ -18,11 +18,14 @@ The pathlib library provides object-oriented filesystem path operations, similar
 | `exists()`         | Check if path exists               |
 | `is_file()`        | Check if path is a file            |
 | `is_dir()`         | Check if path is a directory       |
-| `mkdir(parents=False)` | Create directory               |
+| `mkdir(mode=0o777, parents=False, exist_ok=False)` | Create directory |
+| `chmod(mode)`      | Change file or directory permissions |
 | `rmdir()`          | Remove empty directory             |
 | `unlink(missing_ok=False)` | Remove file or link        |
 | `read_text()`      | Read file contents as string       |
 | `write_text(data)` | Write string to file               |
+| `read_bytes()`     | Read file contents as bytes        |
+| `write_bytes(data)` | Write bytes to file               |
 
 ## Basic Usage
 
@@ -167,18 +170,47 @@ p = pathlib.Path("/home/user/newfile.txt")
 p.write_text("Hello, World!")
 ```
 
-### `mkdir(parents=False)`
+### `read_bytes()`
+
+Read the contents of a file as bytes.
+
+```python
+p = pathlib.Path("/home/user/data.bin")
+data = p.read_bytes()
+```
+
+### `write_bytes(data)`
+
+Write bytes to a file.
+
+```python
+p = pathlib.Path("/home/user/data.bin")
+p.write_bytes("raw bytes")
+```
+
+### `mkdir(mode=0o777, parents=False, exist_ok=False)`
 
 Create a directory.
 
 ```python
 # Create a single directory
 p = pathlib.Path("/home/user/newfolder")
-p.mkdir()
+p.mkdir(0o700)
 
 # Create nested directories
 p2 = pathlib.Path("/home/user/a/b/c")
-p2.mkdir(parents=True)
+p2.mkdir(parents=True, exist_ok=True)
+```
+
+The `mode` argument uses permission bits such as `0o700` or `0o755`. Like Python, the final permissions are still subject to the process umask when creating directories.
+
+### `chmod(mode)`
+
+Change the permissions of a file or directory.
+
+```python
+p = pathlib.Path("/home/user/script.sh")
+p.chmod(0o755)
 ```
 
 ### `rmdir()`

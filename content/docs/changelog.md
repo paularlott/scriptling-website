@@ -6,7 +6,7 @@ nav-skip: true
 ---
 
 
-## May 2026
+## June 2026
 
 {{< version "v0.9.0" >}}
 
@@ -38,6 +38,15 @@ nav-skip: true
 - Each request is a dict with `method`, `url`, and optional `data`, `json`, `headers`, `params`, `auth`, `timeout`
 - Returns a list of `Response` objects (or objects with an `error` attribute on failure)
 - The `max_parallel` parameter controls the concurrency limit (default: 4)
+
+**Filesystem Libraries — Permission Modes:**
+
+- New `os.chmod(path, mode)` and `pathlib.Path.chmod(mode)` for changing file or directory permissions
+- `os.mkdir(path, mode=0o777)`, `os.makedirs(path, mode=0o777, exist_ok=False)`, and `pathlib.Path.mkdir(mode=0o777, parents=False, exist_ok=False)` now accept Python-style mode arguments for directory creation
+- New `os.removedirs(name)` for pruning empty directory trees
+- New `pathlib.Path.read_bytes()` and `pathlib.Path.write_bytes(data)` for byte-oriented file helpers
+- `os.write_file(path, content, mode=0o644)` now accepts an optional mode for newly-created files
+- `fs.write_bytes(path, offset, data, mode=0o644)` now accepts an optional mode for newly-created files
 {{< /changelog-item >}}
 
 {{< changelog-item "removed" >}}
@@ -48,6 +57,8 @@ nav-skip: true
 {{< /changelog-item >}}
 
 ---
+
+## May 2026
 
 {{< version "v0.8.0" >}}
 

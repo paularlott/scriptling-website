@@ -19,7 +19,7 @@ extlibs.RegisterFSLibrary(p, []string{"/tmp", "/data"})
 | Function | Description |
 | -------- | ----------- |
 | `read_bytes(path, offset, length)` | Read a range of bytes from a file |
-| `write_bytes(path, offset, data)` | Write raw bytes at an offset |
+| `write_bytes(path, offset, data[, mode])` | Write raw bytes at an offset |
 | `unpack(format, data)` | Unpack binary data using format strings |
 | `pack(format, values)` | Pack values into a binary string |
 | `byte_at(data, index)` | Return the unsigned byte value (0-255) at an index |
@@ -48,7 +48,7 @@ import fs
 data = fs.read_bytes("/tmp/data.bin", 0, 16)
 ```
 
-### fs.write_bytes(path, offset, data)
+### fs.write_bytes(path, offset, data[, mode])
 
 Write raw bytes at an offset. Creates the file if it does not exist.
 
@@ -57,6 +57,7 @@ Write raw bytes at an offset. Creates the file if it does not exist.
 - `path` (str): File path to write
 - `offset` (int): 0-based byte position to start writing
 - `data` (str): Raw bytes to write
+- `mode` (int, optional): Permission bits used when creating a new file. Defaults to `0o644`.
 
 **Returns:** None
 
@@ -65,7 +66,7 @@ Write raw bytes at an offset. Creates the file if it does not exist.
 ```python
 import fs
 
-fs.write_bytes("/tmp/output.bin", 0, "\x00\x01\x02\x03")
+fs.write_bytes("/tmp/output.bin", 0, "\x00\x01\x02\x03", mode=0o600)
 ```
 
 ### fs.unpack(format, data)
