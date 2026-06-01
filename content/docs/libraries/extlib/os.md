@@ -22,12 +22,14 @@ import os
 | `getcwd()`                   | Get the current working directory            |
 | `listdir(path=".")`          | List directory contents                      |
 | `read_file(path)`            | Read entire file contents as string          |
-| `write_file(path, content)`  | Write content to a file (creates/overwrites) |
+| `write_file(path, content[, mode])` | Write content to a file (creates/overwrites) |
 | `append_file(path, content)` | Append content to a file                     |
 | `remove(path)`               | Remove a file                                |
-| `mkdir(path)`                | Create a directory                           |
-| `makedirs(path)`             | Create directories recursively               |
+| `chmod(path, mode)`          | Change file or directory permissions         |
+| `mkdir(path[, mode])`        | Create a directory                           |
+| `makedirs(path[, mode], exist_ok=False)` | Create directories recursively |
 | `rmdir(path)`                | Remove an empty directory                    |
+| `removedirs(name)`           | Remove empty directory and empty parents     |
 | `rename(old, new)`           | Rename a file or directory                   |
 
 ## Security
@@ -205,7 +207,7 @@ content = os.read_file("/tmp/data.txt")
 print(content)
 ```
 
-### os.write_file(path, content)
+### os.write_file(path, content[, mode])
 
 Write content to a file (creates or overwrites).
 
@@ -213,11 +215,12 @@ Write content to a file (creates or overwrites).
 
 - `path` (string): Path to the file
 - `content` (string): Content to write
+- `mode` (integer, optional): Permission bits used when creating a new file. Defaults to `0o644`.
 
 ```python
 import os
 
-os.write_file("/tmp/output.txt", "Hello, World!")
+os.write_file("/tmp/output.txt", "Hello, World!", mode=0o600)
 ```
 
 ### os.append_file(path, content)
@@ -249,32 +252,50 @@ import os
 os.remove("/tmp/old_file.txt")
 ```
 
-### os.mkdir(path)
+### os.chmod(path, mode)
+
+Change the permissions of a file or directory.
+
+**Parameters:**
+
+- `path` (string): Path to the file or directory
+- `mode` (integer): Permission bits, such as `0o600`, `0o644`, or `0o755`
+
+```python
+import os
+
+os.chmod("/tmp/script.sh", 0o755)
+```
+
+### os.mkdir(path[, mode])
 
 Create a directory.
 
 **Parameters:**
 
 - `path` (string): Path to the directory to create
+- `mode` (integer, optional): Permission bits. Defaults to `0o777` and is still subject to the process umask.
 
 ```python
 import os
 
-os.mkdir("/tmp/newdir")
+os.mkdir("/tmp/newdir", 0o700)
 ```
 
-### os.makedirs(path)
+### os.makedirs(path[, mode], exist_ok=False)
 
 Create directories recursively (creates all parent directories as needed).
 
 **Parameters:**
 
 - `path` (string): Path to the directory to create
+- `mode` (integer, optional): Permission bits for created directories. Defaults to `0o777` and is still subject to the process umask.
+- `exist_ok` (boolean, optional): If `True`, do not error when the target directory already exists.
 
 ```python
 import os
 
-os.makedirs("/tmp/a/b/c")  # Creates all directories in the path
+os.makedirs("/tmp/a/b/c", mode=0o755, exist_ok=True)
 ```
 
 ### os.rmdir(path)
@@ -289,6 +310,20 @@ Remove an empty directory.
 import os
 
 os.rmdir("/tmp/emptydir")
+```
+
+### os.removedirs(name)
+
+Remove an empty directory, then remove empty parent directories until a parent cannot be removed.
+
+**Parameters:**
+
+- `name` (string): Path to the leaf directory to remove
+
+```python
+import os
+
+os.removedirs("/tmp/a/b/c")
 ```
 
 ### os.rename(old, new)
@@ -359,8 +394,11 @@ os.remove("/tmp/data.txt")
 import os
 
 # Create nested directories
-os.makedirs("/tmp/myproject/src")
-os.makedirs("/tmp/myproject/build")
+os.makedirs("/tmp/myproject/src", mode=0o755)
+os.makedirs("/tmp/myproject/build", mode=0o755)
+
+# Adjust permissions after creation
+os.chmod("/tmp/myproject/src", 0o700)
 
 # List contents
 items = os.listdir("/tmp/myproject")
@@ -429,9 +467,11 @@ This library implements a subset of Python's `os` module:
 | environ     | ✅                       |
 | getcwd      | ✅                       |
 | listdir     | ✅                       |
-| mkdir       | ✅                       |
-| makedirs    | ✅                       |
+| chmod       | ✅                       |
+| mkdir       | ✅ (`mode` supported)    |
+| makedirs    | ✅ (`mode` and `exist_ok` supported) |
 | rmdir       | ✅                       |
+| removedirs  | ✅                       |
 | remove      | ✅                       |
 | rename      | ✅                       |
 | read_file   | ✅ (Scriptling-specific) |
@@ -439,7 +479,6 @@ This library implements a subset of Python's `os` module:
 | append_file | ✅ (Scriptling-specific) |
 | stat        | ❌                       |
 | walk        | ❌                       |
-| chmod       | ❌                       |
 | utime       | ❌                       |
 
 ## Differences from Python

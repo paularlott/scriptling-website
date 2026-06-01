@@ -6,6 +6,58 @@ nav-skip: true
 ---
 
 
+## June 2026
+
+{{< version "v0.9.0" >}}
+
+{{< changelog-item "added" >}}
+**AI Library — Parallel Completions:**
+
+- New `client.completion_parallel(model, messages_list, max_parallel=1, **kwargs)` — run multiple chat completions concurrently
+- New `client.ask_parallel(model, messages_list, max_parallel=1, **kwargs)` — run multiple ask completions concurrently
+- The `max_parallel` parameter controls the number of concurrent API requests (default: 1, sequential)
+
+**AI Library — Automatic Retry & Adaptive Parallel Concurrency:**
+
+- `ai.Client()` now accepts `max_retries` (default 3), `retry_backoff` (default 1.0s), `retry_on_rate_limit` (default True), and `retry_on_server_error` (default True) kwargs
+- 429 (rate limit) and 5xx (server error) responses are automatically retried with exponential backoff
+- Completion responses now include a `retry` dict when retries occurred: `{"attempts": 2, "rate_limit_hit": true, "total_backoff": 1.0}`
+- `completion_parallel()` and `ask_parallel()` now use adaptive concurrency — parallelism is automatically halved when rate limits are detected, reducing API pressure without manual tuning; workers wake immediately when backoff expires
+
+**AI Library — Pipeline:**
+
+- New `client.Pipeline(model, max_parallel=1, ask=False, **kwargs)` — creates a streaming completion pipeline that starts processing requests immediately as they are added, overlapping prompt generation with inference
+- `pipe.add(message)` — queues a message; inference begins immediately as concurrency slots are available
+- `pipe.complete()` — waits for all in-flight requests and returns results ordered by submission
+- `ask=True` mode returns plain text strings; `ask=False` (default) returns full response dicts
+- `completion_parallel()` and `ask_parallel()` are now implemented on top of Pipeline internally, giving them the same overlap benefit when items are added faster than they complete
+
+**Requests Library — Parallel HTTP Requests:**
+
+- New `requests.parallel(requests, max_parallel=4)` — execute multiple HTTP requests concurrently and return responses in submission order
+- Each request is a dict with `method`, `url`, and optional `data`, `json`, `headers`, `params`, `auth`, `timeout`
+- Returns a list of `Response` objects (or objects with an `error` attribute on failure)
+- The `max_parallel` parameter controls the concurrency limit (default: 4)
+
+**Filesystem Libraries — Permission Modes:**
+
+- New `os.chmod(path, mode)` and `pathlib.Path.chmod(mode)` for changing file or directory permissions
+- `os.mkdir(path, mode=0o777)`, `os.makedirs(path, mode=0o777, exist_ok=False)`, and `pathlib.Path.mkdir(mode=0o777, parents=False, exist_ok=False)` now accept Python-style mode arguments for directory creation
+- New `os.removedirs(name)` for pruning empty directory trees
+- New `pathlib.Path.read_bytes()` and `pathlib.Path.write_bytes(data)` for byte-oriented file helpers
+- `os.write_file(path, content, mode=0o644)` now accepts an optional mode for newly-created files
+- `fs.write_bytes(path, offset, data, mode=0o644)` now accepts an optional mode for newly-created files
+{{< /changelog-item >}}
+
+{{< changelog-item "removed" >}}
+**AI Library — Removed `tool_round` and `tool_round_parallel`:**
+
+- Removed `ai.tool_round()` — use `client.completion()` with `ai.tool_calls()` and `ai.execute_tool_calls()` directly, or use the `Agent` class for full tool loops
+- Removed `ai.tool_round_parallel()` — use `client.completion_parallel()` with `ai.execute_tool_calls()` directly
+{{< /changelog-item >}}
+
+---
+
 ## May 2026
 
 {{< version "v0.8.0" >}}
