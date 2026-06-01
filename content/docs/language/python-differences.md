@@ -97,6 +97,7 @@ Scriptling **does support**:
 - ✅ Multiple assignment and tuple unpacking
 - ✅ Extended unpacking with `*`
 - ✅ Variadic arguments (`*args`)
+- ✅ Keyword-only parameters with bare `*`
 - ✅ Keyword arguments (`**kwargs`)
 - ✅ Default parameter values
 - ✅ Conditional expressions (ternary operator)

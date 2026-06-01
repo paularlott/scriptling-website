@@ -118,6 +118,29 @@ log("ERROR", "Failed to connect", "Retrying...", "Attempt 2")
 
 **Note**: `*args` must come after regular parameters and default parameters.
 
+## Keyword-only Parameters (*)
+
+Use a bare `*` in a function signature to mark the following parameters as keyword-only. These parameters must be supplied by name when the function is called:
+
+```python
+def resize(image, *, width, height=100):
+    return image + ": " + str(width) + "x" + str(height)
+
+resize("avatar", width=64)              # OK
+resize("avatar", width=64, height=32)   # OK
+resize("avatar", 64)                    # Error: width is keyword-only
+```
+
+Keyword-only parameters can also follow `*args`:
+
+```python
+def log(level, *messages, sep=" "):
+    for msg in messages:
+        print("[" + level + "]" + sep + str(msg))
+
+log("INFO", "Started", "Ready", sep=": ")
+```
+
 ## Keyword Arguments Collection (**kwargs)
 
 Functions can accept arbitrary keyword arguments:
@@ -153,8 +176,9 @@ When using multiple parameter types, they must appear in this order:
 
 1. Regular parameters (e.g., `a`, `b`)
 2. Default parameters (e.g., `c=10`)
-3. Variadic arguments (`*args`)
-4. Keyword arguments (`**kwargs`)
+3. Variadic arguments (`*args`) or a bare `*` keyword-only separator
+4. Keyword-only parameters
+5. Keyword arguments (`**kwargs`)
 
 ## Argument Unpacking
 

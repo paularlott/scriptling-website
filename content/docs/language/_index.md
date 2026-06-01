@@ -109,6 +109,10 @@ def test_kwargs(**kwargs):
 
 result = test_kwargs(a=1, b=2)  # {"a": 1, "b": 2}
 
+# Keyword-only parameters
+def resize(image, *, width, height=100):
+    return image + ": " + str(width) + "x" + str(height)
+
 # Lambda
 square = lambda x: x * 2
 sorted(["ccc", "a", "bb"], key=lambda s: len(s))

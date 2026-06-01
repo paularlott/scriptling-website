@@ -8,6 +8,24 @@ nav-skip: true
 
 ## June 2026
 
+{{< version "v0.9.1" >}}
+
+{{< changelog-item "added" >}}
+**Language — Keyword-only Parameters:**
+
+- Function and lambda signatures now support Python-style keyword-only parameters using a bare `*`, such as `def resize(image, *, width, height=100):`
+- Keyword-only parameters are enforced at call time, so values after bare `*` must be supplied by name
+- Keyword-only parameters can also follow `*args`, such as `def collect(prefix, *items, sep):`
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**Language — Shorthand operators:**
+
+- Shorthand assignment operators (`+=`, `-=`, `*=`, `/=`, `//=`, `%=`, `**=`, `&=`, `|=`, `^=`, `>>=`, `<<=`) now correctly evaluate the left-hand side expression against objects.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.9.0" >}}
 
 {{< changelog-item "added" >}}
