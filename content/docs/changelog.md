@@ -18,6 +18,12 @@ nav-skip: true
 - Keyword-only parameters can also follow `*args`, such as `def collect(prefix, *items, sep):`
 {{< /changelog-item >}}
 
+{{< changelog-item "fixed" >}}
+**Language — Shorthand operators:**
+
+- Shorthand assignment operators (`+=`, `-=`, `*=`, `/=`, `//=`, `%=`, `**=`, `&=`, `|=`, `^=`, `>>=`, `<<=`) now correctly evaluate the left-hand side expression against objects.
+{{< /changelog-item >}}
+
 ---
 
 {{< version "v0.9.0" >}}
