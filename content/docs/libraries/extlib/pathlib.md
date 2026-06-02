@@ -26,6 +26,10 @@ The pathlib library provides object-oriented filesystem path operations, similar
 | `write_text(data)` | Write string to file               |
 | `read_bytes()`     | Read file contents as bytes        |
 | `write_bytes(data)` | Write bytes to file               |
+| `copy(target)`     | Copy file or directory to target   |
+| `rename(target)`   | Rename/move file or directory      |
+| `iterdir()`        | List directory contents as Paths   |
+| `glob(pattern)`    | Match pattern, return list of Paths |
 
 ## Basic Usage
 
@@ -232,6 +236,57 @@ p.unlink()
 
 # Don't error if file doesn't exist
 p.unlink(missing_ok=True)
+```
+
+### `copy(target)`
+
+Copy this file or directory to the target path. Returns a new `Path` pointing to the target.
+
+```python
+p = pathlib.Path("/home/user/file.txt")
+new_path = p.copy("/home/user/file_backup.txt")
+print(new_path)  # "/home/user/file_backup.txt"
+
+# Copy a directory tree
+src = pathlib.Path("/home/user/project")
+src.copy("/home/user/project_backup")
+```
+
+### `rename(target)`
+
+Rename or move this file or directory to the target path. Returns a new `Path` pointing to the target.
+
+```python
+p = pathlib.Path("/home/user/old_name.txt")
+new_path = p.rename("/home/user/new_name.txt")
+print(new_path)  # "/home/user/new_name.txt"
+```
+
+### `iterdir()`
+
+Return a list of `Path` objects for the contents of this directory. The path must point to an existing directory.
+
+```python
+p = pathlib.Path("/home/user/documents")
+for child in p.iterdir():
+    if child.is_file():
+        print(f"File: {child.name}")
+    elif child.is_dir():
+        print(f"Dir: {child.name}")
+```
+
+### `glob(pattern)`
+
+Return a list of `Path` objects matching the given pattern in this directory. Supports `*`, `?`, and `**` (recursive) wildcards.
+
+```python
+p = pathlib.Path("/home/user/documents")
+
+# Find all text files
+txt_files = p.glob("*.txt")
+
+# Find all Python files recursively
+all_py = p.glob("**/*.py")
 ```
 
 ## Security

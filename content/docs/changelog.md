@@ -8,6 +8,25 @@ nav-skip: true
 
 ## June 2026
 
+{{< version "v0.9.2" >}}
+
+{{< changelog-item "added" >}}
+**Filesystem Libraries — Pathlib copy, rename, iterdir, glob:**
+
+- New `pathlib.Path.copy(target)` to copy a file or directory tree to a target path, returning a new `Path` pointing to the target
+- New `pathlib.Path.rename(target)` to rename or move a file or directory, returning a new `Path` pointing to the target
+- New `pathlib.Path.iterdir()` to list directory contents as `Path` objects
+- New `pathlib.Path.glob(pattern)` to match a shell-style wildcard pattern (`*`, `?`, `**`) within a directory and return matching `Path` objects
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**Language — Constant Folding:**
+
+- Constant expressions (arithmetic, string concatenation, comparisons on literals) are now evaluated at compile time, reducing runtime overhead
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.9.1" >}}
 
 {{< changelog-item "added" >}}
