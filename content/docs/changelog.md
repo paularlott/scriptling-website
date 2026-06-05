@@ -8,6 +8,44 @@ nav-skip: true
 
 ## June 2026
 
+{{< version "v0.9.3" >}}
+
+{{< changelog-item "added" >}}
+**AI Library — Vector Similarity:**
+
+- New `ai.cosine_similarity(a, b)` for comparing two embedding vectors; returns a score from -1.0 to 1.0
+
+**Networking Library — DNS Resolve:**
+
+- New `scriptling.net.resolve` library with `lookup_ip`, `lookup_srv`, and `resolve_srv_http` for DNS resolution
+
+**Provisioning Library — File:**
+
+- New `scriptling.provision.file` library with `ensure(path, content, mode=0o644)` for idempotent file provisioning
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**MCP Server — `tool.return_error()` messages lost:**
+
+- When a tool called `return_error()`, the error message was discarded and replaced with a generic `Tool execution failed: script execution failed: SystemExit: 1`; the actual error message from the script is now correctly returned to the MCP client
+
+**MCP Server — Tool script changes not auto-reloading:**
+
+- The file watcher only triggered a reload on `.toml` changes; editing a tool's `.py` script now also triggers an automatic reload
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**CLI — Server Logging:**
+
+- The HTTP and MCP servers now emit `trace`/`debug`-level diagnostics for incoming requests, dispatched handlers, middleware execution, MCP tool invocations, and WebSocket lifecycle events, controlled by `--log-level` / `SCRIPTLING_LOG_LEVEL` and `--log-format` / `SCRIPTLING_LOG_FORMAT`
+
+**Docs — AI Client reference split:**
+
+- The AI Client method reference (completion, streaming, embeddings, Responses API, Pipeline, etc.) has been split into its own [Client](docs/libraries/scriptling/ai/client/) page for easier navigation
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.9.2" >}}
 
 {{< changelog-item "added" >}}
