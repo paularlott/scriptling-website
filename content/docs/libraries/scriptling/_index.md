@@ -49,6 +49,7 @@ Scriptling-specific libraries that provide functionality not available in Python
 | [scriptling.net.gossip](net/gossip/) | Gossip protocol cluster membership and messaging |
 | [scriptling.net.multicast](net/multicast/) | UDP multicast group messaging |
 | [scriptling.net.unicast](net/unicast/) | UDP and TCP point-to-point messaging |
+| [scriptling.net.resolve](net/resolve/) | DNS resolution for IP, SRV, and srv+http URLs |
 | [scriptling.net.websocket](net/websocket/) | WebSocket client for connecting to WebSocket servers |
 
 ## Utilities
@@ -57,6 +58,7 @@ Scriptling-specific libraries that provide functionality not available in Python
 |---------|-------------|
 | [scriptling.console](console/) | Console input/output functions |
 | [scriptling.container](container/) | Container lifecycle management for Docker, Podman, and Apple Containers |
+| [scriptling.provision.file](provision-file/) | File and directory provisioning — create, update, and remove with correct permissions |
 | [scriptling.grep](grep/) | Fast file content search with regex or literal patterns |
 | [scriptling.sed](sed/) | In-place file content replacement with literal strings or regex patterns |
 | [scriptling.secret](secret/) | Resolve secrets through host-configured provider aliases |

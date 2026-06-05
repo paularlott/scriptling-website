@@ -18,6 +18,10 @@ nav-skip: true
 **Networking Library — DNS Resolve:**
 
 - New `scriptling.net.resolve` library with `lookup_ip`, `lookup_srv`, and `resolve_srv_http` for DNS resolution
+
+**Provisioning Library — File:**
+
+- New `scriptling.provision.file` library with `ensure(path, content, mode=0o644)` for idempotent file provisioning
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
