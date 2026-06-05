@@ -13,5 +13,6 @@ Networking libraries for distributed communication patterns using the `scriptlin
 |---------|-------------|
 | [scriptling.net.gossip](gossip/) | Gossip protocol cluster membership and messaging |
 | [scriptling.net.multicast](multicast/) | UDP multicast group messaging |
+| [scriptling.net.resolve](resolve/) | DNS resolution for IP, SRV, and srv+http URLs |
 | [scriptling.net.unicast](unicast/) | UDP and TCP point-to-point messaging |
 | [scriptling.net.websocket](websocket/) | WebSocket client for connecting to WebSocket servers |

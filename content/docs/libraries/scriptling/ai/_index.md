@@ -10,7 +10,8 @@ Libraries for interacting with AI/LLM APIs and building intelligent agents with 
 
 | Library | Description |
 |---------|-------------|
-| [scriptling.ai](ai/) | AI and LLM functions for OpenAI-compatible APIs |
+| [scriptling.ai](ai/) | AI and LLM functions and helpers |
+| [AI Client](client/) | Client class reference (completion, embedding, Responses API) |
 | [scriptling.ai.agent](agent/) | Agentic AI loop with automatic tool execution |
 | [scriptling.ai.agent.interact](interact/) | Interactive terminal interface for AI agents |
 | [scriptling.ai.memory](memory/) | Long-term memory store for AI agents |

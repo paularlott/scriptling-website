@@ -162,6 +162,47 @@ The default logger is configured with:
 
 All loggers created with `getLogger()` will inherit these settings unless specified otherwise.
 
+## Using with the `scriptling` CLI
+
+When running scripts via the `scriptling` CLI, the `logging` library is automatically wired to the CLI's own logger. The CLI exposes two flags that control both the server's internal logging and any output produced through `logging.*` / `logger.*` calls in your scripts:
+
+| Flag            | Environment Variable     | Config Path   | Values                          | Default  |
+| --------------- | ------------------------ | ------------- | ------------------------------- | -------- |
+| `--log-level`   | `SCRIPTLING_LOG_LEVEL`   | `log.level`   | `trace`, `debug`, `info`, `warn`, `error` | `info`   |
+| `--log-format`  | `SCRIPTLING_LOG_FORMAT`  | `log.format`  | `console` (coloured), `json`    | `console`|
+
+These flags apply to every execution mode (script file, `--code`, `--interactive`, `--server`, `--mcp-tools`, `--mcp-exec-script`, `--lint`).
+
+### Examples
+
+```bash
+# Show debug output while running a script
+scriptling --log-level debug app.py
+
+# JSON-formatted logs for ingestion into a log aggregator
+scriptling --log-level info --log-format json --server :8000 app.py
+
+# Enable verbose MCP / HTTP server diagnostics
+scriptling --log-level debug --server :8000 --mcp-tools ./tools --mcp-exec-script app.py
+
+# Via environment variables (useful for .env files or container deployments)
+SCRIPTLING_LOG_LEVEL=debug SCRIPTLING_LOG_FORMAT=json scriptling --server :8000 app.py
+```
+
+When `--log-level debug` is set, the HTTP and MCP servers emit additional diagnostics such as incoming requests, dispatched handlers, MCP tool invocations, and WebSocket lifecycle events — useful for troubleshooting routing, tool loading, and handler behaviour.
+
+### Configuration file
+
+The same options can be set in `scriptling.toml`:
+
+```toml
+[log]
+level = "debug"
+format = "json"
+```
+
+Priority order (highest to lowest): **command-line flag** > **environment variable** > **config file** > **default**.
+
 ## Differences from Python's logging module
 
 This is a simplified implementation focused on basic logging functionality:
