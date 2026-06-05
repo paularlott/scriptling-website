@@ -350,4 +350,4 @@ curl -X POST http://127.0.0.1:8000/mcp \
 
 - [MCP Tool Library](../mcp-tool/) - Full API reference for the tool library
 - [MCP Library](../mcp/) - MCP server library reference
-- [MCP Server Mode](../../../cli/mcp-server/) - Running Scriptling as an MCP server
+- [MCP Server Mode](../../../../cli/mcp-server/) - Running Scriptling as an MCP server

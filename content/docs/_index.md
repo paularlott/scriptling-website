@@ -31,7 +31,7 @@ Scriptling is a dynamically-typed, interpreted language with Python-inspired syn
 - **Python-like syntax** with indentation-based blocks
 - **Sandboxed execution** with configurable security
 - **Go integration** with direct type mapping
-- **Rich library ecosystem** with 25+ built-in libraries
+- **Rich library ecosystem** with 60+ built-in libraries
 - **AI/LLM ready** with MCP protocol support
 
 ### Differences from Python

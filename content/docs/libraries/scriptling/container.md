@@ -16,7 +16,7 @@ container.Register(p)
 
 ## Endpoint Configuration
 
-Docker and Podman endpoints are configured via the `--docker-host` / `--podman-host` CLI flags or the `DOCKER_HOST` / `CONTAINER_HOST` environment variables. See [CLI Basic Usage](../../../cli/basic-usage/#container-endpoints) for details.
+Docker and Podman endpoints are configured via the `--docker-host` / `--podman-host` CLI flags or the `DOCKER_HOST` / `CONTAINER_HOST` environment variables. See [CLI Basic Usage](../../cli/basic-usage/#container-endpoints) for details.
 
 ## Module Functions
 

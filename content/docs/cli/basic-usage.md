@@ -371,4 +371,4 @@ print(f"Path: {env['PATH']}")
 
 - [HTTP Server Mode](../http-server/) - Running Scriptling as an HTTP server
 - [MCP Server Mode](../mcp-server/) - Model Context Protocol integration
-- [Writing MCP Tools](../../../libraries/scriptling/writing-mcp-tools/) - Creating custom MCP tools
+- [Writing MCP Tools](../../libraries/scriptling/mcp/writing-mcp-tools/) - Creating custom MCP tools

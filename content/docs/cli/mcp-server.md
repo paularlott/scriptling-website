@@ -165,7 +165,7 @@ Custom tools are loaded from the directory specified by `--mcp-tools`. Each tool
 scriptling --server :8000 --mcp-tools ./tools setup.py
 ```
 
-For details on creating custom tools, see [Writing MCP Tools](../../../libraries/scriptling/writing-mcp-tools/).
+For details on creating custom tools, see [Writing MCP Tools](../../libraries/scriptling/mcp/writing-mcp-tools/).
 
 ## MCP Endpoints
 
@@ -286,6 +286,6 @@ This configuration:
 
 - [Basic Usage](../basic-usage/) - Installation and command line options
 - [HTTP Server Mode](../http-server/) - HTTP server without MCP
-- [Writing MCP Tools](../../../libraries/scriptling/writing-mcp-tools/) - Creating custom MCP tools
+- [Writing MCP Tools](../../libraries/scriptling/mcp/writing-mcp-tools/) - Creating custom MCP tools
 - [MCP Library](../../libraries/scriptling/mcp/) - MCP library reference
 - [MCP Tool Library](../../libraries/scriptling/mcp-tool/) - Tool implementation API

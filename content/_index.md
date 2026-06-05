@@ -72,7 +72,7 @@ description: A minimal, sandboxed Python-like scripting language for Go applicat
     is4=true
   >}}
   ## Rich Library Ecosystem
-  25+ built-in libraries including JSON, regex, math, HTTP requests, subprocess, YAML, and specialized libraries for AI, MCP, and concurrent execution.
+  60+ built-in libraries including JSON, regex, math, HTTP requests, subprocess, YAML, and specialized libraries for AI, MCP, and concurrent execution.
   {{< /feature-row >}}
 
   {{< feature-row

@@ -437,6 +437,69 @@ window.addEventListener('beforeunload', () => {
   }
 });
 
+class TableOfContents {
+  constructor() {
+    this.tocContainer = document.getElementById('toc-nav');
+    if (!this.tocContainer) return;
+
+    this.tocLinks = Array.from(this.tocContainer.querySelectorAll('.toc-link'));
+    if (this.tocLinks.length === 0) return;
+
+    this.headings = [];
+    this.tocLinks.forEach((link) => {
+      const id = link.getAttribute('href').slice(1);
+      const element = document.getElementById(id);
+      if (element) {
+        this.headings.push({ link, element });
+      }
+    });
+
+    if (this.headings.length === 0) return;
+
+    this.activeClasses = ['font-medium', 'text-gray-900', 'dark:text-gray-100', 'border-teal-500'];
+    this.inactiveClasses = ['text-gray-600', 'dark:text-gray-400', 'border-transparent'];
+
+    this.ticking = false;
+    window.addEventListener('scroll', () => this.onScroll(), { passive: true });
+    window.addEventListener('resize', () => this.onScroll(), { passive: true });
+    this.updateActive();
+  }
+
+  onScroll() {
+    if (!this.ticking) {
+      requestAnimationFrame(() => {
+        this.updateActive();
+        this.ticking = false;
+      });
+      this.ticking = true;
+    }
+  }
+
+  updateActive() {
+    const offset = 120;
+    let activeIdx = 0;
+
+    for (let i = 0; i < this.headings.length; i++) {
+      if (this.headings[i].element.getBoundingClientRect().top <= offset) {
+        activeIdx = i;
+      } else {
+        break;
+      }
+    }
+
+    this.headings.forEach(({ link }, idx) => {
+      const isActive = idx === activeIdx;
+      if (isActive) {
+        link.classList.add(...this.activeClasses);
+        link.classList.remove(...this.inactiveClasses);
+      } else {
+        link.classList.remove(...this.activeClasses);
+        link.classList.add(...this.inactiveClasses);
+      }
+    });
+  }
+}
+
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   new SiteSearch();
@@ -446,6 +509,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Make sure the active menu item is visible
   scrollToActiveItem();
+
+  // Right-side in-page TOC scroll-spy
+  new TableOfContents();
 
   // Start the mesh animation
   initHeroMesh();
