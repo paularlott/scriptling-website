@@ -34,18 +34,6 @@ The `kv` sub-library exposes a **default** system store and the ability to open 
 | --------- | ---------------------------------- |
 | `default` | The system-wide default KV store   |
 
-## Setup
-
-```go
-import "github.com/paularlott/scriptling/extlibs"
-
-// Register the KV sub-library (call after InitKVStore)
-extlibs.RegisterRuntimeKVLibrary(p)
-
-// Or register all runtime sub-libraries at once
-extlibs.RegisterRuntimeLibraryAll(p, nil)
-```
-
 ## Store Methods
 
 ### set(key, value, ttl=0)

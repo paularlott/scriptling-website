@@ -8,7 +8,7 @@ MCP tool helper library for authoring MCP tools in scriptling. This sub-library 
 
 For the MCP client library (connecting to MCP servers), see the [MCP Library](../mcp/) documentation.
 
-## Registration
+## Enabling
 
 The tool helpers are a separate, optional sub-library. Register it explicitly when needed:
 

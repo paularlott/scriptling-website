@@ -1,7 +1,7 @@
 ---
 title: Script Extensions
 description: Extend Scriptling using Scriptling code itself.
-weight: 4
+weight: 11
 ---
 
 In addition to registering Go functions and libraries, you can also register functions and libraries written in Scriptling itself.

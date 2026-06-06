@@ -2,6 +2,7 @@
 title: CLI Reference
 description: Command-line interface for Scriptling.
 weight: 2
+stream: cli
 ---
 
 Scriptling includes a command-line interface for running scripts, interactive mode, and HTTP/MCP servers.

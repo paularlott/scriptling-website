@@ -1,7 +1,7 @@
 ---
 title: Library Loader Chain
 description: Flexible library loading from multiple sources.
-weight: 5
+weight: 12
 ---
 
 The `libloader` package provides a flexible, chainable library loading system. Load libraries from the filesystem, APIs, or custom sources with Python-style folder organization.
@@ -226,5 +226,5 @@ import knot.groups   # Uses loader chain
 ## See Also
 
 - [Script Libraries](scripts/) - Write libraries in Scriptling
-- [Native Libraries](native/libraries/) - Create Go libraries
+- [Native Libraries](native-libraries/) - Create Go libraries
 - [CLI Library Loading](../cli/#library-loading) - Automatic script-dir loading and `--libpath`

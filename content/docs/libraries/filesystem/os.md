@@ -1,0 +1,475 @@
+---
+title: os
+weight: 1
+
+aliases:
+  - /docs/libraries/extlib/os/
+  - /docs/libraries/os/
+requires_registration: true
+---
+
+The `os` library provides operating system interfaces for file system operations and environment variables. This is an **extended library** that must be explicitly registered.
+
+> **Note:** This library requires security configuration. When using the Go API, you can specify allowed paths to restrict file system access for security.
+
+## Import
+
+```python
+import os
+```
+
+## Available Functions
+
+| Function                     | Description                                  |
+| ---------------------------- | -------------------------------------------- |
+| `getenv(key[, default])`     | Get an environment variable                  |
+| `environ`                    | Dictionary of all environment variables      |
+| `getcwd()`                   | Get the current working directory            |
+| `listdir(path=".")`          | List directory contents                      |
+| `read_file(path)`            | Read entire file contents as string          |
+| `write_file(path, content[, mode])` | Write content to a file (creates/overwrites) |
+| `append_file(path, content)` | Append content to a file                     |
+| `remove(path)`               | Remove a file                                |
+| `chmod(path, mode)`          | Change file or directory permissions         |
+| `mkdir(path[, mode])`        | Create a directory                           |
+| `makedirs(path[, mode], exist_ok=False)` | Create directories recursively |
+| `rmdir(path)`                | Remove an empty directory                    |
+| `removedirs(name)`           | Remove empty directory and empty parents     |
+| `rename(old, new)`           | Rename a file or directory                   |
+
+## Security
+
+The `os` library supports filesystem security restrictions. When registering the library, you can specify allowed paths:
+
+```go
+// Restrict to specific directories (recommended for untrusted scripts)
+extlibs.RegisterOSLibrary(p, []string{"/tmp/sandbox", "/home/user/data"})
+
+// No restrictions - full filesystem access (dangerous for untrusted code)
+extlibs.RegisterOSLibrary(p, nil)
+```
+
+All file operations in the `os` library are restricted to the allowed directories. Path traversal attacks (`../../../etc/passwd`) and symlink attacks are prevented.
+
+## Special Variables
+
+### `__file__`
+
+When a script is run from a file (via `EvalFile`, `SetSourceFile`, or the CLI), `__file__` is set to the absolute path of the script file. This allows scripts to locate resources relative to themselves, just like Python.
+
+```python
+import os.path
+
+# Get the directory containing this script
+script_dir = os.path.dirname(__file__)
+
+# Load a data file next to the script
+data_file = os.path.join(script_dir, "data.json")
+content = os.read_file(data_file)
+```
+
+> **Note:** `__file__` is only set when running from a file. It is not available in `Eval()` calls without a source file set.
+
+## Constants
+
+### `os.sep`
+
+The path separator used by the operating system.
+
+```python
+import os
+print(os.sep)  # "/" on Unix, "\" on Windows
+```
+
+### `os.linesep`
+
+The line separator used by the operating system.
+
+```python
+import os
+print(os.linesep)  # "\n" on Unix, "\r\n" on Windows
+```
+
+### `os.name`
+
+The operating system name (Python-compatible).
+
+```python
+import os
+print(os.name)  # "posix" on Unix/Linux/macOS, "nt" on Windows
+```
+
+### `os.platform`
+
+The specific platform identifier.
+
+```python
+import os
+print(os.platform)  # "darwin" on macOS, "linux" on Linux, "windows" on Windows
+```
+
+## Functions
+
+### os.getenv(key[, default])
+
+Get an environment variable.
+
+**Parameters:**
+
+- `key` (string): Name of the environment variable
+- `default` (optional): Value to return if the variable is not set
+
+**Returns:** String value of the environment variable, `None` if not set and no default given, or `default` if provided
+
+```python
+import os
+
+# Get environment variable - returns None if not set
+home = os.getenv("HOME")
+if home:
+    print(home)
+
+# With default value
+path = os.getenv("MY_PATH", "/default/path")
+print(path)
+
+# Common pattern: use default when variable may not be set
+base_dir = os.getenv("APP_DIR")
+if not base_dir:
+    base_dir = "/tmp"
+```
+
+### os.environ
+
+Dictionary of all environment variables. Supports both direct access and the `.get()` method.
+
+**Returns:** Dictionary of all environment variables
+
+```python
+import os
+
+# Access as dictionary
+print(os.environ["PATH"])
+print(os.environ["HOME"])
+
+# Use .get() method with default (Python-compatible)
+token = os.environ.get("API_TOKEN", "default_token")
+user = os.environ.get("USER")
+
+# Iterate over all variables
+for key, value in os.environ.items():
+    print(f"{key} = {value}")
+```
+
+### os.getcwd()
+
+Get the current working directory.
+
+**Returns:** String path to the current working directory
+
+```python
+import os
+
+cwd = os.getcwd()
+print(cwd)  # e.g., "/home/user/projects"
+```
+
+### os.listdir(path=".")
+
+List directory contents.
+
+**Parameters:**
+
+- `path` (string, optional): Directory path to list (default: current directory)
+
+**Returns:** List of entry names in the directory
+
+```python
+import os
+
+# List current directory
+entries = os.listdir()
+print(entries)  # ["file1.txt", "file2.py", "subdir"]
+
+# List specific directory
+entries = os.listdir("/tmp")
+```
+
+### os.read_file(path)
+
+Read entire file contents as a string.
+
+**Parameters:**
+
+- `path` (string): Path to the file
+
+**Returns:** String containing the file contents
+
+```python
+import os
+
+content = os.read_file("/tmp/data.txt")
+print(content)
+```
+
+### os.write_file(path, content[, mode])
+
+Write content to a file (creates or overwrites).
+
+**Parameters:**
+
+- `path` (string): Path to the file
+- `content` (string): Content to write
+- `mode` (integer, optional): Permission bits used when creating a new file. Defaults to `0o644`.
+
+```python
+import os
+
+os.write_file("/tmp/output.txt", "Hello, World!", mode=0o600)
+```
+
+### os.append_file(path, content)
+
+Append content to a file.
+
+**Parameters:**
+
+- `path` (string): Path to the file
+- `content` (string): Content to append
+
+```python
+import os
+
+os.append_file("/tmp/log.txt", "New log entry\n")
+```
+
+### os.remove(path)
+
+Remove a file.
+
+**Parameters:**
+
+- `path` (string): Path to the file to remove
+
+```python
+import os
+
+os.remove("/tmp/old_file.txt")
+```
+
+### os.chmod(path, mode)
+
+Change the permissions of a file or directory.
+
+**Parameters:**
+
+- `path` (string): Path to the file or directory
+- `mode` (integer): Permission bits, such as `0o600`, `0o644`, or `0o755`
+
+```python
+import os
+
+os.chmod("/tmp/script.sh", 0o755)
+```
+
+### os.mkdir(path[, mode])
+
+Create a directory.
+
+**Parameters:**
+
+- `path` (string): Path to the directory to create
+- `mode` (integer, optional): Permission bits. Defaults to `0o777` and is still subject to the process umask.
+
+```python
+import os
+
+os.mkdir("/tmp/newdir", 0o700)
+```
+
+### os.makedirs(path[, mode], exist_ok=False)
+
+Create directories recursively (creates all parent directories as needed).
+
+**Parameters:**
+
+- `path` (string): Path to the directory to create
+- `mode` (integer, optional): Permission bits for created directories. Defaults to `0o777` and is still subject to the process umask.
+- `exist_ok` (boolean, optional): If `True`, do not error when the target directory already exists.
+
+```python
+import os
+
+os.makedirs("/tmp/a/b/c", mode=0o755, exist_ok=True)
+```
+
+### os.rmdir(path)
+
+Remove an empty directory.
+
+**Parameters:**
+
+- `path` (string): Path to the directory to remove
+
+```python
+import os
+
+os.rmdir("/tmp/emptydir")
+```
+
+### os.removedirs(name)
+
+Remove an empty directory, then remove empty parent directories until a parent cannot be removed.
+
+**Parameters:**
+
+- `name` (string): Path to the leaf directory to remove
+
+```python
+import os
+
+os.removedirs("/tmp/a/b/c")
+```
+
+### os.rename(old, new)
+
+Rename a file or directory.
+
+**Parameters:**
+
+- `old` (string): Current path
+- `new` (string): New path
+
+```python
+import os
+
+os.rename("/tmp/old.txt", "/tmp/new.txt")
+```
+
+## Examples
+
+### Reading and Writing Files
+
+```python
+import os
+
+# Write to a file
+os.write_file("/tmp/data.txt", "Hello, World!")
+
+# Read it back
+content = os.read_file("/tmp/data.txt")
+print(content)  # "Hello, World!"
+
+# Append to it
+os.append_file("/tmp/data.txt", "\nMore content")
+
+# Clean up
+os.remove("/tmp/data.txt")
+```
+
+### Working with Directories
+
+```python
+import os
+
+# Create nested directories
+os.makedirs("/tmp/myproject/src", mode=0o755)
+os.makedirs("/tmp/myproject/build", mode=0o755)
+
+# Adjust permissions after creation
+os.chmod("/tmp/myproject/src", 0o700)
+
+# List contents
+items = os.listdir("/tmp/myproject")
+print(items)  # ["src", "build"]
+
+# Clean up
+os.remove("/tmp/myproject/src")
+os.remove("/tmp/myproject/build")
+os.rmdir("/tmp/myproject")
+```
+
+### Environment Variables
+
+```python
+import os
+
+# Get specific environment variable with os.getenv()
+home = os.getenv("HOME", "/default/home")
+print(f"Home directory: {home}")
+
+# Use os.environ.get() (Python-compatible)
+api_key = os.environ.get("API_KEY", "default_key")
+print(f"API Key: {api_key}")
+
+# Direct access to os.environ
+path = os.environ["PATH"]
+print(f"PATH: {path}")
+
+# Iterate over all environment variables
+for key, value in os.environ.items():
+    print(f"{key} = {value}")
+```
+
+### Working with Different Path Separators
+
+```python
+import os
+
+print(f"Path separator: {os.sep}")
+print(f"Line separator: {repr(os.linesep)}")
+print(f"OS name: {os.name}")
+print(f"Platform: {os.platform}")
+
+# Build paths correctly (though pathlib is preferred)
+if os.name == "nt":
+    path = "C:\\Users\\Documents"
+else:
+    path = "/home/user/documents"
+
+# Or check specific platform
+if os.platform == "darwin":
+    print("Running on macOS")
+elif os.platform == "linux":
+    print("Running on Linux")
+elif os.platform == "windows":
+    print("Running on Windows")
+```
+
+## Python Compatibility
+
+This library implements a subset of Python's `os` module:
+
+| Function    | Supported                |
+| ----------- | ------------------------ |
+| getenv      | ✅ (returns `None` when unset, matching Python) |
+| environ     | ✅                       |
+| getcwd      | ✅                       |
+| listdir     | ✅                       |
+| chmod       | ✅                       |
+| mkdir       | ✅ (`mode` supported)    |
+| makedirs    | ✅ (`mode` and `exist_ok` supported) |
+| rmdir       | ✅                       |
+| removedirs  | ✅                       |
+| remove      | ✅                       |
+| rename      | ✅                       |
+| read_file   | ✅ (Scriptling-specific) |
+| write_file  | ✅ (Scriptling-specific) |
+| append_file | ✅ (Scriptling-specific) |
+| stat        | ❌                       |
+| walk        | ❌                       |
+| utime       | ❌                       |
+
+## Differences from Python
+
+- `os.getenv()` returns `None` when the variable is not set and no default is given (matches Python)
+- File operations use `read_file()`, `write_file()`, and `append_file()` instead of `open()`
+- No file object handles - operations are direct functions
+- All file operations are subject to security restrictions when configured
+- No `os.path` module - use `import os.path` for path operations
+- `__file__` is set automatically when running from a file, enabling `os.path.dirname(__file__)` to work as in Python
+
+## See Also
+
+- [os.path](./os.path.md) - Path manipulation functions
+- [pathlib](./pathlib.md) - Object-oriented filesystem paths

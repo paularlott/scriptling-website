@@ -8,10 +8,33 @@ Welcome to the Scriptling documentation. Scriptling is a minimal, sandboxed inte
 
 ## Getting Started
 
-- [Quick Start](quick-start/) - Get up and running quickly
-- [Language Guide](language/) - Complete language reference
-- [Libraries](libraries/) - Available libraries and APIs
-- [Security Guide](security/) - Security best practices for embedding Scriptling
+- [Getting Started](quick-start/)
+
+## CLI Reference
+
+- [CLI Reference](cli/)
+
+## Go Integration
+
+- [Go Integration](go-integration/)
+
+## Language Guide
+
+- [Language Guide](language/)
+
+## Libraries
+
+- [Libraries](libraries/)
+
+## Security Guide
+
+- [Security Guide](security/)
+
+## Tutorials
+
+- [Fetching API Data](tutorials/api-data-fetching/) - CLI script for HTTP + JSON processing
+- [Embedding a Rules Engine](tutorials/embedding-rules-engine/) - Go integration with custom functions
+- [Building an MCP Tool Server](tutorials/mcp-tool-server/) - Custom tools for AI assistants
 
 ## Core Concepts
 
@@ -51,3 +74,4 @@ While Scriptling is inspired by Python, it has some key differences:
 - **REST API Automation** - Built-in HTTP client with JSON handling
 - **Sandboxed Execution** - Run untrusted code with security controls
 - **MCP Servers** - Build Model Context Protocol servers for LLM tools
+

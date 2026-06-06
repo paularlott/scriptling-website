@@ -314,5 +314,5 @@ response = requests.post("https://api.example.com/users", body, options)
 ## See Also
 
 - [Error Handling](./error-handling/) - Try/except patterns
-- [Requests Library](../libraries/extlib/requests/) - Full requests documentation
-- [JSON Library](../libraries/stdlib/json/) - Full JSON documentation
+- [Requests Library](../libraries/http-process/requests/) - Full requests documentation
+- [JSON Library](../libraries/data-formats/json/) - Full JSON documentation

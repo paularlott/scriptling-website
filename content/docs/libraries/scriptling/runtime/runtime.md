@@ -12,23 +12,6 @@ Background tasks and concurrency for scripts and HTTP servers.
 | ------------------------------------------ | ------------------------------------------------ |
 | `background(name, handler, *args, **kwargs)` | Start a background task, returns a Promise |
 
-## Setup
-
-```go
-import "github.com/paularlott/scriptling/extlibs"
-
-// Register only the core runtime library (background function)
-extlibs.RegisterRuntimeLibrary(p)
-
-// Optionally register sub-libraries individually
-extlibs.RegisterRuntimeHTTPLibrary(p)   // HTTP routes and responses
-extlibs.RegisterRuntimeKVLibrary(p)     // Key-value store
-extlibs.RegisterRuntimeSyncLibrary(p)   // Concurrency primitives
-
-// Or register everything at once (core + all sub-libraries)
-extlibs.RegisterRuntimeLibraryAll(p)
-```
-
 ## Functions
 
 ### scriptling.runtime.background(name, handler, *args, **kwargs)

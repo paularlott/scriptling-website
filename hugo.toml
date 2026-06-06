@@ -21,6 +21,9 @@ title = 'Scriptling'
     [[params.navigation.header]]
       name = 'Changelog'
       url = '/docs/changelog/'
+    [[params.navigation.static]]
+      name = 'LLM Script Generation Guide'
+      url = '/docs/llm-guide/'
 
 [build]
   [build.buildStats]

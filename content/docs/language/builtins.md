@@ -572,4 +572,4 @@ copy(42)          # 42
 
 - [Data Types](./types/) - Available data types
 - [Slicing](./slicing/) - Indexing and slicing operations
-- [String Library](../libraries/stdlib/string/) - String constants
+- [String Library](../libraries/text-processing/string/) - String constants

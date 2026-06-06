@@ -1,7 +1,8 @@
 ---
 title: Go Integration
-description: Embedding and using Scriptling from Go applications.
-weight: 4
+description: Embed Scriptling in your Go application.
+weight: 3
+stream: embedding
 ---
 
 Complete guide for embedding Scriptling in Go applications.
@@ -42,7 +43,14 @@ func main() {
 
 - [Basics](basics/) - Creating interpreters, variable exchange, calling functions
 - [Native API](native/) - Direct control with maximum performance
+- [Native Functions](native-functions/) - Register individual Go functions
+- [Native Classes](native-classes/) - Create custom classes with full control
+- [Native Libraries](native-libraries/) - Create libraries with functions and constants
 - [Builder API](builder/) - Type-safe, cleaner syntax
+- [Builder Functions](builder-functions/) - Type-safe function builder
+- [Builder Libraries](builder-libraries/) - Type-safe library builder
+- [Builder Classes](builder-classes/) - Type-safe class builder
+- [Builder Instantiation](builder-instantiation/) - Library templates with per-instance config
 - [Script Extensions](scripts/) - Extend using Scriptling code
 - [Library Loader Chain](loader-chain/) - Flexible library loading from multiple sources
 - [Documenting Extensions](documentation/) - Add help text to functions and libraries

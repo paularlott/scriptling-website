@@ -22,18 +22,6 @@ Long-term memory store for AI agents. Backed by a KV store, memories persist acr
 | `count()` | Total number of memories |
 | `compact()` | Run full compaction (prune + LLM deduplication if AI client configured); returns dict with `removed` and `remaining` counts |
 
-## Go Registration
-
-```go
-import (
-    "github.com/paularlott/scriptling/extlibs"
-    aimemory "github.com/paularlott/scriptling/extlibs/ai/memory"
-)
-
-extlibs.RegisterRuntimeKVLibrary(p)
-aimemory.Register(p)
-```
-
 ## memory.new(kv_store, ai_client=None, model="")
 
 Creates a memory store backed by the given KV store.

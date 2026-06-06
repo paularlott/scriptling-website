@@ -1,7 +1,6 @@
 ---
 title: Language Guide
-description: Complete reference for the Scriptling programming language.
-weight: 3
+weight: 4
 ---
 
 Scriptling is a dynamically-typed, interpreted language with Python-inspired syntax designed for embedding in Go applications.
@@ -208,6 +207,8 @@ response = requests.post("https://api.example.com/users", body)
 
 ## See Also
 
+- [Quick Start](../quick-start/) - Get started with CLI or embedding
+- [Go Integration](../go-integration/) - Embedding Scriptling in Go
 - [CLI Reference](../cli/) - Command-line interface documentation
 - [Libraries](../libraries/) - Standard and extended library reference
 - [Security Guide](../security/) - Security best practices

@@ -1,6 +1,6 @@
 ---
-title: AI & LLM
-description: AI and LLM integration libraries for building intelligent agents.
+title: AI
+description: AI integration libraries for building intelligent agents.
 weight: 1
 ---
 

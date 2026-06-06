@@ -23,15 +23,6 @@ HTTP server route registration and response helpers.
 | `text(status_code, content)`       | Create text response                |
 | `redirect(location, status=302)`   | Create redirect response            |
 
-## Setup
-
-```go
-import "github.com/paularlott/scriptling/extlibs"
-
-// Register the HTTP sub-library
-extlibs.RegisterRuntimeHTTPLibrary(p)
-```
-
 ## Route Registration
 
 ### scriptling.runtime.http.get(path, handler)

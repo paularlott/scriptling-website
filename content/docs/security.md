@@ -337,4 +337,4 @@ If you discover a security vulnerability in Scriptling, please report it respons
 
 - [Go Integration Basics](../go-integration/basics/) - Setting up Scriptling in Go
 - [Sandbox Library](../libraries/scriptling/runtime/sandbox/) - Runtime sandbox configuration
-- [Extended Libraries](../libraries/extlib/) - Libraries requiring explicit registration
+- [Library Registration](../go-integration/library-registration/) - How to register libraries in Go

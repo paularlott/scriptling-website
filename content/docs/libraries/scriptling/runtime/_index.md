@@ -1,7 +1,7 @@
 ---
 title: Runtime
 description: Runtime utilities for background tasks, HTTP servers, key-value storage, and concurrency.
-weight: 2
+weight: 6
 ---
 
 Libraries for runtime functionality including background task execution, HTTP server integration, key-value storage, and concurrency primitives.

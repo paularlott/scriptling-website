@@ -11,10 +11,10 @@ description: A minimal, sandboxed Python-like scripting language for Go applicat
 {{< hero
   title="Simple. Sandboxed. Powerful."
   subtitle="Scriptling is a minimal, sandboxed interpreter with Python-inspired syntax designed for embedding in Go applications. Perfect for LLM agents to execute code and interact with REST APIs, with built-in AI integration and MCP protocol support."
-  btn1="Get Started"
-  btn1Link="docs/quick-start/"
-  btn2="View Docs"
-  btn2Link="docs"
+  btn1="Get Started with CLI"
+  btn1Link="docs/quick-start/cli/"
+  btn2="Get Started with Embedding"
+  btn2Link="docs/quick-start/embedding/"
   img="/images/mascot.png"
   alt="Scriptling Mascot"
 >}}

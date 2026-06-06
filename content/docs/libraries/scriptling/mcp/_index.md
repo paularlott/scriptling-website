@@ -1,7 +1,7 @@
 ---
 title: MCP Protocol
 description: MCP (Model Context Protocol) client and tool authoring libraries.
-weight: 4
+weight: 2
 ---
 
 Libraries for connecting to MCP servers and authoring MCP tools that can be used by AI agents.

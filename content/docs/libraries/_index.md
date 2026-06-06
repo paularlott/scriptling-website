@@ -4,61 +4,92 @@ description: Available libraries and APIs in Scriptling.
 weight: 5
 ---
 
-Scriptling provides a rich set of libraries organized into three categories.
+## [Quick Reference: Library Cheat Sheet](/docs/libraries/cheat-sheet/)
+
+Scriptling provides 60+ libraries organized by capability.
 
 ## Core Functions
 
 Always available without importing:
 
-### I/O
-- `print(value)` - Output to console
+| Function | Description |
+|----------|-------------|
+| `print(value)` | Output to console |
+| `str(value)` | Convert to string |
+| `int(value)` | Convert to integer |
+| `float(value)` | Convert to float |
+| `bool(value)` | Convert to boolean |
+| `list(value)` | Convert to list |
+| `dict(value)` | Convert to dictionary |
+| `type(object)` | Get type of object |
+| `isinstance(object, type)` | Check if object is instance of type |
+| `help([object])` | Display help information |
 
-### Type Conversions
-- `str(value)` - Convert to string
-- `int(value)` - Convert to integer
-- `float(value)` - Convert to float
-- `bool(value)` - Convert to boolean
-- `list(value)` - Convert to list
-- `dict(value)` - Convert to dictionary
+## Built-in Libraries
 
-### System
-- `import library_name` - Load library dynamically
-- `help([object])` - Display help information
-- `type(object)` - Get type of object
-- `isinstance(object, type)` - Check if object is instance of type
+Available for import without registration:
 
-## Library Categories
+- [Data Formats](data-formats/) — JSON, YAML, TOML
+- [Text Processing](text-processing/) — Regex, strings, HTML, diffing
+- [Math & Numbers](math-numbers/) — Math, random, statistics, hashing, UUID
+- [Collections & Iteration](collections-iteration/) — Collections, itertools, functools
+- [Time & System](time-system/) — Time, datetime, I/O, platform, URL handling
 
-### [Standard Libraries](stdlib/)
+## Extended Libraries
 
-Built-in libraries available for import without any registration. These include common utilities like JSON, math, regex, and time handling.
+Require [registration](../go-integration/library-registration/) when embedding in Go. In the CLI they are available by default.
 
-### [Scriptling Libraries](scriptling/)
+- [File System](filesystem/) — OS, paths, binary I/O, glob
+- [HTTP & Process](http-process/) — HTTP requests, subprocesses, system, logging, secrets
 
-Scriptling-specific libraries for AI/LLM integration, MCP protocol support, HTTP server functionality, and concurrency.
+## Scriptling Libraries
 
-### [Extended Libraries](extlib/)
+Scripting-specific libraries that provide functionality not available in Python's standard library. They use the `scriptling.` namespace prefix.
 
-Python-compatible libraries requiring explicit registration by the host application. These include HTTP requests, filesystem access, and subprocess management.
+### AI
+- [AI](scriptling/ai/ai/) — AI and LLM functions for OpenAI-compatible APIs
+- [Agent](scriptling/ai/agent/) — Agentic AI loop with automatic tool execution
+- [Agent Interaction](scriptling/ai/interact/) — Interactive terminal interface for AI agents
+- [Memory](scriptling/ai/memory/) — Long-term memory store for AI agents
 
-## Quick Reference
+### MCP
+- [MCP Client](scriptling/mcp/client/) — MCP (Model Context Protocol) client for connecting to MCP servers
+- [MCP Tools](scriptling/mcp/tool/) | Helper library for authoring MCP tools
+- [Writing MCP Tools](scriptling/mcp/writing-mcp-tools/) | Guide for creating MCP tools
 
-```python
-# Import and use libraries
-import json
-import math
-import requests
+### Messaging
+- [Telegram](scriptling/messaging/telegram/) — Telegram Bot API client
+- [Discord](scriptling/messaging/discord/) — Discord Bot API client
+- [Slack](scriptling/messaging/slack/) — Slack Bot API client
+- [Console](scriptling/messaging/console/) — Console-based messaging client
 
-# JSON
-data = json.loads('{"key": "value"}')
-text = json.dumps(data)
+### Networking
+- [Gossip](scriptling/networking/gossip/) — Gossip protocol cluster membership and messaging
+- [Multicast](scriptling/networking/multicast/) — UDP multicast group messaging
+- [Unicast](scriptling/networking/unicast/) — UDP and TCP point-to-point messaging
+- [Resolve](scriptling/networking/resolve/) — DNS resolution for IP, SRV, and srv+http URLs
+- [Websocket](scriptling/networking/websocket/) — WebSocket client for connecting to WebSocket servers
 
-# Math
-result = math.sqrt(16)  # 4.0
+### Provisioning
+- [Provisioning](scriptling/provisioning/provision-file/) — File and directory provisioning
 
-# HTTP (requires registration)
-response = requests.get("https://api.example.com")
-```
+### Runtime
+- [Runtime](scriptling/runtime/runtime/) — Background tasks and async execution
+- [HTTP](scriptling/runtime/http/) — HTTP route registration and response helpers
+- [KV](scriptling/runtime/kv/) — Thread-safe key-value store
+- [Sync](scriptling/runtime/sync/) — Named cross-environment concurrency primitives
+- [Sandbox](scriptling/runtime/sandbox/) — Isolated script execution environments
+
+### Utilities
+- [Console](scriptling/utilities/console/) — Console input/output functions
+- [Container](scriptling/utilities/container/) — Container lifecycle management
+- [Grep](scriptling/utilities/grep/) — Fast file content search
+- [Sed](scriptling/utilities/sed/) — In-place file content replacement
+- [Secrets](scriptling/utilities/secret/) — Resolve secrets through host-configured provider aliases
+- [Wait For](scriptling/utilities/wait_for/) — Wait for resources to become available
+- [Toon](scriptling/utilities/toon/) — TOON encoding/decoding
+- [Similarity](scriptling/utilities/similarity/) — Text similarity utilities
+- [Templates](scriptling/utilities/template/) — Go-powered template rendering
 
 ## Getting Help
 
@@ -68,3 +99,4 @@ Use the `help()` function within scripts:
 import json
 help(json)
 ```
+

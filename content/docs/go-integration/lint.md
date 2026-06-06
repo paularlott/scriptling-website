@@ -1,7 +1,7 @@
 ---
 title: Linting
 description: Code analysis for detecting syntax errors without execution.
-weight: 6
+weight: 15
 ---
 
 The `lint` package provides code analysis functionality for Scriptling scripts. It can detect syntax errors and potential issues without executing the code, making it safe for untrusted input.

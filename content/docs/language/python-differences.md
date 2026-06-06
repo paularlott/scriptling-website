@@ -21,7 +21,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Nested classes | Classes cannot be defined inside other classes/functions |
 | Metaclasses | Custom metaclasses are not supported |
 | Descriptors | The descriptor protocol is not implemented |
-| Regex backreferences (`\1`, `\2`) | RE2 engine used; no backreferences, lookaheads, or lookbehinds — see [regex docs](../libraries/stdlib/regex/) |
+| Regex backreferences (`\1`, `\2`) | RE2 engine used; no backreferences, lookaheads, or lookbehinds — see [regex docs](../libraries/text-processing/regex/) |
 
 ### Built-in Functions NOT Supported
 

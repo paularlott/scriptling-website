@@ -15,15 +15,6 @@ Named cross-environment concurrency primitives shared across all environments.
 | `WaitGroup(name)`         | Get/create named wait group        |
 | `Queue(name, maxsize=0)`  | Get/create named thread-safe queue |
 
-## Setup
-
-```go
-import "github.com/paularlott/scriptling/extlibs"
-
-// Register the Sync sub-library
-extlibs.RegisterRuntimeSyncLibrary(p)
-```
-
 ## Functions
 
 ### scriptling.runtime.sync.Atomic(name, initial=0)

@@ -421,3 +421,11 @@ else:
     }
 }
 ```
+
+## See Also
+
+- [Library Registration](library-registration/) - How to register built-in libraries
+- [Native API](native/) - Direct control with maximum performance
+- [Builder API](builder/) - Type-safe, cleaner syntax
+- [Security Guide](../security/) - Security best practices for embedding
+- [Libraries](../libraries/) - Usage reference for all libraries
