@@ -1,170 +1,59 @@
 ---
-title: Quick Start
-description: Get up and running with Scriptling quickly.
+title: Getting Started
+description: Get up and running with Scriptling.
 weight: 1
 ---
 
-Get up and running with Scriptling in minutes.
+Scriptling can be used two ways: as a standalone command-line tool, or embedded inside a Go application. Choose the path that's right for you.
 
-## CLI Installation
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-8 not-prose">
 
-Install the Scriptling CLI to run scripts from the command line.
+  <a href="cli/" class="block rounded-lg border-2 border-gray-200 dark:border-gray-700 p-6 hover:border-teal-500 dark:hover:border-teal-500 hover:shadow-lg transition-all no-underline bg-white dark:bg-gray-800">
+    <div class="flex items-center gap-3 mb-3">
+      <svg class="w-8 h-8 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 m-0">Using the CLI</h2>
+    </div>
+    <p class="text-gray-600 dark:text-gray-400 mb-4">Install the Scriptling CLI and start running scripts from the command line. Includes interactive mode, HTTP server, and MCP server capabilities.</p>
+    <ul class="text-sm text-gray-500 dark:text-gray-400 space-y-1 mb-4">
+      <li>Install on macOS, Linux, or Windows</li>
+      <li>Run scripts, use the REPL, or start a server</li>
+      <li>No Go knowledge required</li>
+    </ul>
+    <span class="text-teal-600 dark:text-teal-400 font-semibold text-sm">Get started &rarr;</span>
+  </a>
 
-### Homebrew (macOS & Linux)
+  <a href="embedding/" class="block rounded-lg border-2 border-gray-200 dark:border-gray-700 p-6 hover:border-teal-500 dark:hover:border-teal-500 hover:shadow-lg transition-all no-underline bg-white dark:bg-gray-800">
+    <div class="flex items-center gap-3 mb-3">
+      <svg class="w-8 h-8 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+      <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 m-0">Embedding in Go</h2>
+    </div>
+    <p class="text-gray-600 dark:text-gray-400 mb-4">Add scripting capabilities to your Go application. Register libraries, exchange variables, and create custom extensions.</p>
+    <ul class="text-sm text-gray-500 dark:text-gray-400 space-y-1 mb-4">
+      <li>Single dependency, minimal binary size</li>
+      <li>Register built-in or custom libraries</li>
+      <li>Sandboxed execution with configurable security</li>
+    </ul>
+    <span class="text-teal-600 dark:text-teal-400 font-semibold text-sm">Get started &rarr;</span>
+  </a>
 
-```bash
-brew install paularlott/tap/scriptling
-```
+  <a href="vscode/" class="block rounded-lg border-2 border-gray-200 dark:border-gray-700 p-6 hover:border-teal-500 dark:hover:border-teal-500 hover:shadow-lg transition-all no-underline bg-white dark:bg-gray-800">
+    <div class="flex items-center gap-3 mb-3">
+      <svg class="w-8 h-8 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+      <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 m-0">VSCode Extension</h2>
+    </div>
+    <p class="text-gray-600 dark:text-gray-400 mb-4">Get syntax highlighting and language support for Scriptling in Visual Studio Code.</p>
+    <ul class="text-sm text-gray-500 dark:text-gray-400 space-y-1 mb-4">
+      <li>Syntax highlighting</li>
+      <li>Language support</li>
+    </ul>
+    <span class="text-teal-600 dark:text-teal-400 font-semibold text-sm">Get started &rarr;</span>
+  </a>
 
-### GitHub Releases
+</div>
 
-Download pre-built binaries from [GitHub Releases](https://github.com/paularlott/scriptling/releases):
+## Already know what you need?
 
-- Linux (AMD64, ARM64)
-- macOS (AMD64, ARM64)
-- Windows (AMD64, ARM64)
-
-### Go Install
-
-If you have Go installed:
-
-```bash
-go install github.com/paularlott/scriptling/scriptling-cli@latest
-```
-
-### Build from Source
-
-```bash
-# Clone the repository
-git clone https://github.com/paularlott/scriptling.git
-cd scriptling
-
-# Build CLI for current platform
-make build
-# or use Task: task build
-
-# Run scripts
-./bin/scriptling script.py
-```
-
-## VSCode Extension
-
-Install the [Scriptling language extension](https://marketplace.visualstudio.com/items?itemName=PaulArlott.scriptling) for Visual Studio Code to get syntax highlighting and language support for scriptling libraries.
-
-## CLI Quick Start
-
-### Run a Script
-
-```bash
-scriptling script.py
-```
-
-### Interactive Mode
-
-```bash
-scriptling --interactive
-```
-
-### Pipe Script
-
-```bash
-echo 'print("Hello")' | scriptling
-```
-
-### HTTP Server
-
-```bash
-scriptling --server :8000 script.py
-```
-
-### MCP Server
-
-```bash
-scriptling --server :8000 --mcp-tools ./tools script.py
-```
-
----
-
-## Go Embedding
-
-For embedding Scriptling in Go applications:
-
-```bash
-go get github.com/paularlott/scriptling
-```
-
-### Hello World
-
-```go
-package main
-
-import (
-    "fmt"
-    "github.com/paularlott/scriptling"
-    "github.com/paularlott/scriptling/stdlib"
-)
-
-func main() {
-    // Create interpreter
-    p := scriptling.New()
-
-    // Register standard libraries
-    stdlib.RegisterAll(p)
-
-    // Execute Scriptling code
-    result, err := p.Eval(`
-print("Hello, World!")
-`)
-    if err != nil {
-        fmt.Println("Error:", err)
-    }
-}
-```
-
-### Variables and Functions
-
-```go
-p := scriptling.New()
-stdlib.RegisterAll(p)
-
-result, err := p.Eval(`
-# Variables
-x = 42
-name = "Alice"
-numbers = [1, 2, 3]
-
-# Functions
-def greet(n):
-    return "Hello " + n
-
-# Output
-print(greet(name))
-print("Sum:", x + len(numbers))
-`)
-```
-
-### Variable Exchange
-
-```go
-// Set variables from Go
-p.SetVar("api_base", "https://api.example.com")
-p.SetVar("timeout", 30)
-
-// Execute script
-p.Eval(`
-response = requests.get(api_base + "/users", {"timeout": timeout})
-data = json.loads(response.body)
-result = len(data)
-`)
-
-// Get variables back
-count, _ := p.GetVarAsInt("result")
-fmt.Printf("Found %d users\n", count)
-```
-
-## Next Steps
-
-- [Language Guide](../language/) - Learn the complete language syntax
-- [Libraries](../libraries/) - Explore available libraries
-- [Go Integration](../go-integration/) - Deep dive into Go embedding
-- [CLI Reference](../cli/) - CLI tool documentation
+- [Language Guide](/reference/) - Complete language reference
+- [Libraries](../../reference/libraries/) - Library usage and APIs
+- [CLI Reference](../cli/) - Full command-line documentation
+- [Go Integration](../go-integration/) - Deep dive into embedding

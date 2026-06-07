@@ -11,10 +11,11 @@
       {{ end }}
     </ul>
     <div class="border-t border-gray-200 dark:border-gray-700 my-3"></div>
-  {{ end }}
-{{ end }}
+  {{- end -}}
+{{- end -}}
 
-<!-- Main Navigation Tree -->
+<!-- Main Navigation Tree (hidden on home page) -->
+{{- if ne $.context.RelPermalink "/" -}}
 {{- $includeSections := $.context.Site.Params.includeSections | default (slice) -}}
 {{- $filteredSections := slice -}}
 {{- $currentSection := $.context.Section -}}
@@ -22,13 +23,20 @@
   {{- $currentSection = "docs" -}}
 {{- end -}}
 
+{{- /* Determine the current section path from URL */ -}}
+{{- $currentPagePath := $.context.RelPermalink -}}
+{{- $isInSection := false -}}
+{{- if and $currentSection (not (eq $currentSection "")) -}}
+  {{- $isInSection = true -}}
+{{- end -}}
+
 {{- if $includeSections -}}
   {{- range $.context.Site.Sections -}}
     {{- if in $includeSections .Section -}}
-      {{- /* If we're in a specific section, only show that section */ -}}
-      {{- if and $currentSection (eq .Section $currentSection) -}}
+      {{- /* If we're inside a specific section, only show that section's tree */ -}}
+      {{- if and $isInSection (eq .Section $currentSection) -}}
         {{- $filteredSections = $filteredSections | append . -}}
-      {{- else if not $currentSection -}}
+      {{- else if not $isInSection -}}
         {{- /* If we're not in any section (e.g., home page), show all included sections */ -}}
         {{- $filteredSections = $filteredSections | append . -}}
       {{- end -}}
@@ -36,7 +44,7 @@
   {{- end -}}
 {{- else -}}
   {{- /* If no includeSections specified, use the same logic with all sections */ -}}
-  {{- if $currentSection -}}
+  {{- if $isInSection -}}
     {{- range $.context.Site.Sections -}}
       {{- if eq .Section $currentSection -}}
         {{- $filteredSections = $filteredSections | append . -}}
@@ -47,6 +55,7 @@
   {{- end -}}
 {{- end -}}
 {{ template "nav-tree" (dict "context" $.context "sections" $filteredSections "mobile" $.mobile "level" 0 "currentSection" $currentSection) }}
+{{- end -}}
 
 {{- define "nav-tree" -}}
   {{- $context := .context -}}
@@ -136,8 +145,8 @@
   {{- end -}}
 {{- end -}}
 
-<!-- Static Links from Configuration -->
-{{ if $.context.Site.Params.navigation.static }}
+<!-- Static Links from Configuration (hidden on home page) -->
+{{- if and (ne $.context.RelPermalink "/") $.context.Site.Params.navigation.static }}
   <div class="{{ if $.mobile }}mt-3{{ else }}mt-4{{ end }}">
     <ul class="{{ if $.mobile }}space-y-0{{ else }}space-y-1{{ end }}">
       {{ range $.context.Site.Params.navigation.static }}
@@ -170,3 +179,4 @@
     </ul>
   </div>
 {{ end }}
+

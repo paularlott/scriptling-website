@@ -270,4 +270,4 @@ curl -X POST http://localhost:8000/api/users \
 
 - [Basic Usage](../basic-usage/) - Installation and command line options
 - [MCP Server Mode](../mcp-server/) - Model Context Protocol integration
-- [Runtime HTTP Library](../../libraries/scriptling/runtime/http/) - HTTP server API reference
+- [Runtime HTTP Library](../../../reference/libraries/scriptling/runtime/http/) - HTTP server API reference

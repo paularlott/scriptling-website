@@ -1,7 +1,9 @@
 ---
 title: LLM Script Generation Guide
 description: One-page guidance for generating accurate, Python-like Scriptling code.
-weight: 7
+weight: 9
+aliases:
+  - /docs/llm-guide/
 ---
 
 Use this page as a compact reference for generating high-quality Scriptling scripts.
@@ -59,75 +61,69 @@ Two differences matter a lot when generating code:
 
 ## Libraries
 
-### Standard Libraries
+Standard libraries are always available. Extended libraries are available in the CLI by default but require [registration](/docs/go-integration/library-registration/) when embedding in Go. Prefer standard libraries for general scripting; use `scriptling.*` libraries only when the task depends on host runtime features such as MCP, AI agents, HTTP routes, or networking.
 
-These are the main Python-style modules to reach for first:
-
-| Import         | Typical use                   |
-| -------------- | ----------------------------- |
-| `json`         | JSON encode/decode            |
-| `re`           | Regular expressions           |
-| `math`         | Numeric functions             |
-| `time`         | Timestamps, sleep, formatting |
-| `datetime`     | Dates, datetimes, timedeltas  |
-| `random`       | Random values                 |
-| `statistics`   | Aggregations                  |
-| `itertools`    | Iteration helpers             |
-| `functools`    | `partial`, `reduce`           |
-| `collections`  | Containers and counters       |
-| `textwrap`     | Text formatting               |
-| `hashlib`      | Hashing                       |
-| `base64`       | Base64 encode/decode          |
-| `uuid`         | UUID generation               |
-| `urllib.parse` | URL parsing and encoding      |
-| `html`         | HTML escaping                 |
-| `io`           | String I/O utilities          |
-| `difflib`      | Diffs and similarity          |
-| `string`       | String constants and helpers  |
-| `platform`     | Platform metadata             |
-| `contextlib`   | Context manager helpers       |
-
-### Extended / Host-Provided Libraries
-
-These are powerful, but they may not exist unless the embedding app enables them:
-
-| Import                                 | Typical use             |
-| -------------------------------------- | ----------------------- |
-| `requests`                             | HTTP client             |
-| `os`, `os.path`, `pathlib`, `glob`     | Filesystem access       |
-| `subprocess`                           | Process execution       |
-| `logging`                              | Structured logs         |
-| `yaml`, `toml`                         | Config parsing          |
-| `html.parser`                          | HTML parsing            |
-| `sys`                                  | Runtime info            |
-| `scriptling.mcp`                       | MCP tools and responses |
-| `scriptling.ai`, `scriptling.ai.agent` | AI integration          |
-| `scriptling.net.websocket`             | WebSockets              |
-| `scriptling.similarity`                | Similarity search       |
-
-If a script depends on one of these modules, import it explicitly and assume it may be unavailable in some hosts. This matters most for `requests`, `os`, `os.path`, `pathlib`, `subprocess`, `yaml`, `toml`, and the `scriptling.*` libraries.
-
-### Scriptling-Specific Libraries
-
-Use these when the task is specific to a Scriptling host environment rather than general Python-like scripting:
-
-Prefer standard libraries for general scripting; use `scriptling.*` only when the task depends on host runtime features such as MCP, AI agents, HTTP routes, KV storage, sync primitives, or WebSockets.
-
-| Import | Typical use |
-|--------|-------------|
-| `scriptling.mcp` | Build MCP tools and return structured MCP results |
-| `scriptling.ai` | Call AI models and work with AI responses |
-| `scriptling.ai.agent` | Run agent-style workflows with tools and memory |
-| `scriptling.ai.agent.interact` | Interactive agent loops |
-| `scriptling.runtime.http` | Register HTTP routes and handlers in hosted runtimes |
-| `scriptling.runtime.kv` | Key-value storage |
-| `scriptling.runtime.sync` | Atomics, queues, wait groups, and shared state |
-| `scriptling.runtime.sandbox` | Runtime sandbox helpers |
-| `scriptling.net.websocket` | WebSocket connections |
-| `scriptling.similarity` | Fuzzy matching, ranking, and similarity search |
-| `scriptling.toon` | Toon encoding and decoding |
-
-Do not assume every `scriptling.*` library is available in every host.
+| Import | Typical use | State |
+|--------|-------------|-------|
+| `json` | JSON encode/decode | Standard |
+| `re` | Regular expressions | Standard |
+| `math` | Numeric functions | Standard |
+| `time` | Timestamps, sleep, formatting | Standard |
+| `datetime` | Dates, datetimes, timedeltas | Standard |
+| `random` | Random values | Standard |
+| `statistics` | Aggregations | Standard |
+| `itertools` | Iteration helpers | Standard |
+| `functools` | `partial`, `reduce` | Standard |
+| `collections` | Containers and counters | Standard |
+| `textwrap` | Text formatting | Standard |
+| `hashlib` | Hashing | Standard |
+| `base64` | Base64 encode/decode | Standard |
+| `uuid` | UUID generation | Standard |
+| `urllib.parse` | URL parsing and encoding | Standard |
+| `html` | HTML escaping | Standard |
+| `io` | String I/O utilities | Standard |
+| `difflib` | Diffs and similarity | Standard |
+| `string` | String constants and helpers | Standard |
+| `platform` | Platform metadata | Standard |
+| `contextlib` | Context manager helpers | Standard |
+| `requests` | HTTP client | Extended |
+| `os`, `os.path`, `pathlib`, `glob` | Filesystem access | Extended |
+| `fs` | Binary filesystem I/O | Extended |
+| `subprocess` | Process execution | Extended |
+| `logging` | Structured logs | Extended |
+| `secrets` | Secret resolution | Extended |
+| `yaml`, `toml` | Config parsing | Extended |
+| `html.parser` | HTML parsing | Extended |
+| `sys` | Runtime info | Extended |
+| `scriptling.mcp` | MCP client and responses | Extended |
+| `scriptling.mcp.tool` | MCP tool authoring helper | Extended |
+| `scriptling.ai` | Call AI models and work with AI responses | Extended |
+| `scriptling.ai.agent` | Agent workflows with tools and memory | Extended |
+| `scriptling.ai.agent.interact` | Interactive agent loops | Extended |
+| `scriptling.ai.memory` | Long-term memory store for AI agents | Extended |
+| `scriptling.runtime.http` | HTTP routes and handlers in hosted runtimes | Extended |
+| `scriptling.runtime.kv` | Key-value storage | Extended |
+| `scriptling.runtime.sync` | Atomics, queues, wait groups, shared state | Extended |
+| `scriptling.runtime.sandbox` | Runtime sandbox helpers | Extended |
+| `scriptling.net.websocket` | WebSocket connections | Extended |
+| `scriptling.net.gossip` | Gossip protocol cluster messaging | Extended |
+| `scriptling.net.multicast` | UDP multicast group messaging | Extended |
+| `scriptling.net.unicast` | UDP and TCP point-to-point messaging | Extended |
+| `scriptling.net.resolve` | DNS resolution for IP, SRV, and srv+http URLs | Extended |
+| `scriptling.messaging.telegram` | Telegram Bot API client | Extended |
+| `scriptling.messaging.discord` | Discord Bot API client | Extended |
+| `scriptling.messaging.slack` | Slack Bot API client | Extended |
+| `scriptling.messaging.console` | Console-based messaging client | Extended |
+| `scriptling.similarity` | Fuzzy matching, ranking, and similarity search | Extended |
+| `scriptling.template` | Go-powered template rendering (HTML and text) | Extended |
+| `scriptling.toon` | Toon encoding and decoding | Extended |
+| `scriptling.console` | Console input/output functions | Extended |
+| `scriptling.grep` | Fast file content search | Extended |
+| `scriptling.sed` | In-place file content replacement | Extended |
+| `scriptling.wait_for` | Wait for resources to become available | Extended |
+| `scriptling.container` | Container lifecycle management | Extended |
+| `scriptling.secret` | Secret resolution through provider aliases | Extended |
+| `scriptling.provision.file` | File and directory provisioning | Extended |
 
 ## HTTP and JSON
 

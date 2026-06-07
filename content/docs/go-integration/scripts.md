@@ -1,7 +1,7 @@
 ---
 title: Script Extensions
 description: Extend Scriptling using Scriptling code itself.
-weight: 4
+weight: 11
 ---
 
 In addition to registering Go functions and libraries, you can also register functions and libraries written in Scriptling itself.
@@ -551,4 +551,4 @@ print(string_utils.count_vowels(text))      # 3
 
 - [Native API](native/) - Create extensions in Go
 - [Builder API](builder/) - Type-safe Go builders
-- [Error Handling](../language/error-handling/) - Try/except patterns
+- [Error Handling](/reference/error-handling/) - Try/except patterns
