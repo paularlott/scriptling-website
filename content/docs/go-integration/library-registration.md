@@ -285,4 +285,4 @@ When embedding Scriptling, you have full control over what scripts can access. S
 
 - [Basics](basics/) — creating interpreters and exchanging variables
 - [Security Guide](../security/) — security best practices for embedding
-- [Libraries](../libraries/) — usage reference for all libraries
+- [Libraries](../../reference/libraries/) — usage reference for all libraries

@@ -9,7 +9,7 @@ title = 'Scriptling'
   githubURL = "https://github.com/paularlott/scriptling"
   copyright = "Paul Arlott"
   defaultTheme = "light"  # Options: "light" or "dark"
-  includeSections = ["docs"]
+  includeSections = ["docs", "reference"]
 
   [params.navigation]
     [[params.navigation.header]]
@@ -19,11 +19,11 @@ title = 'Scriptling'
       name = 'Docs'
       url = '/docs'
     [[params.navigation.header]]
+      name = 'Reference'
+      url = '/reference'
+    [[params.navigation.header]]
       name = 'Changelog'
       url = '/docs/changelog/'
-    [[params.navigation.static]]
-      name = 'LLM Script Generation Guide'
-      url = '/docs/llm-guide/'
 
 [build]
   [build.buildStats]

@@ -551,4 +551,4 @@ print(string_utils.count_vowels(text))      # 3
 
 - [Native API](native/) - Create extensions in Go
 - [Builder API](builder/) - Type-safe Go builders
-- [Error Handling](../language/error-handling/) - Try/except patterns
+- [Error Handling](/reference/error-handling/) - Try/except patterns

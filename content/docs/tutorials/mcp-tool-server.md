@@ -231,7 +231,7 @@ my-tools/
 
 ## See Also
 
-- [Writing MCP Tools](../../libraries/scriptling/mcp/writing-mcp-tools/) - Complete MCP tool reference
-- [MCP Client Library](../../libraries/scriptling/mcp/client/) - Connecting to MCP servers from scripts
+- [Writing MCP Tools](../../../reference/libraries/scriptling/mcp/writing-mcp-tools/) - Complete MCP tool reference
+- [MCP Client Library](../../../reference/libraries/scriptling/mcp/client/) - Connecting to MCP servers from scripts
 - [CLI MCP Server](../../cli/mcp-server/) - CLI server mode documentation
-- [Statistics Library](../../libraries/math-numbers/statistics/) - Stats functions used in this tutorial
+- [Statistics Library](../../../reference/libraries/math-numbers/statistics/) - Stats functions used in this tutorial

@@ -109,5 +109,5 @@ See the [Go Integration](../basics/) guide for the full library registration ref
 - [Go Integration Basics](../basics/) - Complete guide to interpreters, variables, and functions
 - [Native API](../native/) - Direct control with maximum performance
 - [Builder API](../builder/) - Type-safe, cleaner syntax
-- [Libraries](../../libraries/) - Library usage and registration reference
+- [Libraries](../../../reference/libraries/) - Library usage and registration reference
 - [Security Guide](../../security/) - Security best practices for embedding

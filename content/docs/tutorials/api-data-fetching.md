@@ -271,7 +271,7 @@ if users:
 
 ## See Also
 
-- [Requests Library](../../libraries/http-process/requests/) - Full HTTP client documentation
-- [JSON Library](../../libraries/data-formats/json/) - JSON parsing reference
-- [Language Guide](../../language/) - Complete syntax reference
+- [Requests Library](../../../reference/libraries/http-process/requests/) - Full HTTP client documentation
+- [JSON Library](../../../reference/libraries/data-formats/json/) - JSON parsing reference
+- [Language Guide](..//reference/) - Complete syntax reference
 - [CLI Reference](../../cli/) - Command-line options

@@ -41,7 +41,7 @@ nav-skip: true
 
 **Docs — AI Client reference split:**
 
-- The AI Client method reference (completion, streaming, embeddings, Responses API, Pipeline, etc.) has been split into its own [Client](docs/libraries/scriptling/ai/client/) page for easier navigation
+- The AI Client method reference (completion, streaming, embeddings, Responses API, Pipeline, etc.) has been split into its own [Client](reference/libraries/scriptling/ai/client/) page for easier navigation
 {{< /changelog-item >}}
 
 ---

@@ -92,7 +92,7 @@ scriptling --server :8000 --mcp-tools ./tools setup.py
 
 ## Next Steps
 
-- [Language Guide](../../language/) - Learn the complete language syntax
-- [Libraries](../../libraries/) - Explore available libraries and APIs
+- [Language Guide](..//reference/) - Learn the complete language syntax
+- [Libraries](../../../reference/libraries/) - Explore available libraries and APIs
 - [CLI Reference](../../cli/) - Full command-line interface documentation
 - [Security Guide](../../security/) - Security best practices

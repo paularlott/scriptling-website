@@ -18,14 +18,6 @@ Welcome to the Scriptling documentation. Scriptling is a minimal, sandboxed inte
 
 - [Go Integration](go-integration/)
 
-## Language Guide
-
-- [Language Guide](language/)
-
-## Libraries
-
-- [Libraries](libraries/)
-
 ## Security Guide
 
 - [Security Guide](security/)

@@ -428,4 +428,4 @@ else:
 - [Native API](native/) - Direct control with maximum performance
 - [Builder API](builder/) - Type-safe, cleaner syntax
 - [Security Guide](../security/) - Security best practices for embedding
-- [Libraries](../libraries/) - Usage reference for all libraries
+- [Libraries](../../reference/libraries/) - Usage reference for all libraries
