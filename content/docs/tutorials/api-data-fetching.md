@@ -260,18 +260,56 @@ if users:
     display_report(report)
 ```
 
+## Other HTTP Methods
+
+The `requests` library also supports POST, PUT, PATCH, and DELETE for full REST API interaction:
+
+```python
+import json
+import requests
+
+API_URL = "https://api.example.com/users"
+options = {"timeout": 10, "headers": {"Authorization": "Bearer token"}}
+
+# Create (POST)
+payload = json.dumps({"name": "Bob", "email": "bob@example.com"})
+resp = requests.post(API_URL, payload, options)
+if resp.status_code == 201:
+    user_id = json.loads(resp.body)["id"]
+
+# Update (PUT)
+payload = json.dumps({"name": "Bob Updated"})
+requests.put(API_URL + "/" + str(user_id), payload, options)
+
+# Partial update (PATCH)
+payload = json.dumps({"email": "newemail@example.com"})
+requests.patch(API_URL + "/" + str(user_id), payload, options)
+
+# Delete
+resp = requests.delete(API_URL + "/" + str(user_id), options)
+if resp.status_code == 204:
+    print("Deleted successfully")
+```
+
 ## What You Learned
 
-- Using `requests` to fetch data from HTTP APIs
+- Using `requests` to fetch data from HTTP APIs (GET, POST, PUT, PATCH, DELETE)
 - Parsing JSON with `json.loads()` and formatting with `json.dumps()`
 - Working with lists, dictionaries, and loops
 - Defining and calling functions
 - Error handling with try/except
 - File I/O with `open()` and `with` statements
 
+## Best Practices
+
+- **Always check status codes** before processing responses
+- **Always set timeouts** — don't rely on the default
+- **Parse JSON responses** with `json.loads()` instead of using raw body text
+- **Stringify before sending** — use `json.dumps()` to convert payloads before POST/PUT
+
 ## See Also
 
 - [Requests Library](../../../reference/libraries/http-process/requests/) - Full HTTP client documentation
 - [JSON Library](../../../reference/libraries/data-formats/json/) - JSON parsing reference
-- [Language Guide](..//reference/) - Complete syntax reference
+- [Reference](/reference/) - Complete language reference
 - [CLI Reference](../../cli/) - Command-line options
