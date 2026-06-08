@@ -1,6 +1,6 @@
 ---
 title: Classes
-description: Class definition, inheritance, super(), dunder methods, and the __init__ method in Scriptling.
+description: Class definition, inheritance, super(), dunder methods, __init__, __del__, and property decorators in Scriptling.
 weight: 7
 ---
 
@@ -368,6 +368,46 @@ ns = NumberSet(1, 2, 3, 5, 8)
 print(3 in ns)   # True
 print(4 in ns)   # False
 print(4 not in ns)  # True
+```
+
+### `__del__`
+
+Called when an instance is garbage collected. Use it to release resources like file handles, connections, or locks:
+
+```python
+class FileHandle:
+    def __init__(self, path):
+        self.path = path
+
+    def __del__(self):
+        print("closing", self.path)
+
+fh = FileHandle("/tmp/data")
+# "closing /tmp/data" printed when fh is garbage collected
+```
+
+You can also call `__del__` explicitly — it runs each time it's called:
+
+```python
+fh = FileHandle("/tmp/data")
+fh.__del__()  # "closing /tmp/data"
+fh.__del__()  # "closing /tmp/data" — runs again
+```
+
+GC finalizers are not prompt and may not run before process exit. Prefer explicit cleanup (calling `__del__` directly or using a `with` statement / context manager) for critical resources.
+
+`__del__` is inherited like other methods:
+
+```python
+class Base:
+    def __del__(self):
+        print("base cleanup")
+
+class Child(Base):
+    pass
+
+c = Child()
+# "base cleanup" printed when c is collected
 ```
 
 ### `__iter__` and `__next__`

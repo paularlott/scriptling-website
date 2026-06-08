@@ -47,6 +47,7 @@ Scriptling-specific libraries that provide functionality not available in Python
 - [Sed](sed/) — In-place file content replacement with literal strings or regex patterns
 - [Secrets](secret/) — Resolve secrets through host-configured provider aliases
 - [Wait For](wait_for/) — Wait for resources to become available
+- [Plugin](plugin/) — Control library for executable plugins
 - [Toon](toon/) — TOON (Token-Oriented Object Notation) encoding/decoding
 - [Similarity](similarity/) — Text similarity utilities including fuzzy search and MinHash
 - [Templates](template/) — Go-powered template rendering (HTML and text)

@@ -47,18 +47,130 @@ func createPersonClass() *object.Class {
 
 ## Method Signatures
 
-Class methods support flexible signatures. The first parameter is ALWAYS the instance (`self`):
+Class methods support flexible signatures. The first parameter is the receiver — either `*Instance` or a typed pointer:
+
+### Instance Receiver (manual Fields)
 
 - `func(self *Instance, args...) result` - Instance + positional arguments
 - `func(self *Instance, ctx context.Context, args...) result` - Instance + context + positional
 - `func(self *Instance, kwargs object.Kwargs, args...) result` - Instance + kwargs + positional
 - `func(self *Instance, ctx context.Context, kwargs object.Kwargs, args...) result` - All parameters
 
+### Typed Receiver (Go struct, automatic wrapping)
+
+- `func(self *T, args...) result` - Struct + positional arguments
+- `func(self *T, ctx context.Context, args...) result` - Struct + context + positional
+- `func(self *T, kwargs object.Kwargs, args...) result` - Struct + kwargs + positional
+- `func(self *T, ctx context.Context, kwargs object.Kwargs, args...) result` - All parameters
+
 **Parameter Order Rules (ALWAYS in this order):**
-1. Instance (`self`) - ALWAYS FIRST
+1. Receiver (`self`) - ALWAYS FIRST (`*Instance` or typed pointer)
 2. Context (optional) - comes second if present
 3. Kwargs (optional) - comes after context (or second if no context)
 4. Positional arguments - ALWAYS LAST
+
+## Typed Receivers
+
+When your class is backed by a Go struct, use `Constructor` to register a function that returns a pointer to your struct. The struct is automatically wrapped and stored on the instance. Methods whose first parameter matches the constructor's return type receive the unwrapped struct directly — no manual Field boxing/unboxing needed.
+
+```go
+type PlayerData struct {
+    Name   string
+    Health int
+    MaxHP  int
+}
+
+cb := object.NewClassBuilder("Player")
+
+cb.Constructor(func(name string, hp int) *PlayerData {
+    return &PlayerData{Name: name, Health: hp, MaxHP: hp}
+})
+
+cb.Method("take_damage", func(self *PlayerData, amount int) string {
+    self.Health -= amount
+    if self.Health < 0 {
+        self.Health = 0
+    }
+    return fmt.Sprintf("%s took %d damage, health: %d", self.Name, amount, self.Health)
+})
+
+cb.Method("heal", func(self *PlayerData, amount int) string {
+    self.Health += amount
+    if self.Health > self.MaxHP {
+        self.Health = self.MaxHP
+    }
+    return fmt.Sprintf("%s healed %d, health: %d", self.Name, amount, self.Health)
+})
+
+cb.Method("name", func(self *PlayerData) string {
+    return self.Name
+})
+
+cb.Method("__del__", func(self *PlayerData) {
+    // Cleanup resources — runs when the instance is garbage collected
+})
+```
+
+The constructor:
+- Accepts typed parameters (with optional `context.Context` and `object.Kwargs`)
+- Returns a pointer type (e.g., `*PlayerData`)
+- Can optionally return an error as a second value: `func(...) (*T, error)`
+
+Methods:
+- First parameter must match the constructor's return type
+- Read and write struct fields directly — no `self.Fields` or type assertions needed
+- `__del__` is called when the instance is garbage collected, or explicitly via `instance.__del__()`
+- `__del__` can also be called multiple times explicitly — it runs every time it is called
+- GC finalizers are not prompt: prefer explicit cleanup for critical resources
+
+### Exposing Struct Fields with Properties
+
+Go struct fields are **private** to Scriptling — they're wrapped in an internal `_receiver` field. To make them accessible as `player.name`, register properties:
+
+```go
+type PlayerData struct {
+    Name   string
+    Health int
+}
+
+cb := object.NewClassBuilder("Player")
+
+cb.Constructor(func(name string, hp int) *PlayerData {
+    return &PlayerData{Name: name, Health: hp}
+})
+
+cb.Property("name", func(self *PlayerData) string {
+    return self.Name
+})
+
+cb.PropertyWithSetter("health",
+    func(self *PlayerData) int {
+        return self.Health
+    },
+    func(self *PlayerData, hp int) {
+        self.Health = hp
+    },
+)
+```
+
+```python
+p = Player("Ada", 100)
+print(p.name)     # "Ada" — calls property getter
+p.health = 50     # calls property setter
+```
+
+This gives you full control over what's exposed. You can derive computed values, validate inputs, or keep internal state truly private.
+
+### When to Use Typed Receivers
+
+| Factor | `*Instance` (manual) | Typed Receiver |
+|--------|---------------------|----------------|
+| **Best for** | Simple state, mixed types | Go struct-backed classes |
+| **State access** | `self.Fields["key"]` + type assertion | Direct struct field access |
+| **Exposed to Scriptling** | Yes — Fields are readable/writable | No — use `Property()` to expose |
+| **Cleanup (`__del__`)** | Receives `*object.Instance` | Receives Go struct directly |
+| **GC trigger** | Yes — finalizer installed on instance | Yes — finalizer installed on instance |
+| **Boilerplate** | More (boxing/unboxing) | Less |
 
 ## Examples
 
@@ -203,7 +315,77 @@ func createStudentClass(personClass *object.Class) *object.Class {
 }
 ```
 
-## Cross-Approach Inheritance
+## Scriptling Inheritance from Go Classes
+
+Scriptling classes can inherit from Go-registered classes. The child class must call `super().__init__()` to trigger the Go constructor — `__init__` is not automatically chained:
+
+```python
+class BetterCounter(Counter):
+    def __init__(self, start, label):
+        super().__init__(start)
+        self.label = label
+
+    def labeled_get(self):
+        return self.label + ": " + str(self.get())
+```
+
+How inheritance behaves depends on which pattern the Go class uses:
+
+### Instance Fields — fully accessible
+
+When the Go class uses `*object.Instance` and stores values in `self.Fields`, those fields are accessible from Scriptling as normal attributes:
+
+```go
+// Go side
+cb := object.NewClassBuilder("Config").
+    Method("__init__", func(self *object.Instance, name string) {
+        self.Fields["name"] = object.NewString(name)
+    }).
+    Method("get", func(self *object.Instance) string {
+        return self.Fields["name"].(*object.String).StringValue()
+    })
+```
+
+```python
+# Scriptling side — child can read parent fields directly
+class ChildConfig(Config):
+    def __init__(self, name):
+        super().__init__(name)
+
+    def upper_name(self):
+        return self.name.upper()  # reads parent's Fields["name"]
+```
+
+### Typed Receivers — private by default
+
+When the Go class uses a typed receiver, the Go struct's fields are **not accessible** from Scriptling — they're opaque inside the internal `_receiver` wrapper. Child classes can call parent methods (which unwrap the receiver internally) but cannot read or write the Go struct's fields directly:
+
+```python
+# Scriptling side
+class BetterPlayer(Player):
+    def __init__(self, name):
+        super().__init__(name)
+
+    def bonus(self, n):
+        return self.add_score(n * 2)  # works — calls Go method
+
+    def get_name(self):
+        return self.Name  # None — Go struct fields are not exposed
+```
+
+To expose Go struct fields to Scriptling children, register properties on the Go class:
+
+```go
+cb.Property("name", func(self *playerData) string {
+    return self.Name
+})
+```
+
+```python
+class BetterPlayer(Player):
+    def get_name(self):
+        return self.name  # works — calls property getter
+```
 
 The Builder API and Native API work seamlessly together for inheritance.
 
@@ -365,7 +547,8 @@ print("Inventory:", status["inventory"])
 
 | Method | Description |
 |--------|-------------|
-| `Method(name, fn)` | Register a typed Go method |
+| `Constructor(fn)` | Register a typed constructor (returns `*T`, sets receiver type) |
+| `Method(name, fn)` | Register a typed Go method (receiver is `*Instance` or `*T`) |
 | `MethodWithHelp(name, fn, help)` | Register method with help text |
 | `Property(name, fn)` | Register a read-only getter as `@property` |
 | `PropertyWithSetter(name, getter, setter)` | Register a getter+setter `@property` |

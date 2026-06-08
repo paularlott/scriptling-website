@@ -14,6 +14,11 @@ Write a CLI script that fetches data from a public API, processes it with JSON, 
 
 ## Go Integration Tutorials
 
+### [Plugin Streaming Callbacks](plugin-callbacks/)
+
+Pass a Scriptling function into a Go plugin and stream events back while the plugin function is running. Covers `plugin.Callback`, callback lifetime, and structured callback payloads.
+
+
 ### [Embedding a Rules Engine](embedding-rules-engine/)
 
 Embed Scriptling in a Go application to evaluate business rules at runtime. Covers interpreter setup, variable exchange, custom function registration, and library loading.
