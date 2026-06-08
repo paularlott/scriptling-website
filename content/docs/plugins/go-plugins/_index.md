@@ -67,9 +67,9 @@ import plugin.hello
 print(plugin.hello.greet("Ada"))
 ```
 
-### Native Object API
+### Advanced FunctionBuilder Callback
 
-For full control over argument conversion, register a function with the raw `BuiltinFunction` signature:
+For full control over argument conversion, pass a raw `BuiltinFunction`-style callback to the same `FunctionBuilder`:
 
 ```go
 package main

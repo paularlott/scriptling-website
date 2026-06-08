@@ -41,7 +41,7 @@ All messages are one of three shapes:
 }
 ```
 
-The `id` field is a unique integer set by the sender. Every response echoes back the `id` of the request it corresponds to, so both sides can correlate requests and responses on the shared stdio transport. The host assigns incrementing IDs for its requests.
+The `id` field is a unique integer set by the sender. Every response echoes back the `id` of the request it corresponds to, so both sides can correlate requests and responses on the shared stdio transport. Responses may arrive out of order when a plugin handles overlapping requests. The host assigns incrementing IDs for its requests.
 
 Error codes:
 

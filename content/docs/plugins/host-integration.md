@@ -46,7 +46,7 @@ print(plugin.hello.greet("Ada"))
 
 ## Multiple Environments
 
-The manager starts each plugin executable once. Multiple Scriptling environments can share the same manager:
+The manager starts each plugin executable once. Multiple Scriptling environments can share the same manager. Each environment must still be evaluated by only one Go thread at a time:
 
 ```go
 p1 := scriptling.New()
