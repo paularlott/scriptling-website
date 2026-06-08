@@ -52,6 +52,7 @@ func main() {
 - [Builder Classes](builder-classes/) - Type-safe class builder
 - [Builder Instantiation](builder-instantiation/) - Library templates with per-instance config
 - [Script Extensions](scripts/) - Extend using Scriptling code
+- [Plugin Manager](/docs/plugins/host-integration/) - Enable executable plugins in embedded applications
 - [Library Loader Chain](loader-chain/) - Flexible library loading from multiple sources
 - [Documenting Extensions](documentation/) - Add help text to functions and libraries
 - [Linting](lint/) - Code analysis for detecting syntax errors without execution

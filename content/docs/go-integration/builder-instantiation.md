@@ -215,27 +215,25 @@ func pathJoinpath(ctx context.Context, kwargs object.Kwargs, args ...object.Obje
 
 ## Libraries with Classes (Builder Pattern)
 
-Alternatively, use ClassBuilder for type-safe class creation:
+Alternatively, use ClassBuilder for type-safe class creation. For Go struct-backed classes, use `Constructor` with a typed receiver:
 
 ```go
 classBuilder := object.NewClassBuilder("Path")
-classBuilder.Method("exists", func(self *object.Instance) bool {
-    data := self.NativeData.(*pathData)
-    config := data.config
-    pathStr := data.path
-
+classBuilder.Constructor(func(config FSConfig, pathStr string) (*pathData, error) {
     if !config.IsPathAllowed(pathStr) {
-        panic("access denied")
+        return nil, fmt.Errorf("access denied")
     }
-
-    _, err := os.Stat(pathStr)
+    return &pathData{config: config, path: pathStr}, nil
+})
+classBuilder.Method("exists", func(self *pathData) bool {
+    _, err := os.Stat(self.path)
     return err == nil
 })
 
 PathClass := classBuilder.Build()
 ```
 
-The rest of the pattern (library builder, constructor, instantiation) remains the same.
+For simpler cases without instantiation, use the manual pattern:
 
 ## Data Flow Summary
 

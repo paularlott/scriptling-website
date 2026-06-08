@@ -1,0 +1,72 @@
+---
+title: Writing a Bash Plugin
+description: Implement the plugin JSON-RPC protocol directly from a shell script.
+weight: 26
+---
+
+A plugin can be any executable that speaks Scriptling's line-delimited JSON-RPC protocol on stdio. This tutorial builds a tiny Bash plugin. It requires `jq`.
+
+## Create the Plugin
+
+Create `plugins/hello-bash`:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+while IFS= read -r line; do
+  method=$(printf '%s\n' "$line" | jq -r '.method')
+  id=$(printf '%s\n' "$line" | jq -r '.id')
+
+  case "$method" in
+    scriptling.handshake)
+      printf '{"jsonrpc":"2.0","id":%s,"result":{"protocol":"1.0","transport":"json","library":{"name":"hello","version":"1.0.0","description":"Bash hello plugin"},"capabilities":[],"schema":{"functions":[{"name":"greet"}],"classes":[],"constants":[]}}}\n' "$id"
+      ;;
+    function.call)
+      name=$(printf '%s\n' "$line" | jq -r '.params.name')
+      if [ "$name" = "greet" ]; then
+        who=$(printf '%s\n' "$line" | jq -r '.params.args[0].value')
+        jq -nc --argjson id "$id" --arg text "Hello, $who" \
+          '{"jsonrpc":"2.0","id":$id,"result":{"type":"string","value":$text}}'
+      else
+        jq -nc --argjson id "$id" \
+          '{"jsonrpc":"2.0","id":$id,"error":{"code":-32601,"message":"unknown function"}}'
+      fi
+      ;;
+    plugin.shutdown)
+      printf '{"jsonrpc":"2.0","id":%s,"result":null}\n' "$id"
+      exit 0
+      ;;
+  esac
+done
+```
+
+Make it executable:
+
+```bash
+chmod +x plugins/hello-bash
+```
+
+The handshake declares the short name `hello`. Scriptling imports it as `plugin.hello`.
+
+## Run It
+
+```bash
+scriptling --plugin-dir ./plugins -c 'import plugin.hello; print(plugin.hello.greet("Ada"))'
+```
+
+Output:
+
+```text
+Hello, Ada
+```
+
+## Protocol Notes
+
+The host sends `scriptling.handshake` first. The plugin returns protocol metadata and a schema. After that, generated wrappers call `function.call` with transported values:
+
+```json
+{"type":"string","value":"Ada"}
+```
+
+Bash is useful for small integrations and protocol tests. For richer plugins with classes and resource cleanup, prefer the Go server package.
