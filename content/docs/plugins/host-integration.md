@@ -50,7 +50,7 @@ print(plugin.hello.greet("Ada"))
 
 ## Multiple Environments
 
-The manager starts each plugin executable once. Multiple Scriptling environments can share the same manager. Each environment must still be evaluated by only one Go thread at a time:
+The manager starts each plugin executable once. Multiple Scriptling environments can share the same manager. Each environment must still be evaluated by only one Go thread at a time. The stdio JSON-RPC connection multiplexes overlapping calls by request id; connection pooling is intentionally not used because it would create multiple plugin process instances and violate the singleton plugin model:
 
 ```go
 p1 := scriptling.New()

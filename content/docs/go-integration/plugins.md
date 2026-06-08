@@ -52,7 +52,7 @@ print(plugin.hello.greet("Ada"))
 
 Each Scriptling environment belongs to one Go thread of execution and must not be evaluated concurrently. Create one environment per concurrent request or worker, then call `plugin.RegisterLibraries(env, manager)` for each environment.
 
-The manager starts each plugin executable once. Multiple environments can share that manager, and plugin calls from those separate environments may overlap on the same plugin process.
+The manager starts each plugin executable once. Multiple environments can share that manager, and plugin calls from those separate environments may overlap on the same plugin process. The stdio JSON-RPC connection multiplexes overlapping calls by request id; connection pooling is intentionally not used because it would create multiple plugin process instances and violate the singleton plugin model.
 
 ## Crash Handling
 

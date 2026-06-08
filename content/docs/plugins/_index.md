@@ -31,6 +31,8 @@ import plugin.hello
 print(plugin.hello.greet("Ada"))
 ```
 
+The `plugin.` prefix is host-owned. A plugin should declare a short name such as `hello`; if an executable declares `plugin.hello`, the host normalizes it to the same library name, `plugin.hello`. If two executables normalize to the same library name, only the first one is loaded and the duplicate is reported as a manager warning.
+
 `scriptling.plugin` is different: it is the built-in control library used for listing plugins, inspecting metadata, direct function calls, and explicit release of remote objects.
 
 ## Transports

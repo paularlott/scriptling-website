@@ -139,7 +139,7 @@ Remote objects are passed by reference:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `protocol` | string | Must be `"1.0"` |
+| `protocol` | string | Must exactly match the host protocol version, currently `"1.0"` |
 | `transport` | string | Must be `"json"` |
 | `library` | object | `name`, `version`, `description` |
 | `capabilities` | [string] | Plugin capabilities |
@@ -169,6 +169,8 @@ The `schema` object:
   ]
 }
 ```
+
+If the plugin returns any other protocol version, the host refuses to load it and records a manager warning. Breaking protocol changes require a new protocol version and older hosts will reject the plugin during handshake.
 
 When `source` is empty or absent the host auto-generates an RPC proxy. When `source` is provided the host uses it directly — either as a wrapper around RPC calls or as pure host-side Scriptling code.
 
