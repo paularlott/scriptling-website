@@ -94,6 +94,17 @@ field is set depending on `type`:
 }
 ```
 
+Callbacks are passed by reference. A callback id is valid only while the outer plugin call that received it is still running:
+
+```json
+{
+  "type": "callback",
+  "callback": {
+    "id": "cb-1"
+  }
+}
+```
+
 Remote objects are passed by reference:
 
 ```json
@@ -208,6 +219,32 @@ Example:
 → {"jsonrpc":"2.0","id":2,"method":"function.call","params":{"name":"greet","args":[{"type":"string","value":"Ada"}]}}
 ← {"jsonrpc":"2.0","id":2,"result":{"type":"string","value":"Hello, Ada"}}
 ```
+
+### `callback.call`
+
+**Direction:** Plugin -> Host  
+**When:** A plugin invokes a callback argument before the outer function, constructor, or method call has returned.
+
+Callback calls are ordinary JSON-RPC requests sent over the same stdio stream while another host -> plugin request is still pending. The host executes the Scriptling callback synchronously on the same environment call stack and responds before the plugin continues.
+
+**Request params:**
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `id` | string | No | Callback id from a `callback` transport value |
+| `args` | [Value] | Yes | Positional callback arguments |
+| `kwargs` | {string: Value} | Yes | Keyword callback arguments |
+
+**Response result:** A single `Value` — the callback return value.
+
+Example:
+
+```json
+-> {"jsonrpc":"2.0","id":7,"method":"callback.call","params":{"id":"cb-1","args":[{"type":"dict","entries":{"token":{"type":"string","value":"Hello"}}}]}}
+<- {"jsonrpc":"2.0","id":7,"result":{"type":"string","value":"ack"}}
+```
+
+If the callback raises an error, the host returns a JSON-RPC error and the plugin function should fail the outer call. Once the outer call returns, all callback ids created for that call expire; later use returns `unknown callback`.
 
 ### `object.new`
 

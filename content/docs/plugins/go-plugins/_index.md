@@ -245,6 +245,45 @@ With typed receivers, `__del__` receives the Go struct directly. With `*object.I
 
 `__del__` is called at most once — destroying the same object twice is a silent no-op.
 
+## Function Callbacks
+
+A Scriptling function can be passed into a plugin call. The host sends it as a scoped callback reference, and the Go plugin receives it as `plugin.Callback`. The callback can be invoked until the outer plugin function returns.
+
+```go
+type tokenEvent struct {
+    Token string `json:"token"`
+    Index int    `json:"index"`
+}
+
+fb := object.NewFunctionBuilder()
+fb.Function(func(ctx context.Context, onEvent plugin.Callback) (string, error) {
+    if _, err := onEvent.Call(ctx, tokenEvent{Token: "Hello", Index: 0}); err != nil {
+        return "", err
+    }
+    if _, err := onEvent.Call(ctx, []any{"done", 1}); err != nil {
+        return "", err
+    }
+    return "Hello", nil
+})
+server.RegisterFunc("stream", fb)
+```
+
+Host usage:
+
+```python
+import plugin.callback
+
+events = []
+
+def on_event(event):
+    events.append(event)
+    return "ack"
+
+text = plugin.callback.stream(on_event)
+```
+
+Callback payloads use the normal plugin transport values. Go maps and exported struct fields arrive as Scriptling dictionaries; slices and arrays arrive as Scriptling lists. If the Scriptling callback raises an error, `Callback.Call` returns that error and the plugin should return it from the outer function.
+
 ## Constants
 
 ```go
