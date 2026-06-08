@@ -8,6 +8,30 @@ nav-skip: true
 
 ## June 2026
 
+{{< version "v0.10.0" >}}
+
+{{< changelog-item "added" >}}
+**Plugin System:**
+
+- Go plugin system for extending Scriptling with out-of-process plugins written in Go
+- `plugin.NewServer` for building plugin executables that register functions, classes, and constants via RPC
+- `plugin.Manager` for loading and managing plugin binaries from directories
+- Auto-generated proxy classes with `__del__` that releases plugin-side objects on garbage collection
+- Custom wrapper class source for full control over the host-side proxy
+- `scriptling.plugin` control library: `list()`, `describe()`, `call_function()`, `call_method()`, `release()`
+- Concurrent plugin server — multiple requests are dispatched in parallel so slow calls don't block others
+- `plugin.RegisterScriptFunc` / `plugin.RegisterScriptClass` for host-side Scriptling code within plugin libraries
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**Class Builder:**
+
+- `object.ClassBuilder.Constructor(fn)` for typed receiver classes — constructor returns a Go struct, methods receive it directly
+- `object.ClassBuilder.Property(name, getter)` and `PropertyWithSetter(name, getter, setter)` for exposing private Go struct fields as readable/writable Scriptling properties
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.9.3" >}}
 
 {{< changelog-item "added" >}}
