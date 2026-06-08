@@ -41,7 +41,7 @@ class Counter:
         scriptling.plugin.release(self._plugin_remote)
 ```
 
-The `__del__` method sends `object.destroy` to the plugin, which calls the plugin-side `__del__` to free resources (file handles, connections, etc.). This ensures cleanup happens when the Scriptling object is garbage collected.
+The `__del__` method sends `object.destroy` to the plugin, which calls the plugin-side `__del__` to free resources (file handles, connections, etc.). The evaluator also installs a GC finalizer on the proxy instance, so cleanup happens automatically when the object becomes unreachable — even if `__del__` is never called explicitly.
 
 ## Custom Wrappers
 

@@ -64,4 +64,4 @@ print(cfg.get("name"))
 scriptling.plugin.release(cfg)
 ```
 
-Prefer explicit `release()` for deterministic cleanup. Proxy objects also use a best-effort GC release hook as a fallback.
+Prefer explicit `release()` for deterministic cleanup. All class instances with `__del__` get a GC finalizer installed automatically — both in-process and plugin objects — as a best-effort fallback.

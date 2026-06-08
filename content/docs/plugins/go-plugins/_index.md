@@ -238,12 +238,16 @@ The lifecycle works like this:
 
 1. Host calls `plugin.mylib.Handle("data.txt")` → host sends `object.new` to plugin
 2. Plugin creates the real instance, runs `__init__`, stores it in memory
-3. Host is done with the object → host sends `object.destroy` (via `scriptling.plugin.release()` or GC finalizer)
+3. Host-side proxy becomes unreachable → Go GC fires finalizer → sends `object.destroy` to plugin
 4. Plugin receives `object.destroy` → calls `__del__` on the real instance → `self.file.Close()`
 
-With typed receivers, `__del__` receives the Go struct directly. With `*object.Instance`, it receives the instance and can clean up fields manually.
+You can also trigger cleanup explicitly:
 
-`__del__` is called at most once — destroying the same object twice is a silent no-op.
+- From Scriptling: `scriptling.plugin.release(handle)` or `handle.__del__()`
+- `__del__` can be called multiple times explicitly — each call runs the function
+- When triggered by GC (via `object.destroy`), the server calls `__del__` at most once per object
+
+With typed receivers, `__del__` receives the Go struct directly. With `*object.Instance`, it receives the instance and can clean up fields manually.
 
 ## Function Callbacks
 

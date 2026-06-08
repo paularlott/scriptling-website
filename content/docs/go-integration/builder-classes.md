@@ -107,7 +107,7 @@ cb.Method("name", func(self *PlayerData) string {
 })
 
 cb.Method("__del__", func(self *PlayerData) {
-    // Cleanup resources
+    // Cleanup resources — runs when the instance is garbage collected
 })
 ```
 
@@ -119,7 +119,9 @@ The constructor:
 Methods:
 - First parameter must match the constructor's return type
 - Read and write struct fields directly — no `self.Fields` or type assertions needed
-- `__del__` receives the typed receiver for cleanup
+- `__del__` is called when the instance is garbage collected, or explicitly via `instance.__del__()`
+- `__del__` can also be called multiple times explicitly — it runs every time it is called
+- GC finalizers are not prompt: prefer explicit cleanup for critical resources
 
 ### Exposing Struct Fields with Properties
 
@@ -166,7 +168,8 @@ This gives you full control over what's exposed. You can derive computed values,
 | **Best for** | Simple state, mixed types | Go struct-backed classes |
 | **State access** | `self.Fields["key"]` + type assertion | Direct struct field access |
 | **Exposed to Scriptling** | Yes — Fields are readable/writable | No — use `Property()` to expose |
-| **Cleanup (`__del__`)** | Receives `*object.Instance`, extract via `GetClientField` | Receives Go struct directly |
+| **Cleanup (`__del__`)** | Receives `*object.Instance` | Receives Go struct directly |
+| **GC trigger** | Yes — finalizer installed on instance | Yes — finalizer installed on instance |
 | **Boilerplate** | More (boxing/unboxing) | Less |
 
 ## Examples

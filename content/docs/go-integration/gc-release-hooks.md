@@ -28,7 +28,10 @@ _ = object.ClearGCReleaseHook(target)
 
 GC release hooks are useful when a Go object owns a secondary resource and should send a cleanup signal if user code drops the object without calling an explicit release method.
 
-The plugin system uses this for proxy objects. When a local Scriptling object that represents a plugin-side object becomes unreachable, the finalizer can enqueue an `object.destroy` request for the plugin process.
+Scriptling uses `runtime.SetFinalizer` in two places:
+
+- **All classes with `__del__`** (including pure Scriptling classes, Go builder classes, and plugin proxy objects): when an instance becomes unreachable, the finalizer calls `__del__` on it.
+- **Plugin proxy objects**: the finalizer also sends `object.destroy` to the plugin server, which calls the server-side `__del__` to free plugin resources.
 
 ## Limits
 
