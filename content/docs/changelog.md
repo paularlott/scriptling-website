@@ -16,14 +16,15 @@ nav-skip: true
 - Go plugin system for extending Scriptling with out-of-process plugins written in Go
 - `plugin.NewServer` for building plugin executables that register functions, classes, and constants via RPC
 - `plugin.Manager` for loading and managing plugin binaries from directories
+- `--plugin-dir` CLI flag and `SCRIPTLING_PLUGIN_DIR` env var for loading plugins in both CLI and server modes
 - Auto-generated proxy classes with `__del__` that releases plugin-side objects on garbage collection
 - Custom wrapper class source for full control over the host-side proxy
 - `scriptling.plugin` control library: `list()`, `describe()`, `call_function()`, `call_method()`, `release()`
-- Concurrent plugin server — multiple requests are dispatched in parallel so slow calls don't block others
+- Concurrent plugin server — multiple requests are dispatched in parallel so slow calls from one environment don't block another
 - `plugin.RegisterScriptFunc` / `plugin.RegisterScriptClass` for host-side Scriptling code within plugin libraries
-{{< /changelog-item >}}
+- Plugin callbacks — plugins can call host-provided functions via `plugin.Callback` interface during RPC calls, enabling streaming, event handlers, and other bidirectional patterns
+- `object.GCReleaseHook` for best-effort cleanup when GC collects plugin-owned objects
 
-{{< changelog-item "changed" >}}
 **Class Builder:**
 
 - `object.ClassBuilder.Constructor(fn)` for typed receiver classes — constructor returns a Go struct, methods receive it directly
