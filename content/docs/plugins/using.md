@@ -64,4 +64,4 @@ print(cfg.get("name"))
 scriptling.plugin.release(cfg)
 ```
 
-Prefer explicit `release()` for deterministic cleanup. Embedded Go applications can call `plugin.ReleaseWithContext(ctx, obj)` when release should follow a request context. All class instances with `__del__` get a GC finalizer installed automatically — both in-process and plugin objects — as a best-effort fallback.
+Prefer explicit `release()` for deterministic cleanup. Embedded Go applications can call `plugin.ReleaseWithContext(ctx, obj)` when release should follow a request context. The contextless `plugin.Release(obj)` and GC finalizer fallback use `plugin.DefaultReleaseTimeout`. All class instances with `__del__` get a GC finalizer installed automatically — both in-process and plugin objects — as a best-effort fallback.
