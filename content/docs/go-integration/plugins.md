@@ -21,6 +21,10 @@ func main() {
     ctx := context.Background()
 
     manager := plugin.NewManager()
+    manager.SetCrashHandler(func(name string, err error) {
+        log.Println("plugin crashed:", name, err)
+        // Decide whether to terminate, restart, or mark this host unhealthy.
+    })
     manager.AddDir("./plugins")
     if err := manager.Load(ctx); err != nil {
         log.Fatal(err)
@@ -49,6 +53,18 @@ print(plugin.hello.greet("Ada"))
 Each Scriptling environment belongs to one Go thread of execution and must not be evaluated concurrently. Create one environment per concurrent request or worker, then call `plugin.RegisterLibraries(env, manager)` for each environment.
 
 The manager starts each plugin executable once. Multiple environments can share that manager, and plugin calls from those separate environments may overlap on the same plugin process.
+
+## Crash Handling
+
+`manager.SetCrashHandler()` installs a callback for plugin processes that exit unexpectedly after loading. This is the normal long-running server hook for logging, terminating, restarting, or marking the host unhealthy.
+
+```go
+manager.SetCrashHandler(func(name string, err error) {
+    log.Println("plugin crashed:", name, err)
+})
+```
+
+`manager.Health()` reports plugin processes that have exited or whose stdio transport has closed. The returned map is empty when all loaded plugins are healthy.
 
 ## Startup and Failure Behavior
 

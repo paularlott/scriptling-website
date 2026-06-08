@@ -244,6 +244,7 @@ The lifecycle works like this:
 You can also trigger cleanup explicitly:
 
 - From Scriptling: `scriptling.plugin.release(handle)` or `handle.__del__()`
+- From Go: `plugin.ReleaseWithContext(ctx, obj)` for request-scoped cleanup
 - `__del__` can be called multiple times explicitly — each call runs the function
 - When triggered by GC (via `object.destroy`), the server calls `__del__` at most once per object
 

@@ -21,6 +21,10 @@ func main() {
     ctx := context.Background()
 
     manager := plugin.NewManager()
+    manager.SetCrashHandler(func(name string, err error) {
+        log.Println("plugin crashed:", name, err)
+        // Decide whether to terminate, restart, or mark this host unhealthy.
+    })
     manager.AddDir("./plugins")
     if err := manager.Load(ctx); err != nil {
         log.Fatal(err)
@@ -55,6 +59,18 @@ plugin.RegisterLibraries(p1, manager)
 p2 := scriptling.New()
 plugin.RegisterLibraries(p2, manager)
 ```
+
+## Crash Handling
+
+`manager.SetCrashHandler()` installs a callback for plugin processes that exit unexpectedly after loading. Long-running applications can log the failure, terminate, restart the process, or mark themselves unhealthy.
+
+```go
+manager.SetCrashHandler(func(name string, err error) {
+    log.Println("plugin crashed:", name, err)
+})
+```
+
+`manager.Health()` is still available for polling or health endpoints. It returns a map of unhealthy plugin library names to errors and is empty when all loaded plugins are healthy.
 
 ## Server Applications
 
