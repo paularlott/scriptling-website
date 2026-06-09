@@ -13,6 +13,8 @@ import (
     "context"
     "log"
 
+    logslog "github.com/paularlott/logger/slog"
+
     "github.com/paularlott/scriptling"
     "github.com/paularlott/scriptling/plugin"
 )
@@ -20,8 +22,12 @@ import (
 func main() {
     ctx := context.Background()
 
-    manager := plugin.NewManager()
-    manager.SetCrashHandler(func(name string, err error) {
+    appLogger := logslog.New(logslog.Config{
+        Level:  "info",
+        Format: "console",
+    })
+
+    manager := plugin.NewManager(appLogger, func(name string, err error) {
         log.Println("plugin crashed:", name, err)
         // Decide whether to terminate, restart, or mark this host unhealthy.
     })
@@ -54,9 +60,20 @@ Each Scriptling environment belongs to one Go thread of execution and must not b
 
 The manager starts each plugin executable once. Multiple environments can share that manager, and plugin calls from those separate environments may overlap on the same plugin process. The stdio JSON-RPC connection multiplexes overlapping calls by request id; connection pooling is intentionally not used because it would create multiple plugin process instances and violate the singleton plugin model.
 
+
+## Plugin Logs
+
+Pass a logger to `plugin.NewManager(appLogger, crashHandler)` to install the manager-lifetime host logger used for records emitted by Go plugins through `plugin.Logger(ctx)`. Pass the same `github.com/paularlott/logger.Logger` your application already uses; the example above uses `github.com/paularlott/logger/slog` so plugin logs are visible during development. `manager.SetLogger()` is also available for late wiring. If no logger is configured, plugin log records are acknowledged and dropped.
+
+A Go plugin writes to the host logger from an active plugin call:
+
+```go
+plugin.Logger(ctx).Info("plugin work started", "name", name)
+```
+
 ## Crash Handling
 
-`manager.SetCrashHandler()` installs a callback for plugin processes that exit unexpectedly after loading. This is the normal long-running server hook for logging, terminating, restarting, or marking the host unhealthy.
+Pass a crash handler to `plugin.NewManager(appLogger, crashHandler)` to handle plugin processes that exit unexpectedly after loading. `manager.SetCrashHandler()` is also available for late wiring. This is the normal long-running server hook for logging, terminating, restarting, or marking the host unhealthy.
 
 ```go
 manager.SetCrashHandler(func(name string, err error) {

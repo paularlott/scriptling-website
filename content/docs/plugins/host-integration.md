@@ -13,6 +13,8 @@ import (
     "context"
     "log"
 
+    logslog "github.com/paularlott/logger/slog"
+
     "github.com/paularlott/scriptling"
     "github.com/paularlott/scriptling/plugin"
 )
@@ -20,8 +22,12 @@ import (
 func main() {
     ctx := context.Background()
 
-    manager := plugin.NewManager()
-    manager.SetCrashHandler(func(name string, err error) {
+    appLogger := logslog.New(logslog.Config{
+        Level:  "info",
+        Format: "console",
+    })
+
+    manager := plugin.NewManager(appLogger, func(name string, err error) {
         log.Println("plugin crashed:", name, err)
         // Decide whether to terminate, restart, or mark this host unhealthy.
     })
@@ -60,9 +66,14 @@ p2 := scriptling.New()
 plugin.RegisterLibraries(p2, manager)
 ```
 
+
+## Plugin Logs
+
+Pass a logger to `plugin.NewManager(appLogger, crashHandler)` to install the manager-lifetime host logger used for records emitted by Go plugins through `plugin.Logger(ctx)`. Pass the same logger your application already uses; the example above uses `github.com/paularlott/logger/slog` so plugin logs are visible during development. `manager.SetLogger()` is also available for late wiring. If no logger is configured, plugin log records are acknowledged and dropped.
+
 ## Crash Handling
 
-`manager.SetCrashHandler()` installs a callback for plugin processes that exit unexpectedly after loading. Long-running applications can log the failure, terminate, restart the process, or mark themselves unhealthy.
+Pass a crash handler to `plugin.NewManager(appLogger, crashHandler)` to handle plugin processes that exit unexpectedly after loading. `manager.SetCrashHandler()` is also available for late wiring. Long-running applications can log the failure, terminate, restart the process, or mark themselves unhealthy.
 
 ```go
 manager.SetCrashHandler(func(name string, err error) {

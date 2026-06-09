@@ -8,6 +8,26 @@ nav-skip: true
 
 ## June 2026
 
+
+{{< version "v0.11.0" >}}
+
+{{< changelog-item "added" >}}
+**Plugin System:**
+
+- Plugin class properties are exposed through generated and native proxies, including read-only getters and getter/setter pairs
+- Go plugins can emit records to the host logger with `plugin.Logger(ctx)`; host applications pass the manager-lifetime logger to `plugin.NewManager(appLogger, crashHandler)`
+- Plugin manager crash handling can be supplied during construction, with `SetCrashHandler()` still available for late wiring
+- New runnable plugin examples for properties and host logging
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**Version:**
+
+- Scriptling version bumped to `v0.11.0`
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.10.0" >}}
 
 {{< changelog-item "added" >}}

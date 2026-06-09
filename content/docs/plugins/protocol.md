@@ -161,6 +161,10 @@ The `schema` object:
       "constructor": { "name": "Config" },
       "methods": [
         { "name": "get" }
+      ],
+      "properties": [
+        { "name": "name", "settable": true },
+        { "name": "label" }
       ]
     }
   ],
@@ -173,6 +177,8 @@ The `schema` object:
 If the plugin returns any other protocol version, the host refuses to load it and records a manager warning. Breaking protocol changes require a new protocol version and older hosts will reject the plugin during handshake.
 
 When `source` is empty or absent the host auto-generates an RPC proxy. When `source` is provided the host uses it directly — either as a wrapper around RPC calls or as pure host-side Scriptling code.
+
+Class `properties` are auto-generated as Scriptling @property descriptors. `settable: true` means the host also generates a setter. Getter-only properties are read-only from Scriptling.
 
 ### `environment.open`
 
@@ -248,6 +254,33 @@ Example:
 
 If the callback raises an error, the host returns a JSON-RPC error and the plugin function should fail the outer call. Once the outer call returns, all callback ids created for that call expire; later use returns `unknown callback`.
 
+
+
+
+### `host.log`
+
+**Direction:** Plugin -> Host  
+**When:** A Go plugin writes through `plugin.Logger(ctx)` during an active function, constructor, or method call.
+
+**Request params:**
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `level` | string | No | `trace`, `debug`, `info`, `warn`, `error`, or `fatal` |
+| `message` | string | No | Log message |
+| `args` | [Value] | Yes | Logger key/value arguments encoded as transport values |
+
+**Response result:** `null`
+
+Example:
+
+```json
+-> {"jsonrpc":"2.0","id":8,"method":"host.log","params":{"level":"info","message":"plugin work started","args":[{"type":"string","value":"name"},{"type":"string","value":"Ada"}]}}
+<- {"jsonrpc":"2.0","id":8,"result":{"type":"null"}}
+```
+
+The host forwards the record to the plugin manager logger if one is configured. If no host logger is configured, the host acknowledges the request and drops the record.
+
 ### `object.new`
 
 **Direction:** Host → Plugin
@@ -285,7 +318,9 @@ If the callback raises an error, the host returns a JSON-RPC error and the plugi
 | `args` | [Value] | Yes | Positional arguments |
 | `kwargs` | {string: Value} | Yes | Keyword arguments |
 
-**Response result:** A single `Value` — the method's return value.
+**Response result:** A single `Value` — the method return value.
+
+Class properties also use `object.call_method`. A getter call sends the property name with no `args`; a setter call sends the property name with one positional argument containing the new value. Read-only properties return a JSON-RPC error when called as a setter.
 
 ### `object.destroy`
 

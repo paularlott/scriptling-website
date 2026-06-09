@@ -490,7 +490,7 @@ print(str(Cat("Whiskers"))) # Cat(Whiskers)
 
 ### `@property`
 
-Turns a method into a read-only attribute:
+`@property` turns a method into an attribute. The getter receives `self` and is called when the attribute is read. Scriptling users access the value without call parentheses:
 
 ```python
 class Circle:
@@ -506,11 +506,17 @@ class Circle:
         return 3.14159 * self._radius * self._radius
 
 c = Circle(5)
-print(c.radius)  # 5  — no call parens needed
+print(c.radius)  # 5
 print(c.area)    # 78.53975
 ```
 
-Add a setter with `@<name>.setter`:
+A property without a setter is read-only. Assigning to it raises `AttributeError`:
+
+```python
+# c.area = 10  # AttributeError: property is read-only
+```
+
+Add a setter with `@<name>.setter`. The setter method must use the same property name and receives `self` plus the assigned value:
 
 ```python
 class Temperature:
@@ -538,6 +544,25 @@ print(t.fahrenheit) # 32.0
 # t.fahrenheit = 50  # AttributeError: property is read-only
 ```
 
+Use properties when you want attribute syntax with validation, computed values, or private backing fields. A common pattern is to store the real value in an underscore-prefixed field and expose it through a property:
+
+```python
+class Account:
+    def __init__(self, balance):
+        self._balance = 0
+        self.balance = balance  # reuse setter validation
+
+    @property
+    def balance(self):
+        return self._balance
+
+    @balance.setter
+    def balance(self, value):
+        if value < 0:
+            raise ValueError("balance cannot be negative")
+        self._balance = value
+```
+
 Properties (with or without setters) are inherited:
 
 ```python
@@ -562,6 +587,7 @@ sq = Square(3)
 print(sq.name)      # "square"  — inherited property
 print(sq.perimeter) # 12
 ```
+
 
 ### `@staticmethod`
 

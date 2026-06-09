@@ -259,7 +259,7 @@ def fn(): ...
 # equivalent to: fn = outer(inner(fn))
 ```
 
-See [Classes](./classes/) for `@property` and `@staticmethod`.
+See [Classes](./classes/#decorators) for `@property`, `@<name>.setter`, `@staticmethod`, and `@classmethod`.
 
 ## Lambda Functions
 

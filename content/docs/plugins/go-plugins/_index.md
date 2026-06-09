@@ -250,6 +250,78 @@ You can also trigger cleanup explicitly:
 
 With typed receivers, `__del__` receives the Go struct directly. With `*object.Instance`, it receives the instance and can clean up fields manually.
 
+
+## Plugin Class Properties
+
+Use `Property()` for getter-only properties and `PropertyWithSetter()` for read/write properties. Properties are exposed to the host as native Scriptling properties, so users write `obj.name` and `obj.name = value` rather than calling RPC helper functions directly.
+
+```go
+type counter struct {
+    value int
+}
+
+cb := object.NewClassBuilder("Counter").
+    Constructor(func(start int) *counter {
+        return &counter{value: start}
+    }).
+    PropertyWithSetter("value",
+        func(self *counter) int {
+            return self.value
+        },
+        func(self *counter, value int) {
+            self.value = value
+        },
+    ).
+    Property("label", func(self *counter) string {
+        return fmt.Sprintf("counter:%d", self.value)
+    })
+
+server.RegisterClass(cb)
+```
+
+Host usage:
+
+```python
+import plugin.properties
+
+c = plugin.properties.Counter(10)
+c.value = c.value + 5
+print(c.value)   # 15
+print(c.label)   # counter:15
+```
+
+`Property()` creates a read-only property. Assigning to it raises a Scriptling attribute error. `PropertyWithSetter()` creates a getter and setter pair; the setter receives the same receiver as methods and the new value as its next argument.
+
+See `examples/plugins/properties` for a runnable plugin.
+
+## Plugin Logging
+
+Go plugins can ask for a call-scoped proxy to the host logger with `plugin.Logger(ctx)`. The proxy implements the standard `github.com/paularlott/logger.Logger` interface and sends records back to the manager-lifetime host logger over JSON-RPC.
+
+```go
+fb := object.NewFunctionBuilder()
+fb.Function(func(ctx context.Context, name string, tags []any) string {
+    plugin.Logger(ctx).With("plugin", "logger").Info("plugin work started",
+        "name", name,
+        "tags", tags,
+    )
+    return "logged:" + name
+})
+server.RegisterFunc("work", fb)
+```
+
+Host usage:
+
+```python
+import plugin.logger
+
+print(plugin.logger.work("Ada", ["demo", 1]))
+```
+
+The logger proxy is call-scoped because it uses the active `context.Context` to reach the JSON-RPC runtime for that plugin call. Do not store it globally; call `plugin.Logger(ctx)` from functions, constructors, methods, or property accessors that receive the active `context.Context`. Values in log key/value pairs use the same transport conversion as function arguments: structs and maps become dictionaries, and slices or arrays become lists.
+
+See `examples/plugins/logger` for a runnable plugin.
+
 ## Function Callbacks
 
 A Scriptling function can be passed into a plugin call. The host sends it as a scoped callback reference, and the Go plugin receives it as `plugin.Callback`. The callback can be invoked until the outer plugin function returns.

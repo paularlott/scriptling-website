@@ -239,7 +239,7 @@ cb.Method("fetch", func(self *object.Instance, ctx context.Context, kwargs objec
 
 ### `Property(name, fn)`
 
-Registers a read-only getter as a `@property`. The getter receives `self` only — do **not** include extra parameters:
+Registers a read-only getter as a `@property`. The getter receives `self` only, returns the attribute value, and is called when Scriptling reads `obj.name`. Do **not** include extra parameters:
 
 ```go
 cb.Property("area", func(self *object.Instance) float64 {
@@ -254,7 +254,7 @@ cb.Property("area", func(self *object.Instance) float64 {
 
 ### `PropertyWithSetter(name, getter, setter)`
 
-Registers a getter and setter. The setter receives `self` and the new value:
+Registers a getter and setter. The getter receives `self` only. The setter receives `self` and the new value, and may validate or normalize before storing it. Setter return values are ignored by normal assignment:
 
 ```go
 cb.PropertyWithSetter("radius",
@@ -267,7 +267,7 @@ cb.PropertyWithSetter("radius",
     },
 )
 
-// c.radius = 10  # calls setter
+// c.radius = 10   # calls setter
 // print(c.radius) # calls getter
 ```
 
