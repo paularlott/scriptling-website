@@ -15,6 +15,7 @@ A plugin declares a short name such as `hello`. Scriptling imports it as `plugin
 - [Go Plugins](go-plugins/) - Register functions, classes, and constants in a Go plugin.
   - [Client Wrappers](go-plugins/client-wrappers/) - Auto-generated proxies and custom Scriptling wrappers.
   - [Host-Side Scripting](go-plugins/host-side-scripting/) - Pure Scriptling functions and classes on the host.
+- [C Plugins](c-plugins/) - Build plugins in C using the single-header SDK.
 - [Bash Plugins](bash/) - Implement the JSON-RPC protocol directly.
 - [JSON-RPC Protocol](protocol/) - Wire format reference for all methods and value encoding.
 
