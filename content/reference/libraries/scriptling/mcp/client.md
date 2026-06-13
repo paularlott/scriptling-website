@@ -89,7 +89,7 @@ client = mcp.Client(
 
 Lists all tools available from this MCP server.
 
-**Returns:** list - List of tool dicts with name, description, input_schema
+**Returns:** list - List of tool dicts with name, description, inputSchema
 
 **Example:**
 
@@ -99,8 +99,8 @@ tools = client.tools()
 
 for tool in tools:
     print(f"{tool.name}: {tool.description}")
-    if "input_schema" in tool:
-        print(f"  Schema: {tool.input_schema}")
+    if "inputSchema" in tool:
+        print(f"  Schema: {tool.inputSchema}")
 ```
 
 ### client.call_tool(name, arguments)
@@ -287,7 +287,7 @@ tools = client.tools()
 for tool in tools:
     if tool.name == "search":
         # Check what parameters are required
-        schema = tool.input_schema
+        schema = tool.inputSchema
         print(f"Search tool schema: {schema}")
 
         # Call with proper arguments
@@ -429,7 +429,7 @@ tools = client.tools()
 
 for tool in tools:
     if tool.name == "search":
-        schema = tool.input_schema
+        schema = tool.inputSchema
         # Example schema:
         # {
         #     "type": "object",
