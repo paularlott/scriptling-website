@@ -163,6 +163,7 @@ These are the most useful exception types to generate in normal scripts:
 - `AttributeError` for missing attributes.
 - `ValueError` for bad values.
 - `TypeError` for invalid argument or operand types.
+- `ImportError` for optional libraries or imported names that are not available.
 
 Use normal `try` / `except` patterns:
 

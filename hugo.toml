@@ -1,5 +1,4 @@
 baseURL = 'https://scriptling.dev/'
-languageCode = 'en-US'
 title = 'Scriptling'
 
 [outputs]
