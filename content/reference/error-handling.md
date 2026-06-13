@@ -105,6 +105,7 @@ Exception (base class)
 ├── ValueError      - Invalid values
 ├── TypeError       - Type mismatches
 ├── NameError       - Undefined names
+├── ImportError     - Library or imported name cannot be imported
 ├── ZeroDivisionError - Division by zero
 ├── IndexError      - Sequence index out of range
 ├── KeyError        - Dictionary key not found
@@ -120,6 +121,7 @@ Exception (base class)
 | `ValueError` | Invalid value for operation |
 | `TypeError` | Operation on wrong type |
 | `NameError` | Variable/identifier not found |
+| `ImportError` | Library or imported name cannot be imported |
 | `ZeroDivisionError` | Division or modulo by zero |
 | `IndexError` | Sequence index out of range |
 | `KeyError` | Dictionary key not found |
@@ -141,6 +143,11 @@ try:
     x = undefined_variable
 except NameError as e:
     print("Caught name error")  # This works!
+
+try:
+    import optional_library
+except ImportError:
+    print("Optional library is not available")
 ```
 
 ## Raise Statement
@@ -165,6 +172,7 @@ raise Exception("generic error")
 raise ValueError("invalid value")
 raise TypeError("wrong type")
 raise NameError("name not defined")
+raise ImportError("module not found")
 ```
 
 ### Simple String Raise

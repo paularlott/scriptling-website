@@ -279,7 +279,7 @@ scriptling --disable-lib subprocess --disable-lib os script.py
 SCRIPTLING_DISABLE_LIB=subprocess scriptling script.py
 ```
 
-If a script attempts to import a disabled library, it will raise an import error.
+If a script attempts to import a disabled library, it raises `ImportError`, which can be caught with `try` / `except`.
 
 ## Script Execution Modes
 

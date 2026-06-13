@@ -9,6 +9,17 @@ nav-skip: true
 ## June 2026
 
 
+{{< version "v0.11.1" >}}
+
+{{< changelog-item "fixed" >}}
+**Language — ImportError handling:**
+
+- Failed `import` and `from ... import ...` statements now raise catchable `ImportError` exceptions inside `try` / `except`, while uncaught import failures still terminate evaluation as before
+- `ImportError(...)` is available as a built-in exception constructor and can be used in typed `except ImportError` and tuple `except (..., ImportError)` clauses
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.11.0" >}}
 
 {{< changelog-item "added" >}}
