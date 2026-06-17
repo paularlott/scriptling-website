@@ -9,6 +9,16 @@ nav-skip: true
 ## June 2026
 
 
+{{< version "v0.11.3" >}}
+
+{{< changelog-item "added" >}}
+**Markdown Library:**
+
+- New `scriptling.markdown` library with `to_html(markdown_string)` for converting Markdown to HTML
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.11.1" >}}
 
 {{< changelog-item "fixed" >}}

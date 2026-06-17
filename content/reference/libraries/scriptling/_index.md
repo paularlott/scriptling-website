@@ -41,16 +41,17 @@ Scriptling-specific libraries that provide functionality not available in Python
 - [Sandbox](runtime/sandbox/) — Isolated script execution environments
 
 #### Utilities
-- [Console](console/) — Console input/output functions
-- [Container](container/) — Container lifecycle management for Docker, Podman, and Apple Containers
-- [Grep](grep/) — Fast file content search with regex or literal patterns
-- [Sed](sed/) — In-place file content replacement with literal strings or regex patterns
-- [Secrets](secret/) — Resolve secrets through host-configured provider aliases
-- [Wait For](wait_for/) — Wait for resources to become available
-- [Plugin](plugin/) — Control library for executable plugins
-- [Toon](toon/) — TOON (Token-Oriented Object Notation) encoding/decoding
-- [Similarity](similarity/) — Text similarity utilities including fuzzy search and MinHash
-- [Templates](template/) — Go-powered template rendering (HTML and text)
+- [Console](utilities/console/) — Console input/output functions
+- [Container](utilities/container/) — Container lifecycle management for Docker, Podman, and Apple Containers
+- [Grep](utilities/grep/) — Fast file content search with regex or literal patterns
+- [Sed](utilities/sed/) — In-place file content replacement with literal strings or regex patterns
+- [Secrets](utilities/secret/) — Resolve secrets through host-configured provider aliases
+- [Wait For](utilities/wait_for/) — Wait for resources to become available
+- [Plugin](utilities/plugin/) — Control library for executable plugins
+- [Toon](utilities/toon/) — TOON (Token-Oriented Object Notation) encoding/decoding
+- [Similarity](utilities/similarity/) — Text similarity utilities including fuzzy search and MinHash
+- [Templates](utilities/template/) — Go-powered template rendering (HTML and text)
+- [Markdown](utilities/markdown/) — Markdown to HTML conversion (GitHub Flavored Markdown)
 
 ## Usage
 
