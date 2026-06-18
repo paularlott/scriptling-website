@@ -12,6 +12,7 @@ Libraries for runtime functionality including background task execution, HTTP se
 |---------|-------------|
 | [scriptling.runtime](runtime/) | Background tasks and async execution |
 | [scriptling.runtime.http](http/) | HTTP route registration and response helpers |
+| [scriptling.runtime.jsonrpc](jsonrpc/) | Concurrent stdio JSON-RPC 2.0 server |
 | [scriptling.runtime.kv](kv/) | Thread-safe key-value store |
 | [scriptling.runtime.sync](sync/) | Named cross-environment concurrency primitives |
 | [scriptling.runtime.sandbox](sandbox/) | Isolated script execution environments |

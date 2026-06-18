@@ -21,6 +21,9 @@ scriptling --server :8000 setup.py
 
 # Start MCP server with tools
 scriptling --server :8000 --mcp-tools ./tools setup.py
+
+# Start stdio JSON-RPC server
+scriptling --jsonrpc setup.py
 ```
 
 ## Documentation
@@ -32,6 +35,10 @@ Installation, running scripts, interactive mode, lint mode, command line options
 ### [HTTP Server Mode](./http-server/)
 
 Running Scriptling as an HTTP server with custom routes, TLS, and authentication.
+
+### [JSON-RPC Server Mode](./jsonrpc-server/)
+
+Running Scriptling as a concurrent stdio JSON-RPC 2.0 server.
 
 ### [MCP Server Mode](./mcp-server/)
 
@@ -48,6 +55,7 @@ Create, distribute, and load Scriptling packages from local files or URLs.
 - **Interactive mode**: REPL-like interactive execution
 - **Lint mode**: Check scripts for syntax errors without execution
 - **HTTP Server**: Start HTTP server with custom routes via `--server`
+- **JSON-RPC Server**: Serve concurrent JSON-RPC 2.0 over stdio with `--jsonrpc`
 - **MCP Server**: Serve tools via Model Context Protocol with `--mcp-tools`
 - **MCP Script Execution**: Allow LLMs to execute Scriptling code via `--mcp-exec-script`
 - **Packages**: Load libraries from local or remote ZIP packages with `--package`
