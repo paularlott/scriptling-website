@@ -14,7 +14,7 @@ The `scriptling.provision.file` library provides a single `ensure` function that
 
 | Function | Description |
 |----------|-------------|
-| `ensure(path, content, mode=0o644)` | Ensure a file exists with the given content |
+| `ensure(path, content, mode=0o644, create_only=False)` | Ensure a file exists with the given content |
 | `absent(path)` | Remove a file if it exists |
 | `ensure_directory(path, mode=0o755)` | Ensure a directory exists |
 | `absent_directory(path)` | Remove an empty directory if it exists |
@@ -33,10 +33,14 @@ The `scriptling.provision.file` library provides a single `ensure` function that
 ## ensure
 
 ```python
-ensure(path: str, content: str, mode: int = 0o644) -> str
+ensure(path: str, content: str, mode: int = 0o644, create_only: bool = False) -> str
 ```
 
 Creates parent directories if needed. If the file already exists with the same content, it is left unchanged. Otherwise the file is written with the specified mode.
+
+### create_only
+
+When `create_only=True`, an existing file is never modified — the call returns `file.UNCHANGED` without writing, even if the content on disk differs. New files are still written normally. This is useful for seeding configuration files that should only be created once and left alone on subsequent runs.
 
 ### Constants
 
@@ -67,6 +71,14 @@ if status == file.CREATED:
     print("Git config created")
 elif status == file.UPDATED:
     print("Git config updated")
+```
+
+Seed a file only on first run, leaving any later edits intact:
+
+```python
+import scriptling.provision.file as file
+
+status = file.ensure("~/.config/myapp/defaults.toml", DEFAULTS, create_only=True)
 ```
 
 ## absent

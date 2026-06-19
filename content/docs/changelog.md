@@ -35,6 +35,12 @@ nav-skip: true
   run, server, and `--json-rpc` modes.
 {{< /changelog-item >}}
 
+{{< changelog-item "changed" >}}
+**Provisioning Library File:**
+
+- `scriptling.provision.file.ensure` now accepts a `create_only=False` keyword argument; when `True`, an existing file is never modified and the call returns `file.UNCHANGED`, while new files are still written normally — useful for seeding config files only on first run
+{{< /changelog-item >}}
+
 ---
 
 {{< version "v0.12.0" >}}
