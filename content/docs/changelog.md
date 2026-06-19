@@ -5,13 +5,34 @@ layout: changelog
 nav-skip: true
 ---
 
-
 ## June 2026
 
 {{< version "v0.12.1" >}}
 
 {{< changelog-item "added" >}}
+### Easier executable plugins with `scriptling.plugin`
 
+- New `scriptling.plugin.load(name, path, scriptling=False, args=None)` starts
+  an executable plugin, registers it under `name`, and returns the normalised
+  library name. Use `args` to pass command-line arguments.
+- `call_function` now works for both plugin styles:
+  `scriptling=True` uses Scriptling's typed `function.call` protocol,
+  while `scriptling=False` (default) sends raw JSON-RPC method calls.
+- New `scriptling.plugin.batch_call(library, calls)` sends multiple calls in
+  one JSON-RPC batch and returns results in the same order.
+- `scriptling=True` fills `describe()` / `list()` from the plugin handshake;
+  `scriptling=False` skips handshake metadata.
+- `call_function`, `call_method`, `describe`, and `unload` accept either short
+  names (like `"widgets"`) or normalised names (like `"plugin.widgets"`).
+- Plugin identity is based on absolute path to prevent accidental duplicates:
+  reloading the same path and name is a no-op, but conflicting name/path pairs
+  raise an error.
+- New `scriptling.plugin.unload(name)` cleanly stops the process and releases
+  the name.
+- Go parity: `plugin.Manager.LoadPath(ctx, name, path, scriptling, args)` and
+  `plugin.Manager.Unload(name)` provide the same behavior.
+- `scriptling.plugin` is now always available (even without `--plugin-dir`) in
+  run, server, and `--json-rpc` modes.
 {{< /changelog-item >}}
 
 ---

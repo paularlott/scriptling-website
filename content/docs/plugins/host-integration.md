@@ -88,3 +88,37 @@ manager.SetCrashHandler(func(name string, err error) {
 For long-running servers, create the manager during application startup and close it during shutdown. Register plugin libraries in every request environment.
 
 Scriptling's CLI server mode does this for `--plugin-dir` automatically.
+
+## Loading Executables on Demand
+
+`Manager.LoadPath` spawns a single executable at runtime without scanning a
+directory. `Manager.Unload` closes one and removes it. Both are safe to call
+while the manager is also serving `--plugin-dir` plugins.
+
+```go
+// Plugin protocol peer (scriptling.handshake + function.call etc.)
+client, err := manager.LoadPath(ctx, "widgets", "/opt/widgets/widget", true, nil)
+if err != nil { log.Fatal(err) }
+defer manager.Unload("widgets")
+
+// Typed plugin call — ints stay ints, etc.
+result, err := client.CallFunction(ctx, "build",
+    []Value{{Type: valueString, Value: "chair"}}, nil)
+
+// Pass command-line arguments, e.g. loading scriptling itself in raw JSON-RPC mode.
+client, err = manager.LoadPath(ctx, "rpc", "scriptling", false,
+    []string{"--json-rpc", "./setup.py"})
+if err != nil { log.Fatal(err) }
+defer manager.Unload("rpc")
+```
+
+`LoadPath` is idempotent on absolute path + name: a second call with the same
+path and the same name returns the existing client without respawning.
+Loading an already-loaded path under a different name, or loading a new path
+under a name already in use, returns an error.
+
+The CLI always constructs a manager (even without `--plugin-dir`) so that
+`scriptling.plugin.load` / `unload` / `call` are available to scripts in run,
+server, and `--json-rpc` modes. Embedded applications get the same behaviour
+as long as they construct a manager and call `plugin.RegisterLibraries` on
+each environment.
