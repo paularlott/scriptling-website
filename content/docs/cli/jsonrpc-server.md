@@ -10,10 +10,10 @@ JSON-RPC methods.
 
 ## Starting the Server
 
-Use the `--jsonrpc` flag to start a stdio JSON-RPC server:
+Use the `--json-rpc` flag to start a stdio JSON-RPC server:
 
 ```bash
-scriptling --jsonrpc setup.py
+scriptling --json-rpc setup.py
 ```
 
 The setup script runs once at startup and registers method and notification
@@ -21,7 +21,7 @@ handlers via `scriptling.runtime.jsonrpc`. The server then reads newline-
 delimited JSON-RPC 2.0 requests from stdin and writes one response per line to
 stdout.
 
-> **Logging goes to stderr.** In `--jsonrpc` mode, all log output is
+> **Logging goes to stderr.** In `--json-rpc` mode, all log output is
 > automatically redirected to **stderr** so it never corrupts the JSON-RPC
 > stream on stdout. You can safely combine `--log-level debug` with piping
 > requests on stdin.
@@ -30,14 +30,14 @@ stdout.
 
 | Flag              | Environment Variable       | Description                          | Default    |
 | ----------------- | -------------------------- | ------------------------------------ | ---------- |
-| `--jsonrpc`       | `SCRIPTLING_JSONRPC`       | Enable stdio JSON-RPC server mode    | false      |
+| `--json-rpc`       | `SCRIPTLING_JSONRPC`       | Enable stdio JSON-RPC server mode    | false      |
 | `--allowed-paths` | `SCRIPTLING_ALLOWED_PATHS` | Allowed filesystem paths             | (none)     |
 | `--kv-storage`    | `SCRIPTLING_KV_STORAGE`    | Directory for persistent KV store    | in-memory  |
 | `--libpath`       | -                          | Extra library search directories     | none       |
 | `--package`       | -                          | Load libraries from a package (zip)  | none       |
 | `--plugin-dir`    | -                          | Load plugin libraries                | none       |
 
-`--jsonrpc` and `--server` are mutually exclusive modes.
+`--json-rpc` and `--server` are mutually exclusive modes.
 
 ## Registering Handlers
 
@@ -79,19 +79,19 @@ for the full API.
 ```bash
 # Single request
 echo '{"jsonrpc":"2.0","method":"echo","params":{"hello":"world"},"id":1}' \
-  | scriptling --jsonrpc setup.py
+  | scriptling --json-rpc setup.py
 # {"jsonrpc":"2.0","result":{"hello":"world"},"id":1}
 
 # Batch (returned as a single JSON array)
 echo '[{"jsonrpc":"2.0","method":"divide","params":{"a":1,"b":0},"id":1},
        {"jsonrpc":"2.0","method":"echo","params":42,"id":2}]' \
-  | scriptling --jsonrpc setup.py
+  | scriptling --json-rpc setup.py
 # [{"jsonrpc":"2.0","error":{"code":-32602,"message":"division by zero","data":{"field":"b"}},"id":1},
 #  {"jsonrpc":"2.0","result":42,"id":2}]
 
 # Notification (no id) — no response is written
 echo '{"jsonrpc":"2.0","method":"progress","params":{"done":1}}' \
-  | scriptling --jsonrpc setup.py
+  | scriptling --json-rpc setup.py
 ```
 
 ## Concurrency

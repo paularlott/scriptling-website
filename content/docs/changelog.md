@@ -8,6 +8,14 @@ nav-skip: true
 
 ## June 2026
 
+{{< version "v0.12.1" >}}
+
+{{< changelog-item "added" >}}
+
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.12.0" >}}
 
 {{< changelog-item "added" >}}
@@ -16,7 +24,7 @@ nav-skip: true
 - Added `scriptling.runtime.jsonrpc`, a concurrent stdin/stdout JSON-RPC 2.0
   server. Handlers are referenced by string (`"library.function"`) and run on a
   fresh, isolated evaluator per request. Supports batches, notifications, and structured errors. Start with
-  `scriptling --jsonrpc setup.py`; logs are redirected to stderr so the stdout
+  `scriptling --json-rpc setup.py`; logs are redirected to stderr so the stdout
   stream stays pure JSON-RPC.
 
 {{< /changelog-item >}}

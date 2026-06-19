@@ -12,10 +12,10 @@ referenced by string (`"library.function"`), the same model used by
 `runtime.http`, so each request runs on a fresh, isolated evaluator in its own
 goroutine and a slow handler never blocks the next request.
 
-Start the stdio server with the `--jsonrpc` flag:
+Start the stdio server with the `--json-rpc` flag:
 
 ```bash
-scriptling --jsonrpc setup.py
+scriptling --json-rpc setup.py
 ```
 
 Logging is automatically redirected to stderr so it never corrupts the JSON-RPC
@@ -131,12 +131,12 @@ def on_progress(params):
 
 ```bash
 $ echo '{"jsonrpc":"2.0","method":"echo","params":{"hello":"world"},"id":1}' \
-  | scriptling --jsonrpc setup.py
+  | scriptling --json-rpc setup.py
 {"jsonrpc":"2.0","result":{"hello":"world"},"id":1}
 
 $ echo '[{"jsonrpc":"2.0","method":"divide","params":{"a":1,"b":0},"id":1},
          {"jsonrpc":"2.0","method":"echo","params":42,"id":2}]' \
-  | scriptling --jsonrpc setup.py
+  | scriptling --json-rpc setup.py
 [{"jsonrpc":"2.0","error":{"code":-32602,"message":"division by zero","data":{"field":"b"}},"id":1},
  {"jsonrpc":"2.0","result":42,"id":2}]
 ```
@@ -146,5 +146,5 @@ $ echo '[{"jsonrpc":"2.0","method":"divide","params":{"a":1,"b":0},"id":1},
 - Routes/methods are registered during setup script execution, then frozen.
 - The `JSONRPCError` class is exposed as `runtime.jsonrpc.JSONRPCError` for
   type checks.
-- Use `--jsonrpc` together with `--kv-storage` or `--libpath` exactly as you
+- Use `--json-rpc` together with `--kv-storage` or `--libpath` exactly as you
   would for the HTTP `--server` mode.
