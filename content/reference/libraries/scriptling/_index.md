@@ -31,7 +31,7 @@ Scriptling-specific libraries that provide functionality not available in Python
 - [Websocket](networking/websocket/) — WebSocket client for connecting to WebSocket servers
 
 #### Provisioning
-- [Provisioning](provisioning/provision-file/) — File and directory provisioning
+- [Provisioning](provisioning/) — File/directory provisioning and HTTP/HTTPS fetch provisioning
 
 #### Runtime
 - [Runtime](runtime/runtime/) — Background tasks and async execution

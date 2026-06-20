@@ -254,6 +254,7 @@ import (
     "github.com/paularlott/scriptling/extlibs/console"
     "github.com/paularlott/scriptling/extlibs/container"
     "github.com/paularlott/scriptling/extlibs/similarity"
+    "github.com/paularlott/scriptling/extlibs/provision/fetch"
     "github.com/paularlott/scriptling/extlibs/provision/file"
 )
 
@@ -261,6 +262,7 @@ console.Register(p)                        // scriptling.console
 container.Register(p, "", "")              // scriptling.container (empty = default sockets)
 similarity.Register(p)                     // scriptling.similarity
 file.Register(p)                           // scriptling.provision.file
+fetch.Register(p)                          // scriptling.provision.fetch
 ```
 
 | Namespace | Import Path | Call |
@@ -269,6 +271,7 @@ file.Register(p)                           // scriptling.provision.file
 | `scriptling.container` | `extlibs/container` | `container.Register(p, dockerSock, podmanSock)` |
 | `scriptling.similarity` | `extlibs/similarity` | `similarity.Register(p)` |
 | `scriptling.provision.file` | `extlibs/provision/file` | `file.Register(p)` |
+| `scriptling.provision.fetch` | `extlibs/provision/fetch` | `fetch.Register(p)` |
 
 ## Security Considerations
 

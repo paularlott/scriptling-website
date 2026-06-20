@@ -124,6 +124,7 @@ Standard libraries are always available. Extended libraries are available in the
 | `scriptling.container` | Container lifecycle management | Extended |
 | `scriptling.secret` | Secret resolution through provider aliases | Extended |
 | `scriptling.provision.file` | File and directory provisioning | Extended |
+| `scriptling.provision.fetch` | HTTP/HTTPS fetch provisioning and zip unpacking | Extended |
 
 ## HTTP and JSON
 

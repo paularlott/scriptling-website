@@ -39,6 +39,12 @@ nav-skip: true
 - New `scriptling.provision.file.ensure_block(path, content, id="managed", comment="#", position="end", insert_after="", mode=0o644, create_only=False)` maintains a marker-delimited block within a file, replacing only the content between distinctive `# >>> scriptling managed: {id} >>>` / `# <<< scriptling managed: {id} <<<` markers and leaving the rest of the file untouched
 - New blocks are inserted at `position="end"` (append) or `"start"` (prepend), or immediately after the first line matching an `insert_after` substring anchor (which takes precedence); a unique `id` allows multiple independent blocks to coexist in one file
 - New `scriptling.provision.file.absent_block(path, id="managed", comment="#")` removes a managed block (markers and content) for the given id, preserving everything else and the file's existing permissions; returns `file.REMOVED` or `file.UNCHANGED`
+
+**Provisioning Library — Fetch:**
+
+- New `scriptling.provision.fetch.file(url, dest, insecure=False, unpack_zip=False, timeout=30, mode=0o644, dir_mode=0o755)` downloads HTTP/HTTPS files idempotently and returns a structured result with `status`, `bytes`, and `files`
+- Set `insecure=True` to skip HTTPS certificate verification for trusted internal endpoints
+- Set `unpack_zip=True` to extract the fetched response as a zip archive into `dest`; extraction rejects entries that would escape the destination directory
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
