@@ -16,7 +16,7 @@ When `unpack_zip=True`, the destination is treated as a directory and the respon
 
 | Function | Description |
 |----------|-------------|
-| `file(url, dest, insecure=False, unpack_zip=False, timeout=30, mode=0o644, dir_mode=0o755)` | Download a file or unpack a fetched zip archive |
+| `file(url, dest, insecure=False, unpack_zip=False, timeout=30, max_bytes=0, mode=0o644, dir_mode=0o755)` | Download a file or unpack a fetched zip archive |
 
 ## Constants
 
@@ -35,6 +35,7 @@ file(
     insecure: bool = False,
     unpack_zip: bool = False,
     timeout: int = 30,
+    max_bytes: int = 0,
     mode: int = 0o644,
     dir_mode: int = 0o755,
 ) -> dict
@@ -55,6 +56,7 @@ When `unpack_zip=True`, `dest` is a directory path. The fetched body is read as 
 | `insecure` | `False` | Skip HTTPS certificate verification |
 | `unpack_zip` | `False` | Treat the response body as a zip archive and extract it |
 | `timeout` | `30` | Request timeout in seconds |
+| `max_bytes` | `0` | Maximum response size in bytes, or `0` for no cap |
 | `mode` | `0o644` | File permission mode for written files |
 | `dir_mode` | `0o755` | Directory permission mode for created directories |
 
@@ -70,6 +72,8 @@ When `unpack_zip=True`, `dest` is a directory path. The fetched body is read as 
 | `bytes` | Size of the fetched response body |
 | `unpacked` | `True` when `unpack_zip=True` |
 | `files` | Written or checked file paths |
+
+When unpacking a zip archive, `fetch.UPDATED` takes precedence over `fetch.CREATED`: if one entry updates existing content and another creates a new file, the overall status is `fetch.UPDATED`. Existing files whose bytes already match are still chmod'd to the requested mode. For zip entries, executable bits from the archive are OR'd into `mode`, so a `0o755` file in the archive remains executable when the default `mode=0o644` is used. Directory entries create missing directories with `dir_mode`; existing directories are not re-chmod'd.
 
 ### Examples
 
@@ -119,4 +123,6 @@ fetch.file(
 
 - `insecure=True` disables HTTPS certificate verification. Use it only for trusted internal endpoints or bootstrapping environments where certificate validation is impossible.
 - Zip extraction rejects absolute paths and `..` traversal paths.
+- Zip extraction rejects non-regular file entries such as symlinks and device files.
+- Use `max_bytes` when fetching from endpoints where a large or misconfigured response could exhaust memory.
 - This library performs network and filesystem writes. Avoid registering it for untrusted scripts unless the host environment is otherwise constrained.

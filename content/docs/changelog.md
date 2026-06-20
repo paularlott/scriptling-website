@@ -42,9 +42,10 @@ nav-skip: true
 
 **Provisioning Library — Fetch:**
 
-- New `scriptling.provision.fetch.file(url, dest, insecure=False, unpack_zip=False, timeout=30, mode=0o644, dir_mode=0o755)` downloads HTTP/HTTPS files idempotently and returns a structured result with `status`, `bytes`, and `files`
+- New `scriptling.provision.fetch.file(url, dest, insecure=False, unpack_zip=False, timeout=30, max_bytes=0, mode=0o644, dir_mode=0o755)` downloads HTTP/HTTPS files idempotently and returns a structured result with `status`, `bytes`, and `files`
 - Set `insecure=True` to skip HTTPS certificate verification for trusted internal endpoints
-- Set `unpack_zip=True` to extract the fetched response as a zip archive into `dest`; extraction rejects entries that would escape the destination directory
+- Set `max_bytes` to cap response size before writing or extracting
+- Set `unpack_zip=True` to extract the fetched response as a zip archive into `dest`; extraction rejects entries that would escape the destination directory and preserves executable bits from regular file entries
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
