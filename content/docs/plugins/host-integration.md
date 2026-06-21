@@ -103,7 +103,7 @@ defer manager.Unload("widgets")
 
 // Typed plugin call — ints stay ints, etc.
 result, err := client.CallFunction(ctx, "build",
-    []Value{{Type: valueString, Value: "chair"}}, nil)
+    []plugin.Value{{Type: "string", Value: "chair"}}, nil)
 
 // Pass command-line arguments, e.g. loading scriptling itself in raw JSON-RPC mode.
 client, err = manager.LoadPath(ctx, "rpc", "scriptling", false,

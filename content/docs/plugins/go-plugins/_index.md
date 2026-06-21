@@ -104,7 +104,7 @@ func main() {
 
 `RegisterClass` takes a `*object.ClassBuilder`. Two styles are supported:
 
-- **`*Instance` methods** — manually manage `self.Fields` (shown below). Fields stored in `self.Fields` are readable and writable from Scriptling.
+- **`*Instance` methods** — manually manage `self.Fields` for in-process state (shown below). Plugin-side Fields live inside the plugin process; the host only sees the methods and properties you register on the builder.
 - **Typed receivers** — use `Constructor` to auto-wrap a Go struct (see [Storing Go Structs](#storing-go-structs)). Go struct fields are private; only registered methods and properties are exposed to Scriptling.
 
 `RegisterClass` calls `.Build()` internally.

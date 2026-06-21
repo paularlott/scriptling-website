@@ -341,10 +341,12 @@ The plugin removes the instance and calls `__del__` if defined. Destroy is idemp
 
 1. Host starts the plugin executable.
 2. Host sends `scriptling.handshake`. Plugin responds with schema.
-3. Host sends `environment.open` (reserved, currently no-op).
-4. Host sends `function.call`, `object.new`, `object.call_method`, `object.destroy` as needed.
-5. Host sends `environment.close` (reserved, currently no-op).
-6. Host sends `plugin.shutdown`. Plugin responds and exits.
+3. Host sends `function.call`, `object.new`, `object.call_method`, `object.destroy` as needed.
+4. Host sends `plugin.shutdown`. Plugin responds and exits.
+
+`environment.open` and `environment.close` are reserved for future use. The
+host does not currently send them, but plugins must accept them as no-ops if
+they arrive.
 
 ## Skipping the handshake
 
