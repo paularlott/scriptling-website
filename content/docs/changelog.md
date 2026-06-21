@@ -5,13 +5,45 @@ layout: changelog
 nav-skip: true
 ---
 
-
 ## June 2026
 
 {{< version "v0.12.1" >}}
 
 {{< changelog-item "added" >}}
+**Plugins with `scriptling.plugin`:**
 
+- `scriptling.plugin.load(...)` can now load local executables and HTTP(S) JSON-RPC endpoints.
+- Works with both plugin styles: typed Scriptling plugin protocol (`scriptling=True`) and raw JSON-RPC methods (`scriptling=False`, default).
+- New `scriptling.plugin.batch_call(...)` supports batched calls with ordered results.
+- `describe()` / `list()` include handshake metadata for Scriptling plugins, while raw JSON-RPC peers skip handshake metadata.
+- Loading is deduplicated by absolute path; conflicting name/path combinations raise an error.
+- New `scriptling.plugin.unload(name)` cleanly stops and removes a plugin.
+- Go manager support matches this behavior, including HTTP(S) loading.
+- `scriptling.plugin` is always available in run, server, and `--json-rpc` modes (even without `--plugin-dir`).
+
+**JSON-RPC over HTTP:**
+
+- `scriptling --server ... --json-rpc ...` now exposes JSON-RPC at `POST /json-rpc`.
+- `scriptling --json-rpc ...` still works over stdio when `--server` is not used.
+- HTTP JSON-RPC supports single calls, batches, and notifications (`204 No Content` for notification-only requests), and can run alongside existing HTTP routes and MCP tools.
+
+**Provisioning Library — Managed Blocks:**
+
+- New `scriptling.provision.file.ensure_block(...)` manages marker-delimited sections inside a file, updating only the managed block and leaving the rest untouched.
+- Supports start/end placement, insertion after a matching line, and multiple independent blocks via unique block ids.
+- New `scriptling.provision.file.absent_block(...)` removes a managed block and returns `file.REMOVED` or `file.UNCHANGED`.
+
+**Provisioning Library — Fetch:**
+
+- New `scriptling.provision.fetch.file(...)` downloads HTTP/HTTPS files idempotently, with optional size limits and zip extraction.
+- Supports trusted internal endpoints (`insecure=True`) and optional `provides` checks to skip work when expected files already exist.
+- Zip extraction is safe against path traversal and keeps executable bits.
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**Provisioning Library File:**
+
+- `scriptling.provision.file.ensure` now accepts a `create_only=False` keyword argument; when `True`, an existing file is never modified and the call returns `file.UNCHANGED`, while new files are still written normally — useful for seeding config files only on first run
 {{< /changelog-item >}}
 
 ---
@@ -19,7 +51,7 @@ nav-skip: true
 {{< version "v0.12.0" >}}
 
 {{< changelog-item "added" >}}
-### JSON-RPC stdio server
+**JSON-RPC stdio server:**
 
 - Added `scriptling.runtime.jsonrpc`, a concurrent stdin/stdout JSON-RPC 2.0
   server. Handlers are referenced by string (`"library.function"`) and run on a

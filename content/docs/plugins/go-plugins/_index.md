@@ -67,6 +67,58 @@ import plugin.hello
 print(plugin.hello.greet("Ada"))
 ```
 
+## HTTP Transport
+
+Go plugins can also serve the Scriptling plugin protocol over HTTP by mounting
+the server as an `http.Handler`:
+
+```go
+package main
+
+import (
+    "log"
+    "net/http"
+
+    "github.com/paularlott/scriptling/object"
+    "github.com/paularlott/scriptling/plugin"
+)
+
+func main() {
+    server := plugin.NewServer("hello_http", "1.0.0", "HTTP plugin")
+
+    fb := object.NewFunctionBuilder()
+    fb.Function(func(name string) string {
+        return "Hello, " + name
+    })
+    server.RegisterFunc("greet", fb)
+
+    http.Handle("/json-rpc", server)
+    log.Fatal(http.ListenAndServe("127.0.0.1:8081", nil))
+}
+```
+
+Load it from Scriptling as a full plugin peer:
+
+```python
+import scriptling.plugin
+
+name = scriptling.plugin.load(
+    "hello_http",
+    "http://127.0.0.1:8081/json-rpc",
+    scriptling=True,
+    headers={"Authorization": "Bearer token"},
+)
+import plugin.hello_http
+print(plugin.hello_http.greet("Ada"))
+```
+
+HTTP plugin transport is request/response only: it supports handshakes,
+generated `plugin.*` proxies, function calls, object lifecycle, and batches,
+but the server cannot initiate callbacks back to the client. Host callbacks and
+`plugin.Logger(ctx)` require the bidirectional stdio transport. See the
+`examples/plugins/http-go` example for a complete
+server and client script.
+
 ### Advanced FunctionBuilder Callback
 
 For full control over argument conversion, pass a raw `BuiltinFunction`-style callback to the same `FunctionBuilder`:
@@ -104,7 +156,7 @@ func main() {
 
 `RegisterClass` takes a `*object.ClassBuilder`. Two styles are supported:
 
-- **`*Instance` methods** — manually manage `self.Fields` (shown below). Fields stored in `self.Fields` are readable and writable from Scriptling.
+- **`*Instance` methods** — manually manage `self.Fields` for in-process state (shown below). Plugin-side Fields live inside the plugin process; the host only sees the methods and properties you register on the builder.
 - **Typed receivers** — use `Constructor` to auto-wrap a Go struct (see [Storing Go Structs](#storing-go-structs)). Go struct fields are private; only registered methods and properties are exposed to Scriptling.
 
 `RegisterClass` calls `.Build()` internally.

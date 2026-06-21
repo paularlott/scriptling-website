@@ -53,13 +53,15 @@ The host sends these JSON-RPC methods:
 | Method | Direction | Description |
 | --- | --- | --- |
 | `scriptling.handshake` | host → plugin | Exchange protocol version and schema |
-| `environment.open` | host → plugin | Notify plugin of new environment |
-| `environment.close` | host → plugin | Notify plugin of environment closing |
 | `function.call` | host → plugin | Call a registered function |
 | `object.new` | host → plugin | Construct a class instance |
 | `object.call_method` | host → plugin | Call a method on an instance |
 | `object.destroy` | host → plugin | Destroy an instance |
 | `plugin.shutdown` | host → plugin | Graceful shutdown |
+
+`environment.open` and `environment.close` are reserved for future use; the
+host does not currently send them. Plugins should accept them as no-ops if
+they arrive.
 
 Bash is useful for small integrations and protocol tests. For richer plugins with classes and resource cleanup, prefer the Go server package.
 

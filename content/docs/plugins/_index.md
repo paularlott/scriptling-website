@@ -4,7 +4,16 @@ description: Extend Scriptling with executable plugins over JSON-RPC.
 weight: 8
 ---
 
-Plugins are standalone executables that Scriptling loads eagerly at startup. They communicate over line-delimited JSON-RPC on stdio and expose libraries under the host-owned `plugin.` namespace.
+Plugins are standalone executables that Scriptling loads eagerly at startup.
+They communicate over line-delimited JSON-RPC on stdio and expose libraries
+under the host-owned `plugin.` namespace. Runtime-loaded peers can also be
+connected over HTTP(S) with `scriptling.plugin.load(..., scriptling=True)` when
+they expose the Scriptling plugin protocol at a JSON-RPC endpoint.
+
+HTTP plugin transport is request/response only. It supports handshakes,
+function calls, object lifecycle, generated `plugin.*` proxies, and batches,
+but the server cannot initiate callbacks back to the client. Host callbacks and
+`plugin.Logger(ctx)` require the bidirectional stdio transport.
 
 A plugin declares a short name such as `hello`. Scriptling imports it as `plugin.hello`.
 
@@ -38,4 +47,8 @@ The `plugin.` prefix is host-owned. A plugin should declare a short name such as
 
 ## Transports
 
-The transport is JSON-RPC over stdio.
+The default plugin transport is JSON-RPC over stdio. Go plugins can also expose
+the same protocol over HTTP with `plugin.Server.ServeHTTP`; HTTP plugin
+transport supports handshakes, function calls, object lifecycle, and batches.
+Host callbacks and `plugin.Logger(ctx)` require the bidirectional stdio
+transport.

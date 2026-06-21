@@ -22,6 +22,7 @@ The setup script is executed when the server starts and typically registers rout
 | Flag                | Environment Variable      | Description                      | Default    |
 | ------------------- | ------------------------- | -------------------------------- | ---------- |
 | `--server`          | `SCRIPTLING_SERVER`       | HTTP server address (host:port)  | (disabled) |
+| `--json-rpc`        | `SCRIPTLING_JSONRPC`      | Mount JSON-RPC at `/json-rpc`    | false      |
 | `--web-root`        | `SCRIPTLING_WEB_ROOT`     | Directory or zip to serve static files from | none       |
 | `--bearer-token`    | `SCRIPTLING_BEARER_TOKEN` | Bearer token for authentication  | none       |
 | `--allowed-paths`   | `SCRIPTLING_ALLOWED_PATHS`| Allowed filesystem paths         | (none)     |
@@ -67,6 +68,19 @@ Priority order for incoming requests:
 3. Web root directory (`--web-root`)
 4. `not_found` handler (if registered)
 5. Plain `404 Not Found`
+
+## JSON-RPC Endpoint
+
+Add `--json-rpc` to mount `scriptling.runtime.jsonrpc` handlers at
+`POST /json-rpc` on the same HTTP server:
+
+```bash
+scriptling --server :8000 --json-rpc setup.py
+```
+
+This can run alongside normal HTTP routes, static files, MCP tools, and the MCP
+script execution tool. See [JSON-RPC Server Mode](../jsonrpc-server/) for
+single request, batch, and notification examples.
 
 ## TLS/HTTPS
 

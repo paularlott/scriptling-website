@@ -89,6 +89,7 @@ These libraries extend functionality but require explicit registration:
 | `secrets`     | Cryptographically secure random generation                                  |
 | `logging`     | File and console logging - may write to disk                                |
 | `scriptling.wait_for` | Network/resource polling - may access network                               |
+| `scriptling.provision.fetch` | HTTP/HTTPS downloads and filesystem writes; `insecure=True` skips TLS verification |
 | `yaml`        | YAML parsing - safe but watch for large files                               |
 | `toml`        | TOML parsing - safe but watch for large files                               |
 | `html.parser` | HTML parsing - safe but watch for large files                               |
@@ -152,6 +153,7 @@ These libraries can make network requests:
 - `scriptling.ai.agent` - Agentic AI with tool execution
 - `scriptling.mcp` - MCP protocol client
 - `scriptling.wait_for` - Resource polling (may check network endpoints)
+- `scriptling.provision.fetch` - HTTP/HTTPS downloads and optional zip unpacking
 
 ### Disabling Network Access
 

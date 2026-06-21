@@ -4,7 +4,7 @@ description: The wire protocol between Scriptling and plugin executables.
 weight: 8
 ---
 
-Plugins communicate with the Scriptling host over line-delimited JSON-RPC 2.0 on stdio. Every message is a single JSON object terminated by a newline. The host writes requests to the plugin's stdin and reads responses from the plugin's stdout.
+Plugins communicate with the Scriptling host over line-delimited JSON-RPC 2.0 on stdio. Each frame is a JSON object or JSON-RPC batch array terminated by a newline. The host writes requests to the plugin's stdin and reads responses from the plugin's stdout.
 
 ## Wire Envelope
 
@@ -341,7 +341,26 @@ The plugin removes the instance and calls `__del__` if defined. Destroy is idemp
 
 1. Host starts the plugin executable.
 2. Host sends `scriptling.handshake`. Plugin responds with schema.
-3. Host sends `environment.open` (reserved, currently no-op).
-4. Host sends `function.call`, `object.new`, `object.call_method`, `object.destroy` as needed.
-5. Host sends `environment.close` (reserved, currently no-op).
-6. Host sends `plugin.shutdown`. Plugin responds and exits.
+3. Host sends `function.call`, `object.new`, `object.call_method`, `object.destroy` as needed.
+4. Host sends `plugin.shutdown`. Plugin responds and exits.
+
+`environment.open` and `environment.close` are reserved for future use. The
+host does not currently send them, but plugins must accept them as no-ops if
+they arrive.
+
+## Skipping the handshake
+
+Executables loaded via `scriptling.plugin.load(name, path)` (without
+`scriptling=True`) skip the plugin handshake — no `scriptling.handshake`
+exchange and no schema/version metadata collected. The host still reports
+`transport` as `"json"` because raw peers use the same JSON-RPC-over-stdio
+codec. In this raw JSON-RPC mode,
+`scriptling.plugin.call_function(library, name, ...)` sends `name` directly as
+the JSON-RPC method instead of wrapping it in `function.call`. This is useful
+for peers such as `scriptling --json-rpc setup.py`, where methods are
+registered with `scriptling.runtime.jsonrpc.method()`.
+
+`plugin.shutdown` is sent on `unload()` as a best-effort hint and any
+method-not-found response is ignored, so implementing it is optional. The
+host closes stdin immediately afterwards; the executable should exit promptly
+when stdin reaches EOF.

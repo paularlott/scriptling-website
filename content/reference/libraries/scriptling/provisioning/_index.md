@@ -11,4 +11,5 @@ Provisioning libraries for managing files and directories within the Scriptling 
 
 | Library | Description |
 |---------|-------------|
-| [scriptling.provision.file](provision-file/) | File and directory provisioning — create, update, and remove with correct permissions |
+| [scriptling.provision.file](provision-file/) | File and directory provisioning — create, update, and remove with correct permissions, plus marker-delimited managed blocks for maintaining a region within a file |
+| [scriptling.provision.fetch](provision-fetch/) | HTTP/HTTPS file fetching with optional insecure TLS and safe zip unpacking |
