@@ -10,62 +10,34 @@ nav-skip: true
 {{< version "v0.12.1" >}}
 
 {{< changelog-item "added" >}}
-### Easier executable plugins with `scriptling.plugin`
+**Plugins with `scriptling.plugin`:**
 
-- New `scriptling.plugin.load(name, path, scriptling=False, args=None, insecure_skip_tls=False, headers=None)` starts
-  an executable plugin or connects to an HTTP(S) JSON-RPC endpoint, registers
-  it under `name`, and returns the normalised library name. Use `args` to pass
-  command-line arguments to executables, and `insecure_skip_tls=True` for
-  trusted self-signed HTTPS endpoints. Use `headers={...}` to send auth or
-  routing headers with every HTTP(S) JSON-RPC request.
-- `call_function` now works for both plugin styles:
-  `scriptling=True` uses Scriptling's typed `function.call` protocol,
-  while `scriptling=False` (default) sends raw JSON-RPC method calls.
-- New `scriptling.plugin.batch_call(library, calls)` sends multiple calls in
-  one JSON-RPC batch and returns results in the same order.
-- `scriptling=True` fills `describe()` / `list()` from the plugin handshake;
-  `scriptling=False` skips handshake metadata.
-- `call_function`, `call_method`, `describe`, and `unload` accept either short
-  names (like `"widgets"`) or normalised names (like `"plugin.widgets"`).
-- Plugin identity is based on absolute path to prevent accidental duplicates:
-  reloading the same path and name is a no-op, but conflicting name/path pairs
-  raise an error.
-- New `scriptling.plugin.unload(name)` cleanly stops the process and releases
-  the name.
-- Go parity: `plugin.Manager.LoadPath(ctx, name, path, scriptling, args)` and
-  `plugin.Manager.LoadURL(ctx, name, url, scriptling, insecureSkipTLS, headers)`
-  plus `plugin.Manager.Unload(name)` provide the same behavior.
-- Go plugin servers can expose the Scriptling plugin protocol over HTTP with
-  `plugin.Server.ServeHTTP`, making `scriptling.plugin.load(name, url,
-  scriptling=True)` work for full plugin handshakes, generated `plugin.*`
-  proxies, function calls, object lifecycle, and batches.
-- `scriptling.plugin` is now always available (even without `--plugin-dir`) in
-  run, server, and `--json-rpc` modes.
+- `scriptling.plugin.load(...)` can now load local executables and HTTP(S) JSON-RPC endpoints.
+- Works with both plugin styles: typed Scriptling plugin protocol (`scriptling=True`) and raw JSON-RPC methods (`scriptling=False`, default).
+- New `scriptling.plugin.batch_call(...)` supports batched calls with ordered results.
+- `describe()` / `list()` include handshake metadata for Scriptling plugins, while raw JSON-RPC peers skip handshake metadata.
+- Loading is deduplicated by absolute path; conflicting name/path combinations raise an error.
+- New `scriptling.plugin.unload(name)` cleanly stops and removes a plugin.
+- Go manager support matches this behavior, including HTTP(S) loading.
+- `scriptling.plugin` is always available in run, server, and `--json-rpc` modes (even without `--plugin-dir`).
 
-### JSON-RPC over HTTP
+**JSON-RPC over HTTP:**
 
-- `scriptling --server :8000 --json-rpc setup.py` now serves registered
-  `runtime.jsonrpc` handlers at `POST /json-rpc`.
-- `scriptling --json-rpc setup.py` remains the stdio transport; `--json-rpc`
-  selects exactly one transport based on whether `--server` is present.
-- HTTP JSON-RPC can run alongside normal `runtime.http` routes, MCP tools, and
-  the MCP script execution tool on the same server.
-- HTTP requests support single JSON-RPC calls, batches, and notifications.
-  Notification-only requests return `204 No Content`.
+- `scriptling --server ... --json-rpc ...` now exposes JSON-RPC at `POST /json-rpc`.
+- `scriptling --json-rpc ...` still works over stdio when `--server` is not used.
+- HTTP JSON-RPC supports single calls, batches, and notifications (`204 No Content` for notification-only requests), and can run alongside existing HTTP routes and MCP tools.
 
 **Provisioning Library — Managed Blocks:**
 
-- New `scriptling.provision.file.ensure_block(path, content, id="managed", comment="#", position="end", insert_after="", mode=0o644, create_only=False)` maintains a marker-delimited block within a file, replacing only the content between distinctive `# >>> scriptling managed: {id} >>>` / `# <<< scriptling managed: {id} <<<` markers and leaving the rest of the file untouched
-- New blocks are inserted at `position="end"` (append) or `"start"` (prepend), or immediately after the first line matching an `insert_after` substring anchor (which takes precedence); a unique `id` allows multiple independent blocks to coexist in one file
-- New `scriptling.provision.file.absent_block(path, id="managed", comment="#")` removes a managed block (markers and content) for the given id, preserving everything else and the file's existing permissions; returns `file.REMOVED` or `file.UNCHANGED`
+- New `scriptling.provision.file.ensure_block(...)` manages marker-delimited sections inside a file, updating only the managed block and leaving the rest untouched.
+- Supports start/end placement, insertion after a matching line, and multiple independent blocks via unique block ids.
+- New `scriptling.provision.file.absent_block(...)` removes a managed block and returns `file.REMOVED` or `file.UNCHANGED`.
 
 **Provisioning Library — Fetch:**
 
-- New `scriptling.provision.fetch.file(url, dest, insecure=False, unpack_zip=False, timeout=30, max_bytes=0, mode=0o644, dir_mode=0o755)` downloads HTTP/HTTPS files idempotently and returns a structured result with `status`, `bytes`, and `files`
-- Set `insecure=True` to skip HTTPS certificate verification for trusted internal endpoints
-- Set `max_bytes` to cap response size before writing or extracting
-- Set `unpack_zip=True` to extract the fetched response as a zip archive into `dest`; extraction rejects entries that would escape the destination directory and preserves executable bits from regular file entries
-- `provides` parameter accepts a list of file paths; if all paths exist, the call returns `UNCHANGED` without downloading or extracting
+- New `scriptling.provision.fetch.file(...)` downloads HTTP/HTTPS files idempotently, with optional size limits and zip extraction.
+- Supports trusted internal endpoints (`insecure=True`) and optional `provides` checks to skip work when expected files already exist.
+- Zip extraction is safe against path traversal and keeps executable bits.
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
@@ -79,7 +51,7 @@ nav-skip: true
 {{< version "v0.12.0" >}}
 
 {{< changelog-item "added" >}}
-### JSON-RPC stdio server
+**JSON-RPC stdio server:**
 
 - Added `scriptling.runtime.jsonrpc`, a concurrent stdin/stdout JSON-RPC 2.0
   server. Handlers are referenced by string (`"library.function"`) and run on a
