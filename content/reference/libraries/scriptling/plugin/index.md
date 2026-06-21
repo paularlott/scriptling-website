@@ -21,7 +21,7 @@ The library is always available in the CLI even without `--plugin-dir`.
 | `call_function(library, name, *args, **kwargs)` | Call a plugin function directly |
 | `batch_call(library, calls)` | Call multiple functions on one executable in a JSON-RPC batch |
 | `call_method(obj, name, *args, **kwargs)` | Call a method on a remote plugin object |
-| `load(name, path, scriptling=False)` | Spawn an executable and register it under `name` |
+| `load(name, path, scriptling=False, args=None, insecure_skip_tls=False, headers=None)` | Register an executable or HTTP(S) JSON-RPC peer under `name` |
 | `unload(name)` | Close a loaded executable and remove it from the registry |
 | `release(obj)` | Explicitly release a remote plugin object |
 
@@ -73,8 +73,8 @@ print(meta["functions"])
 call_function(library: str, name: str, *args, **kwargs) -> any
 ```
 
-Calls a function on a loaded executable. The dispatch mode is automatic based
-on how the executable was loaded:
+Calls a function on a loaded JSON-RPC peer. The dispatch mode is automatic
+based on how the peer was loaded:
 
 - **Plugin protocol** (`scriptling=True`): sends `function.call` with typed
   plugin transport values. Arguments and return values preserve int/float
@@ -85,8 +85,9 @@ on how the executable was loaded:
   become a `params` object. Return values are raw JSON (numbers come back as
   floats).
 
-This means `call_function` works for both plugin peers and `--json-rpc` peers
-without the caller needing to know which protocol the peer speaks.
+This means `call_function` works for plugin peers, stdio `--json-rpc` peers,
+and HTTP(S) JSON-RPC peers without the caller needing to know which protocol
+the peer speaks.
 
 ### Returns
 
@@ -104,6 +105,14 @@ scriptling.plugin.call_function(name, "build", "chair")
 # Raw JSON-RPC peer (e.g. scriptling --json-rpc)
 rpc = scriptling.plugin.load("rpc", "scriptling", args=["--json-rpc", "./setup.py"])
 scriptling.plugin.call_function(rpc, "search", {"query": "hello"})
+
+# HTTP JSON-RPC peer
+remote = scriptling.plugin.load(
+    "remote",
+    "http://127.0.0.1:8000/json-rpc",
+    headers={"Authorization": "Bearer token"},
+)
+scriptling.plugin.call_function(remote, "search", {"query": "hello"})
 ```
 
 ## batch_call
@@ -112,8 +121,8 @@ scriptling.plugin.call_function(rpc, "search", {"query": "hello"})
 batch_call(library: str, calls: list[dict]) -> list
 ```
 
-Calls multiple functions on one loaded executable by sending a JSON-RPC batch
-over that executable's stdio connection. Results are returned in the same order
+Calls multiple functions on one loaded JSON-RPC peer by sending a JSON-RPC
+batch over its stdio or HTTP transport. Results are returned in the same order
 as the input calls.
 
 Each call dictionary supports:
@@ -175,24 +184,33 @@ result = scriptling.plugin.call_method(cfg, "get", "name")
 ## load
 
 ```python
-load(name: str, path: str, *, scriptling: bool = False, args: list[str] = []) -> str
+load(name: str, path: str, *, scriptling: bool = False, args: list[str] = [], insecure_skip_tls: bool = False, headers: dict[str, str] = {}) -> str
 ```
 
-Spawns an executable and registers it under `name`. With `scriptling=False`
-(the default), `call_function` sends the requested function name directly as a
-raw JSON-RPC method. With `scriptling=True`, the executable must implement the
-Scriptling plugin handshake and `function.call` dispatch method. The loaded
-client is reachable via `call_function`, `describe`, and `list`; no proxy
-library is generated.
+Registers a JSON-RPC peer under `name`. The peer can be a filesystem
+executable using stdio JSON-RPC, or an `http://` / `https://` JSON-RPC endpoint.
+With `scriptling=False` (the default), `call_function` sends the requested
+function name directly as a raw JSON-RPC method. With `scriptling=True`, the
+peer must implement the Scriptling plugin handshake and `function.call`
+dispatch method. Handshaken peers also register an importable `plugin.*` proxy
+library. With `scriptling=False`, the loaded client is helper-only and
+reachable via `call_function`, `describe`, and `list`.
+
+HTTP(S) transport is request/response only. It supports calls, objects,
+generated `plugin.*` proxies, and batches, but the server cannot initiate
+callbacks back to the client. Use stdio plugins when host callbacks or
+`plugin.Logger(ctx)` are required.
 
 ### Parameters
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `name` | `str` | — | Library name to register under. Normalised into the `plugin.*` namespace (e.g. `"widgets"` becomes `"plugin.widgets"`). Must not collide with an existing plugin library name. |
-| `path` | `str` | — | Filesystem path to the executable. |
-| `scriptling` | `bool` | `False` | If `True`, perform the plugin protocol handshake so `describe()` / `list()` report version and schema from the executable. If `False`, the handshake is skipped; `transport` is still reported as `"json"`. |
-| `args` | `list[str]` | `[]` | Command-line arguments passed to the executable (e.g. `["--json-rpc", "./setup.py"]`). |
+| `path` | `str` | — | Filesystem path to the executable, or `http://` / `https://` JSON-RPC endpoint. |
+| `scriptling` | `bool` | `False` | If `True`, perform the plugin protocol handshake, register an importable `plugin.*` proxy library, and fill `describe()` / `list()` from peer metadata. If `False`, the handshake and proxy registration are skipped; `transport` is still reported as `"json"`. |
+| `args` | `list[str]` | `[]` | Command-line arguments passed to executable peers (e.g. `["--json-rpc", "./setup.py"]`). Ignored for HTTP endpoints. |
+| `insecure_skip_tls` | `bool` | `False` | Skip HTTPS certificate verification for HTTP endpoints. Intended for local or trusted self-signed servers. |
+| `headers` | `dict[str, str]` | `{}` | Additional HTTP headers sent with every HTTP(S) JSON-RPC request, including handshake, calls, and batches. |
 
 ### Short names
 
@@ -202,9 +220,10 @@ accept either the normalised name (`"plugin.widgets"`) or the short name
 
 ### Identity and collisions
 
-Identity is by absolute path. A second `load()` of the same path with the same
-name is a no-op (returns the existing client, ignoring `scriptling`/`args`).
-Loading an already-loaded path under a different name, or loading a new path
+Identity is by absolute path for executables and by URL for HTTP endpoints. A
+second `load()` of the same path or URL with the same name is a no-op (returns
+the existing client, ignoring `scriptling`/`args`/`insecure_skip_tls`/`headers`).
+Loading an already-loaded peer under a different name, or loading a new peer
 under a name already in use, raises an error.
 
 ### Returns
@@ -225,6 +244,11 @@ scriptling.plugin.call_function("widgets", "build", "chair")
 # Pass command-line arguments:
 rpc = scriptling.plugin.load("rpc", "scriptling",
                              args=["--json-rpc", "./setup.py"])
+
+# Connect to an HTTP JSON-RPC endpoint:
+remote = scriptling.plugin.load("remote", "https://127.0.0.1:8443/json-rpc",
+                                insecure_skip_tls=True,
+                                headers={"Authorization": "Bearer token"})
 ```
 
 ## unload

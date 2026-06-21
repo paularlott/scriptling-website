@@ -4,13 +4,13 @@ linkTitle: runtime.jsonrpc
 weight: 2
 ---
 
-Concurrent stdio JSON-RPC 2.0 server method and notification registration.
+Concurrent JSON-RPC 2.0 server method and notification registration.
 
 `scriptling.runtime.jsonrpc` registers handlers for a JSON-RPC 2.0 server that
-reads requests from stdin and writes responses to stdout. Handlers are
-referenced by string (`"library.function"`), the same model used by
-`runtime.http`, so each request runs on a fresh, isolated evaluator in its own
-goroutine and a slow handler never blocks the next request.
+can run over stdin/stdout or HTTP. Handlers are referenced by string
+(`"library.function"`), the same model used by `runtime.http`, so each request
+runs on a fresh, isolated evaluator in its own goroutine and a slow handler
+never blocks the next request.
 
 Start the stdio server with the `--json-rpc` flag:
 
@@ -20,6 +20,15 @@ scriptling --json-rpc setup.py
 
 Logging is automatically redirected to stderr so it never corrupts the JSON-RPC
 stream on stdout.
+
+Start the HTTP server with `--server` and `--json-rpc`:
+
+```bash
+scriptling --server :8000 --json-rpc setup.py
+```
+
+HTTP JSON-RPC is served at `POST /json-rpc` and can run alongside normal
+`runtime.http` routes and MCP tools.
 
 ## Available Functions
 
@@ -76,7 +85,7 @@ evaluator, mirroring `runtime.http`, MCP, and WebSocket serving. Handlers cannot
 share in-memory state across requests; coordinate through `runtime.kv` or
 `runtime.sync` instead.
 
-## Wire Format
+## Stdio Wire Format
 
 - Requests are newline-delimited JSON objects (NDJSON), one per line.
 - Batches (JSON arrays) are supported: each element is dispatched concurrently
@@ -84,11 +93,20 @@ share in-memory state across requests; coordinate through `runtime.kv` or
 - Notifications (requests with no `id`) produce no response.
 - Integer precision is preserved (numbers are not coerced to floats).
 
+## HTTP Wire Format
+
+- Send a single JSON-RPC object or batch array with `POST /json-rpc`.
+- Requests return `200 application/json`.
+- Notifications and all-notification batches return `204 No Content`.
+- Notifications inside a mixed batch are handled but omitted from the response
+  array.
+- Integer precision is preserved.
+
 ## Error Codes
 
 | Code | Meaning | Source |
 |------|---------|--------|
-| `-32700` | Parse error | Malformed JSON on stdin |
+| `-32700` | Parse error | Malformed JSON on stdin or in the HTTP request body |
 | `-32600` | Invalid request | Not a valid JSON-RPC 2.0 request |
 | `-32601` | Method not found | No handler registered for `method` |
 | `-32602` | Invalid params | Params failed to decode (or via `error()`) |
@@ -139,6 +157,20 @@ $ echo '[{"jsonrpc":"2.0","method":"divide","params":{"a":1,"b":0},"id":1},
   | scriptling --json-rpc setup.py
 [{"jsonrpc":"2.0","error":{"code":-32602,"message":"division by zero","data":{"field":"b"}},"id":1},
  {"jsonrpc":"2.0","result":42,"id":2}]
+```
+
+### HTTP session
+
+```bash
+$ curl -X POST http://127.0.0.1:8000/json-rpc \
+    -H "Content-Type: application/json" \
+    -d '{"jsonrpc":"2.0","method":"echo","params":{"hello":"world"},"id":1}'
+{"jsonrpc":"2.0","result":{"hello":"world"},"id":1}
+
+$ curl -i -X POST http://127.0.0.1:8000/json-rpc \
+    -H "Content-Type: application/json" \
+    -d '{"jsonrpc":"2.0","method":"progress","params":{"done":1}}'
+HTTP/1.1 204 No Content
 ```
 
 ## Notes

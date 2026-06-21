@@ -1,16 +1,16 @@
 ---
 title: JSON-RPC Server Mode
-description: Running Scriptling as a concurrent stdio JSON-RPC 2.0 server.
+description: Running Scriptling as a concurrent JSON-RPC 2.0 server over stdio or HTTP.
 weight: 3
 ---
 
-Scriptling can run as a JSON-RPC 2.0 server over stdin/stdout, letting host
-processes (editors, daemons, tool runners) invoke Scriptling handlers as
-JSON-RPC methods.
+Scriptling can run as a JSON-RPC 2.0 server over stdin/stdout or over HTTP,
+letting host processes (editors, daemons, tool runners) invoke Scriptling
+handlers as JSON-RPC methods.
 
 ## Starting the Server
 
-Use the `--json-rpc` flag to start a stdio JSON-RPC server:
+Use the `--json-rpc` flag by itself to start a stdio JSON-RPC server:
 
 ```bash
 scriptling --json-rpc setup.py
@@ -26,18 +26,33 @@ stdout.
 > stream on stdout. You can safely combine `--log-level debug` with piping
 > requests on stdin.
 
+Use `--json-rpc` with `--server` to mount the same handlers over HTTP:
+
+```bash
+scriptling --server :8000 --json-rpc setup.py
+```
+
+HTTP JSON-RPC is served at `POST /json-rpc`. It can run alongside regular
+`runtime.http` routes and MCP tools:
+
+```bash
+scriptling --server :8000 --json-rpc --mcp-tools ./tools setup.py
+```
+
 ## Server Options
 
 | Flag              | Environment Variable       | Description                          | Default    |
 | ----------------- | -------------------------- | ------------------------------------ | ---------- |
-| `--json-rpc`       | `SCRIPTLING_JSONRPC`       | Enable stdio JSON-RPC server mode    | false      |
+| `--json-rpc`       | `SCRIPTLING_JSONRPC`       | Enable JSON-RPC server mode: stdio by default, HTTP `/json-rpc` with `--server` | false      |
+| `--server`         | `SCRIPTLING_SERVER`        | HTTP server address for HTTP JSON-RPC | (disabled) |
 | `--allowed-paths` | `SCRIPTLING_ALLOWED_PATHS` | Allowed filesystem paths             | (none)     |
 | `--kv-storage`    | `SCRIPTLING_KV_STORAGE`    | Directory for persistent KV store    | in-memory  |
 | `--libpath`       | -                          | Extra library search directories     | none       |
 | `--package`       | -                          | Load libraries from a package (zip)  | none       |
 | `--plugin-dir`    | -                          | Load plugin libraries                | none       |
 
-`--json-rpc` and `--server` are mutually exclusive modes.
+`--json-rpc` selects one transport. Without `--server` it uses stdio; with
+`--server` it mounts HTTP JSON-RPC at `/json-rpc`.
 
 ## Registering Handlers
 
@@ -74,7 +89,7 @@ def on_progress(params):
 See the [scriptling.runtime.jsonrpc reference](../../../reference/libraries/scriptling/runtime/jsonrpc/)
 for the full API.
 
-## Talking to the Server
+## Talking to the Stdio Server
 
 ```bash
 # Single request
@@ -94,6 +109,28 @@ echo '{"jsonrpc":"2.0","method":"progress","params":{"done":1}}' \
   | scriptling --json-rpc setup.py
 ```
 
+## Talking to the HTTP Server
+
+```bash
+# Single request
+curl -X POST http://127.0.0.1:8000/json-rpc \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"echo","params":{"hello":"world"},"id":1}'
+# {"jsonrpc":"2.0","result":{"hello":"world"},"id":1}
+
+# Batch. Notifications inside the batch are handled but omitted from the response.
+curl -X POST http://127.0.0.1:8000/json-rpc \
+  -H "Content-Type: application/json" \
+  -d '[{"jsonrpc":"2.0","method":"divide","params":{"a":1,"b":0},"id":1},
+       {"jsonrpc":"2.0","method":"progress","params":{"done":1}},
+       {"jsonrpc":"2.0","method":"echo","params":42,"id":2}]'
+
+# Notification-only requests return 204 No Content.
+curl -i -X POST http://127.0.0.1:8000/json-rpc \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"progress","params":{"done":1}}'
+```
+
 ## Concurrency
 
 Each request is dispatched on its own goroutine with a fresh Scriptling
@@ -108,7 +145,7 @@ requests, use `runtime.kv` (with `--kv-storage` for persistence) or the
 
 | Code | Meaning | When |
 |------|---------|------|
-| `-32700` | Parse error | Malformed JSON on stdin |
+| `-32700` | Parse error | Malformed JSON on stdin or in the HTTP request body |
 | `-32600` | Invalid request | Not a valid JSON-RPC 2.0 request |
 | `-32601` | Method not found | No handler registered for `method` |
 | `-32602` | Invalid params | Params failed to decode, or via `runtime.jsonrpc.error()` |

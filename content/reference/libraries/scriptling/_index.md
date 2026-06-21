@@ -36,6 +36,7 @@ Scriptling-specific libraries that provide functionality not available in Python
 #### Runtime
 - [Runtime](runtime/runtime/) — Background tasks and async execution
 - [HTTP](runtime/http/) — HTTP route registration and response helpers
+- [JSON-RPC](runtime/jsonrpc/) — JSON-RPC 2.0 server registration for stdio or HTTP
 - [KV](runtime/kv/) — Thread-safe key-value store
 - [Sync](runtime/sync/) — Named cross-environment concurrency primitives
 - [Sandbox](runtime/sandbox/) — Isolated script execution environments

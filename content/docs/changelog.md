@@ -12,9 +12,12 @@ nav-skip: true
 {{< changelog-item "added" >}}
 ### Easier executable plugins with `scriptling.plugin`
 
-- New `scriptling.plugin.load(name, path, scriptling=False, args=None)` starts
-  an executable plugin, registers it under `name`, and returns the normalised
-  library name. Use `args` to pass command-line arguments.
+- New `scriptling.plugin.load(name, path, scriptling=False, args=None, insecure_skip_tls=False, headers=None)` starts
+  an executable plugin or connects to an HTTP(S) JSON-RPC endpoint, registers
+  it under `name`, and returns the normalised library name. Use `args` to pass
+  command-line arguments to executables, and `insecure_skip_tls=True` for
+  trusted self-signed HTTPS endpoints. Use `headers={...}` to send auth or
+  routing headers with every HTTP(S) JSON-RPC request.
 - `call_function` now works for both plugin styles:
   `scriptling=True` uses Scriptling's typed `function.call` protocol,
   while `scriptling=False` (default) sends raw JSON-RPC method calls.
@@ -30,9 +33,25 @@ nav-skip: true
 - New `scriptling.plugin.unload(name)` cleanly stops the process and releases
   the name.
 - Go parity: `plugin.Manager.LoadPath(ctx, name, path, scriptling, args)` and
-  `plugin.Manager.Unload(name)` provide the same behavior.
+  `plugin.Manager.LoadURL(ctx, name, url, scriptling, insecureSkipTLS, headers)`
+  plus `plugin.Manager.Unload(name)` provide the same behavior.
+- Go plugin servers can expose the Scriptling plugin protocol over HTTP with
+  `plugin.Server.ServeHTTP`, making `scriptling.plugin.load(name, url,
+  scriptling=True)` work for full plugin handshakes, generated `plugin.*`
+  proxies, function calls, object lifecycle, and batches.
 - `scriptling.plugin` is now always available (even without `--plugin-dir`) in
   run, server, and `--json-rpc` modes.
+
+### JSON-RPC over HTTP
+
+- `scriptling --server :8000 --json-rpc setup.py` now serves registered
+  `runtime.jsonrpc` handlers at `POST /json-rpc`.
+- `scriptling --json-rpc setup.py` remains the stdio transport; `--json-rpc`
+  selects exactly one transport based on whether `--server` is present.
+- HTTP JSON-RPC can run alongside normal `runtime.http` routes, MCP tools, and
+  the MCP script execution tool on the same server.
+- HTTP requests support single JSON-RPC calls, batches, and notifications.
+  Notification-only requests return `204 No Content`.
 
 **Provisioning Library — Managed Blocks:**
 

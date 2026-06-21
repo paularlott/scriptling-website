@@ -89,11 +89,12 @@ For long-running servers, create the manager during application startup and clos
 
 Scriptling's CLI server mode does this for `--plugin-dir` automatically.
 
-## Loading Executables on Demand
+## Loading JSON-RPC Peers on Demand
 
 `Manager.LoadPath` spawns a single executable at runtime without scanning a
-directory. `Manager.Unload` closes one and removes it. Both are safe to call
-while the manager is also serving `--plugin-dir` plugins.
+directory. `Manager.LoadURL` connects to an HTTP(S) JSON-RPC endpoint.
+`Manager.Unload` closes one and removes it. These are safe to call while the
+manager is also serving `--plugin-dir` plugins.
 
 ```go
 // Plugin protocol peer (scriptling.handshake + function.call etc.)
@@ -110,12 +111,22 @@ client, err = manager.LoadPath(ctx, "rpc", "scriptling", false,
     []string{"--json-rpc", "./setup.py"})
 if err != nil { log.Fatal(err) }
 defer manager.Unload("rpc")
+
+// HTTP JSON-RPC endpoint. The last argument skips TLS verification for
+// local/self-signed HTTPS servers.
+client, err = manager.LoadURL(ctx, "remote", "https://127.0.0.1:8443/json-rpc", false, true)
+if err != nil { log.Fatal(err) }
+defer manager.Unload("remote")
 ```
 
-`LoadPath` is idempotent on absolute path + name: a second call with the same
-path and the same name returns the existing client without respawning.
-Loading an already-loaded path under a different name, or loading a new path
-under a name already in use, returns an error.
+HTTP plugin transport is request/response only. It supports calls, objects, and
+batches, but the server cannot initiate callbacks back to the client. Use stdio
+plugins when host callbacks or `plugin.Logger(ctx)` are required.
+
+`LoadPath` is idempotent on absolute path + name; `LoadURL` is idempotent on
+URL + name. A second call with the same peer and name returns the existing
+client. Loading an already-loaded peer under a different name, or loading a new
+peer under a name already in use, returns an error.
 
 The CLI always constructs a manager (even without `--plugin-dir`) so that
 `scriptling.plugin.load` / `unload` / `call` are available to scripts in run,
