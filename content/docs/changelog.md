@@ -65,6 +65,7 @@ nav-skip: true
 - Set `insecure=True` to skip HTTPS certificate verification for trusted internal endpoints
 - Set `max_bytes` to cap response size before writing or extracting
 - Set `unpack_zip=True` to extract the fetched response as a zip archive into `dest`; extraction rejects entries that would escape the destination directory and preserves executable bits from regular file entries
+- `provides` parameter accepts a list of file paths; if all paths exist, the call returns `UNCHANGED` without downloading or extracting
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}

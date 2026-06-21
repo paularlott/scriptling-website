@@ -16,7 +16,7 @@ When `unpack_zip=True`, the destination is treated as a directory and the respon
 
 | Function | Description |
 |----------|-------------|
-| `file(url, dest, insecure=False, unpack_zip=False, timeout=30, max_bytes=0, mode=0o644, dir_mode=0o755)` | Download a file or unpack a fetched zip archive |
+| `file(url, dest, insecure=False, unpack_zip=False, timeout=30, max_bytes=0, mode=0o644, dir_mode=0o755, provides=None)` | Download a file or unpack a fetched zip archive |
 
 ## Constants
 
@@ -38,6 +38,7 @@ file(
     max_bytes: int = 0,
     mode: int = 0o644,
     dir_mode: int = 0o755,
+    provides: list[str] = None,
 ) -> dict
 ```
 
@@ -59,6 +60,7 @@ When `unpack_zip=True`, `dest` is a directory path. The fetched body is read as 
 | `max_bytes` | `0` | Maximum response size in bytes, or `0` for no cap |
 | `mode` | `0o644` | File permission mode for written files |
 | `dir_mode` | `0o755` | Directory permission mode for created directories |
+| `provides` | `None` | List of file paths. If all paths exist, returns `UNCHANGED` without downloading or extracting |
 
 ### Returns
 
@@ -117,6 +119,22 @@ fetch.file(
     insecure=True,
     unpack_zip=True,
 )
+```
+
+Skip fetching when all expected files are already present:
+
+```python
+import scriptling.provision.fetch as fetch
+
+result = fetch.file(
+    "https://example.com/site.zip",
+    "/srv/site",
+    unpack_zip=True,
+    provides=["/srv/site/bin/app", "/srv/site/config.yaml"],
+)
+
+if result["status"] == fetch.UNCHANGED:
+    print("All provided files already exist — skipped")
 ```
 
 ## Security Notes
