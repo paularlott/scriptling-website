@@ -112,9 +112,12 @@ detail_html = markdown.to_html(detail_md)
 
 ## Notes
 
-- `to_html` uses goldmark with GFM extensions enabled. The output is safe for
-  insertion into HTML pages — raw HTML in the Markdown source is passed through
-  unchanged, so callers are responsible for sanitising untrusted input before
-  rendering in a browser.
+- `to_html` uses goldmark with GFM extensions enabled. Raw HTML in the Markdown
+  source is **not** passed through: goldmark's safe default drops raw HTML
+  blocks and inline HTML (replacing them with an HTML comment) so untrusted
+  input, such as LLM output, cannot inject `<script>` tags, event handlers,
+  or other dangerous markup. The output is safe for direct insertion into an
+  HTML page. HTML-like syntax inside code spans and fenced code blocks is still
+  rendered, with the angle brackets HTML-escaped.
 - The function never fails on well-formed UTF-8 Markdown; it raises an
   exception only if conversion encounters an internal error.

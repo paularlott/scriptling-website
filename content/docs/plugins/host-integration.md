@@ -66,10 +66,91 @@ p2 := scriptling.New()
 plugin.RegisterLibraries(p2, manager)
 ```
 
+## Manager Scoping
 
-## Plugin Logs
+For applications where each request or execution should have its own isolated set of plugins — without affecting other requests or the global manager — use `NewScope`. A scope is a lightweight child manager that inherits the parent's logger and connection pools but keeps its own plugin registry.
 
-Pass a logger to `plugin.NewManager(appLogger, crashHandler)` to install the manager-lifetime host logger used for records emitted by Go plugins through `plugin.Logger(ctx)`. Pass the same logger your application already uses; the example above uses `github.com/paularlott/logger/slog` so plugin logs are visible during development. `manager.SetLogger()` is also available for late wiring. If no logger is configured, plugin log records are acknowledged and dropped.
+```go
+// Application start-up — create a long-lived parent manager.
+manager := plugin.NewManager(appLogger)
+manager.AddDir("./plugins")
+manager.Load(ctx)
+defer manager.Close()
+
+// Per-request execution — create an isolated scope and close it on exit.
+// The scope inherits the parent's pooled HTTP transports so TLS connections
+// to plugin endpoints are reused across requests.
+scope := manager.NewScope()
+defer scope.Close()
+
+env := scriptling.New()
+plugin.RegisterLibraries(env, scope)
+
+// Scripts can now use scriptling.plugin.load() to register additional plugins
+// that only exist for the lifetime of this scope.
+```
+
+### Restricting Transport Type
+
+Pass `plugin.WithTransport` to control which plugin transports a scope permits. This is useful in security-sensitive contexts such as server-side script execution, where you want to allow HTTP(S) plugin endpoints but prevent scripts from launching arbitrary local executables.
+
+```go
+// HTTP/HTTPS only — scriptling.plugin.load() will refuse stdio executables.
+scope := manager.NewScope(plugin.WithTransport(plugin.TransportHTTP))
+
+// Stdio only — scriptling.plugin.load() will refuse http(s) URLs.
+scope := manager.NewScope(plugin.WithTransport(plugin.TransportStdio))
+
+// Default — both types permitted (same as not passing any option).
+scope := manager.NewScope(plugin.WithTransport(plugin.TransportAll))
+```
+
+### Visibility and Name Isolation
+
+`scope.Get` and `scope.List` chain to the parent: a scope sees its own plugins plus all ancestor plugins. A child scope may only add plugin names that do not already exist anywhere in the ancestry chain — attempting to load a name that a parent already owns returns an error. This prevents name collisions and the subtle env-binding bugs that shadow-then-overwrite would cause.
+
+Loading the exact same endpoint under the same name is idempotent: `LoadPath` and `LoadURL` return the ancestor's client unchanged without creating a new connection.
+
+```go
+// Parent has plugin.tools loaded at startup.
+// Scope can see plugin.tools via the parent chain but cannot load a competing
+// endpoint under the same name — that would return an error.
+scope := manager.NewScope()
+
+// Loading the exact same URL is idempotent and returns parent's client:
+client, _ := scope.LoadURL(ctx, "tools", "https://plugins.example.com/rpc", true, false)
+// client == parentClient (same pointer)
+
+// scope.Get("tools") → parent's client (via chain)
+// manager.Get("tools") → parent's client (unchanged)
+```
+
+`scope.Unload(name)` only removes scope-local plugins. Attempting to unload a plugin that lives in the parent returns an error, which prevents accidental removal of shared resources from within an isolated request.
+
+### Connection Pooling Across Scopes
+
+The parent manager holds two shared `*http.Transport` instances (one TLS-verified, one skip-verify). `NewScope` inherits the same transport pointers, so all scopes derived from the same manager share a single HTTP/2 connection pool per endpoint. Connections established in one request are reused in the next, even though each request uses its own scope and its own Scriptling environment.
+
+When a scope is closed, its `http.Client` instances are dropped, but the connections remain warm inside the shared transport's pool. The parent's `Close` tears down the transports.
+
+### Nested Scopes
+
+Scopes can themselves be scoped. The same rules apply at every level: lookup chains to the immediate parent, close affects only the local level, and all levels share the root manager's transports.
+
+```go
+tenantScope := manager.NewScope(plugin.WithTransport(plugin.TransportHTTP))
+defer tenantScope.Close()
+// Load tenant-specific plugins into tenantScope…
+
+requestScope := tenantScope.NewScope()
+defer requestScope.Close()
+// requestScope sees its own plugins + tenantScope's + manager's.
+// requestScope.Close() leaves tenantScope fully intact.
+```
+
+### Plugin Logs
+
+Pass a logger to `plugin.NewManager(appLogger, crashHandler)` to install the manager-lifetime host logger used for records emitted by Go plugins through `plugin.Logger(ctx)`. Pass the same `github.com/paularlott/logger.Logger` your application already uses; the example above uses `github.com/paularlott/logger/slog` so plugin logs are visible during development. `manager.SetLogger()` is also available for late wiring. If no logger is configured, plugin log records are acknowledged and dropped.
 
 ## Crash Handling
 

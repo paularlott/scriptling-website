@@ -7,6 +7,35 @@ nav-skip: true
 
 ## June 2026
 
+{{< version "v0.12.3" >}}
+
+{{< changelog-item "added" >}}
+**Plugin Manager Scoping:**
+
+- `manager.NewScope(opts ...ScopeOption)` creates a child manager that isolates dynamically loaded plugins from the parent and from sibling scopes.
+- Scopes chain for lookup: `Get` and `List` fall back to the parent (and so on up the chain) when a name is not found locally. A child scope may not load a plugin under a name that already exists in any ancestor — attempting this returns an error. Loading the exact same endpoint under the same name is idempotent and returns the ancestor's client unchanged.
+- `scope.Close()` shuts down and unloads only the scope-local plugins. The parent and sibling scopes are completely unaffected. The local client map is cleared atomically on close.
+- `scope.Unload(name)` removes only scope-local plugins; parent plugins cannot be unloaded from a child scope.
+- Scopes can be nested to arbitrary depth. `Get`, `List`, and transport inheritance propagate correctly through the full chain.
+- `WithTransport(TransportHTTP)` restricts a scope to HTTP(S) endpoints only — any attempt to load a stdio executable raises an error.
+- `WithTransport(TransportStdio)` restricts a scope to stdio executables only — any attempt to load an HTTP(S) URL raises an error.
+- `WithTransport(TransportAll)` (default) permits both transport types.
+
+**Pooled, HTTP/2-capable transports:**
+
+- `plugin.NewManager` now creates two shared `*http.Transport` instances — one TLS-verified, one with TLS skip-verify — that are inherited by all child scopes via `NewScope`. Connections to the same endpoint are reused across scopes, reducing TLS handshake overhead and enabling HTTP/2 connection reuse.
+- `manager.LoadURL(ctx, name, url, scriptling, insecureSkipTLS=true, ...)` now draws from the manager's pooled skip-verify transport rather than creating a new transport per connection.
+- The shared transports use `ForceAttemptHTTP2: true`, `MaxIdleConnsPerHost: 20`, and `IdleConnTimeout: 90s`.
+{{< /changelog-item >}}
+
+{{< changelog-item "security" >}}
+**Markdown Library:**
+
+- `scriptling.markdown.to_html` no longer passes raw HTML through to the output. Raw HTML blocks and inline HTML are now dropped (replaced with an HTML comment), so untrusted input such as LLM output cannot inject `<script>` tags, event handlers, or other dangerous markup. The rendered HTML is safe for direct insertion into a page. HTML-like syntax inside code spans and fenced code blocks is still rendered, with angle brackets HTML-escaped.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.12.1" >}}
 
 {{< changelog-item "added" >}}
