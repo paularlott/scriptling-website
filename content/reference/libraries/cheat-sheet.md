@@ -236,16 +236,28 @@ print(decoded)  # "Hello, World!"
 import hashlib
 
 # MD5
-md5_hash = hashlib.md5("data")
-print(md5_hash)  # Hex string
+md5_hash = hashlib.md5("data").hexdigest()
+print(md5_hash)  # 32 character hex string
 
 # SHA256
-sha256_hash = hashlib.sha256("data")
+sha256_hash = hashlib.sha256("data").hexdigest()
 print(sha256_hash)  # 64 character hex string
 
-# SHA512
-sha512_hash = hashlib.sha512("data")
-print(sha512_hash)  # 128 character hex string
+# SHA1
+sha1_hash = hashlib.sha1("data").hexdigest()
+print(sha1_hash)  # 40 character hex string
+```
+
+## HMAC
+
+```python
+import hmac
+
+# Compute a message authentication code
+sig = hmac.new("secret", "message", "sha256").hexdigest()
+
+# Constant-time comparison (use for signature verification)
+ok = hmac.compare_digest(sig, received_signature)
 ```
 
 ## String Constants

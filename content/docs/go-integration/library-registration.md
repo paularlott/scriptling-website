@@ -36,6 +36,7 @@ p.RegisterLibrary(stdlib.TimeLibrary)
 | `difflib` | `DifflibLibrary` |
 | `functools` | `FunctoolsLibrary` |
 | `hashlib` | `HashlibLibrary` |
+| `hmac` | `HmacLibrary` |
 | `html` | `HTMLLibrary` |
 | `io` | `IOLibrary` |
 | `itertools` | `ItertoolsLibrary` |

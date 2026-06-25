@@ -339,7 +339,7 @@ except Exception as e:
 
 **Available libraries:**
 
-- Standard libraries: `json`, `math`, `random`, `re`, `time`, `base64`, `hashlib`, `urllib`
+- Standard libraries: `json`, `math`, `random`, `re`, `time`, `base64`, `hashlib`, `hmac`, `urllib`
 - `datetime` - Date and time operations
 - `yaml`, `toml` - YAML and TOML parsing
 - `html.parser` - HTML parsing

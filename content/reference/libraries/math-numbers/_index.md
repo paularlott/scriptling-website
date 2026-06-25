@@ -10,5 +10,6 @@ weight: 4
 | [random](random/) | Random number generation |
 | [statistics](statistics/) | Statistical functions |
 | [hashlib](hashlib/) | Secure hash algorithms |
+| [hmac](hmac/) | Keyed-Hash Message Authentication Codes |
 | [base64](base64/) | Base64 encoding and decoding |
 | [uuid](uuid/) | UUID generation |

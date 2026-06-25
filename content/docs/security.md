@@ -43,6 +43,7 @@ These libraries are safe to use in most sandboxed environments and are available
 | `itertools`   | Pure computation, no external access         |
 | `collections` | Pure computation, no external access         |
 | `hashlib`     | Cryptographic hashing, no external access    |
+| `hmac`        | Keyed hashing (HMAC), no external access     |
 | `platform`    | Platform information, read-only              |
 | `urllib`      | URL parsing only, no network access          |
 | `uuid`        | UUID generation, no external access          |

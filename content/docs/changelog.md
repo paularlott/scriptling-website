@@ -7,6 +7,61 @@ nav-skip: true
 
 ## June 2026
 
+{{< version "v0.14.0" >}}
+
+{{< changelog-item "changed" >}}
+**Breaking change — `hashlib` now returns hash objects:**
+
+`hashlib.md5()`, `hashlib.sha1()` and `hashlib.sha256()` previously returned a
+hexadecimal string directly. They now return **hash objects**, matching Python.
+Call `.hexdigest()` (or `.digest()`) on the result:
+
+```python
+# Before (v0.12)
+h = hashlib.sha256("hello")        # a hex string
+
+# After (v0.14)
+h = hashlib.sha256("hello").hexdigest()
+```
+
+The hash objects also support `.update(data)`, `.copy()`, and the `.name`,
+`.digest_size` and `.block_size` attributes. Constructors accept an optional
+initial `data` argument (a string used as a byte buffer, or a list of byte
+values such as returned by `str.encode()`).
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**New `hmac` standard library** (alongside `hashlib`):
+
+- `hmac.new(key, msg=None, digestmod=None)` returns an HMAC object with
+  `.update()`, `.digest()`, `.hexdigest()`, `.copy()` and `.name` /
+  `.digest_size` / `.block_size` attributes.
+- `digestmod` accepts a string name (`"sha256"` default, `"sha1"`, `"md5"`),
+  the omitted value, or a `hashlib` constructor reference (`hashlib.sha256`).
+- `hmac.digest(key, msg, digestmod)` is a one-shot helper.
+- `hmac.compare_digest(a, b)` performs a constant-time string comparison.
+
+This makes webhook signature verification (GitHub, Stripe, Slack, etc.) a
+one-liner:
+
+```python
+import hmac, hashlib
+
+def verify(body, signature, secret):
+    expected = "sha256=" + hmac.new(
+        secret.encode(), body, hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)
+```
+
+`secrets.compare_digest` now delegates to the shared `hmac.compare_digest`
+implementation. Note that scriptling has no `bytes` type — strings are used as
+byte buffers and parameter type annotations are not supported, so write
+`def verify(body, signature, secret):`.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.12.3" >}}
 
 {{< changelog-item "added" >}}

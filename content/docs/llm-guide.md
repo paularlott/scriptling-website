@@ -77,6 +77,7 @@ Standard libraries are always available. Extended libraries are available in the
 | `collections` | Containers and counters | Standard |
 | `textwrap` | Text formatting | Standard |
 | `hashlib` | Hashing | Standard |
+| `hmac` | HMAC (message auth, signature verification) | Standard |
 | `base64` | Base64 encode/decode | Standard |
 | `uuid` | UUID generation | Standard |
 | `urllib.parse` | URL parsing and encoding | Standard |
