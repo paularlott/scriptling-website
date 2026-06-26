@@ -7,6 +7,30 @@ nav-skip: true
 
 ## June 2026
 
+{{< version "v0.14.1" >}}
+
+{{< changelog-item "added" >}}
+**Embeddable server: inject host libraries via `ServerConfig.ExtraLibs`**
+
+The server runtime (`scriptling-cli/server`) now accepts an optional
+`ExtraLibs func(*scriptling.Scriptling)` on `ServerConfig`. When set, it runs on
+every evaluator the server builds — the setup script and every JSON-RPC, HTTP,
+MCP, and WebSocket request handler — after the standard library set. Host
+applications embedding the server can use it to expose their own libraries to
+served scripts:
+
+```go
+cfg := server.ServerConfig{
+    ScriptFile: "setup.py",
+    ExtraLibs: func(p *scriptling.Scriptling) {
+        myapp.RegisterLibraries(p)
+    },
+}
+server.RunJSONRPCServer(ctx, cfg)
+```
+
+{{< /changelog-item >}}
+
 {{< version "v0.14.0" >}}
 
 {{< changelog-item "changed" >}}
