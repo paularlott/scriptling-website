@@ -43,7 +43,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Module | Notes |
 |--------|-------|
 | `asyncio` | Async I/O framework |
-| `threading`, `multiprocessing` | Scriptling is single-threaded by design |
+| `threading`, `multiprocessing` | Use `runtime.background` — `shared=True` for shared-env threads, default for isolated parallel workers |
 | `socket` | Low-level networking; use `requests` for HTTP |
 | `pickle`, `marshal` | Use `json` for serialization |
 | `struct` | Binary data structures |

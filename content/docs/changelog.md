@@ -7,6 +7,59 @@ nav-skip: true
 
 ## June 2026
 
+{{< version "v0.15.0" >}}
+
+{{< changelog-item "added" >}}
+**Interpreter lock (GIL): one environment is now safe to use from many goroutines.**
+
+Each Scriptling environment now has an interpreter lock, acquired automatically
+whenever script runs. Any number of goroutines may call into the same
+environment — shared-state threads, background handlers, server requests — and
+the lock guarantees only one runs script at a time, so shared state can no longer
+be corrupted by concurrent access (no locks needed in your handlers). Independent
+environments keep independent locks and still run fully in **parallel**, so the
+per-request isolation used by the servers keeps its throughput.
+
+Blocking calls release the lock while they wait, so other threads keep making
+progress: sleeps, `input()`, file I/O, sockets, WebSocket, subprocess, HTTP, AI
+completions/streaming, container calls, plugin calls, provisioning, `wait_for`,
+`grep`/`sed`, messaging sends, `runtime.sync` primitives, `Promise.wait()`, and
+`gossip send_request()`. For tight CPU-bound loops that never block, the new
+global `yield_now()` builtin releases the lock briefly so other threads can run.
+
+**`runtime.background(..., shared=True)` — shared-environment threads.**
+
+`background()` gains a keyword-only `shared` flag. With `shared=True` the handler
+runs on a goroutine in the **caller's own environment**, sharing its live
+variables; the interpreter lock makes concurrent access safe without locks.
+Arguments are passed live (no transferable restriction or copying). The default
+(`shared=False`) is unchanged: an isolated, parallel copy. Also fixed docs that
+referenced a non-existent `runtime.spawn` — the function is `runtime.background`.
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**`scriptling.console` handlers run one at a time, to completion:**
+
+`on_submit`, `on_escape`, and `register_command` handlers run sequentially — each
+finishes before the next starts. This is for ordering, not safety (the
+interpreter lock already makes them memory-safe): a chat conversation is only
+coherent if a submit handler completes before the next begins, and serializing
+keeps input responsive while a handler runs. A long-running handler delays the
+next one; submitting new input or pressing Esc still cancels the in-flight
+handler so cooperative handlers can stop early.
+
+**Faster function calls:**
+
+Two interpreter optimizations cut per-call overhead. A call-site callee cache
+resolves functions defined in an enclosing scope (recursion, shared helpers)
+without re-walking the environment chain, and call-frame environments are now
+recycled through a per-tree free-list instead of a global pool. Recursion-heavy
+workloads (e.g. recursive `fib`) run roughly **16% faster** with no change in
+allocations.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.14.1" >}}
 
 {{< changelog-item "added" >}}

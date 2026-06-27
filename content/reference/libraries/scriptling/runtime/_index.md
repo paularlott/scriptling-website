@@ -23,11 +23,11 @@ Libraries for runtime functionality including background task execution, HTTP se
 import scriptling.runtime as runtime
 import scriptling.runtime.kv as kv
 
-# Background task
+# Background task (handler is passed by name)
 def my_task():
     print("Running in background")
 
-runtime.spawn(my_task)
+runtime.background("my_task", "my_task")
 
 # Key-value storage
 store = kv.open("./mydata.db")

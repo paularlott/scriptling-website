@@ -195,6 +195,23 @@ console.on_escape(lambda: console.spinner_stop())
 console.run()  # blocks until /exit or Ctrl+C
 ```
 
+### Handler concurrency
+
+The interpreter lock (GIL) already makes your handlers memory-safe — you never
+need locks around shared state. On top of that, `on_submit`, `on_escape`, and
+`register_command` handlers run **one at a time, to completion** before the next
+starts. This is deliberate for a TUI: a chat conversation is only coherent if
+each submit finishes before the next begins (otherwise two handlers would
+interleave at blocking points and scramble the order). Serializing also keeps
+input responsive — the input reader enqueues events and keeps reading while a
+handler runs.
+
+Because handlers are sequential, a long-running handler delays the next one
+until it returns. If a handler may run for a while, do its work in a loop that
+checks for cancellation: submitting new input or pressing Esc cancels the
+in-flight handler (and fires `on_escape`), so cooperative handlers can stop
+early and let the next one run.
+
 ## Labels
 
 ```python

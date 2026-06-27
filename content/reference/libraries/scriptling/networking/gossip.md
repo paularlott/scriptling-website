@@ -12,6 +12,25 @@ The `scriptling.net.gossip` library implements a gossip protocol for decentraliz
 
 Advanced features include request/reply messaging, metadata-criteria-based node groups, and quorum-based leader election with optional metadata filtering.
 
+## Handler concurrency
+
+All registered callbacks — `handle`, `handle_with_reply`, `on_state_change`, `on_metadata_change`, `on_gossip_interval`, node-group `on_node_added`/`on_node_removed`, and leader-election `on_event` — fire automatically as messages and events arrive. They run on gossip's internal goroutines under the per-environment interpreter lock (GIL). There is no event pump and no `wait()` loop — handlers invoke themselves.
+
+Because the GIL serializes script execution, a handler never runs concurrently with the rest of your script, so you do not need locks around shared state. Handlers interleave with your script only at its blocking points (or `yield_now()`), which is memory-safe.
+
+A long-running node just stays alive — do work, or sleep — and handlers fire as traffic arrives:
+
+```python
+cluster.handle(gossip.MSG_USER, on_message)
+
+while True:
+    time.sleep(1)   # keep the process alive; handlers fire as messages arrive
+```
+
+Ordering: gossip messages carry Hybrid Logical Clock (HLC) timestamps, so application-level ordering is resolved at the data layer — handler delivery order is not significant and may differ from arrival order.
+
+A single script can both call `send_request()` and serve its own `handle_with_reply()` responder: `send_request` releases the GIL while it blocks, letting an incoming request's handler run and reply.
+
 ## Available Functions
 
 | Function | Description |

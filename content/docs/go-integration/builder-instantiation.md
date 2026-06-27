@@ -379,15 +379,14 @@ if p.exists():
 
 ## Thread Safety
 
-The implementation is thread-safe:
+Each environment carries a per-environment interpreter lock (GIL) that serializes script execution, so a single environment is safe to call from many goroutines. Independent environments have independent locks and run fully in parallel. Use one environment per goroutine for isolation, or share one environment across goroutines for shared state.
 
 - Instance data is injected into context per-call
 - No shared mutable state between instances
-- Each interpreter can run in its own goroutine
 - Functions can be called concurrently without data crossover
 
 ```go
-// Safe to run concurrently
+// Safe to run concurrently — separate environments (parallel, isolated)...
 go func() {
     interpreter1.Eval("mylib.do_something()")
 }()
@@ -395,6 +394,9 @@ go func() {
 go func() {
     interpreter2.Eval("mylib.do_something()")
 }()
+
+// ...or a single shared environment (serialized by the GIL).
+go func() { shared.Eval("mylib.do_something())" }()
 ```
 
 ## Best Practices

@@ -10,7 +10,7 @@ Background tasks and concurrency for scripts and HTTP servers.
 
 | Function                                   | Description                                      |
 | ------------------------------------------ | ------------------------------------------------ |
-| `background(name, handler, *args, **kwargs)` | Start a background task, returns a Promise |
+| `background(name, handler, *args, shared=False, **kwargs)` | Start a background task, returns a Promise |
 
 ## Functions
 
@@ -24,8 +24,30 @@ Start a background task in a goroutine. Returns a `Promise` that can be used to 
 - `handler` (string): Function name to execute — either a local function (`"my_func"`) or a library function (`"lib.func"`)
 - `*args`: Positional arguments passed to the function
 - `**kwargs`: Keyword arguments passed to the function
+- `shared` (bool, keyword-only, default `False`): run the handler in the **caller's own environment** instead of an isolated copy (see below)
 
 **Returns:** A `Promise` object (in script mode) or `None` (in server mode, where tasks are fire-and-forget).
+
+**Isolated vs shared environments:**
+
+- **Isolated (default):** the handler runs in a fresh environment with only sibling functions copied in; arguments must be transferable and are deep-copied. Isolated tasks run truly in **parallel** (separate environments don't share the interpreter lock). Use this for stateless work.
+- **Shared (`shared=True`):** the handler runs on a goroutine in the **same** environment, so it can read and write the caller's live variables directly. Arguments are passed live (no transferable restriction, no copying). The interpreter lock (GIL) serializes script execution, so access to shared state is safe **without locks**. Only one thread runs script at a time; threads interleave when one blocks (`time.sleep`, `Queue` operations, `Promise.wait()`, I/O). Use this for Python-style threads over shared in-memory state.
+
+```python
+state = {"count": 0}
+
+def worker(n):
+    i = 0
+    while i < n:
+        state["count"] = state["count"] + 1  # shared, GIL-protected
+        i = i + 1
+
+t1 = runtime.background("w1", "worker", 1000, shared=True)
+t2 = runtime.background("w2", "worker", 1000, shared=True)
+t1.wait()
+t2.wait()
+print(state["count"])  # 2000
+```
 
 **Promise methods:**
 
@@ -42,6 +64,8 @@ Start a background task in a goroutine. Returns a `Promise` that can be used to 
 - Circular references in containers are rejected
 
 For ongoing coordination between tasks, use `runtime.sync` primitives (`Shared`, `Atomic`, `Queue`, `WaitGroup`).
+
+> **Note:** To yield the interpreter lock from a tight CPU-bound loop, use the global [`yield_now()`](../../builtins/#yield_now) builtin — it is always available without importing `runtime`.
 
 ## Sub-Libraries
 
