@@ -28,6 +28,12 @@ A plugin declares a short name such as `hello`. Scriptling imports it as `plugin
 - [Bash Plugins](bash/) - Implement the JSON-RPC protocol directly.
 - [JSON-RPC Protocol](protocol/) - Wire format reference for all methods and value encoding.
 
+## Scriptling Scripts as Plugins
+
+A Scriptling script can itself act as a plugin server using `runtime.plugin` —
+no compiled binary required. See [Plugin Server Mode](../cli/plugin-server/) in
+the CLI reference.
+
 ## Naming Model
 
 Plugins live under `plugin.<name>` in Scriptling code, but the executable declares only `<name>` in the handshake or Go server constructor:

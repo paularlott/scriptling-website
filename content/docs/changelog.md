@@ -10,6 +10,43 @@ nav-skip: true
 {{< version "v0.15.0" >}}
 
 {{< changelog-item "added" >}}
+**`runtime.plugin` — expose a Scriptling script as a first-class plugin peer (agent variant only).**
+
+A Scriptling setup script can now implement the full Scriptling plugin protocol
+so that host processes can load it with `scriptling=True` and receive
+auto-generated `plugin.<name>` proxy libraries — no compiled binary required.
+
+```python
+# setup.py
+import scriptling.runtime.plugin as plugin_srv
+import scriptling.runtime as runtime
+
+plugin_srv.serve("calculator", "1.0", "Basic arithmetic")
+plugin_srv.function("add", "handlers.add")
+plugin_srv.function("multiply", "handlers.multiply")
+
+runtime.start_server()
+```
+
+```python
+# handlers.py  — called on a fresh evaluator per request
+def add(a, b):
+    return a + b
+
+def multiply(a, b):
+    return a * b
+```
+
+When a client loads this peer with `scriptling=True`, the host performs the
+`scriptling.handshake`, receives the schema, and builds a `plugin.calculator`
+proxy library with generated wrappers for `add` and `multiply`. Function
+handlers receive individual positional arguments decoded from the plugin
+transport (not a raw params blob).
+
+`runtime.plugin` is registered only in the **agent variant** of Scriptling — it
+is intentionally absent from the general CLI runtime. See the
+[Plugin Server Mode](../cli/plugin-server/) docs.
+
 **`runtime.start_server(wait=True)` and `runtime.server_running()` — keep the setup script alive while the server runs.**
 
 Previously, a setup script registered its routes and then exited; the server started automatically in the background. This made it impossible for the setup script to remain alive alongside the running server (to maintain gossip state, share objects, or run a polling loop that feeds HTTP handlers).
