@@ -22,8 +22,8 @@ import scriptling.runtime.plugin as plugin_srv
 import scriptling.runtime as runtime
 
 plugin_srv.serve("calculator", "1.0", "Basic arithmetic")
-plugin_srv.function("add", "handlers.add")
-plugin_srv.function("multiply", "handlers.multiply")
+plugin_srv.register_function("add", "handlers.add")
+plugin_srv.register_function("multiply", "handlers.multiply")
 
 runtime.start_server()
 ```

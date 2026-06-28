@@ -19,8 +19,8 @@ setup script:
 
 1. The setup script calls `runtime.plugin.serve(name, version, description)` to
    declare a plugin identity.
-2. It registers functions, constants, and classes with `runtime.plugin.function`,
-   `runtime.plugin.constant`, and `runtime.plugin.class`.
+2. It registers functions, constants, and classes with `runtime.plugin.register_function`,
+   `runtime.plugin.register_constant`, and `runtime.plugin.register_class`.
 3. It calls `runtime.start_server()` — the CLI switches from the plain JSON-RPC
    loop to the full plugin protocol, serving `scriptling.handshake`,
    `function.call`, `object.*`, and constants over stdio or HTTP.
@@ -36,10 +36,10 @@ import scriptling.runtime.plugin as plugin_srv
 import scriptling.runtime as runtime
 
 plugin_srv.serve("calculator", "1.0", "Basic arithmetic operations")
-plugin_srv.function("add", "handlers.add")
-plugin_srv.function("multiply", "handlers.multiply")
-plugin_srv.constant("VERSION", "1.0.0")
-plugin_srv.class("handlers.Config")
+plugin_srv.register_function("add", "handlers.add")
+plugin_srv.register_function("multiply", "handlers.multiply")
+plugin_srv.register_constant("VERSION", "1.0.0")
+plugin_srv.register_class("handlers.Config")
 
 runtime.start_server()
 ```
@@ -79,17 +79,12 @@ cfg = plugin.calculator.Config("Hello, ")
 print(cfg.greeting("world"))               # "Hello, world"
 ```
 
-Or as a subprocess (stdio transport) when wrapped in a shell shim:
-
-```bash
-#!/bin/sh
-exec scriptling --json-rpc /path/to/setup.py "$@"
-```
+Or as a subprocess over stdio:
 
 ```python
 import scriptling.plugin as plugin
 
-plugin.load("calculator", "/usr/local/bin/calculator-plugin", scriptling=True)
+plugin.load("calculator", "scriptling", scriptling=True, args=["--json-rpc", "setup.py"])
 import plugin.calculator
 print(plugin.calculator.add(3, 4))
 ```
@@ -109,7 +104,7 @@ Declare this script as a Scriptling plugin server.
 Must be called before `runtime.start_server()`. A warning is printed to stderr
 if called after the server has started.
 
-### `runtime.plugin.function(name, handler)`
+### `runtime.plugin.register_function(name, handler)`
 
 Register a function for the plugin server.
 
@@ -145,7 +140,7 @@ only and cannot carry server→client callback calls.
 
 Must be called before `runtime.start_server()`.
 
-### `runtime.plugin.constant(name, value)`
+### `runtime.plugin.register_constant(name, value)`
 
 Register a constant exported by the plugin server.
 
@@ -165,7 +160,7 @@ print(plugin.myservice.MAX_RETRIES)  # 5
 
 Must be called before `runtime.start_server()`.
 
-### `runtime.plugin.class(handler)`
+### `runtime.plugin.register_class(handler)`
 
 Register a class exported by the plugin server.
 
@@ -203,8 +198,8 @@ import scriptling.runtime.plugin as plugin_srv
 import scriptling.runtime as runtime
 
 plugin_srv.serve("stateful", "1.0", "Plugin with shared state")
-plugin_srv.function("greet", "handlers.greet")
-plugin_srv.constant("VERSION", "1.0.0")
+plugin_srv.register_function("greet", "handlers.greet")
+plugin_srv.register_constant("VERSION", "1.0.0")
 
 runtime.start_server(wait=False)
 while runtime.server_running():
@@ -220,9 +215,9 @@ while runtime.server_running():
 | **Distribution** | Compiled binary | Script file |
 | **Handler isolation** | Shared process state | Fresh evaluator per call |
 | **Type safety** | Typed via `FunctionBuilder` | Duck-typed |
-| **Functions** | `RegisterFunc` | `runtime.plugin.function` |
-| **Constants** | `Constant` | `runtime.plugin.constant` |
-| **Classes** | `RegisterClass` | `runtime.plugin.class` |
+| **Functions** | `RegisterFunc` | `runtime.plugin.register_function` |
+| **Constants** | `Constant` | `runtime.plugin.register_constant` |
+| **Classes** | `RegisterClass` | `runtime.plugin.register_class` |
 | **Callbacks** | Supported over stdio; HTTP is request/response only | Supported over stdio; HTTP is request/response only |
 
 ## See Also
