@@ -10,9 +10,51 @@ Background tasks and concurrency for scripts and HTTP servers.
 
 | Function                                   | Description                                      |
 | ------------------------------------------ | ------------------------------------------------ |
-| `background(name, handler, *args, **kwargs)` | Start a background task, returns a Promise |
+| `background(name, handler, *args, shared=False, **kwargs)` | Start a background task, returns a Promise |
+| `start_server(wait=True)` | Signal the server to start accepting requests |
+| `server_running()` | Returns `True` while the server is running |
 
 ## Functions
+
+### scriptling.runtime.start_server(wait=True)
+
+Signal the server to collect registered routes and begin listening for requests. Call this after all routes and methods have been registered.
+
+**Parameters:**
+
+- `wait` (bool, default `True`): If `True`, blocks until the server receives a shutdown signal (equivalent to Flask's `app.run()`). If `False`, returns immediately so the script can keep running — e.g. to maintain gossip state or run a polling loop.
+
+**Backward compatibility:** Scripts that exit without calling `start_server()` continue to work unchanged — the server starts automatically after the setup script finishes. Call `start_server()` only when you need the script to stay alive alongside the running server.
+
+```python
+import scriptling.runtime as runtime
+
+runtime.http.get("/hello", "hello_handler")
+
+# Block until shutdown (default):
+runtime.start_server()
+
+# — or keep running with a loop:
+runtime.start_server(wait=False)
+while runtime.server_running():
+    yield_now()
+```
+
+---
+
+### scriptling.runtime.server_running()
+
+Returns `True` while the server is running, `False` once it receives a shutdown signal. Returns `False` in non-server (script) mode.
+
+Typically used with `start_server(wait=False)` to keep the setup script alive:
+
+```python
+runtime.start_server(wait=False)
+while runtime.server_running():
+    yield_now()   # release interpreter lock on each iteration
+```
+
+---
 
 ### scriptling.runtime.background(name, handler, *args, **kwargs)
 
@@ -24,8 +66,30 @@ Start a background task in a goroutine. Returns a `Promise` that can be used to 
 - `handler` (string): Function name to execute — either a local function (`"my_func"`) or a library function (`"lib.func"`)
 - `*args`: Positional arguments passed to the function
 - `**kwargs`: Keyword arguments passed to the function
+- `shared` (bool, keyword-only, default `False`): run the handler in the **caller's own environment** instead of an isolated copy (see below)
 
 **Returns:** A `Promise` object (in script mode) or `None` (in server mode, where tasks are fire-and-forget).
+
+**Isolated vs shared environments:**
+
+- **Isolated (default):** the handler runs in a fresh environment with only sibling functions copied in; arguments must be transferable and are deep-copied. Isolated tasks run truly in **parallel** (separate environments don't share the interpreter lock). Use this for stateless work.
+- **Shared (`shared=True`):** the handler runs on a goroutine in the **same** environment, so it can read and write the caller's live variables directly. Arguments are passed live (no transferable restriction, no copying). The interpreter lock (GIL) serializes script execution, so access to shared state is safe **without locks**. Only one thread runs script at a time; threads interleave when one blocks (`time.sleep`, `Queue` operations, `Promise.wait()`, I/O). Use this for Python-style threads over shared in-memory state.
+
+```python
+state = {"count": 0}
+
+def worker(n):
+    i = 0
+    while i < n:
+        state["count"] = state["count"] + 1  # shared, GIL-protected
+        i = i + 1
+
+t1 = runtime.background("w1", "worker", 1000, shared=True)
+t2 = runtime.background("w2", "worker", 1000, shared=True)
+t1.wait()
+t2.wait()
+print(state["count"])  # 2000
+```
 
 **Promise methods:**
 
@@ -42,6 +106,8 @@ Start a background task in a goroutine. Returns a `Promise` that can be used to 
 - Circular references in containers are rejected
 
 For ongoing coordination between tasks, use `runtime.sync` primitives (`Shared`, `Atomic`, `Queue`, `WaitGroup`).
+
+> **Note:** To yield the interpreter lock from a tight CPU-bound loop, use the global [`yield_now()`](../../builtins/#yield_now) builtin — it is always available without importing `runtime`.
 
 ## Sub-Libraries
 

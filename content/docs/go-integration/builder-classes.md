@@ -18,27 +18,27 @@ func createPersonClass() *object.Class {
 
     // Constructor
     cb.MethodWithHelp("__init__", func(self *object.Instance, name string, age int) {
-        self.Fields["name"] = object.NewString(name)
-        self.Fields["age"] = object.NewInteger(int64(age))
+        self.SetField("name", object.NewString(name))
+        self.SetField("age", object.NewInteger(int64(age)))
     }, "__init__(name, age) - Initialize Person")
 
     // Method returning value
     cb.MethodWithHelp("greet", func(self *object.Instance) string {
-        name, _ := self.Fields["name"].AsString()
+        name, _ := self.Field("name").AsString()
         return "Hello, " + name + "!"
     }, "greet() - Return greeting")
 
     // Method modifying state
     cb.MethodWithHelp("birthday", func(self *object.Instance) string {
-        age, _ := self.Fields["age"].AsInt()
+        age, _ := self.Field("age").AsInt()
         newAge := age + 1
-        self.Fields["age"] = object.NewInteger(newAge)
+        self.SetField("age", object.NewInteger(newAge))
         return fmt.Sprintf("Happy birthday! You're now %d", newAge)
     }, "birthday() - Increment age")
 
     // Method with parameters
     cb.MethodWithHelp("set_email", func(self *object.Instance, email string) {
-        self.Fields["email"] = object.NewString(email)
+        self.SetField("email", object.NewString(email))
     }, "set_email(email) - Set email address")
 
     return cb.Build()
@@ -118,7 +118,7 @@ The constructor:
 
 Methods:
 - First parameter must match the constructor's return type
-- Read and write struct fields directly — no `self.Fields` or type assertions needed
+- Read and write struct fields directly — no `self.Field()` calls or type assertions needed
 - `__del__` is called when the instance is garbage collected, or explicitly via `instance.__del__()`
 - `__del__` can also be called multiple times explicitly — it runs every time it is called
 - GC finalizers are not prompt: prefer explicit cleanup for critical resources
@@ -166,7 +166,7 @@ This gives you full control over what's exposed. You can derive computed values,
 | Factor | `*Instance` (manual) | Typed Receiver |
 |--------|---------------------|----------------|
 | **Best for** | Simple state, mixed types | Go struct-backed classes |
-| **State access** | `self.Fields["key"]` + type assertion | Direct struct field access |
+| **State access** | `self.SetField("key", v)` / `self.Field("key")` | Direct struct field access |
 | **Exposed to Scriptling** | Yes — Fields are readable/writable | No — use `Property()` to expose |
 | **Cleanup (`__del__`)** | Receives `*object.Instance` | Receives Go struct directly |
 | **GC trigger** | Yes — finalizer installed on instance | Yes — finalizer installed on instance |
@@ -178,7 +178,7 @@ This gives you full control over what's exposed. You can derive computed values,
 
 ```go
 cb.Method("get_name", func(self *object.Instance) string {
-    name, _ := self.Fields["name"].AsString()
+    name, _ := self.Field("name").AsString()
     return name
 })
 ```
@@ -187,7 +187,7 @@ cb.Method("get_name", func(self *object.Instance) string {
 
 ```go
 cb.Method("add_friend", func(self *object.Instance, friendName string) {
-    friends, _ := self.Fields["friends"].(*object.List)
+    friends, _ := self.Field("friends").(*object.List)
     friends.Elements = append(friends.Elements, object.NewString(friendName))
 })
 ```
@@ -213,8 +213,8 @@ cb.Method("configure", func(self *object.Instance, kwargs object.Kwargs) error {
     timeout, _ := kwargs.GetInt("timeout", 30)
     debug, _ := kwargs.GetBool("debug", false)
 
-    self.Fields["timeout"] = object.NewInteger(int64(timeout))
-    self.Fields["debug"] = object.NewBoolean(debug)
+    self.SetField("timeout", object.NewInteger(int64(timeout)))
+    self.SetField("debug", object.NewBoolean(debug))
     return nil
 })
 ```
@@ -243,7 +243,7 @@ Registers a read-only getter as a `@property`. The getter receives `self` only, 
 
 ```go
 cb.Property("area", func(self *object.Instance) float64 {
-    r, _ := self.Fields["radius"].AsFloat()
+    r, _ := self.Field("radius").AsFloat()
     return math.Pi * r * r
 })
 
@@ -259,11 +259,11 @@ Registers a getter and setter. The getter receives `self` only. The setter recei
 ```go
 cb.PropertyWithSetter("radius",
     func(self *object.Instance) float64 {
-        r, _ := self.Fields["_r"].AsFloat()
+        r, _ := self.Field("_r").AsFloat()
         return r
     },
     func(self *object.Instance, v float64) {
-        self.Fields["_r"] = object.NewFloat(v)
+        self.SetField("_r", object.NewFloat(v))
     },
 )
 
@@ -298,16 +298,16 @@ func createStudentClass(personClass *object.Class) *object.Class {
     // Extended constructor (calls parent __init__)
     cb.MethodWithHelp("__init__", func(self *object.Instance, name string, age int, school string) {
         // Initialize base class fields
-        self.Fields["name"] = object.NewString(name)
-        self.Fields["age"] = object.NewInteger(int64(age))
+        self.SetField("name", object.NewString(name))
+        self.SetField("age", object.NewInteger(int64(age)))
         // Add student-specific field
-        self.Fields["school"] = object.NewString(school)
+        self.SetField("school", object.NewString(school))
     }, "__init__(name, age, school) - Initialize Student")
 
     // Student-specific method
     cb.MethodWithHelp("study", func(self *object.Instance, subject string) string {
-        name, _ := self.Fields["name"].AsString()
-        school, _ := self.Fields["school"].AsString()
+        name, _ := self.Field("name").AsString()
+        school, _ := self.Field("school").AsString()
         return fmt.Sprintf("%s is studying %s at %s", name, subject, school)
     }, "study(subject) - Study a subject")
 
@@ -333,16 +333,16 @@ How inheritance behaves depends on which pattern the Go class uses:
 
 ### Instance Fields — fully accessible
 
-When the Go class uses `*object.Instance` and stores values in `self.Fields`, those fields are accessible from Scriptling as normal attributes:
+When the Go class uses `*object.Instance` and stores values via `SetField`, those fields are accessible from Scriptling as normal attributes:
 
 ```go
 // Go side
 cb := object.NewClassBuilder("Config").
     Method("__init__", func(self *object.Instance, name string) {
-        self.Fields["name"] = object.NewString(name)
+        self.SetField("name", object.NewString(name))
     }).
     Method("get", func(self *object.Instance) string {
-        return self.Fields["name"].(*object.String).StringValue()
+        return self.Field("name").(*object.String).StringValue()
     })
 ```
 
@@ -401,15 +401,15 @@ personClass := &object.Class{
                 instance := args[0].(*object.Instance)
                 name, _ := args[1].AsString()
                 age, _ := args[2].AsInt()
-                instance.Fields["name"] = object.NewString(name)
-                instance.Fields["age"] = object.NewInteger(age)
+                instance.SetField("name", object.NewString(name))
+                instance.SetField("age", object.NewInteger(age))
                 return object.NULL
             },
         },
         "greet": &object.Builtin{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 instance := args[0].(*object.Instance)
-                name, _ := instance.Fields["name"].AsString()
+                name, _ := instance.Field("name").AsString()
                 return object.NewString("Hello, I'm " + name)
             },
         },
@@ -426,7 +426,7 @@ cb.Method("__init__", func(self *object.Instance, name string, age int, departme
     parentInit.Fn(nil, nil, self, object.NewString(name), object.NewInteger(int64(age)))
 
     // Add employee-specific field
-    self.Fields["department"] = object.NewString(department)
+    self.SetField("department", object.NewString(department))
 })
 
 employeeClass := cb.Build()
@@ -449,21 +449,21 @@ func createPlayerClass() *object.Class {
     cb := object.NewClassBuilder("Player")
 
     cb.MethodWithHelp("__init__", func(self *object.Instance, name string, health int) {
-        self.Fields["name"] = object.NewString(name)
-        self.Fields["health"] = object.NewInteger(int64(health))
-        self.Fields["max_health"] = object.NewInteger(int64(health))
-        self.Fields["inventory"] = &object.List{Elements: []object.Object{}}
+        self.SetField("name", object.NewString(name))
+        self.SetField("health", object.NewInteger(int64(health)))
+        self.SetField("max_health", object.NewInteger(int64(health)))
+        self.SetField("inventory", &object.List{Elements: []object.Object{}})
     }, "__init__(name, health) - Create player")
 
     cb.MethodWithHelp("take_damage", func(self *object.Instance, amount int) string {
-        health, _ := self.Fields["health"].AsInt()
+        health, _ := self.Field("health").AsInt()
         newHealth := health - amount
         if newHealth < 0 {
             newHealth = 0
         }
-        self.Fields["health"] = object.NewInteger(newHealth)
+        self.SetField("health", object.NewInteger(newHealth))
 
-        name, _ := self.Fields["name"].AsString()
+        name, _ := self.Field("name").AsString()
         if newHealth == 0 {
             return name + " has been defeated!"
         }
@@ -471,28 +471,28 @@ func createPlayerClass() *object.Class {
     }, "take_damage(amount) - Take damage")
 
     cb.MethodWithHelp("heal", func(self *object.Instance, amount int) string {
-        health, _ := self.Fields["health"].AsInt()
-        maxHealth, _ := self.Fields["max_health"].AsInt()
+        health, _ := self.Field("health").AsInt()
+        maxHealth, _ := self.Field("max_health").AsInt()
         newHealth := health + amount
         if newHealth > maxHealth {
             newHealth = maxHealth
         }
-        self.Fields["health"] = object.NewInteger(newHealth)
+        self.SetField("health", object.NewInteger(newHealth))
 
-        name, _ := self.Fields["name"].AsString()
+        name, _ := self.Field("name").AsString()
         return fmt.Sprintf("%s healed %d, health: %d", name, amount, newHealth)
     }, "heal(amount) - Heal player")
 
     cb.MethodWithHelp("add_item", func(self *object.Instance, item string) {
-        inventory := self.Fields["inventory"].(*object.List)
+        inventory := self.Field("inventory").(*object.List)
         inventory.Elements = append(inventory.Elements, object.NewString(item))
     }, "add_item(item) - Add item to inventory")
 
     cb.MethodWithHelp("get_status", func(self *object.Instance) map[string]interface{} {
-        name, _ := self.Fields["name"].AsString()
-        health, _ := self.Fields["health"].AsInt()
-        maxHealth, _ := self.Fields["max_health"].AsInt()
-        inventory := self.Fields["inventory"].(*object.List)
+        name, _ := self.Field("name").AsString()
+        health, _ := self.Field("health").AsInt()
+        maxHealth, _ := self.Field("max_health").AsInt()
+        inventory := self.Field("inventory").(*object.List)
 
         items := make([]string, len(inventory.Elements))
         for i, item := range inventory.Elements {

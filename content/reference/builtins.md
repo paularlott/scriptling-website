@@ -568,6 +568,28 @@ copy((1, 2, 3))   # (1, 2, 3)
 copy(42)          # 42
 ```
 
+## Concurrency
+
+### yield_now()
+
+Briefly release the interpreter lock and yield the thread, letting other goroutines run before continuing. Use it inside a long, purely CPU-bound loop that never hits a naturally-blocking call, so shared-environment threads ([`runtime.background(..., shared=True)`](./libraries/scriptling/runtime/)) and registered handlers can make progress.
+
+Blocking builtins — `time.sleep`, `input()`, file reads/writes, socket send/receive/accept, WebSocket send/receive, subprocess, HTTP requests, AI completions/streaming, all container daemon calls, plugin calls, file provisioning, `wait_for` polling, `grep`/`sed` scans, messaging sends/downloads, `Queue` operations, `WaitGroup.wait()`, `Promise.wait()`/`get()`, `gossip send_request()` — already release the lock while they block, so you only need `yield_now()` for tight compute loops.
+
+```python
+import scriptling.runtime as runtime
+
+def cruncher():
+    # ... CPU-bound work ...
+    pass
+
+runtime.background("cruncher", "cruncher", shared=True)
+
+while working:
+    do_a_chunk_of_work()
+    yield_now()   # let the shared thread run
+```
+
 ## See Also
 
 - [Data Types](./types/) - Available data types

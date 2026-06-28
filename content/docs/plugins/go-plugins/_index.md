@@ -156,7 +156,7 @@ func main() {
 
 `RegisterClass` takes a `*object.ClassBuilder`. Two styles are supported:
 
-- **`*Instance` methods** — manually manage `self.Fields` for in-process state (shown below). Plugin-side Fields live inside the plugin process; the host only sees the methods and properties you register on the builder.
+- **`*Instance` methods** — manually manage instance fields via `SetField`/`Field` for in-process state (shown below). Plugin-side fields live inside the plugin process; the host only sees the methods and properties you register on the builder.
 - **Typed receivers** — use `Constructor` to auto-wrap a Go struct (see [Storing Go Structs](#storing-go-structs)). Go struct fields are private; only registered methods and properties are exposed to Scriptling.
 
 `RegisterClass` calls `.Build()` internally.
@@ -174,16 +174,16 @@ func main() {
 
     cb := object.NewClassBuilder("Counter").
         Method("__init__", func(self *object.Instance, start int) {
-            self.Fields["value"] = object.NewInteger(int64(start))
+            self.SetField("value", object.NewInteger(int64(start)))
         }).
         Method("inc", func(self *object.Instance, amount int) int {
-            current := self.Fields["value"].(*object.Integer).IntValue()
+            current := self.Field("value").(*object.Integer).IntValue()
             next := current + int64(amount)
-            self.Fields["value"] = object.NewInteger(next)
+            self.SetField("value", object.NewInteger(next))
             return int(next)
         }).
         Method("get", func(self *object.Instance) int {
-            return int(self.Fields["value"].(*object.Integer).IntValue())
+            return int(self.Field("value").(*object.Integer).IntValue())
         })
 
     server.RegisterClass(cb)

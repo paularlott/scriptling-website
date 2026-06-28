@@ -31,8 +31,8 @@ var PersonClass = &object.Class{
                 name, _ := args[1].AsString()
                 age, _ := args[2].AsInt()
 
-                instance.Fields["name"] = object.NewString(name)
-                instance.Fields["age"] = object.NewInteger(age)
+                instance.SetField("name", object.NewString(name))
+                instance.SetField("age", object.NewInteger(age))
 
                 return object.None
             },
@@ -42,7 +42,7 @@ var PersonClass = &object.Class{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 instance := args[0].(*object.Instance)
 
-                name, _ := instance.Fields["name"].AsString()
+                name, _ := instance.Field("name").AsString()
                 return object.NewString("Hello, " + name + "!")
             },
             HelpText: "greet() - Return greeting with person's name",
@@ -51,8 +51,8 @@ var PersonClass = &object.Class{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 instance := args[0].(*object.Instance)
 
-                age, _ := instance.Fields["age"].AsInt()
-                instance.Fields["age"] = object.NewInteger(age + 1)
+                age, _ := instance.Field("age").AsInt()
+                instance.SetField("age", object.NewInteger(age + 1))
 
                 return object.NewString(fmt.Sprintf("Happy birthday! You're now %d", age+1))
             },
@@ -62,8 +62,8 @@ var PersonClass = &object.Class{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 instance := args[0].(*object.Instance)
 
-                name, _ := instance.Fields["name"].AsString()
-                age, _ := instance.Fields["age"].AsInt()
+                name, _ := instance.Field("name").AsString()
+                age, _ := instance.Field("age").AsInt()
 
                 return object.NewStringDict(map[string]object.Object{
                     "name": object.NewString(name),
@@ -136,8 +136,8 @@ var RectangleClass = &object.Class{
                 width, _ := args[1].AsFloat()
                 height, _ := args[2].AsFloat()
 
-                instance.Fields["width"] = object.NewFloat(width)
-                instance.Fields["height"] = object.NewFloat(height)
+                instance.SetField("width", object.NewFloat(width))
+                instance.SetField("height", object.NewFloat(height))
                 return object.None
             },
             HelpText: "__init__(width, height) - Initialize Rectangle",
@@ -145,8 +145,8 @@ var RectangleClass = &object.Class{
         "area": &object.Builtin{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 instance := args[0].(*object.Instance)
-                width, _ := instance.Fields["width"].AsFloat()
-                height, _ := instance.Fields["height"].AsFloat()
+                width, _ := instance.Field("width").AsFloat()
+                height, _ := instance.Field("height").AsFloat()
                 return object.NewFloat(width * height)
             },
             HelpText: "area() - Calculate area",
@@ -154,8 +154,8 @@ var RectangleClass = &object.Class{
         "perimeter": &object.Builtin{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 instance := args[0].(*object.Instance)
-                width, _ := instance.Fields["width"].AsFloat()
-                height, _ := instance.Fields["height"].AsFloat()
+                width, _ := instance.Field("width").AsFloat()
+                height, _ := instance.Field("height").AsFloat()
                 return object.NewFloat(2 * (width + height))
             },
             HelpText: "perimeter() - Calculate perimeter",
@@ -176,7 +176,7 @@ var AnimalClass = &object.Class{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 instance := args[0].(*object.Instance)
                 name, _ := args[1].AsString()
-                instance.Fields["name"] = object.NewString(name)
+                instance.SetField("name", object.NewString(name))
                 return object.None
             },
             HelpText: "__init__(name) - Initialize Animal",
@@ -190,7 +190,7 @@ var AnimalClass = &object.Class{
         "info": &object.Builtin{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 instance := args[0].(*object.Instance)
-                name, _ := instance.Fields["name"].AsString()
+                name, _ := instance.Field("name").AsString()
                 return object.NewString("Animal: " + name)
             },
             HelpText: "info() - Return animal info",
@@ -216,7 +216,7 @@ var DogClass = &object.Class{
                 animalInit := AnimalClass.Methods["__init__"].(*object.Builtin)
                 animalInit.Fn(ctx, nil, instance, object.NewString(name))
 
-                instance.Fields["breed"] = object.NewString(breed)
+                instance.SetField("breed", object.NewString(breed))
                 return object.None
             },
             HelpText: "__init__(name, breed) - Initialize Dog",
@@ -230,7 +230,7 @@ var DogClass = &object.Class{
         "fetch": &object.Builtin{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 instance := args[0].(*object.Instance)
-                name, _ := instance.Fields["name"].AsString()
+                name, _ := instance.Field("name").AsString()
                 return object.NewString(name + " fetches the ball!")
             },
             HelpText: "fetch() - Fetch something",
@@ -291,7 +291,7 @@ counterClass := &object.Class{
         "__init__": &object.Builtin{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 instance := args[0].(*object.Instance)
-                instance.Fields["data"] = object.NewStringDict(map[string]object.Object{})
+                instance.SetField("data", object.NewStringDict(map[string]object.Object{}))
                 return object.None
             },
         },
@@ -299,7 +299,7 @@ counterClass := &object.Class{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 instance := args[0].(*object.Instance)
                 key := args[1].Inspect()
-                data := instance.Fields["data"].(*object.Dict)
+                data := instance.Field("data").(*object.Dict)
                 if pair, ok := data.GetByString(key); ok {
                     return pair.Value
                 }
@@ -312,7 +312,7 @@ counterClass := &object.Class{
                 instance := args[0].(*object.Instance)
                 key := args[1].Inspect()
                 value := args[2]
-                data := instance.Fields["data"].(*object.Dict)
+                data := instance.Field("data").(*object.Dict)
                 data.SetByString(key, value)
                 return object.None
             },
@@ -348,7 +348,7 @@ var CircleClass = &object.Class{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 instance := args[0].(*object.Instance)
                 r, _ := args[1].AsFloat()
-                instance.Fields["radius"] = object.NewFloat(r)
+                instance.SetField("radius", object.NewFloat(r))
                 return object.None
             },
         },
@@ -356,13 +356,13 @@ var CircleClass = &object.Class{
             Getter: &object.Builtin{
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     instance := args[0].(*object.Instance)
-                    return instance.Fields["radius"]
+                    return instance.Field("radius")
                 },
             },
             Setter: &object.Builtin{
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     instance := args[0].(*object.Instance)
-                    instance.Fields["radius"] = args[1]
+                    instance.SetField("radius", args[1])
                     return &object.Null{}
                 },
             },
@@ -371,7 +371,7 @@ var CircleClass = &object.Class{
             Getter: &object.Builtin{
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     instance := args[0].(*object.Instance)
-                    r, _ := instance.Fields["radius"].AsFloat()
+                    r, _ := instance.Field("radius").AsFloat()
                     return object.NewFloat(3.14159 * r * r)
                 },
             },
@@ -419,12 +419,9 @@ myLib := object.NewLibrary("counters",
         "create_counter": {
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 // Factory function
-                return &object.Instance{
-                    Class: counterClass,
-                    Fields: map[string]object.Object{
-                        "data": object.NewStringDict(map[string]object.Object{}),
-                    },
-                }
+                return object.NewInstanceWithFields(counterClass, map[string]object.Object{
+                    "data": object.NewStringDict(map[string]object.Object{}),
+                })
             },
             HelpText: "create_counter() - Create a new Counter",
         },
@@ -477,9 +474,9 @@ var HTTPClientClass = &object.Class{
                 baseURL, _ := kwargs.GetString("base_url", "")
                 timeout, _ := kwargs.GetInt("timeout", 30)
 
-                instance.Fields["base_url"] = object.NewString(baseURL)
-                instance.Fields["timeout"] = object.NewInteger(int64(timeout))
-                instance.Fields["headers"] = object.NewStringDict(map[string]object.Object{})
+                instance.SetField("base_url", object.NewString(baseURL))
+                instance.SetField("timeout", object.NewInteger(int64(timeout)))
+                instance.SetField("headers", object.NewStringDict(map[string]object.Object{}))
 
                 return object.None
             },
@@ -491,7 +488,7 @@ var HTTPClientClass = &object.Class{
                 key, _ := args[1].AsString()
                 value, _ := args[2].AsString()
 
-                headers := instance.Fields["headers"].(*object.Dict)
+                headers := instance.Field("headers").(*object.Dict)
                 headers.SetByString(key, object.NewString(value))
 
                 return object.None
@@ -504,11 +501,11 @@ var HTTPClientClass = &object.Class{
                 path, _ := args[1].AsString()
 
                 // Build URL
-                baseURL, _ := instance.Fields["base_url"].AsString()
+                baseURL, _ := instance.Field("base_url").AsString()
                 url := baseURL + path
 
                 // Get timeout
-                timeoutSec, _ := instance.Fields["timeout"].AsInt()
+                timeoutSec, _ := instance.Field("timeout").AsInt()
 
                 // Create client with timeout
                 client := &http.Client{
@@ -522,7 +519,7 @@ var HTTPClientClass = &object.Class{
                 }
 
                 // Add headers
-                headers := instance.Fields["headers"].(*object.Dict)
+                headers := instance.Field("headers").(*object.Dict)
                 for _, pair := range headers.Pairs {
                     key := pair.Key.Inspect()
                     valStr, _ := pair.Value.AsString()
@@ -581,13 +578,13 @@ Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) objec
 }
 ```
 
-### 2. Use `instance.Fields` for User-Visible State
+### 2. Use Instance Fields for User-Visible State
 
 Store data that scripts can read as fields:
 
 ```go
-instance.Fields["name"] = object.NewString(name)
-instance.Fields["count"] = object.NewInteger(count)
+instance.SetField("name", object.NewString(name))
+instance.SetField("count", object.NewInteger(count))
 ```
 
 ### 3. Use `instance.NativeData` for Go-Only State
@@ -620,15 +617,11 @@ var MyClass = &object.Class{
 
 // Create instance with NativeData
 func newClientInstance(conn net.Conn) *object.Instance {
-    return &object.Instance{
-        Class:      MyClass,
-        Fields:     map[string]object.Object{},
-        NativeData: &myConn{conn: conn},
-    }
+    return object.NewInstanceWithData(MyClass, nil, &myConn{conn: conn})
 }
 ```
 
-Use `Fields` for data scripts can read; use `NativeData` for internal Go state. Shallow and deep copies of an instance do not copy `NativeData`, so native-backed objects should be treated as handles rather than copyable data containers.
+Use field accessors (`SetField`/`Field`) for data scripts can read; use `NativeData` for internal Go state. Shallow and deep copies of an instance do not copy `NativeData`, so native-backed objects should be treated as handles rather than copyable data containers.
 
 ### 4. Return `object.None` for Void Methods
 
@@ -663,7 +656,7 @@ func safeMethod(ctx context.Context, kwargs object.Kwargs, args ...object.Object
     }
 
     // Safe to use instance and value
-    instance.Fields["data"] = object.NewString(value)
+    instance.SetField("data", object.NewString(value))
     return object.None
 }
 ```
@@ -681,15 +674,15 @@ func TestClass(t *testing.T) {
             "__init__": &object.Builtin{
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     instance := args[0].(*object.Instance)
-                    instance.Fields["count"] = object.NewInteger(0)
+                    instance.SetField("count", object.NewInteger(0))
                     return object.None
                 },
             },
             "increment": &object.Builtin{
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     instance := args[0].(*object.Instance)
-                    count, _ := instance.Fields["count"].AsInt()
-                    instance.Fields["count"] = object.NewInteger(count + 1)
+                    count, _ := instance.Field("count").AsInt()
+                    instance.SetField("count", object.NewInteger(count + 1))
                     return object.NewInteger(count + 1)
                 },
             },

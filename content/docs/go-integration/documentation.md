@@ -149,14 +149,14 @@ p.RegisterLibrary(library)
 ```go
 classBuilder := object.NewClassBuilder("MyClass")
 classBuilder.MethodWithHelp("__init__", func(self *object.Instance, name string) {
-    self.Fields["name"] = object.NewString(name)
+    self.SetField("name", object.NewString(name))
 }, `__init__(name) - Initialize MyClass
 
   Parameters:
     name - The name for this instance
 `)
 classBuilder.MethodWithHelp("get_data", func(self *object.Instance) string {
-    name, _ := self.Fields["name"].AsString()
+    name, _ := self.Field("name").AsString()
     return "data for " + name
 }, `get_data() - Get data for this instance
 

@@ -43,6 +43,10 @@ Running Scriptling as an HTTP server with custom routes, TLS, and authentication
 
 Running Scriptling as a concurrent JSON-RPC 2.0 server over stdio or HTTP.
 
+### [Plugin Server Mode](./plugin-server/)
+
+Running a Scriptling script as a first-class plugin peer with full handshake support (agent variant only).
+
 ### [MCP Server Mode](./mcp-server/)
 
 Running Scriptling as a Model Context Protocol server for AI integration, including the script execution tool.
@@ -59,6 +63,7 @@ Create, distribute, and load Scriptling packages from local files or URLs.
 - **Lint mode**: Check scripts for syntax errors without execution
 - **HTTP Server**: Start HTTP server with custom routes via `--server`
 - **JSON-RPC Server**: Serve concurrent JSON-RPC 2.0 over stdio, or over HTTP `/json-rpc` with `--server --json-rpc`
+- **Plugin Server**: Expose a script as a first-class plugin peer (agent variant only) with `runtime.plugin.serve()` + `runtime.plugin.register_function()`
 - **MCP Server**: Serve tools via Model Context Protocol with `--mcp-tools`
 - **MCP Script Execution**: Allow LLMs to execute Scriptling code via `--mcp-exec-script`
 - **Packages**: Load libraries from local or remote ZIP packages with `--package`

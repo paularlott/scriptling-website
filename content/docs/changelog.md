@@ -7,6 +7,172 @@ nav-skip: true
 
 ## June 2026
 
+{{< version "v0.15.0" >}}
+
+{{< changelog-item "added" >}}
+**`runtime.plugin` — expose a Scriptling script as a first-class plugin peer (agent variant only).**
+
+A Scriptling setup script can now implement the full Scriptling plugin protocol
+so that host processes can load it with `scriptling=True` and receive
+auto-generated `plugin.<name>` proxy libraries — no compiled binary required.
+
+```python
+# setup.py
+import scriptling.runtime.plugin as plugin_srv
+import scriptling.runtime as runtime
+
+plugin_srv.serve("calculator", "1.0", "Basic arithmetic")
+plugin_srv.register_function("add", "handlers.add")
+plugin_srv.register_function("multiply", "handlers.multiply")
+
+runtime.start_server()
+```
+
+```python
+# handlers.py  — called on a fresh evaluator per request
+def add(a, b):
+    return a + b
+
+def multiply(a, b):
+    return a * b
+```
+
+When a client loads this peer with `scriptling=True`, the host performs the
+`scriptling.handshake`, receives the schema, and builds a `plugin.calculator`
+proxy library with generated wrappers for `add` and `multiply`. Function
+handlers receive individual positional arguments decoded from the plugin
+transport (not a raw params blob).
+
+`runtime.plugin` is registered only in the **agent variant** of Scriptling — it
+is intentionally absent from the general CLI runtime. See the
+[Plugin Server Mode](../cli/plugin-server/) docs.
+
+**`runtime.start_server(wait=True)` and `runtime.server_running()` — keep the setup script alive while the server runs.**
+
+Previously, a setup script registered its routes and then exited; the server started automatically in the background. This made it impossible for the setup script to remain alive alongside the running server (to maintain gossip state, share objects, or run a polling loop that feeds HTTP handlers).
+
+Now the setup script can call `runtime.start_server()` to signal that all routes are registered — the server builds its mux and starts listening — and then continue running for the lifetime of the server:
+
+```python
+import scriptling.runtime as runtime
+import scriptling.net.gossip as gossip
+
+cluster = gossip.create(bind_addr="0.0.0.0:8001")
+cluster.start()
+
+# Register HTTP routes
+runtime.http.get("/status", "handle_status")
+
+# Signal the server to start, then stay alive while it runs
+runtime.start_server(wait=False)
+while runtime.server_running():
+    yield_now()
+```
+
+Use `wait=True` (the default) to block inside `start_server()` until the server shuts down — equivalent to Flask's `app.run()`. Use `wait=False` with a `server_running()` loop to keep the script running while also doing other work.
+
+**Backward compatibility:** scripts that exit without calling `start_server()` continue to work unchanged — the server starts automatically after the setup script finishes.
+
+The same pattern works for HTTP, JSON-RPC, and MCP servers.
+
+**Interpreter lock (GIL): one environment is now safe to use from many goroutines.**
+
+Each Scriptling environment now has an interpreter lock, acquired automatically
+whenever script runs. Any number of goroutines may call into the same
+environment — shared-state threads, background handlers, server requests — and
+the lock guarantees only one runs script at a time, so shared state can no longer
+be corrupted by concurrent access (no locks needed in your handlers). Independent
+environments keep independent locks and still run fully in **parallel**, so the
+per-request isolation used by the servers keeps its throughput.
+
+Blocking calls release the lock while they wait, so other threads keep making
+progress: sleeps, `input()`, file I/O, sockets, WebSocket, subprocess, HTTP, AI
+completions/streaming, container calls, plugin calls, provisioning, `wait_for`,
+`grep`/`sed`, messaging sends, `runtime.sync` primitives, `Promise.wait()`, and
+`gossip send_request()`. For tight CPU-bound loops that never block, the new
+global `yield_now()` builtin releases the lock briefly so other threads can run.
+
+**`runtime.background(..., shared=True)` — shared-environment threads.**
+
+`background()` gains a keyword-only `shared` flag. With `shared=True` the handler
+runs on a goroutine in the **caller's own environment**, sharing its live
+variables; the interpreter lock makes concurrent access safe without locks.
+Arguments are passed live (no transferable restriction or copying). The default
+(`shared=False`) is unchanged: an isolated, parallel copy. Also fixed docs that
+referenced a non-existent `runtime.spawn` — the function is `runtime.background`.
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**`scriptling.console` handlers run one at a time, to completion:**
+
+`on_submit`, `on_escape`, and `register_command` handlers run sequentially — each
+finishes before the next starts. This is for ordering, not safety (the
+interpreter lock already makes them memory-safe): a chat conversation is only
+coherent if a submit handler completes before the next begins, and serializing
+keeps input responsive while a handler runs. A long-running handler delays the
+next one; submitting new input or pressing Esc still cancels the in-flight
+handler so cooperative handlers can stop early.
+
+**Faster interpreter hot path:**
+
+A set of interpreter optimizations cut per-call and per-statement overhead:
+
+- A call-site **callee cache** resolves functions defined in an enclosing scope
+  (recursion, shared helpers) without re-walking the environment chain.
+- **Call-frame environments** are recycled through a per-tree free-list instead
+  of a global pool.
+- **Return values** are now recycled through the same per-tree free-list,
+  removing the per-`return` overhead of a global pool while keeping allocations
+  flat.
+- The **source-file lookup** used for error reporting is no longer performed on
+  every block and statement — it is deferred to the error path, removing a
+  context lookup from every loop body and function call. The call-depth lookup
+  is likewise resolved in a single step per call.
+- Hot type checks (`IsError`, exception detection) use direct type assertions
+  instead of interface method calls.
+- **Integer dictionary keys** (loop indices, ids) allocate far less — small
+  keys are now cached and reused, and larger keys take a single allocation
+  instead of two. Dict-heavy code does roughly **40% fewer allocations**.
+- **Object instances store their fields inline** instead of always allocating a
+  map. Most instances have only a handful of fields, so this avoids a heap map
+  (and its buckets) per object entirely; fields beyond a small inline capacity
+  spill to a map as before. Class-heavy code runs about **13% faster** and uses
+  roughly **23% less memory**.
+
+Recursion-heavy workloads (e.g. recursive `fib`) run roughly **16% faster**,
+dict-heavy code about **15% faster**, class-heavy code about **13% faster**, and
+loop- and call-heavy code is broadly faster too — with fewer allocations across
+the board.
+
+**Breaking change (Go embedders / plugin authors only) — instance fields are now
+accessed through methods, not a map.**
+
+`object.Instance` no longer exposes a public `Fields map[string]Object`. Go code
+that read or wrote instance fields directly must switch to the accessor methods:
+
+```go
+// Before
+v := inst.Fields["name"]
+inst.Fields["name"] = object.NewString("x")
+delete(inst.Fields, "name")
+
+// After
+v, ok := inst.GetField("name")        // or inst.Field("name") for a bare value
+inst.SetField("name", object.NewString("x"))
+inst.DeleteField("name")
+```
+
+Also available: `HasField`, `FieldCount`, `RangeFields`, and `FieldsSnapshot`,
+plus the constructors `object.NewInstance(class)`,
+`object.NewInstanceWithFields(class, fields)` and
+`object.NewInstanceWithData(class, fields, nativeData)`. This decouples the
+public API from the storage layout, which is what enabled the inline-field
+optimization above. **Scripts are unaffected** — this only touches Go code that
+manipulates instances directly.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.14.1" >}}
 
 {{< changelog-item "added" >}}
@@ -359,284 +525,4 @@ byte buffers and parameter type annotations are not supported, so write
 
 - Removed `ai.tool_round()` — use `client.completion()` with `ai.tool_calls()` and `ai.execute_tool_calls()` directly, or use the `Agent` class for full tool loops
 - Removed `ai.tool_round_parallel()` — use `client.completion_parallel()` with `ai.execute_tool_calls()` directly
-{{< /changelog-item >}}
-
----
-
-## May 2026
-
-{{< version "v0.8.0" >}}
-
-{{< changelog-item "changed" >}}
-**Go API — Private Value fields:**
-
-- `Integer.Value`, `Float.Value`, `Boolean.Value`, and `String.Value` are now private
-- Use `object.NewInteger()`, `object.NewFloat()`, `object.NewBoolean()`, `object.NewString()` constructors instead of struct literals
-- Use `.IntValue()`, `.FloatValue()`, `.BoolValue()`, `.StringValue()` getters instead of `.Value`
-- Small integer caching now prevents accidental mutation of shared singletons
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.7.0" >}}
-
-{{< changelog-item "changed" >}}
-**Improved Performance**
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.7.0" >}}
-
-{{< changelog-item "added" >}}
-**AI Tool Registry - type aliases:**
-
-- `registry.add()` now accepts Python-style type aliases: `int` → `integer`, `float` → `number`, `str` → `string`, `bool` → `boolean`, `dict` → `object`, `list` → `array`
-
-**MCP Go library:**
-
-- New `mcp.Integer()` and `mcp.IntegerArray()` parameter constructors for tools that require whole numbers
-{{< /changelog-item >}}
-
-{{< changelog-item "fixed" >}}
-- `str.upper()` and `str.lower()` now correctly handle strings that mix ASCII letters with non-ASCII Unicode characters (e.g. `"naïve résumé".upper()` now returns `"NAÏVE RÉSUMÉ"`)
-- AI Tool Registry: `"number"` is now emitted as JSON Schema `number` (was silently downgraded to `integer`)
-- AI Tool Registry: unknown type strings now raise an error at `registry.add()` time instead of producing invalid schemas silently
-- MCP tool metadata: `int` / `integer` now emit JSON Schema `integer`; `float` / `number` emit `number` (previously both mapped to `number`)
-- MCP tool metadata: `array:int` / `array:integer` now emit array items of type `integer`; `array:float` / `array:number` emit items of type `number`
-- MCP tool metadata: unknown type strings in `.toml` tool definitions now produce a registration error instead of silently defaulting to `string`
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.6.5" >}}
-
-{{< changelog-item "changed" >}}
-**AI library:**
-
-- `scriptling.ai.Client(..., headers={...})` — Add custom HTTP headers to every AI API request made by that client
-- `client.completion(..., extra_body={...})` and `client.completion_stream(..., extra_body={...})` — Merge provider-specific fields into chat completion request bodies, such as Z.ai thinking-mode options
-- `scriptling.ai.estimate_tokens(request, response=None)` — Allow request-only and response-only token estimates by omitting `response` or passing `None` for either side
-{{< /changelog-item >}}
-
-{{< version "v0.6.4" >}}
-
-{{< changelog-item "added" >}}
-**FloatArray enhancements:**
-
-- `.tolist()` method - Convert FloatArray to a plain list (1D returns list of floats, 2D returns list of lists)
-- `.shape()` method - Return shape as a list of integers (method equivalent of `math.shape()`)
-- `+` operator - Concatenate FloatArrays (1D joins elements, 2D stacks rows with matching columns)
-- List comprehension support - Iterate FloatArray in comprehensions with optional filtering (`[v * 2 for v in a]`, `[row[0] for row in m]`)
-
-**Go API:**
-
-- `GetFloatMatrix(obj)` - Typed getter that extracts data, rows, and cols from a 2D FloatArray
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.6.3" >}}
-
-{{< changelog-item "changed" >}}
-
-**Performance improvements**
-
-**Language:**
-
-- `rf"..."` and `fr"..."` raw f-string prefixes now supported (previously only `r` and `f` separately)
-- Triple-quoted f-strings: `f"""..."""` and `f'''...'''`
-{{< /changelog-item >}}
-
-{{< changelog-item "added" >}}
-**FloatArray type:**
-
-- New `FloatArray` type for efficient numerical operations, avoiding per-element boxing overhead
-- 1D and 2D arrays with row-major storage
-- Supports indexing, slicing, assignment, iteration, equality, `in` operator, `for` loops, `len()`, `list()` conversion
-- `math.array(data)` - Create a FloatArray from a list of numbers or list of lists
-- `math.shape(a)` - Return the shape of a FloatArray as a list of ints
-
-**Math library:**
-
-- `softmax`, `dot`, `matmul`, `transpose`, `mat_add` now accept `FloatArray` inputs
-- Functions return `FloatArray` when given `FloatArray` input, preserving type
-
-**Built-in functions:**
-
-- `sum()`, `min()`, `max()` accept `FloatArray`
-- `enumerate()`, `zip()`, `reversed()` accept `FloatArray`
-- `list()` converts `FloatArray` to a list of floats
-- `for` loop iterates over `FloatArray` elements (1D) or rows (2D)
-{{< /changelog-item >}}
-
----
-
-## April 2026
-
-{{< version "v0.6.2" >}}
-
-{{< changelog-item "added" >}}
-**Math library:**
-
-- `tanh(x)` - Hyperbolic tangent
-- `erf(x)` / `erfc(x)` - Error function and complementary error function
-- `gamma(x)` / `lgamma(x)` - Gamma function and log-gamma
-- `cbrt(x)` - Cube root
-- `nextafter(x, y)` - Next floating-point value
-- `remainder(x, y)` - IEEE 754-style remainder
-- `log1p(x)` / `expm1(x)` - Accurate log(1+x) and exp(x)-1 for small x
-- `comb(n, k)` - Binomial coefficient
-- `perm(n[, k])` - Permutations
-- `prod(iterable, start=1)` - Product of all elements
-- `dist(p, q)` - Euclidean distance between two points
-- `softmax(x)` - Numerically stable softmax
-- `dot(a, b)` - Dot product of two vectors
-- `matmul(a, b)` - Matrix multiplication
-- `transpose(m)` - Matrix transpose
-- `mat_add(a, b)` - Element-wise matrix addition
-- `tau` constant - 2π (6.283185...)
-
-**Random library:**
-
-- `choices(population, weights, k)` - Weighted random sampling with replacement
-- `betavariate(alpha, beta)` - Beta distribution
-- `gammavariate(alpha, beta)` - Gamma distribution
-- `triangular(low, high[, mode])` - Triangular distribution
-- `paretovariate(alpha)` - Pareto distribution
-- `weibullvariate(alpha, beta)` - Weibull distribution
-
-**fs extension library:**
-
-- `read_bytes(path, offset, length)` - Read bytes from a file
-- `write_bytes(path, offset, data)` - Write bytes to a file
-- `unpack(format, data)` / `pack(format, values)` - Binary struct packing/unpacking
-- `byte_at(data, index)` - Get unsigned byte value
-- `len(data)` - Byte length (not Unicode code points)
-- `slice(data, start[, end])` - Byte-safe slicing
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.6.1" >}}
-
-{{< changelog-item "added" >}}
-**Container library:**
-
-- `volume_create(name, size=...)` - optional `size` kwarg (e.g. `"20G"`, `"512M"`) sets the volume size on Apple Containers; silently ignored for Docker and Podman
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.6.0" >}}
-
-{{< changelog-item "added" >}}
-**HTTP server:**
-
-- `runtime.http.not_found(handler)` - Register a custom 404 handler, called when no route matches or a web root file is not found
-- `--web-root <dir|zip>` CLI flag (`SCRIPTLING_WEB_ROOT` / `server.web_root`) - Serve static files from a directory or zip archive; requests fall through to the `not_found` handler if no file is found
-
-**Template library:**
-
-- `scriptling.template.html` - `html/template` rendering with automatic HTML escaping
-- `scriptling.template.text` - `text/template` rendering with no escaping
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.5.8" >}}
-
-{{< changelog-item "changed" >}}
-
-**Gossip library updates:**
-
-- `scriptling.text` renamed to `scriptling.sed` to better reflect its in-place editing capabilities
-{{< /changelog-item >}}
-
-{{< version "v0.5.7" >}}
-
-{{< changelog-item "added" >}}
-**Configuration file:**
-
-- Optional `scriptling.toml` configuration file with search paths (`.`, `$HOME/`, `$HOME/.config/scriptling/`)
-- `-C`/`--config` flag to specify a custom config file path
-- All flags with a config path column can be set in the file
-- Priority order: command-line flag > environment variable > config file > default
-
-**Container management:**
-
-- `scriptling.container` - Container lifecycle management for Docker, Podman, and Apple Containers
-
-**Search:**
-
-- `scriptling.grep` - Fast file content search with concurrent worker pool, glob filtering, binary file detection, and path restriction support
-- `scriptling.text` - In-place file content replacement with atomic temp-file rename, concurrent worker pool, and path restriction support
-{{< /changelog-item >}}
-
-{{< changelog-item "changed" >}}
-
-**Gossip library updates:**
-
-- Request/reply messaging, node groups, and leader election
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.5.6" >}}
-
-{{< changelog-item "added" >}}
-**Networking libraries:**
-
-- `scriptling.net.gossip` - Gossip protocol cluster membership and messaging with failure detection, metadata propagation, tag-based routing, encryption, and compression
-- `scriptling.net.multicast` - UDP multicast group messaging for one-to-many communication
-- `scriptling.net.unicast` - UDP and TCP point-to-point messaging with client and server support
-
-**Secrets:**
-
-- `scriptling.secret` - Provider-agnostic secret access through host-configured aliases
-- `--secret-config` - CLI support for loading Vault and 1Password provider aliases from TOML
-{{< /changelog-item >}}
-
-{{< changelog-item "changed" >}}
-**Runtime and tooling:**
-
-- `scriptling.websocket` moved to `scriptling.net.websocket` to consolidate all networking libraries under the `scriptling.net` namespace
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.5.5" >}}
-
-{{< changelog-item "added" >}}
-**Language:**
-
-- `del` statement for removing list indices, slices, dict keys, and object attributes (`del items[0]`, `del cache["key"]`, `del obj.attr`)
-
-**AI library:**
-
-- `ai.tool_calls(response)` - Extract and normalize tool calls from a completion response, message dict, or raw list
-- `ai.execute_tool_calls(registry, tool_calls)` - Execute tool calls using a `ToolRegistry` and return result messages
-- `ai.collect_stream(stream, **kwargs)` - Collect a chat stream into a single aggregated result with optional per-chunk callbacks
-- `ai.tool_round(client, model, messages, registry)` - Perform a single tool-use round: complete, execute tool calls, return results
-- `ai.estimate_tokens(messages, model)` - Estimate token count for a message list
-
-**Agent framework:**
-
-- Agent constructor gains `max_tokens` and `compaction_threshold` parameters
-- Automatic message compaction for long conversations, with configurable threshold
-- Improved streaming support with reasoning and content chunk helpers
-
-**Console:**
-
-- Panel `add_message()` now accepts a `role` parameter (`user`, `system`, `thinking`, `tool`, `assistant`) for richer TUI output
-{{< /changelog-item >}}
-
-{{< changelog-item "changed" >}}
-**Runtime and tooling:**
-
-- `isinstance()` now accepts a tuple or list of types, matching Python semantics (`isinstance(x, (int, float))`)
-- Lexer keyword lookup refactored from map-based to switch-based dispatch for improved performance
-- Better concurrency handling in `ChatStreamInstance` with caller cancellation support
-- Improved error handling in variadic function calls
-- Parser refactored with cleaner initialization and improved regex handling
 {{< /changelog-item >}}

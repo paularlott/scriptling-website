@@ -148,12 +148,12 @@ func createHTTPLibrary() *object.Library {
     // Create first class
     httpClientClass := object.NewClassBuilder("Client")
     httpClientClass.MethodWithHelp("__init__", func(self *object.Instance, baseURL string) {
-        self.Fields["base_url"] = object.NewString(baseURL)
-        self.Fields["headers"] = object.NewStringDict(map[string]object.Object{})
+        self.SetField("base_url", object.NewString(baseURL))
+        self.SetField("headers", object.NewStringDict(map[string]object.Object{}))
     }, "__init__(base_url) - Create HTTP client")
 
     httpClientClass.MethodWithHelp("get", func(self *object.Instance, path string) map[string]interface{} {
-        baseURL, _ := self.Fields["base_url"].AsString()
+        baseURL, _ := self.Field("base_url").AsString()
         // ... HTTP GET logic
         return map[string]interface{}{
             "status": 200,

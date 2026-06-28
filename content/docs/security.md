@@ -68,7 +68,7 @@ These libraries provide server and concurrency functionality:
 
 | Library                      | Security Considerations                                     |
 | ---------------------------- | ----------------------------------------------------------- |
-| `scriptling.runtime`         | Background task execution - safe but uses goroutines        |
+| `scriptling.runtime`         | Background task execution (isolated and shared-env threads) |
 | `scriptling.runtime.http`    | **HTTP SERVER** - Registers HTTP routes and handlers        |
 | `scriptling.runtime.kv`      | In-memory key-value store - safe but unbounded memory       |
 | `scriptling.runtime.sync`    | Concurrency primitives - safe but can cause deadlocks       |
