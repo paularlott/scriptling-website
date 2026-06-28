@@ -105,6 +105,10 @@ func main() {
 }
 ```
 
+### Blocking operations
+
+Builder and native functions both run holding the environment's interpreter lock (GIL). If a function does blocking I/O (HTTP, files, database, network, subprocess), wrap the blocking call in `object.RunBlocking(ctx, fn)` to release the lock so other shared-environment threads and handlers keep running while yours is blocked. See [Blocking operations and the interpreter lock](../native/) in the Native API guide for a full example — it applies to any function that receives a `ctx`.
+
 ## See Also
 
 - [Native API](../native/) - Direct control with maximum performance

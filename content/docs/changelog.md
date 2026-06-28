@@ -10,6 +10,34 @@ nav-skip: true
 {{< version "v0.15.0" >}}
 
 {{< changelog-item "added" >}}
+**`runtime.start_server(wait=True)` and `runtime.server_running()` — keep the setup script alive while the server runs.**
+
+Previously, a setup script registered its routes and then exited; the server started automatically in the background. This made it impossible for the setup script to remain alive alongside the running server (to maintain gossip state, share objects, or run a polling loop that feeds HTTP handlers).
+
+Now the setup script can call `runtime.start_server()` to signal that all routes are registered — the server builds its mux and starts listening — and then continue running for the lifetime of the server:
+
+```python
+import scriptling.runtime as runtime
+import scriptling.net.gossip as gossip
+
+cluster = gossip.create(bind_addr="0.0.0.0:8001")
+cluster.start()
+
+# Register HTTP routes
+runtime.http.get("/status", "handle_status")
+
+# Signal the server to start, then stay alive while it runs
+runtime.start_server(wait=False)
+while runtime.server_running():
+    yield_now()
+```
+
+Use `wait=True` (the default) to block inside `start_server()` until the server shuts down — equivalent to Flask's `app.run()`. Use `wait=False` with a `server_running()` loop to keep the script running while also doing other work.
+
+**Backward compatibility:** scripts that exit without calling `start_server()` continue to work unchanged — the server starts automatically after the setup script finishes.
+
+The same pattern works for HTTP, JSON-RPC, and MCP servers.
+
 **Interpreter lock (GIL): one environment is now safe to use from many goroutines.**
 
 Each Scriptling environment now has an interpreter lock, acquired automatically

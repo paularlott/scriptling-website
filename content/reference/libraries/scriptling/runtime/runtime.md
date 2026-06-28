@@ -11,8 +11,50 @@ Background tasks and concurrency for scripts and HTTP servers.
 | Function                                   | Description                                      |
 | ------------------------------------------ | ------------------------------------------------ |
 | `background(name, handler, *args, shared=False, **kwargs)` | Start a background task, returns a Promise |
+| `start_server(wait=True)` | Signal the server to start accepting requests |
+| `server_running()` | Returns `True` while the server is running |
 
 ## Functions
+
+### scriptling.runtime.start_server(wait=True)
+
+Signal the server to collect registered routes and begin listening for requests. Call this after all routes and methods have been registered.
+
+**Parameters:**
+
+- `wait` (bool, default `True`): If `True`, blocks until the server receives a shutdown signal (equivalent to Flask's `app.run()`). If `False`, returns immediately so the script can keep running — e.g. to maintain gossip state or run a polling loop.
+
+**Backward compatibility:** Scripts that exit without calling `start_server()` continue to work unchanged — the server starts automatically after the setup script finishes. Call `start_server()` only when you need the script to stay alive alongside the running server.
+
+```python
+import scriptling.runtime as runtime
+
+runtime.http.get("/hello", "hello_handler")
+
+# Block until shutdown (default):
+runtime.start_server()
+
+# — or keep running with a loop:
+runtime.start_server(wait=False)
+while runtime.server_running():
+    yield_now()
+```
+
+---
+
+### scriptling.runtime.server_running()
+
+Returns `True` while the server is running, `False` once it receives a shutdown signal. Returns `False` in non-server (script) mode.
+
+Typically used with `start_server(wait=False)` to keep the setup script alive:
+
+```python
+runtime.start_server(wait=False)
+while runtime.server_running():
+    yield_now()   # release interpreter lock on each iteration
+```
+
+---
 
 ### scriptling.runtime.background(name, handler, *args, **kwargs)
 
