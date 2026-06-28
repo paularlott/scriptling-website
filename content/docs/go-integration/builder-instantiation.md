@@ -148,16 +148,12 @@ func createPath(config FSConfig, ctx context.Context, kwargs object.Kwargs, args
         return &object.Error{Message: "access denied"}
     }
 
-    // Create instance. Script-visible properties go in Fields;
+    // Create instance. Script-visible properties use SetField;
     // internal Go-only state goes in NativeData.
-    return &object.Instance{
-        Class:  PathClass,
-        Fields: map[string]object.Object{},
-        NativeData: &pathData{
-            config: config,
-            path:   pathStr,
-        },
-    }
+    return object.NewInstanceWithData(PathClass, nil, &pathData{
+        config: config,
+        path:   pathStr,
+    })
 }
 ```
 
@@ -258,11 +254,11 @@ Wrapped constructor injects config into context
     ↓
 Constructor retrieves config via InstanceDataFromContext(ctx)
     ↓
-Constructor stores config in instance.Fields["__config__"]
+Constructor stores config in instance.Field("__config__")
     ↓
 User calls method (e.g., p.exists())
     ↓
-Method retrieves config from self.Fields["__config__"]
+Method retrieves config from self.Field("__config__")
     ↓
 Method uses config
 ```
@@ -299,8 +295,8 @@ var PathClass = &object.Class{
         "exists": &object.Builtin{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 self := args[0].(*object.Instance)
-                config := self.Fields["__config__"].(FSConfig)
-                pathStr := self.Fields["__path__"].(*object.String).StringValue()
+                config := self.Field("__config__").(FSConfig)
+                pathStr := self.Field("__path__").(*object.String).StringValue()
 
                 if !config.IsPathAllowed(pathStr) {
                     return &object.Error{Message: "access denied"}
@@ -328,12 +324,9 @@ func createPath(config FSConfig, ctx context.Context, kwargs object.Kwargs, args
         return &object.Error{Message: "access denied"}
     }
 
-    instance := &object.Instance{
-        Class:  PathClass,
-        Fields: make(map[string]object.Object),
-    }
-    instance.Fields["__config__"] = config
-    instance.Fields["__path__"] = object.NewString(pathStr)
+    instance := object.NewInstance(PathClass)
+    instance.SetField("__config__", config)
+    instance.SetField("__path__", object.NewString(pathStr))
 
     return instance
 }
@@ -458,7 +451,7 @@ When a method needs to create a new instance of the same class, retrieve config 
 ```go
 func pathJoinpath(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
     self := args[0].(*object.Instance)
-    config := self.Fields["__config__"].(FSConfig)
+    config := self.Field("__config__").(FSConfig)
 
     // ... compute newPath ...
 
@@ -489,7 +482,7 @@ interpreter.Import("mylib")
 interpreter.Eval("mylib.func()")
 ```
 
-For classes, add constructor that stores config in instance fields, and methods retrieve from `self.Fields["__config__"]`.
+For classes, add constructor that stores config in instance fields via `SetField`, and methods retrieve it via `self.Field("__config__")`.
 
 ## See Also
 

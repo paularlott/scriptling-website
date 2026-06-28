@@ -96,10 +96,42 @@ A set of interpreter optimizations cut per-call and per-statement overhead:
 - **Integer dictionary keys** (loop indices, ids) allocate far less — small
   keys are now cached and reused, and larger keys take a single allocation
   instead of two. Dict-heavy code does roughly **40% fewer allocations**.
+- **Object instances store their fields inline** instead of always allocating a
+  map. Most instances have only a handful of fields, so this avoids a heap map
+  (and its buckets) per object entirely; fields beyond a small inline capacity
+  spill to a map as before. Class-heavy code runs about **13% faster** and uses
+  roughly **23% less memory**.
 
 Recursion-heavy workloads (e.g. recursive `fib`) run roughly **16% faster**,
-dict-heavy code about **15% faster**, and loop- and call-heavy code is broadly
-faster too — with no increase in allocations.
+dict-heavy code about **15% faster**, class-heavy code about **13% faster**, and
+loop- and call-heavy code is broadly faster too — with fewer allocations across
+the board.
+
+**Breaking change (Go embedders / plugin authors only) — instance fields are now
+accessed through methods, not a map.**
+
+`object.Instance` no longer exposes a public `Fields map[string]Object`. Go code
+that read or wrote instance fields directly must switch to the accessor methods:
+
+```go
+// Before
+v := inst.Fields["name"]
+inst.Fields["name"] = object.NewString("x")
+delete(inst.Fields, "name")
+
+// After
+v, ok := inst.GetField("name")        // or inst.Field("name") for a bare value
+inst.SetField("name", object.NewString("x"))
+inst.DeleteField("name")
+```
+
+Also available: `HasField`, `FieldCount`, `RangeFields`, and `FieldsSnapshot`,
+plus the constructors `object.NewInstance(class)`,
+`object.NewInstanceWithFields(class, fields)` and
+`object.NewInstanceWithData(class, fields, nativeData)`. This decouples the
+public API from the storage layout, which is what enabled the inline-field
+optimization above. **Scripts are unaffected** — this only touches Go code that
+manipulates instances directly.
 {{< /changelog-item >}}
 
 ---
