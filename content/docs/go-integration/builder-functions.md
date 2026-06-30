@@ -159,7 +159,7 @@ fb.FunctionWithHelp(func(a, b float64) (float64, error) {
 
 ## Variadic Functions
 
-For variadic functions, see [Library Builder](builder-libraries/) `FunctionFromVariadicWithHelp`.
+For variadic functions, see [Library Builder](../builder-libraries/) `FunctionFromVariadicWithHelp`.
 
 ## Builder Methods Reference
 
@@ -181,6 +181,6 @@ For variadic functions, see [Library Builder](builder-libraries/) `FunctionFromV
 
 ## See Also
 
-- [Builder Libraries](libraries/) - Type-safe library builder
-- [Builder Classes](classes/) - Type-safe class builder
-- [Native Functions](native-functions/) - Direct control with maximum performance
+- [Builder Libraries](../builder-libraries/) - Type-safe library builder
+- [Builder Classes](../builder-classes/) - Type-safe class builder
+- [Native Functions](../native-functions/) - Direct control with maximum performance

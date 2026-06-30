@@ -218,6 +218,6 @@ Returns:
 
 ## See Also
 
-- [Builder Functions](functions/) - Type-safe function builder
-- [Builder Classes](classes/) - Type-safe class builder
-- [Native Libraries](native-libraries/) - Direct control with maximum performance
+- [Builder Functions](../builder-functions/) - Type-safe function builder
+- [Builder Classes](../builder-classes/) - Type-safe class builder
+- [Native Libraries](../native-libraries/) - Direct control with maximum performance

@@ -218,7 +218,7 @@ ord("a")                  # 97
 len("hello")                        # 5
 ```
 
-String transformation is done with methods on the `str` type, not free functions. See [string](../reference/libraries/text-processing/string/) for the full list:
+String transformation is done with methods on the `str` type, not free functions. See [string](../libraries/text-processing/string/) for the full list:
 
 ```python
 "hello".upper()                          # "HELLO"
@@ -582,7 +582,7 @@ copy(42)          # 42
 
 ### yield_now()
 
-Briefly release the interpreter lock and yield the thread, letting other goroutines run before continuing. Use it inside a long, purely CPU-bound loop that never hits a naturally-blocking call, so shared-environment threads ([`runtime.background(..., shared=True)`](./libraries/scriptling/runtime/)) and registered handlers can make progress.
+Briefly release the interpreter lock and yield the thread, letting other goroutines run before continuing. Use it inside a long, purely CPU-bound loop that never hits a naturally-blocking call, so shared-environment threads ([`runtime.background(..., shared=True)`](../libraries/scriptling/runtime/)) and registered handlers can make progress.
 
 Blocking builtins: `time.sleep`, `input()`, file reads/writes, socket send/receive/accept, WebSocket send/receive, subprocess, HTTP requests, AI completions/streaming, all container daemon calls, plugin calls, file provisioning, `wait_for` polling, `grep`/`sed` scans, messaging sends/downloads, `Queue` operations, `WaitGroup.wait()`, `Promise.wait()`/`get()`, `gossip send_request()`: already release the lock while they block, so you only need `yield_now()` for tight compute loops.
 
@@ -602,6 +602,6 @@ while working:
 
 ## See Also
 
-- [Data Types](./types/) - Available data types
-- [Slicing](./slicing/) - Indexing and slicing operations
+- [Data Types](../types/) - Available data types
+- [Slicing](../slicing/) - Indexing and slicing operations
 - [String Library](../../reference/libraries/text-processing/string/) - String constants

@@ -257,7 +257,7 @@ except Exception:
 
 ## See Also
 
-- [Syntax Rules](./syntax/) - Scriptling syntax
-- [Functions](./functions/) - Function parameters
-- [Error Handling](./error-handling/) - Error vs Exception
-- [Classes](./classes/) - Class limitations
+- [Syntax Rules](../syntax/) - Scriptling syntax
+- [Functions](../functions/) - Function parameters
+- [Error Handling](../error-handling/) - Error vs Exception
+- [Classes](../classes/) - Class limitations

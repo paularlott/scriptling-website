@@ -21,7 +21,7 @@ handlers via `scriptling.runtime.jsonrpc`. The server then reads newline-
 delimited JSON-RPC 2.0 requests from stdin and writes one response per line to
 stdout.
 
-> **Keeping the setup script alive:** As with the HTTP server, the setup script can call [`runtime.start_server()`](../../reference/libraries/scriptling/runtime/) to stay alive alongside the stdio server instead of exiting after registration: useful for sharing state or running background work while serving requests.
+> **Keeping the setup script alive:** As with the HTTP server, the setup script can call [`runtime.start_server()`](../../../reference/libraries/scriptling/runtime/) to stay alive alongside the stdio server instead of exiting after registration: useful for sharing state or running background work while serving requests.
 
 > **Logging goes to stderr.** In `--json-rpc` mode, all log output is
 > automatically redirected to **stderr** so it never corrupts the JSON-RPC

@@ -347,6 +347,6 @@ while      with
 
 ## See Also
 
-- [Data Types](./types/) - Available data types in Scriptling
-- [Functions](./functions/) - Function definition and parameters
-- [Python Differences](./python-differences/) - Differences from Python
+- [Data Types](../types/) - Available data types in Scriptling
+- [Functions](../functions/) - Function definition and parameters
+- [Python Differences](../python-differences/) - Differences from Python

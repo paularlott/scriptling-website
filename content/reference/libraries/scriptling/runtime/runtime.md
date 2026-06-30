@@ -99,7 +99,7 @@ t2.wait()
 print(state["count"])  # 2000
 ```
 
-For ongoing coordination between tasks, use `runtime.sync` primitives (`Shared`, `Atomic`, `Queue`, `WaitGroup`). To yield the interpreter lock from a tight CPU-bound loop, use the global [`yield_now()`](../../builtins/#yield_now) builtin: it is always available without importing `runtime`.
+For ongoing coordination between tasks, use `runtime.sync` primitives (`Shared`, `Atomic`, `Queue`, `WaitGroup`). To yield the interpreter lock from a tight CPU-bound loop, use the global [`yield_now()`](../../../../builtins/#yield_now) builtin: it is always available without importing `runtime`.
 
 ## Sub-Libraries
 

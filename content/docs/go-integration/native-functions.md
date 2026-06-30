@@ -422,6 +422,6 @@ p.RegisterFunc("connect", func(ctx context.Context, kwargs object.Kwargs, args .
 
 ## See Also
 
-- [Native Libraries](libraries/) - Create libraries with functions and constants
-- [Native Classes](classes/) - Define custom classes
-- [Builder Functions](builder-functions/) - Type-safe function builder
+- [Native Libraries](../native-libraries/) - Create libraries with functions and constants
+- [Native Classes](../native-classes/) - Define custom classes
+- [Builder Functions](../builder-functions/) - Type-safe function builder

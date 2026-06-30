@@ -603,4 +603,4 @@ console.run()
 
 ## See Also
 
-- [scriptling.ai.agent.interact](../interact/) - Interactive agent loop using this library
+- [scriptling.ai.agent.interact](../../ai/interact/) - Interactive agent loop using this library

@@ -21,10 +21,10 @@ Use the **Builder API** for cleaner code and type safety. Use the **Native API**
 
 ## Topics
 
-- [Functions](builder-functions/) - Type-safe function builder
-- [Libraries](builder-libraries/) - Type-safe library builder
-- [Classes](builder-classes/) - Type-safe class builder
-- [Instantiation](builder-instantiation/) - Library templates with per-instance configuration
+- [Functions](../builder-functions/) - Type-safe function builder
+- [Libraries](../builder-libraries/) - Type-safe library builder
+- [Classes](../builder-classes/) - Type-safe class builder
+- [Instantiation](../builder-instantiation/) - Library templates with per-instance configuration
 
 ## Supported Types
 

@@ -494,6 +494,6 @@ For classes, add a constructor that stores config on `instance.NativeData`, and 
 
 ## See Also
 
-- [Builder Libraries](libraries/) - Basic library building
-- [Native Classes](native-classes/) - Native class creation
-- [Builder Classes](classes/) - Builder class creation
+- [Builder Libraries](../builder-libraries/) - Basic library building
+- [Native Classes](../native-classes/) - Native class creation
+- [Builder Classes](../builder-classes/) - Builder class creation

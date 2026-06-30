@@ -387,6 +387,6 @@ set([1, 2, 2, 3])  # {1, 2, 3}
 
 ## See Also
 
-- [Operators](./operators/) - Operations on different types
-- [Built-in Functions](./builtins/) - Type conversion and checking functions
-- [Slicing](./slicing/) - Indexing and slicing operations
+- [Operators](../operators/) - Operations on different types
+- [Built-in Functions](../builtins/) - Type conversion and checking functions
+- [Slicing](../slicing/) - Indexing and slicing operations

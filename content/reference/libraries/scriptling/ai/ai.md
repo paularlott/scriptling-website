@@ -286,4 +286,4 @@ This is an extended library, requiring registration in Go, see [Library Registra
 - [scriptling.ai.agent](../agent/): Agentic AI loop with automatic tool execution
 - [scriptling.ai.memory](../memory/): Long-term memory store for AI agents
 - [scriptling.ai.tools](../tools/): Tool schema builder (`Registry` / `ai.ToolRegistry`)
-- [scriptling.mcp](../mcp/): MCP client for connecting to MCP servers
+- [scriptling.mcp](../../mcp/): MCP client for connecting to MCP servers

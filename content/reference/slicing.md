@@ -224,5 +224,5 @@ is_palindrome = seq == seq[::-1]
 
 ## See Also
 
-- [Data Types](./types/) - Lists, strings, and tuples
-- [Built-in Functions](./builtins/) - len(), reversed(), enumerate()
+- [Data Types](../types/) - Lists, strings, and tuples
+- [Built-in Functions](../builtins/) - len(), reversed(), enumerate()

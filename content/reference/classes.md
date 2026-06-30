@@ -764,6 +764,6 @@ print(account.get_statement())
 
 ## See Also
 
-- [Functions](./functions/) - Function definitions
-- [Error Handling](./error-handling/) - Using raise in classes
-- [Python Differences](./python-differences/) - Class limitations
+- [Functions](../functions/) - Function definitions
+- [Error Handling](../error-handling/) - Using raise in classes
+- [Python Differences](../python-differences/) - Class limitations

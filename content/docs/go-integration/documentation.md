@@ -305,8 +305,8 @@ HelpText: `fetch(url, timeout=30) - Fetch data from a URL
 
 ## See Also
 
-- [Native Functions](native-functions/) - Registering Go functions
-- [Native Libraries](native-libraries/) - Creating Go libraries
-- [Builder Functions](builder-functions/) - Type-safe function builder
-- [Builder Libraries](builder-libraries/) - Type-safe library builder
-- [Script Extensions](scripts/) - Script-based extensions
+- [Native Functions](../native-functions/) - Registering Go functions
+- [Native Libraries](../native-libraries/) - Creating Go libraries
+- [Builder Functions](../builder-functions/) - Type-safe function builder
+- [Builder Libraries](../builder-libraries/) - Type-safe library builder
+- [Script Extensions](../scripts/) - Script-based extensions

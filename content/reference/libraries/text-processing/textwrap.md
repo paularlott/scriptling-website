@@ -198,6 +198,6 @@ This library implements a subset of Python's `textwrap` module:
 
 ## See Also
 
-- [string](./string.md) - String constants for character classification
-- [regex](./regex.md) - Regular expressions for pattern matching
-- [difflib](./difflib.md) - Sequence comparison and diffing utilities
+- [string](../string/) - String constants for character classification
+- [regex](../regex/) - Regular expressions for pattern matching
+- [difflib](../difflib/) - Sequence comparison and diffing utilities

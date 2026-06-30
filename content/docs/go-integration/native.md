@@ -59,9 +59,9 @@ p.RegisterFunc("fetch", func(ctx context.Context, kwargs object.Kwargs, args ...
 
 ## Topics
 
-- [Functions](native-functions/) - Register individual Go functions
-- [Libraries](native-libraries/) - Create libraries with functions and constants
-- [Classes](native-classes/) - Define custom classes
+- [Functions](../native-functions/) - Register individual Go functions
+- [Libraries](../native-libraries/) - Create libraries with functions and constants
+- [Classes](../native-classes/) - Define custom classes
 
 ## Quick Example
 

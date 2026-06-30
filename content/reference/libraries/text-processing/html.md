@@ -111,6 +111,6 @@ Note: Python's `html.escape()` has an optional `quote` parameter (default `True`
 
 ## See Also
 
-- [html.parser](./html.parser.md) - HTML parsing for extracting tags and data
-- [string](./string.md) - String constants for character classification
-- [regex](./regex.md) - Regular expressions for text processing
+- [html.parser](../html.parser/) - HTML parsing for extracting tags and data
+- [string](../string/) - String constants for character classification
+- [regex](../regex/) - Regular expressions for text processing

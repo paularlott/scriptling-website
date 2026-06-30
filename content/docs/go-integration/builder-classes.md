@@ -569,6 +569,6 @@ print("Inventory:", status["inventory"])
 
 ## See Also
 
-- [Builder Functions](functions/) - Type-safe function builder
-- [Builder Libraries](libraries/) - Type-safe library builder
-- [Native Classes](native-classes/) - Direct control with maximum performance
+- [Builder Functions](../builder-functions/) - Type-safe function builder
+- [Builder Libraries](../builder-libraries/) - Type-safe library builder
+- [Native Classes](../native-classes/) - Direct control with maximum performance

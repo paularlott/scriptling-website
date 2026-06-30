@@ -713,6 +713,6 @@ result = c.increment()
 
 ## See Also
 
-- [Native Functions](functions/) - Register individual functions
-- [Native Libraries](libraries/) - Create libraries with functions and constants
-- [Builder Classes](builder-classes/) - Type-safe class builder
+- [Native Functions](../native-functions/) - Register individual functions
+- [Native Libraries](../native-libraries/) - Create libraries with functions and constants
+- [Builder Classes](../builder-classes/) - Type-safe class builder

@@ -95,12 +95,12 @@ import "github.com/paularlott/scriptling/stdlib"
 stdlib.RegisterAll(p)
 ```
 
-Extended and `scriptling.*` libraries are registered individually. See [Library Registration](../go-integration/library-registration/) for the complete list and signatures.
+Extended and `scriptling.*` libraries are registered individually. See [Library Registration](../../go-integration/library-registration/) for the complete list and signatures.
 
 ## Next Steps
 
-- [Go Integration Basics](../basics/) - Complete guide to interpreters, variables, and functions
-- [Native API](../native/) - Direct control with maximum performance
-- [Builder API](../builder/) - Type-safe, cleaner syntax
+- [Go Integration Basics](../../go-integration/basics/) - Complete guide to interpreters, variables, and functions
+- [Native API](../../go-integration/native/) - Direct control with maximum performance
+- [Builder API](../../go-integration/builder/) - Type-safe, cleaner syntax
 - [Libraries](../../../reference/libraries/) - Library usage and registration reference
 - [Security Guide](../../security/) - Security best practices for embedding

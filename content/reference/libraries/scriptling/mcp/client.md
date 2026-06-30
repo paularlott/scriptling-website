@@ -6,7 +6,7 @@ weight: 1
 
 MCP (Model Context Protocol) client library. This library provides functions for connecting to MCP servers and interacting with the tools they expose for AI models to use.
 
-For MCP integration with AI clients, see the `remote_servers` parameter on [scriptling.ai.Client](../ai/client/).
+For MCP integration with AI clients, see the `remote_servers` parameter on [scriptling.ai.Client](../../ai/client/).
 
 ## Available Functions
 
@@ -365,5 +365,5 @@ This is an extended library, requiring registration in Go, see [Library Registra
 ## See Also
 
 - [scriptling.mcp.tool](../tool/): Helper library for authoring MCP tools
-- [scriptling.ai](../ai/): AI client and completion functions
-- [scriptling.ai.agent](../ai/agent/): Building AI agents with automatic tool execution
+- [scriptling.ai](../../ai/): AI client and completion functions
+- [scriptling.ai.agent](../../ai/agent/): Building AI agents with automatic tool execution

@@ -527,7 +527,7 @@ Other differences worth noting:
 
 ## See Also
 
-- [html](./html.md): HTML escaping and unescaping utilities
-- [html.parser](./html.parser.md): HTML/XHTML parser for structured markup
-- [string](./string.md): String constants
-- [difflib](./difflib.md): Sequence comparison and diff generation
+- [html](../html/): HTML escaping and unescaping utilities
+- [html.parser](../html.parser/): HTML/XHTML parser for structured markup
+- [string](../string/): String constants
+- [difflib](../difflib/): Sequence comparison and diff generation

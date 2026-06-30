@@ -167,6 +167,6 @@ if has_significant_change(old_content, new_content):
 
 ## See Also
 
-- [string](./string.md) - String constants for character classification
-- [textwrap](./textwrap.md) - Text wrapping and filling utilities
-- [regex](./regex.md) - Regular expressions for pattern matching
+- [string](../string/) - String constants for character classification
+- [textwrap](../textwrap/) - Text wrapping and filling utilities
+- [regex](../regex/) - Regular expressions for pattern matching

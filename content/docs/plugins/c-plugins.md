@@ -195,7 +195,7 @@ sl_wrapper(srv, "greet",
 );
 ```
 
-See [Client Wrappers](go-plugins/client-wrappers/) for details on wrapper source conventions.
+See [Client Wrappers](../go-plugins/client-wrappers/) for details on wrapper source conventions.
 
 ## Compilation
 

@@ -265,7 +265,7 @@ import "github.com/paularlott/scriptling/stdlib"
 stdlib.RegisterAll(p)
 ```
 
-Extended and `scriptling.*` libraries are registered individually, and filesystem libraries take an `allowedPaths` argument for access control. See [Library Registration](library-registration/) for the complete list of libraries and their registration functions.
+Extended and `scriptling.*` libraries are registered individually, and filesystem libraries take an `allowedPaths` argument for access control. See [Library Registration](../library-registration/) for the complete list of libraries and their registration functions.
 
 ### Programmatic Import
 
@@ -413,8 +413,8 @@ else:
 
 ## See Also
 
-- [Library Registration](library-registration/) - How to register built-in libraries
-- [Native API](native/) - Direct control with maximum performance
-- [Builder API](builder/) - Type-safe, cleaner syntax
-- [Security Guide](../security/) - Security best practices for embedding
-- [Libraries](../../reference/libraries/) - Usage reference for all libraries
+- [Library Registration](../library-registration/) - How to register built-in libraries
+- [Native API](../native/) - Direct control with maximum performance
+- [Builder API](../builder/) - Type-safe, cleaner syntax
+- [Security Guide](../../security/) - Security best practices for embedding
+- [Libraries](../../../reference/libraries/) - Usage reference for all libraries

@@ -470,6 +470,6 @@ result = testlib.add(10, 20)
 
 ## See Also
 
-- [Native Functions](functions/) - Register individual functions
-- [Native Classes](classes/) - Define custom classes
-- [Builder Libraries](builder-libraries/) - Type-safe library builder
+- [Native Functions](../native-functions/) - Register individual functions
+- [Native Classes](../native-classes/) - Define custom classes
+- [Builder Libraries](../builder-libraries/) - Type-safe library builder

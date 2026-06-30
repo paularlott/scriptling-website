@@ -375,6 +375,6 @@ for link in parser.links:
 
 ## See Also
 
-- [html](./html.md): HTML escaping and unescaping utilities
-- [re](./regex.md): Regular expressions for text processing
-- [difflib](./difflib.md): Sequence comparison and diff generation
+- [html](../html/): HTML escaping and unescaping utilities
+- [re](../regex/): Regular expressions for text processing
+- [difflib](../difflib/): Sequence comparison and diff generation

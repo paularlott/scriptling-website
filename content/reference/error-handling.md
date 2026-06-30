@@ -498,5 +498,5 @@ if ex, ok := result.(*object.Exception); ok {
 
 ## See Also
 
-- [Functions](./functions/) - Function definitions
-- [Python Differences](./python-differences/) - Exception handling differences
+- [Functions](../functions/) - Function definitions
+- [Python Differences](../python-differences/) - Exception handling differences

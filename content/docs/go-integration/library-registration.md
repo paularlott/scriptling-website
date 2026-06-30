@@ -312,11 +312,11 @@ plugin.RegisterLibraries(p, manager)  // scriptling.plugin, plus plugin.<name> f
 |-----------|-------------|------|
 | `scriptling.plugin` | `plugin` | `plugin.RegisterLibraries(p, manager)` |
 
-See [Plugins](plugins/) for the full plugin embedding guide.
+See [Plugins](../plugins/) for the full plugin embedding guide.
 
 ## Security Considerations
 
-When embedding Scriptling, you have full control over what scripts can access. See the [Security Guide](../security/) for best practices.
+When embedding Scriptling, you have full control over what scripts can access. See the [Security Guide](../../security/) for best practices.
 
 **Never register these libraries when running untrusted code:**
 
@@ -327,6 +327,6 @@ When embedding Scriptling, you have full control over what scripts can access. S
 
 ## See Also
 
-- [Basics](basics/): creating interpreters and exchanging variables
-- [Security Guide](../security/): security best practices for embedding
-- [Libraries](../../reference/libraries/): usage reference for all libraries
+- [Basics](../basics/): creating interpreters and exchanging variables
+- [Security Guide](../../security/): security best practices for embedding
+- [Libraries](../../../reference/libraries/): usage reference for all libraries

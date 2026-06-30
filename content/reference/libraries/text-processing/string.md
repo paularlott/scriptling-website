@@ -188,7 +188,7 @@ This module provides the same constants as Python's `string` module.
 
 ## See Also
 
-- [textwrap](./textwrap.md) - Text wrapping and filling utilities
-- [regex](./regex.md) - Regular expressions for pattern matching
-- [difflib](./difflib.md) - Sequence comparison and diffing utilities
-- [html](./html.md) - HTML escaping and unescaping
+- [textwrap](../textwrap/) - Text wrapping and filling utilities
+- [regex](../regex/) - Regular expressions for pattern matching
+- [difflib](../difflib/) - Sequence comparison and diffing utilities
+- [html](../html/) - HTML escaping and unescaping

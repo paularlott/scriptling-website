@@ -487,6 +487,6 @@ total = sum(x * y for x in range(4) for y in range(4))
 
 ## See Also
 
-- [Functions](./functions/) - Function definitions and parameters
-- [Operators](./operators/) - Comparison and boolean operators
-- [Error Handling](./error-handling/) - Try/except and raise
+- [Functions](../functions/) - Function definitions and parameters
+- [Operators](../operators/) - Comparison and boolean operators
+- [Error Handling](../error-handling/) - Try/except and raise

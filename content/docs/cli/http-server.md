@@ -17,7 +17,7 @@ scriptling --server :8000 setup.py
 
 The setup script is executed when the server starts and typically registers route handlers.
 
-> **Keeping the setup script alive:** By default the setup script exits after registering handlers and the server runs until shutdown. To keep the script running alongside the server: e.g. to maintain gossip state, run a polling loop, or share objects with handlers via `runtime.sync`: call [`runtime.start_server()`](../../reference/libraries/scriptling/runtime/) instead of exiting. See the [runtime reference](../../reference/libraries/scriptling/runtime/) for details.
+> **Keeping the setup script alive:** By default the setup script exits after registering handlers and the server runs until shutdown. To keep the script running alongside the server: e.g. to maintain gossip state, run a polling loop, or share objects with handlers via `runtime.sync`: call [`runtime.start_server()`](../../../reference/libraries/scriptling/runtime/) instead of exiting. See the [runtime reference](../../../reference/libraries/scriptling/runtime/) for details.
 
 ## Server Options
 
