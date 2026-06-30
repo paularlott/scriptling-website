@@ -122,8 +122,8 @@ extlibs.RegisterPathlibLibrary(p, []string{
 })
 
 // Dangerous: Allows access to entire file system
-extlibs.RegisterOSLibrary(p, []string{}) // Empty = no restriction!
-extlibs.RegisterOSLibrary(p, nil)       // Nil = read-only access everywhere
+extlibs.RegisterOSLibrary(p, nil)        // Nil = no restriction (full read/write access)
+extlibs.RegisterOSLibrary(p, []string{}) // Empty = deny all (no paths allowed)
 ```
 
 ### Path Traversal Protection

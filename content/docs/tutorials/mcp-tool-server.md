@@ -14,9 +14,9 @@ This tutorial walks through building an MCP (Model Context Protocol) server with
 ## What You'll Build
 
 A tool server that exposes three tools:
-1. **time_now** — returns the current time in a given timezone format
-2. **data_summary** — generates a summary of a list of numbers
-3. **format_report** — formats key-value data as a structured report
+1. **time_now**: returns the current time in a given timezone format
+2. **data_summary**: generates a summary of a list of numbers
+3. **format_report**: formats key-value data as a structured report
 
 ## Step 1: Create the Tool Directory
 
@@ -138,28 +138,23 @@ def call(args, kwargs):
 
 ## Step 5: Start the MCP Server
 
-Start Scriptling as an MCP server with the tools directory:
+Scriptling serves MCP over HTTP. Start the server with the tools directory:
 
 ```bash
-scriptling --mcp-server ./my-tools
+scriptling --server :8000 --mcp-tools ./my-tools setup.py
 ```
 
-Or with stdio transport for Claude Desktop:
-
-```bash
-scriptling --mcp-server ./my-tools --mcp-transport stdio
-```
+The MCP endpoint is mounted at `http://127.0.0.1:8000/mcp`. See [MCP Server Mode](../../cli/mcp-server/) for the full set of options.
 
 ## Step 6: Configure Claude Desktop
 
-Add the tool server to your Claude Desktop configuration (`claude_desktop_config.json`):
+Add the tool server to your Claude Desktop configuration (`claude_desktop_config.json`) using the HTTP endpoint:
 
 ```json
 {
   "mcpServers": {
     "scriptling-tools": {
-      "command": "scriptling",
-      "args": ["--mcp-server", "/absolute/path/to/my-tools", "--mcp-transport", "stdio"]
+      "url": "http://127.0.0.1:8000/mcp"
     }
   }
 }
@@ -169,17 +164,26 @@ Restart Claude Desktop. The AI will discover the tools automatically and can cal
 
 ## Step 7: Test Tools from the CLI
 
-Test individual tools directly from the command line:
+Call individual tools directly against the `/mcp` endpoint with a `tools/call` request:
 
 ```bash
 # Test time_now
-scriptling --call-tool my-tools/time_now '{"format": "%H:%M"}'
+curl -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"my-tools/time_now","arguments":{"format":"%H:%M"}}}'
 
 # Test data_summary
-scriptling --call-tool my-tools/data_summary '{"numbers": [10, 20, 30, 40, 50]}'
+curl -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"my-tools/data_summary","arguments":{"numbers":[10,20,30,40,50]}}}'
+```
 
-# Test format_report
-scriptling --call-tool my-tools/format_report '{"title": "Sales Report", "data": "{\"Q1\": \"$10,000\", \"Q2\": \"$15,000\"}"}'
+To list all available tools, send a `tools/list` request:
+
+```bash
+curl -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":3,"method":"tools/list"}'
 ```
 
 ## Step 8: Add Discoverable Tools

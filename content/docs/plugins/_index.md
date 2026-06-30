@@ -30,7 +30,7 @@ A plugin declares a short name such as `hello`. Scriptling imports it as `plugin
 
 ## Scriptling Scripts as Plugins
 
-A Scriptling script can itself act as a plugin server using `runtime.plugin` —
+A Scriptling script can itself act as a plugin server using `runtime.plugin`,
 no compiled binary required. See [Plugin Server Mode](../cli/plugin-server/) in
 the CLI reference.
 

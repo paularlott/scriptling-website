@@ -31,7 +31,7 @@ int(-3.9)        # -3 (truncates toward zero)
 int(42)          # 42 (no change)
 ```
 
-Optional `base` argument (2–36) for base conversion from a string:
+Optional `base` argument (2 to 36) for base conversion from a string:
 
 ```python
 int("ff", 16)    # 255
@@ -119,7 +119,7 @@ type("hello")   # "STRING"
 type([1, 2])    # "LIST"
 type({"a": 1})  # "DICT"
 type(True)      # "BOOLEAN"
-type(None)      # "NONE"
+type(None)      # "NULL"
 type((1, 2))    # "TUPLE"
 ```
 
@@ -216,21 +216,24 @@ ord("a")                  # 97
 
 ```python
 len("hello")                        # 5
-upper("hello")                      # "HELLO"
-lower("HELLO")                      # "hello"
-capitalize("hello world")           # "Hello world"
-title("hello world")                # "Hello World"
-split("a,b,c", ",")                 # ["a", "b", "c"]
-join(["a", "b", "c"], "-")          # "a-b-c"
-replace("hello world", "world", "python")  # "hello python"
-strip("  hello  ")                  # "hello"
-strip("??hello??", "?")             # "hello"
-lstrip("  hello  ")                 # "hello  "
-lstrip("??hello", "?")              # "hello"
-rstrip("  hello  ")                 # "  hello"
-rstrip("hello??", "?")              # "hello"
-startswith("hello", "he")           # True
-endswith("hello", "lo")             # True
+```
+
+String transformation is done with methods on the `str` type, not free functions. See [string](../reference/libraries/text-processing/string/) for the full list:
+
+```python
+"hello".upper()                          # "HELLO"
+"HELLO".lower()                          # "hello"
+"hello world".capitalize()               # "Hello world"
+"hello world".title()                    # "Hello World"
+"a,b,c".split(",")                       # ["a", "b", "c"]
+"-".join(["a", "b", "c"])                # "a-b-c"
+"hello world".replace("world", "python") # "hello python"
+"  hello  ".strip()                      # "hello"
+"??hello??".strip("?")                   # "hello"
+"  hello  ".lstrip()                     # "hello  "
+"  hello  ".rstrip()                     # "  hello"
+"hello".startswith("he")                 # True
+"hello".endswith("lo")                   # True
 ```
 
 ## String Methods
@@ -356,16 +359,21 @@ s1.issuperset(s2)           # False
 person = {"name": "Alice", "age": 30}
 
 len(person)                        # 2
-keys(person)                       # ["name", "age"]
-values(person)                     # ["Alice", 30]
-items(person)                      # [["name", "Alice"], ["age", 30]]
+keys(person)                       # dict_keys(["name", "age"])  (a view object)
+values(person)                     # dict_values(["Alice", 30])  (a view object)
+items(person)                      # dict_items([["name", "Alice"], ["age", 30]])  (a view object)
 
-# Iterate over dictionary
+# Iterate over dictionary (views are iterable)
 for item in items(person):
     key = item[0]
     value = item[1]
     print(key, value)
+
+# Materialize a view into a list when needed
+list(keys(person))                 # ["name", "age"]
 ```
+
+`keys()`, `values()`, and `items()` may also be called as methods: `person.keys()`, `person.values()`, `person.items()`.
 
 ## Dict Methods
 
@@ -419,13 +427,13 @@ all([True, False, True])          # False
 `iter()` and `next()` expose the iterator protocol directly, enabling manual iteration and working with custom iterable classes.
 
 ```python
-# iter() — create an iterator from any iterable
+# iter(): create an iterator from any iterable
 it = iter([10, 20, 30])
 next(it)   # 10
 next(it)   # 20
 next(it)   # 30
 
-# next() with a default — no exception on exhaustion
+# next() with a default: no exception on exhaustion
 next(it, "done")   # "done"
 
 # next() without default raises StopIteration when exhausted
@@ -497,6 +505,8 @@ print("Hello", "World", sep="-")   # Custom separator: Hello-World
 input("Prompt: ")                  # Read user input (returns string)
 ```
 
+`input()` is not a core builtin: it is only available when the `sys` library is registered with a stdin reader (for example, by the `scriptling` CLI in interactive or server stdin mode). It is absent in a bare embedded interpreter unless the embedder provides it.
+
 ## Introspection
 
 ### dir()
@@ -528,10 +538,10 @@ dir({"x": 1, "y": 2})   # ["x", "y"]
 
 ### copy()
 
-Returns a shallow copy of an object. Nested objects are not copied — use `copy.deepcopy()` from the `copy` library for that. For native-backed instances, hidden Go-only state is not copied.
+Returns a shallow copy of an object. Nested objects are not copied: use `copy.deepcopy()` from the `copy` library for that. For native-backed instances, hidden Go-only state is not copied.
 
 ```python
-# List copy — mutations don't affect the original
+# List copy: mutations don't affect the original
 original = [1, 2, 3]
 c = copy(original)
 c.append(4)
@@ -552,7 +562,7 @@ sc.add(4)
 len(s)    # 3
 len(sc)   # 4
 
-# Instance copy — fields are copied, class is shared
+# Instance copy: fields are copied, class is shared
 class Box:
     def __init__(self, v):
         self.v = v
@@ -574,7 +584,7 @@ copy(42)          # 42
 
 Briefly release the interpreter lock and yield the thread, letting other goroutines run before continuing. Use it inside a long, purely CPU-bound loop that never hits a naturally-blocking call, so shared-environment threads ([`runtime.background(..., shared=True)`](./libraries/scriptling/runtime/)) and registered handlers can make progress.
 
-Blocking builtins — `time.sleep`, `input()`, file reads/writes, socket send/receive/accept, WebSocket send/receive, subprocess, HTTP requests, AI completions/streaming, all container daemon calls, plugin calls, file provisioning, `wait_for` polling, `grep`/`sed` scans, messaging sends/downloads, `Queue` operations, `WaitGroup.wait()`, `Promise.wait()`/`get()`, `gossip send_request()` — already release the lock while they block, so you only need `yield_now()` for tight compute loops.
+Blocking builtins: `time.sleep`, `input()`, file reads/writes, socket send/receive/accept, WebSocket send/receive, subprocess, HTTP requests, AI completions/streaming, all container daemon calls, plugin calls, file provisioning, `wait_for` polling, `grep`/`sed` scans, messaging sends/downloads, `Queue` operations, `WaitGroup.wait()`, `Promise.wait()`/`get()`, `gossip send_request()`: already release the lock while they block, so you only need `yield_now()` for tight compute loops.
 
 ```python
 import scriptling.runtime as runtime

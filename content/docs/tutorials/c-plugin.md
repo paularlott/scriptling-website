@@ -4,7 +4,7 @@ description: Build a multi-threaded C plugin with functions, classes, properties
 weight: 27
 ---
 
-This tutorial builds a C executable plugin that exposes functions, classes with properties, callbacks, and logging. It uses the Scriptling C SDK — a single header and source file with no external dependencies.
+This tutorial builds a C executable plugin that exposes functions, classes with properties, callbacks, and logging. It uses the Scriptling C SDK: a single header and source file with no external dependencies.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ cp scriptling_plugin.h scriptling_plugin.c hello-plugin/
 cd hello-plugin
 ```
 
-## Step 1 — A Simple Function
+## Step 1: A Simple Function
 
 Create `main.c` with a single function:
 
@@ -63,7 +63,7 @@ Hello, Ada
 
 The plugin declares the short name `hello`. Scriptling imports it as `plugin.hello`.
 
-## Step 2 — Classes with Properties
+## Step 2: Classes with Properties
 
 Add a `Counter` class with a constructor, methods, and read/write properties:
 
@@ -149,7 +149,7 @@ counter:100
 
 The constructor returns a heap-allocated struct. The SDK passes it as the `void *data` first argument to every method and property callback. The destructor frees it when the instance is released or garbage-collected.
 
-## Step 3 — Callbacks
+## Step 3: Callbacks
 
 A function can receive a Scriptling callback and invoke it from C:
 
@@ -205,7 +205,7 @@ Ada 2
 
 Callbacks are only valid while the outer function call is still running.
 
-## Step 4 — Logging
+## Step 4: Logging
 
 Use `sl_log_info`, `sl_log_debug`, `sl_log_warn`, and `sl_log_error` to route messages through the host logger:
 
@@ -238,7 +238,7 @@ DBG args received: 1
 done:Ada
 ```
 
-## Step 5 — Constants
+## Step 5: Constants
 
 Register constant values that appear as module attributes:
 
@@ -345,6 +345,6 @@ scriptling --plugin-dir ./plugins script.py
 
 ## What's Next
 
-- [C Plugins](/docs/plugins/c-plugins/) — full API reference for the C SDK
-- [JSON-RPC Protocol](/docs/plugins/protocol/) — wire format details
-- [Go Plugins](/docs/plugins/go-plugins/) — the Go plugin server for comparison
+- [C Plugins](/docs/plugins/c-plugins/): full API reference for the C SDK
+- [JSON-RPC Protocol](/docs/plugins/protocol/): wire format details
+- [Go Plugins](/docs/plugins/go-plugins/): the Go plugin server for comparison

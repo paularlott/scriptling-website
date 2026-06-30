@@ -245,7 +245,7 @@ If you omit the help text, basic help will be auto-generated:
 ```go
 p.RegisterFunc("my_func", func(...) object.Object {
     // Auto-generates: "my_func(...) - User-defined function"
-    return object.NULL
+    return &object.Null{}
 })
 ```
 
@@ -273,8 +273,8 @@ return object.NewString("hello")
 
 ```go
 return object.NewBoolean(true)
-return object.True
-return object.False
+return object.NewBoolean(true)
+return object.NewBoolean(false)
 ```
 
 ### Lists
@@ -298,7 +298,7 @@ return object.NewStringDict(map[string]object.Object{
 ### None/Null
 
 ```go
-return object.None
+return &object.Null{}
 ```
 
 ### Errors

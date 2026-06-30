@@ -4,7 +4,7 @@ linkTitle: websocket
 weight: 5
 ---
 
-WebSocket client library for connecting to WebSocket servers.
+WebSocket client library for connecting to WebSocket servers, with a simple synchronous API for sending and receiving text or binary messages.
 
 ## Overview
 
@@ -14,87 +14,78 @@ The `scriptling.net.websocket` library provides a simple, synchronous WebSocket 
 
 | Function | Description |
 |----------|-------------|
-| `connect(url, timeout=10, headers={})` | Connect to a WebSocket server |
-| `is_text(message)` | Check if a received message is text (string) |
-| `is_binary(message)` | Check if a received message is binary (list) |
+| `connect(url, timeout=10, headers={})` | Connect to a WebSocket server. |
+| `is_text(message)` | Check if a received message is text. |
+| `is_binary(message)` | Check if a received message is binary. |
 
-## Connection Methods
+## Connection Object
 
-When you call `connect()`, it returns a connection object with these methods:
+The `connect()` function returns a connection object with the following methods and properties.
 
-| Method | Description |
+| Method/Property | Description |
 |--------|-------------|
-| `send(message)` | Send a text message (dict is auto-JSON encoded) |
-| `send_binary(data)` | Send binary data as list of bytes |
-| `receive(timeout=30)` | Receive a message (None on timeout/disconnect) |
-| `connected()` | Check if connection is still open |
-| `close()` | Close the connection |
+| `send(message)` | Send a text message (dict is auto-JSON encoded). |
+| `send_binary(data)` | Send binary data as a list of bytes. |
+| `receive(timeout=30)` | Receive a message (`None` on timeout/disconnect). |
+| `connected()` | Check if the connection is still open. |
+| `close()` | Close the connection. |
+| `remote_addr` | `str` property: remote address of the connection. |
 
 ## Functions
 
-### scriptling.net.websocket.connect(url, timeout=10, headers={})
+### `connect(url, timeout=10, headers={})`
 
-Connect to a WebSocket server.
+Connects to a WebSocket server.
 
 **Parameters:**
+- `url` (`str`): WebSocket URL, `ws://` or `wss://`.
+- `timeout` (`int`, optional): Connection timeout in seconds. Default: `10`.
+- `headers` (`dict`, optional): HTTP headers to send during the handshake. Default: `{}`.
 
-- `url` (string): WebSocket URL (ws:// or wss://)
-- `timeout` (int, optional): Connection timeout in seconds (default: 10)
-- `headers` (dict, optional): HTTP headers for the handshake
+**Returns:** `Connection`: a connection object.
 
-**Returns:** Connection object
-
-**Example:**
 ```python
 import scriptling.net.websocket as ws
 
 conn = ws.connect("wss://echo.websocket.org", timeout=5)
 ```
 
-## Connection Methods
+### `conn.send(message)`
 
-### conn.send(message)
-
-Send a text message. If the message is a dict, it's automatically JSON encoded.
+Sends a text message. If `message` is a dict, it is automatically JSON encoded.
 
 **Parameters:**
+- `message` (`str` or `dict`): Message to send.
 
-- `message` (string or dict): Message to send
+**Returns:** `None`
 
-**Example:**
 ```python
 conn.send("Hello, WebSocket!")
 conn.send({"type": "ping", "data": "test"})  # Auto-JSON encoded
 ```
 
-### conn.send_binary(data)
+### `conn.send_binary(data)`
 
-Send binary data.
+Sends binary data.
 
 **Parameters:**
+- `data` (`list`): List of byte values (`0`-`255`).
 
-- `data` (list): List of byte values (0-255)
+**Returns:** `None`
 
-**Example:**
 ```python
 conn.send_binary([0x01, 0x02, 0x03, 0xFF])
 ```
 
-### conn.receive(timeout=30)
+### `conn.receive(timeout=30)`
 
-Receive a message from the server.
+Receives a message from the server.
 
 **Parameters:**
+- `timeout` (`int`, optional): Timeout in seconds. Default: `30`.
 
-- `timeout` (int, optional): Timeout in seconds (default: 30)
+**Returns:** `str` for text messages, `list` of bytes for binary messages, or `None` on timeout or disconnect.
 
-**Returns:**
-
-- string for text messages
-- list of bytes for binary messages
-- None on timeout or disconnect
-
-**Example:**
 ```python
 msg = conn.receive(timeout=5)
 if msg:
@@ -105,13 +96,14 @@ else:
         print("Disconnected!")
 ```
 
-### conn.connected()
+### `conn.connected()`
 
-Check if the connection is still open.
+Checks if the connection is still open.
 
-**Returns:** True if connected, False otherwise
+**Parameters:** None
 
-**Example:**
+**Returns:** `bool`: `True` if connected, `False` otherwise.
+
 ```python
 while conn.connected():
     msg = conn.receive(timeout=60)
@@ -119,52 +111,59 @@ while conn.connected():
         conn.send(f"Echo: {msg}")
 ```
 
-### conn.close()
+### `conn.close()`
 
-Close the WebSocket connection.
+Closes the WebSocket connection.
 
-**Example:**
+**Parameters:** None
+
+**Returns:** `None`
+
 ```python
 conn.close()
 ```
 
-### scriptling.net.websocket.is_text(message)
+### `is_text(message)`
 
-Check if a received message is a text message.
+Checks if a received message is a text message.
 
 **Parameters:**
+- `message`: A message returned from `receive()`.
 
-- `message`: A message returned from `receive()`
+**Returns:** `bool`: `True` if the message is text (`str`), `False` otherwise.
 
-**Returns:** True if the message is text (string), False otherwise
-
-**Example:**
 ```python
 msg = conn.receive()
 if ws.is_text(msg):
     print(f"Text: {msg}")
 ```
 
-### scriptling.net.websocket.is_binary(message)
+### `is_binary(message)`
 
-Check if a received message is a binary message.
+Checks if a received message is a binary message.
 
 **Parameters:**
+- `message`: A message returned from `receive()`.
 
-- `message`: A message returned from `receive()`
+**Returns:** `bool`: `True` if the message is binary (`list` of bytes), `False` otherwise.
 
-**Returns:** True if the message is binary (list of bytes), False otherwise
-
-**Example:**
 ```python
 msg = conn.receive()
 if ws.is_binary(msg):
     print(f"Binary: {len(msg)} bytes")
 ```
 
-### conn.remote_addr
+### `conn.remote_addr`
 
-The remote address of the connection (string).
+The remote address of the connection.
+
+**Type:** `str` property.
+
+## Security Considerations
+
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`scriptling.net.websocket` opens outbound WebSocket connections to any URL a script supplies, and can send and receive arbitrary data over that connection, including any headers (such as bearer tokens) the script passes in. The library does not restrict which hosts a script can connect to: that is the embedder's responsibility, typically enforced with OS-level firewalling or network namespacing around the process. See [Security Considerations](/docs/security/#network-security) for a full breakdown of network-enabled libraries.
 
 ## Examples
 
@@ -274,79 +273,6 @@ print(msg)
 conn.close()
 ```
 
-## WebSocket Server (runtime.http.websocket)
-
-To accept WebSocket connections in your server, use `runtime.http.websocket()`:
-
-### runtime.http.websocket(path, handler)
-
-Register a WebSocket endpoint.
-
-**Parameters:**
-
-- `path` (string): URL path for the WebSocket endpoint
-- `handler` (string): Handler function as "library.function"
-
-The handler receives a WebSocketClient object and runs for the connection lifetime.
-
-### Server Example
-
-```python
-# setup.py
-import scriptling.runtime as runtime
-
-runtime.http.websocket("/chat", "handlers.chat_handler")
-```
-
-```python
-# handlers.py
-_clients = []
-
-def chat_handler(client):
-    """Handle a WebSocket connection - runs until connection closes."""
-    _clients.append(client)
-    client.send("Welcome to the chat!")
-
-    try:
-        while client.connected():
-            msg = client.receive(timeout=60)
-            if msg:
-                # Broadcast to all clients
-                for c in _clients:
-                    if c.connected():
-                        c.send(msg)
-    finally:
-        _clients.remove(client)
-```
-
-### WebSocketClient Object (Server-side)
-
-The client object passed to server handlers has:
-
-| Method/Field | Description |
-|--------------|-------------|
-| `client.connected()` | Check if client is still connected |
-| `client.receive(timeout=30)` | Receive message (None on timeout) |
-| `client.send(message)` | Send text message (dict auto-JSON) |
-| `client.send_binary(data)` | Send binary data |
-| `client.close()` | Close the connection |
-| `client.remote_addr` | Client's remote address |
-
-To check message type in server handlers, use the module-level functions:
-
-```python
-import scriptling.net.websocket as ws
-
-def handler(client):
-    while client.connected():
-        msg = client.receive(timeout=60)
-        if msg:
-            if ws.is_text(msg):
-                client.send(f"Echo text: {msg}")
-            elif ws.is_binary(msg):
-                client.send_binary(msg)  # Echo binary back
-```
-
 ## Error Handling
 
 ```python
@@ -369,8 +295,47 @@ finally:
 
 ## Notes
 
-- The library uses a synchronous API - `receive()` blocks until a message arrives or timeout
-- `receive()` returns None both on timeout and disconnect - use `connected()` to distinguish
-- Dicts passed to `send()` are automatically JSON encoded
-- Binary messages are represented as lists of byte values (0-255)
-- Always call `close()` when done to properly clean up resources
+- The library uses a synchronous API - `receive()` blocks until a message arrives or timeout.
+- `receive()` returns `None` both on timeout and disconnect - use `connected()` to distinguish.
+- Dicts passed to `send()` are automatically JSON encoded.
+- Binary messages are represented as lists of byte values (`0`-`255`).
+- Always call `close()` when done to properly clean up resources.
+
+## Accepting WebSocket Connections (Server-Side)
+
+This page documents the WebSocket *client*. To accept incoming WebSocket connections in a Scriptling-powered HTTP server, register a handler with `runtime.http.websocket(path, handler)`: see [scriptling.runtime.http](/reference/libraries/scriptling/runtime/http/) for details. The handler receives a `WebSocketClient` object exposing the same `connected()`, `receive()`, `send()`, `send_binary()`, `close()`, and `remote_addr` surface documented above, plus access to the module-level `is_text()` / `is_binary()` helpers for distinguishing message types:
+
+```python
+# setup.py
+import scriptling.runtime as runtime
+
+runtime.http.websocket("/chat", "handlers.chat_handler")
+```
+
+```python
+# handlers.py
+import scriptling.net.websocket as ws
+
+_clients = []
+
+def chat_handler(client):
+    """Handle a WebSocket connection - runs until connection closes."""
+    _clients.append(client)
+    client.send("Welcome to the chat!")
+
+    try:
+        while client.connected():
+            msg = client.receive(timeout=60)
+            if msg:
+                for c in _clients:
+                    if c.connected():
+                        c.send(msg)
+    finally:
+        _clients.remove(client)
+```
+
+## See Also
+
+- [scriptling.runtime.http](/reference/libraries/scriptling/runtime/http/): register server-side WebSocket endpoints with `runtime.http.websocket()`
+- [scriptling.net.unicast](../unicast/): direct point-to-point UDP/TCP messaging
+- [Security Guide](/docs/security/): full risk breakdown across all libraries

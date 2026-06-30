@@ -1,16 +1,13 @@
 ---
 title: scriptling.runtime.jsonrpc
 linkTitle: runtime.jsonrpc
+description: Register JSON-RPC 2.0 server methods and notifications served over stdio or HTTP.
 weight: 2
 ---
 
-Concurrent JSON-RPC 2.0 server method and notification registration.
+## Overview
 
-`scriptling.runtime.jsonrpc` registers handlers for a JSON-RPC 2.0 server that
-can run over stdin/stdout or HTTP. Handlers are referenced by string
-(`"library.function"`), the same model used by `runtime.http`, so each request
-runs on a fresh, isolated evaluator in its own goroutine and a slow handler
-never blocks the next request.
+The `scriptling.runtime.jsonrpc` library registers handlers for a JSON-RPC 2.0 **server** that runs over stdin/stdout or HTTP: it does not make outbound JSON-RPC calls. Handlers are referenced by string (`"library.function"`), the same model used by `runtime.http`, so each request runs on a fresh, isolated evaluator in its own goroutine and a slow handler never blocks the next request.
 
 Start the stdio server with the `--json-rpc` flag:
 
@@ -18,8 +15,7 @@ Start the stdio server with the `--json-rpc` flag:
 scriptling --json-rpc setup.py
 ```
 
-Logging is automatically redirected to stderr so it never corrupts the JSON-RPC
-stream on stdout.
+Logging is automatically redirected to stderr so it never corrupts the JSON-RPC stream on stdout.
 
 Start the HTTP server with `--server` and `--json-rpc`:
 
@@ -27,8 +23,7 @@ Start the HTTP server with `--server` and `--json-rpc`:
 scriptling --server :8000 --json-rpc setup.py
 ```
 
-HTTP JSON-RPC is served at `POST /json-rpc` and can run alongside normal
-`runtime.http` routes and MCP tools.
+HTTP JSON-RPC is served at `POST /json-rpc` and can run alongside normal `runtime.http` routes and MCP tools.
 
 ## Available Functions
 
@@ -38,58 +33,87 @@ HTTP JSON-RPC is served at `POST /json-rpc` and can run alongside normal
 | `notification(name, handler)` | Register a notification handler (no response) |
 | `error(code, message, data=None)` | Build a structured JSON-RPC error response |
 
-## Method Registration
+## Functions
 
-### scriptling.runtime.jsonrpc.method(name, handler)
+### `method(name, handler)`
 
-Register a JSON-RPC method handler.
-
-**Parameters:**
-
-- `name` (str): JSON-RPC method name
-- `handler` (str): Handler function as `"library.function"`
-
-The handler receives the decoded JSON-RPC `params` as its single argument and
-returns a JSON-compatible result. Raise an exception, or return
-`runtime.jsonrpc.error(...)`, to produce an error response.
-
-### scriptling.runtime.jsonrpc.notification(name, handler)
-
-Register a JSON-RPC notification handler.
+Registers a JSON-RPC method handler. The handler receives the decoded JSON-RPC `params` as its single argument and returns a JSON-compatible result. Raise an exception, or return `jsonrpc.error(...)`, to produce an error response.
 
 **Parameters:**
+- `name` (`str`): JSON-RPC method name.
+- `handler` (`str`): Handler function as `"library.function"`.
 
-- `name` (str): JSON-RPC notification name
-- `handler` (str): Handler function as `"library.function"`
+**Returns:** `None`
 
-Notifications are JSON-RPC requests without an `id` field. The handler receives
-the decoded params but no response is written. Return values are ignored.
+```python
+# setup.py
+import scriptling.runtime as runtime
 
-### scriptling.runtime.jsonrpc.error(code, message, data=None)
+runtime.jsonrpc.method("echo", "handlers.echo")
+runtime.jsonrpc.method("divide", "handlers.divide")
+```
 
-Build a structured JSON-RPC error response.
+```python
+# handlers.py
+import scriptling.runtime as runtime
+
+def echo(params):
+    return params
+
+def divide(params):
+    if params["b"] == 0:
+        return runtime.jsonrpc.error(-32602, "division by zero", {"field": "b"})
+    return params["a"] / params["b"]
+```
+
+### `notification(name, handler)`
+
+Registers a JSON-RPC notification handler. Notifications are JSON-RPC requests without an `id` field. The handler receives the decoded params but no response is written, and return values are ignored.
 
 **Parameters:**
+- `name` (`str`): JSON-RPC notification name.
+- `handler` (`str`): Handler function as `"library.function"`.
 
-- `code` (int): JSON-RPC error code (e.g. `-32602` for invalid params)
-- `message` (str): Human-readable error message
-- `data` (any, optional): Optional structured data attached to the error
+**Returns:** `None`
 
-Return this from a method handler to emit a JSON-RPC error response with a
-custom code.
+```python
+import scriptling.runtime as runtime
+
+def on_progress(params):
+    # Side effects only; no response is written.
+    pass
+
+runtime.jsonrpc.notification("progress", "handlers.on_progress")
+```
+
+### `error(code, message, data=None)`
+
+Builds a structured JSON-RPC error response. Return this from a method handler to emit a JSON-RPC error response with a custom code.
+
+**Parameters:**
+- `code` (`int`): JSON-RPC error code (e.g. `-32602` for invalid params).
+- `message` (`str`): Human-readable error message.
+- `data` (any, optional): Optional structured data attached to the error. Default: `None`.
+
+**Returns:** `JSONRPCError`: instance recognized by the server and converted into a JSON-RPC error response.
+
+```python
+import scriptling.runtime as runtime
+
+def divide(params):
+    if params["b"] == 0:
+        return runtime.jsonrpc.error(-32602, "division by zero", {"field": "b"})
+    return params["a"] / params["b"]
+```
 
 ## Concurrency Model
 
-Each request is dispatched on its own goroutine with a fresh Scriptling
-evaluator, mirroring `runtime.http`, MCP, and WebSocket serving. Handlers cannot
-share in-memory state across requests; coordinate through `runtime.kv` or
-`runtime.sync` instead.
+Each request is dispatched on its own goroutine with a fresh Scriptling evaluator, mirroring `runtime.http`, MCP, and WebSocket serving. Handlers cannot share in-memory state across requests; coordinate through `runtime.kv` or `runtime.sync` instead.
 
 ## Stdio Wire Format
 
 - Requests are newline-delimited JSON objects (NDJSON), one per line.
-- Batches (JSON arrays) are supported: each element is dispatched concurrently
-  and a single JSON array of responses is returned.
+- Batches (JSON arrays) are supported: each element is dispatched concurrently and a single JSON array of responses is returned.
 - Notifications (requests with no `id`) produce no response.
 - Integer precision is preserved (numbers are not coerced to floats).
 
@@ -98,8 +122,7 @@ share in-memory state across requests; coordinate through `runtime.kv` or
 - Send a single JSON-RPC object or batch array with `POST /json-rpc`.
 - Requests return `200 application/json`.
 - Notifications and all-notification batches return `204 No Content`.
-- Notifications inside a mixed batch are handled but omitted from the response
-  array.
+- Notifications inside a mixed batch are handled but omitted from the response array.
 - Integer precision is preserved.
 
 ## Error Codes
@@ -115,37 +138,7 @@ share in-memory state across requests; coordinate through `runtime.kv` or
 
 ## Examples
 
-### Setup script
-
-```python
-# setup.py
-import scriptling.runtime as runtime
-
-runtime.jsonrpc.method("echo", "handlers.echo")
-runtime.jsonrpc.method("divide", "handlers.divide")
-runtime.jsonrpc.notification("progress", "handlers.on_progress")
-```
-
-### Handlers
-
-```python
-# handlers.py
-import scriptling.runtime as runtime
-
-def echo(params):
-    return params
-
-def divide(params):
-    if params["b"] == 0:
-        return runtime.jsonrpc.error(-32602, "division by zero", {"field": "b"})
-    return params["a"] / params["b"]
-
-def on_progress(params):
-    # Side effects only; no response is written.
-    pass
-```
-
-### Sample session
+### Sample stdio session
 
 ```bash
 $ echo '{"jsonrpc":"2.0","method":"echo","params":{"hello":"world"},"id":1}' \
@@ -159,7 +152,7 @@ $ echo '[{"jsonrpc":"2.0","method":"divide","params":{"a":1,"b":0},"id":1},
  {"jsonrpc":"2.0","result":42,"id":2}]
 ```
 
-### HTTP session
+### Sample HTTP session
 
 ```bash
 $ curl -X POST http://127.0.0.1:8000/json-rpc \
@@ -175,8 +168,19 @@ HTTP/1.1 204 No Content
 
 ## Notes
 
-- Routes/methods are registered during setup script execution, then frozen.
-- The `JSONRPCError` class is exposed as `runtime.jsonrpc.JSONRPCError` for
-  type checks.
-- Use `--json-rpc` together with `--kv-storage` or `--libpath` exactly as you
-  would for the HTTP `--server` mode.
+- Methods/notifications are registered during setup script execution, then frozen.
+- The `JSONRPCError` class is exposed as `runtime.jsonrpc.JSONRPCError` for type checks.
+- Use `--json-rpc` together with `--kv-storage` or `--libpath` exactly as you would for the HTTP `--server` mode.
+
+## Security Considerations
+
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`scriptling.runtime.jsonrpc` is server-only: it registers method/notification handlers for an incoming JSON-RPC stream and never issues outbound JSON-RPC calls itself. The risk shape matches `runtime.http`: registering a method exposes that handler to any peer that can reach the stdio stream or `POST /json-rpc` endpoint, so treat every registered method as a network-reachable entry point and validate `params` defensively. For a full risk breakdown across all libraries, see the [Security Guide](/docs/security/).
+
+## See Also
+
+- [scriptling.runtime.http](../http/): HTTP route registration sharing the same per-request evaluator model
+- [scriptling.runtime.plugin](../plugin/): full plugin protocol server (functions, constants, and classes)
+- [scriptling.runtime.kv](../kv/): share state across JSON-RPC handlers
+- [Security Guide](/docs/security/)

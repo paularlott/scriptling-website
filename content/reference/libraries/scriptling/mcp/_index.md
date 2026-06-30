@@ -4,7 +4,7 @@ description: MCP (Model Context Protocol) client and tool authoring libraries.
 weight: 2
 ---
 
-Libraries for connecting to MCP servers and authoring MCP tools that can be used by AI agents.
+MCP (Model Context Protocol) is a protocol for AI models to interact with external tools and data sources. These libraries connect to MCP servers and author MCP tools that can be used by AI agents: a client for calling server-exposed tools, and helpers for creating tools.
 
 ## Available Libraries
 
@@ -20,18 +20,17 @@ Libraries for connecting to MCP servers and authoring MCP tools that can be used
 import scriptling.mcp as mcp
 
 # Connect to an MCP server
-client = mcp.connect("http://localhost:8080/mcp")
+client = mcp.Client("http://localhost:8080/mcp")
 
 # List available tools
-tools = client.list_tools()
+tools = client.tools()
 
 # Call a tool
 result = client.call_tool("search", {"query": "hello"})
 ```
 
-## Overview
+## See Also
 
-MCP (Model Context Protocol) is a protocol for AI models to interact with external tools and data sources. These libraries provide:
-
-- **Client**: Connect to MCP servers and use their tools
-- **Tool Authoring**: Create MCP tools that can be exposed to AI agents
+- [scriptling.ai](../ai/) - AI and agent libraries that consume MCP tools
+- [Libraries](../../) - Full library reference index
+- [Security Guide](/docs/security/#network-security) - Network-enabled libraries risk breakdown

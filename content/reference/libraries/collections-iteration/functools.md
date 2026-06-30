@@ -1,5 +1,6 @@
 ---
 title: functools
+description: Higher-order functions that act on or return other functions.
 weight: 1
 
 aliases:
@@ -7,36 +8,29 @@ aliases:
   - /reference/libraries/functools/
 ---
 
-The `functools` library provides higher-order functions that act on or return other functions, compatible with Python's `functools` module.
-
-## Import
-
-```python
-import functools
-```
+The `functools` library provides higher-order functions that act on or return other functions, compatible with Python's `functools` module. Reach for it when reducing a list to a single value or pre-filling some of a function's arguments.
 
 ## Available Functions
 
-| Function                                    | Description                     |
-| ------------------------------------------- | ------------------------------- |
-| `reduce(function, iterable[, initializer])` | Reduce iterable to single value |
-| `partial(func, *args, **kwargs)`            | Create a partial function application |
+| Function | Description |
+|----------|-------------|
+| `reduce(function, iterable[, initializer])` | Reduce an iterable to a single value. |
+| `partial(func, *args, **kwargs)` | Create a function with some arguments pre-filled. |
 
 ## Functions
 
-### partial(func, *args, **kwargs)
+### `reduce(function, iterable[, initializer])`
 
-Create a new function with some arguments pre-filled.
+Applies `function` of two arguments cumulatively to the items of `iterable`, from left to right, reducing it to a single value. Equivalent to `function(function(function(item0, item1), item2), item3)...`.
 
 **Parameters:**
+- `function` (`callable`): A function taking two arguments: `(accumulator, current_item)`.
+- `iterable` (`list`): Items to reduce.
+- `initializer` (`any`, optional): Starting value for the accumulator. If omitted, the first element of `iterable` is used as the initial accumulator and reduction starts from the second element.
 
-- `func` - The function to partially apply
-- `*args` - Positional arguments to pre-fill
-- `**kwargs` - Keyword arguments to pre-fill
+**Returns:** `any`: the final accumulated value.
 
-**Returns:** A new callable with the pre-filled arguments
-
-**Examples:**
+**Raises:** `Error`: if `iterable` is empty and no `initializer` is given.
 
 ```python
 import functools
@@ -44,95 +38,11 @@ import functools
 def add(x, y):
     return x + y
 
-add_five = functools.partial(add, 5)
-print(add_five(3))   # 8
-print(add_five(10))  # 15
+result = functools.reduce(add, [1, 2, 3, 4, 5])  # 15
+result = functools.reduce(add, [1, 2, 3], 10)    # 16
 ```
 
-```python
-# Pre-fill keyword arguments
-def greet(name, greeting="Hello"):
-    return greeting + ", " + name + "!"
-
-say_hi = functools.partial(greet, greeting="Hi")
-print(say_hi("Alice"))  # Hi, Alice!
-```
-
-```python
-# Works with built-in functions too
-def power(base, exp):
-    return base ** exp
-
-square = functools.partial(power, exp=2)
-cube   = functools.partial(power, exp=3)
-print(square(4))  # 16
-print(cube(3))    # 27
-```
-
-### reduce(function, iterable[, initializer])
-
-Apply a function of two arguments cumulatively to the items of an iterable, from left to right, to reduce the iterable to a single value.
-
-**Parameters:**
-
-- `function` - A function taking two arguments (accumulator, current_item)
-- `iterable` - A list of items to process
-- `initializer` - Optional. Starting value for the accumulator
-
-**Returns:** The final accumulated value
-
-**Examples:**
-
-```python
-import functools
-
-# Sum a list
-def add(x, y):
-    return x + y
-
-result = functools.reduce(add, [1, 2, 3, 4, 5])  # Returns 15
-```
-
-```python
-# With initial value
-result = functools.reduce(add, [1, 2, 3], 10)  # Returns 16
-```
-
-```python
-# Product of a list
-def multiply(x, y):
-    return x * y
-
-result = functools.reduce(multiply, [1, 2, 3, 4])  # Returns 24
-```
-
-```python
-# Find maximum
-def max_val(a, b):
-    if a > b:
-        return a
-    return b
-
-result = functools.reduce(max_val, [3, 1, 4, 1, 5, 9])  # Returns 9
-```
-
-```python
-# Concatenate strings
-def concat(a, b):
-    return a + b
-
-result = functools.reduce(concat, ["a", "b", "c"])  # Returns "abc"
-```
-
-## How reduce() Works
-
-`reduce()` applies a function cumulatively:
-
-```
-reduce(add, [1, 2, 3, 4, 5])
-```
-
-Is equivalent to:
+`reduce()` applies the function cumulatively: `reduce(add, [1, 2, 3, 4, 5])` is equivalent to:
 
 ```
 add(add(add(add(1, 2), 3), 4), 5)
@@ -142,35 +52,7 @@ add(add(add(add(1, 2), 3), 4), 5)
 = 15
 ```
 
-With an initializer:
-
-```
-reduce(add, [1, 2, 3], 10)
-```
-
-Is equivalent to:
-
-```
-add(add(add(10, 1), 2), 3)
-= add(add(11, 2), 3)
-= add(13, 3)
-= 16
-```
-
-## Use Cases
-
-### Summing Values
-
-```python
-import functools
-
-def add(x, y):
-    return x + y
-
-total = functools.reduce(add, [100, 200, 300])  # 600
-```
-
-### Building Data Structures
+It's commonly used for summing, building data structures, or chaining a pipeline of functions:
 
 ```python
 import functools
@@ -183,8 +65,6 @@ pairs = [["a", 1], ["b", 2], ["c", 3]]
 result = functools.reduce(merge_dicts, pairs, {})
 # {"a": 1, "b": 2, "c": 3}
 ```
-
-### Processing Pipelines
 
 ```python
 import functools
@@ -203,24 +83,53 @@ result = functools.reduce(apply_fn, functions, 5)
 # double(5) = 10, add_one(10) = 11, double(11) = 22
 ```
 
-## Notes
+### `partial(func, *args, **kwargs)`
 
-- If the iterable is empty and no initializer is provided, an error is raised
-- If the iterable has one item and no initializer, that item is returned
-- The function must take exactly 2 arguments
+Creates a new callable with some positional and/or keyword arguments pre-filled. Calling the result with additional arguments appends them after the pre-filled positional arguments and merges keyword arguments.
+
+**Parameters:**
+- `func` (`callable`): The function to partially apply.
+- `*args` (`any`): Positional arguments to pre-fill.
+- `**kwargs` (`any`): Keyword arguments to pre-fill.
+
+**Returns:** `callable`: a new function with the given arguments pre-filled.
+
+```python
+import functools
+
+def add(x, y):
+    return x + y
+
+add_five = functools.partial(add, 5)
+print(add_five(3))   # 8
+print(add_five(10))  # 15
+```
+
+```python
+def greet(name, greeting="Hello"):
+    return greeting + ", " + name + "!"
+
+say_hi = functools.partial(greet, greeting="Hi")
+print(say_hi("Alice"))  # Hi, Alice!
+```
 
 ## Python Compatibility
 
 This library implements a subset of Python's `functools` module:
 
-| Function        | Supported |
-| --------------- | --------- |
-| reduce          | ✅        |
-| partial         | ✅        |
-| partialmethod   | ❌        |
-| lru_cache       | ❌        |
-| cache           | ❌        |
-| cached_property | ❌        |
-| wraps           | ❌        |
-| total_ordering  | ❌        |
-| cmp_to_key      | ❌        |
+| Function | Supported |
+|----------|-----------|
+| `reduce` | Yes |
+| `partial` | Yes |
+| `partialmethod` | No |
+| `lru_cache` | No |
+| `cache` | No |
+| `cached_property` | No |
+| `wraps` | No |
+| `total_ordering` | No |
+| `cmp_to_key` | No |
+
+## See Also
+
+- [itertools](../itertools/): iteration and combinatorics utilities, including `accumulate()` for running totals.
+- [contextlib](../contextlib/): context manager utilities.

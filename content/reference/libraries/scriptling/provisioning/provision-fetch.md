@@ -1,70 +1,50 @@
 ---
 title: scriptling.provision.fetch
 linkTitle: provision.fetch
+description: Download files over HTTP/HTTPS and optionally unpack zip archives, idempotently.
 weight: 6
 ---
 
-Fetch provisioning library for downloading files over HTTP/HTTPS and optionally unpacking zip archives.
-
 ## Overview
 
-The `scriptling.provision.fetch` library downloads remote files to local paths in an idempotent way. If the destination already contains the fetched bytes, the call returns `fetch.UNCHANGED`; otherwise it writes the new content and returns `fetch.CREATED` or `fetch.UPDATED`.
-
-When `unpack_zip=True`, the destination is treated as a directory and the response body is extracted as a zip archive. Zip entries are constrained to the destination directory, so path traversal entries such as `../secret` are rejected.
+The `scriptling.provision.fetch` library downloads remote files to local paths in an idempotent way. If the destination already contains the fetched bytes, the call returns `fetch.UNCHANGED`; otherwise it writes the new content and returns `fetch.CREATED` or `fetch.UPDATED`. When `unpack_zip=True`, the destination is treated as a directory and the response body is extracted as a zip archive, with entries constrained to that directory so path-traversal entries such as `../secret` are rejected.
 
 ## Available Functions
 
 | Function | Description |
 |----------|-------------|
-| `file(url, dest, insecure=False, unpack_zip=False, timeout=30, max_bytes=0, mode=0o644, dir_mode=0o755, provides=None)` | Download a file or unpack a fetched zip archive |
+| `file(url, dest, insecure=False, unpack_zip=False, timeout=30, max_bytes=0, mode=0o644, dir_mode=0o755, provides=None)` | Download a file, or download and unpack a zip archive |
 
 ## Constants
 
-| Constant | Value | Meaning |
-|----------|-------|---------|
-| `fetch.CREATED` | `"created"` | Destination file or extracted files were newly created |
-| `fetch.UPDATED` | `"updated"` | Existing destination content changed |
-| `fetch.UNCHANGED` | `"unchanged"` | Existing destination content already matched |
+| Constant | Description |
+|----------|-------------|
+| `fetch.CREATED` | Destination file or extracted files were newly created (`"created"`) |
+| `fetch.UPDATED` | Existing destination content changed (`"updated"`) |
+| `fetch.UNCHANGED` | Existing destination content already matched (`"unchanged"`) |
 
-## file
+## Functions
 
-```python
-file(
-    url: str,
-    dest: str,
-    insecure: bool = False,
-    unpack_zip: bool = False,
-    timeout: int = 30,
-    max_bytes: int = 0,
-    mode: int = 0o644,
-    dir_mode: int = 0o755,
-    provides: list[str] = None,
-) -> dict
-```
+### `file(url, dest, insecure=False, unpack_zip=False, timeout=30, max_bytes=0, mode=0o644, dir_mode=0o755, provides=None)`
 
 Downloads `url` using HTTP GET. The URL must use `http://` or `https://`.
 
-When `unpack_zip=False`, `dest` is a file path. Parent directories are created automatically.
+When `unpack_zip=False`, `dest` is a file path and parent directories are created automatically. When `unpack_zip=True`, `dest` is a directory path: the fetched body is read as a zip archive and each file entry is written under that directory.
 
-When `unpack_zip=True`, `dest` is a directory path. The fetched body is read as a zip archive and each file entry is written under that directory.
+When unpacking a zip archive, `fetch.UPDATED` takes precedence over `fetch.CREATED`: if one entry updates existing content and another creates a new file, the overall status is `fetch.UPDATED`. Existing files whose bytes already match are still chmod'd to the requested mode. For zip entries, executable bits from the archive are OR'd into `mode`, so a `0o755` file in the archive remains executable even when the default `mode=0o644` is used. Directory entries create missing directories with `dir_mode`; existing directories are not re-chmod'd.
 
-### Parameters
+**Parameters:**
+- `url` (`str`): `http://` or `https://` URL to fetch.
+- `dest` (`str`): Destination file path, or destination directory when `unpack_zip=True`.
+- `insecure` (`bool`, optional): Skip HTTPS certificate verification. Default: `False`.
+- `unpack_zip` (`bool`, optional): Treat the response body as a zip archive and extract it. Default: `False`.
+- `timeout` (`int`, optional): Request timeout in seconds. Default: `30`.
+- `max_bytes` (`int`, optional): Maximum response size in bytes, or `0` for no cap. Default: `0`.
+- `mode` (`int`, optional): File permission mode for written files. Default: `0o644`.
+- `dir_mode` (`int`, optional): Directory permission mode for created directories. Default: `0o755`.
+- `provides` (`list`, optional): List of file paths. If all paths exist, returns `fetch.UNCHANGED` without downloading or extracting. Default: `None`.
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `url` | — | `http://` or `https://` URL to fetch |
-| `dest` | — | Destination file, or destination directory when `unpack_zip=True` |
-| `insecure` | `False` | Skip HTTPS certificate verification |
-| `unpack_zip` | `False` | Treat the response body as a zip archive and extract it |
-| `timeout` | `30` | Request timeout in seconds |
-| `max_bytes` | `0` | Maximum response size in bytes, or `0` for no cap |
-| `mode` | `0o644` | File permission mode for written files |
-| `dir_mode` | `0o755` | Directory permission mode for created directories |
-| `provides` | `None` | List of file paths. If all paths exist, returns `UNCHANGED` without downloading or extracting |
-
-### Returns
-
-`dict` with:
+**Returns:** `dict`: with keys:
 
 | Key | Description |
 |-----|-------------|
@@ -75,11 +55,7 @@ When `unpack_zip=True`, `dest` is a directory path. The fetched body is read as 
 | `unpacked` | `True` when `unpack_zip=True` |
 | `files` | Written or checked file paths |
 
-When unpacking a zip archive, `fetch.UPDATED` takes precedence over `fetch.CREATED`: if one entry updates existing content and another creates a new file, the overall status is `fetch.UPDATED`. Existing files whose bytes already match are still chmod'd to the requested mode. For zip entries, executable bits from the archive are OR'd into `mode`, so a `0o755` file in the archive remains executable when the default `mode=0o644` is used. Directory entries create missing directories with `dir_mode`; existing directories are not re-chmod'd.
-
-### Examples
-
-Download a file:
+**Raises:** `Error`: if the URL scheme isn't `http`/`https`, the request fails or times out, the response exceeds `max_bytes`, or a zip entry would escape the destination directory or is not a regular file.
 
 ```python
 import scriptling.provision.fetch as fetch
@@ -134,13 +110,17 @@ result = fetch.file(
 )
 
 if result["status"] == fetch.UNCHANGED:
-    print("All provided files already exist — skipped")
+    print("All provided files already exist: skipped")
 ```
 
-## Security Notes
+## Security Considerations
 
-- `insecure=True` disables HTTPS certificate verification. Use it only for trusted internal endpoints or bootstrapping environments where certificate validation is impossible.
-- Zip extraction rejects absolute paths and `..` traversal paths.
-- Zip extraction rejects non-regular file entries such as symlinks and device files.
-- Use `max_bytes` when fetching from endpoints where a large or misconfigured response could exhaust memory.
-- This library performs network and filesystem writes. Avoid registering it for untrusted scripts unless the host environment is otherwise constrained.
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`scriptling.provision.fetch` makes outbound HTTP/HTTPS requests to arbitrary URLs and writes the downloaded bytes (or unpacked zip contents) to the local filesystem: so it combines network access with filesystem writes. Setting `insecure=True` disables HTTPS certificate verification entirely; only use it for trusted internal endpoints or bootstrap scenarios where certificate validation is genuinely impossible: passing it carelessly exposes downloads to interception and tampering. Zip extraction rejects absolute paths, `..` traversal, and non-regular entries (symlinks, device files), but the library otherwise writes wherever the host process has permission. For a full risk breakdown across all libraries, see the [Security Guide](/docs/security/).
+
+## See Also
+
+- [scriptling.provision.file](../provision-file/): provision plain files and managed blocks without fetching them remotely
+- [Library Registration](/docs/go-integration/library-registration/#extended-libraries)
+- [Security Guide](/docs/security/)

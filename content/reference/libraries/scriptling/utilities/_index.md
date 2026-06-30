@@ -21,3 +21,21 @@ General purpose utility libraries for common scripting tasks.
 | [scriptling.similarity](similarity/) | Text similarity utilities including fuzzy search and MinHash |
 | [scriptling.template](template/) | Go-powered template rendering (HTML and text) |
 | [scriptling.markdown](markdown/) | Markdown to HTML conversion (GitHub Flavored Markdown) |
+
+## Quick Start
+
+```python
+import scriptling.grep as grep
+
+# Find all TODO comments in Python files
+matches = grep.pattern(r"\bTODO\b", "./src", recursive=True, glob="*.py")
+for m in matches:
+    print(f"{m['file']}:{m['line']}: {m['text']}")
+```
+
+## See Also
+
+- [Provisioning](../provisioning/) - File and directory provisioning libraries
+- [Runtime](../runtime/) - Background tasks, HTTP, and storage
+- [Libraries](../../) - Full library reference index
+- [Security Guide](/docs/security/) - Security guidance for host-provided libraries

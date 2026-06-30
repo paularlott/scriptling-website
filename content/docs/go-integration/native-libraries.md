@@ -236,7 +236,7 @@ Chain multiple loaders to try different sources:
 ```go
 chain := libloader.NewChain(
     libloader.NewFilesystem("/app/libs"),           // Try disk first
-    libloader.NewAPI("https://api.example.com"),    // Then API
+    libloader.NewMemoryLoader(map[string]string{}), // Then in-memory
 )
 p.SetLibraryLoader(chain)
 ```

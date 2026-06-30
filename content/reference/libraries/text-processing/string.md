@@ -1,5 +1,6 @@
 ---
 title: string
+description: String constants for character classification, matching Python's string module.
 weight: 1
 
 aliases:
@@ -7,99 +8,123 @@ aliases:
   - /reference/libraries/string/
 ---
 
-String constants for character classification, matching Python's `string` module.
+The `string` library provides string constants for character classification, such as ASCII letters, digits, and punctuation. It is commonly used for validating input or building character sets, matching Python's `string` module.
 
-## Import
+## Available Functions
 
-```python
-import string
-```
-
-## Available Constants
-
-| Constant          | Description                        |
-| ----------------- | ---------------------------------- |
-| `ascii_letters`   | All ASCII letters (a-z, A-Z)       |
-| `ascii_lowercase` | Lowercase ASCII letters (a-z)      |
-| `ascii_uppercase` | Uppercase ASCII letters (A-Z)      |
-| `digits`          | Decimal digits (0-9)               |
-| `hexdigits`       | Hexadecimal digits (0-9, a-f, A-F) |
-| `octdigits`       | Octal digits (0-7)                 |
-| `punctuation`     | ASCII punctuation characters       |
-| `whitespace`      | Whitespace characters              |
+This library has no functions, only constants.
 
 ## Constants
 
-### `ascii_letters`
+| Constant          | Description                                                            |
+| ------------------ | ------------------------------------------------------------------------ |
+| `ascii_letters`   | Concatenation of `ascii_lowercase` and `ascii_uppercase` (`"abc...xyzABC...XYZ"`) |
+| `ascii_lowercase` | Lowercase ASCII letters (`"abcdefghijklmnopqrstuvwxyz"`)                |
+| `ascii_uppercase` | Uppercase ASCII letters (`"ABCDEFGHIJKLMNOPQRSTUVWXYZ"`)                |
+| `digits`          | Decimal digits (`"0123456789"`)                                         |
+| `hexdigits`       | Hexadecimal digits (`"0123456789abcdefABCDEF"`)                         |
+| `octdigits`       | Octal digits (`"01234567"`)                                             |
+| `punctuation`     | ASCII punctuation characters (`` "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" ``) |
+| `whitespace`      | Whitespace characters (`" \t\n\r\v\f"`)                                 |
+| `printable`       | Concatenation of `digits`, `ascii_letters`, `punctuation`, and `whitespace` |
+
+### `string.ascii_letters`
 
 Concatenation of `ascii_lowercase` and `ascii_uppercase`.
 
+**Value:** `str` (`"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"`)
+
 ```python
-string.ascii_letters  # "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+import string
+print(string.ascii_letters)  # "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 ```
 
-### `ascii_lowercase`
+### `string.ascii_lowercase`
 
 Lowercase ASCII letters.
 
+**Value:** `str` (`"abcdefghijklmnopqrstuvwxyz"`)
+
 ```python
-string.ascii_lowercase  # "abcdefghijklmnopqrstuvwxyz"
+import string
+print(string.ascii_lowercase)  # "abcdefghijklmnopqrstuvwxyz"
 ```
 
-### `ascii_uppercase`
+### `string.ascii_uppercase`
 
 Uppercase ASCII letters.
 
+**Value:** `str` (`"ABCDEFGHIJKLMNOPQRSTUVWXYZ"`)
+
 ```python
-string.ascii_uppercase  # "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+import string
+print(string.ascii_uppercase)  # "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 ```
 
-### `digits`
+### `string.digits`
 
 Decimal digits.
 
-```python
-string.digits  # "0123456789"
-```
-
-### `hexdigits`
-
-Hexadecimal digits.
+**Value:** `str` (`"0123456789"`)
 
 ```python
-string.hexdigits  # "0123456789abcdefABCDEF"
+import string
+print(string.digits)  # "0123456789"
 ```
 
-### `octdigits`
+### `string.hexdigits`
+
+Hexadecimal digits, including both lowercase and uppercase letter forms.
+
+**Value:** `str` (`"0123456789abcdefABCDEF"`)
+
+```python
+import string
+print(string.hexdigits)  # "0123456789abcdefABCDEF"
+```
+
+### `string.octdigits`
 
 Octal digits.
 
+**Value:** `str` (`"01234567"`)
+
 ```python
-string.octdigits  # "01234567"
+import string
+print(string.octdigits)  # "01234567"
 ```
 
-### `punctuation`
+### `string.punctuation`
 
 ASCII punctuation characters.
 
+**Value:** `str` (`` "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" ``)
+
 ```python
-string.punctuation  # "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+import string
+print(string.punctuation)  # "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
 ```
 
-### `whitespace`
+### `string.whitespace`
 
-Whitespace characters.
+Whitespace characters: space, tab, newline, carriage return, vertical tab, and form feed.
+
+**Value:** `str` (`" \t\n\r\v\f"`)
 
 ```python
-string.whitespace  # " \t\n\r\v\f"
+import string
+print(repr(string.whitespace))  # ' \t\n\r\x0b\x0c'
 ```
 
-### `printable`
+### `string.printable`
 
-Combination of digits, letters, punctuation, and whitespace.
+Concatenation of `digits`, `ascii_letters`, `punctuation`, and `whitespace`.
+
+**Value:** `str`
 
 ```python
-string.printable
+import string
+print(string.printable)
 ```
 
 ## Examples
@@ -160,3 +185,10 @@ print(is_hex("xyz123"))    # False
 ## Python Compatibility
 
 This module provides the same constants as Python's `string` module.
+
+## See Also
+
+- [textwrap](./textwrap.md) - Text wrapping and filling utilities
+- [regex](./regex.md) - Regular expressions for pattern matching
+- [difflib](./difflib.md) - Sequence comparison and diffing utilities
+- [html](./html.md) - HTML escaping and unescaping

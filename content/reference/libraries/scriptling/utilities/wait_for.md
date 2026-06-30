@@ -1,40 +1,38 @@
 ---
 title: scriptling.wait_for
 linkTitle: wait_for
+description: Wait for files, directories, ports, HTTP endpoints, or processes to become available.
 weight: 1
 ---
 
-Functions for waiting on resources to become available. Useful for coordination between services, waiting for files, ports, or HTTP endpoints.
+The `scriptling.wait_for` library provides functions for waiting on resources to become available. It's useful for coordination between services: waiting for a file to be written, a port to start accepting connections, an HTTP health check to pass, or a process to start.
 
 ## Available Functions
 
-| Function                                                      | Description                             |
-| ------------------------------------------------------------- | --------------------------------------- |
-| `scriptling.wait_for.file(path, timeout=30, poll_rate=1)`     | Wait for file to exist                  |
-| `scriptling.wait_for.dir(path, timeout=30, poll_rate=1)`      | Wait for directory to exist             |
-| `scriptling.wait_for.port(host, port, timeout=30, ...)`       | Wait for TCP port to accept connections |
-| `scriptling.wait_for.http(url, timeout=30, ...)`              | Wait for HTTP endpoint to return 200    |
-| `scriptling.wait_for.file_content(path, content, ...)`        | Wait for file to contain content        |
-| `scriptling.wait_for.process_name(name, timeout=30, ...)`     | Wait for process to be running          |
+| Function | Description |
+|----------|-------------|
+| `file(path, timeout=30, poll_rate=1)` | Wait for a file to exist |
+| `dir(path, timeout=30, poll_rate=1)` | Wait for a directory to exist |
+| `port(host, port, timeout=30, poll_rate=1)` | Wait for a TCP port to accept connections |
+| `http(url, timeout=30, poll_rate=1, status_code=200)` | Wait for an HTTP endpoint to return the expected status |
+| `file_content(path, content, timeout=30, poll_rate=1)` | Wait for a file to contain specific content |
+| `process_name(name, timeout=30, poll_rate=1)` | Wait for a process to be running |
 
 ## Functions
 
-### scriptling.wait_for.file(path, timeout=30, poll_rate=1)
+### `file(path, timeout=30, poll_rate=1)`
 
 Waits for a file to exist.
 
 **Parameters:**
+- `path` (`str`): Path to the file to wait for.
+- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
+- `poll_rate` (`float`, optional): Time between checks in seconds. Default: `1`.
 
-- `path` (string): Path to the file to wait for
-- `timeout` (int, optional): Maximum time to wait in seconds (default: 30)
-- `poll_rate` (float, optional): Time between checks in seconds (default: 1)
-
-**Returns:** `bool` - `True` if file exists, `False` if timeout exceeded
-
-**Example:**
+**Returns:** `bool`: `True` if the file exists, `False` if the timeout was exceeded.
 
 ```python
-import scriptling.wait_for
+import scriptling.wait_for as wait_for
 
 # Wait for a file to be created (up to 2 minutes)
 if wait_for.file("/mnt/nas/index_ready", timeout=120):
@@ -43,45 +41,39 @@ else:
     print("Timeout waiting for file")
 ```
 
-### scriptling.wait_for.dir(path, timeout=30, poll_rate=1)
+### `dir(path, timeout=30, poll_rate=1)`
 
 Waits for a directory to exist.
 
 **Parameters:**
+- `path` (`str`): Path to the directory to wait for.
+- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
+- `poll_rate` (`float`, optional): Time between checks in seconds. Default: `1`.
 
-- `path` (string): Path to the directory to wait for
-- `timeout` (int, optional): Maximum time to wait in seconds (default: 30)
-- `poll_rate` (float, optional): Time between checks in seconds (default: 1)
-
-**Returns:** `bool` - `True` if directory exists, `False` if timeout exceeded
-
-**Example:**
+**Returns:** `bool`: `True` if the directory exists, `False` if the timeout was exceeded.
 
 ```python
-import scriptling.wait_for
+import scriptling.wait_for as wait_for
 
 # Wait for a backup directory to be created
 if wait_for.dir("/mnt/nas/backups", timeout=60):
     print("Backup directory exists")
 ```
 
-### scriptling.wait_for.port(host, port, timeout=30, poll_rate=1)
+### `port(host, port, timeout=30, poll_rate=1)`
 
-Waits for a TCP port to accept connections.
+Waits for a TCP port to accept connections. Each connection attempt uses a 1-second timeout.
 
 **Parameters:**
+- `host` (`str`): Hostname or IP address.
+- `port` (`int` or `str`): Port number.
+- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
+- `poll_rate` (`float`, optional): Time between checks in seconds. Default: `1`.
 
-- `host` (string): Hostname or IP address
-- `port` (int|string): Port number
-- `timeout` (int, optional): Maximum time to wait in seconds (default: 30)
-- `poll_rate` (float, optional): Time between checks in seconds (default: 1)
-
-**Returns:** `bool` - `True` if port is open, `False` if timeout exceeded
-
-**Example:**
+**Returns:** `bool`: `True` if the port is open, `False` if the timeout was exceeded.
 
 ```python
-import scriptling.wait_for
+import scriptling.wait_for as wait_for
 
 # Wait for PostgreSQL to be ready
 if wait_for.port("localhost", 5432, timeout=60):
@@ -90,23 +82,20 @@ else:
     print("PostgreSQL did not start in time")
 ```
 
-### scriptling.wait_for.http(url, timeout=30, poll_rate=1, status_code=200)
+### `http(url, timeout=30, poll_rate=1, status_code=200)`
 
 Waits for an HTTP endpoint to respond with the expected status code.
 
 **Parameters:**
+- `url` (`str`): URL to check.
+- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
+- `poll_rate` (`float`, optional): Time between checks in seconds. Default: `1`.
+- `status_code` (`int`, optional): Expected HTTP status code. Default: `200`.
 
-- `url` (string): URL to check
-- `timeout` (int, optional): Maximum time to wait in seconds (default: 30)
-- `poll_rate` (float, optional): Time between checks in seconds (default: 1)
-- `status_code` (int, optional): Expected HTTP status code (default: 200)
-
-**Returns:** `bool` - `True` if endpoint responds with expected status, `False` if timeout exceeded
-
-**Example:**
+**Returns:** `bool`: `True` if the endpoint responds with the expected status, `False` if the timeout was exceeded.
 
 ```python
-import scriptling.wait_for
+import scriptling.wait_for as wait_for
 
 # Wait for a health check endpoint
 if wait_for.http("http://localhost:8080/health", timeout=60):
@@ -117,23 +106,20 @@ if wait_for.http("http://api.example.com/ready", timeout=30, status_code=200):
     print("API is ready")
 ```
 
-### scriptling.wait_for.file_content(path, content, timeout=30, poll_rate=1)
+### `file_content(path, content, timeout=30, poll_rate=1)`
 
 Waits for a file to exist and contain specific content.
 
 **Parameters:**
+- `path` (`str`): Path to the file to check.
+- `content` (`str`): Content to search for in the file.
+- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
+- `poll_rate` (`float`, optional): Time between checks in seconds. Default: `1`.
 
-- `path` (string): Path to the file to check
-- `content` (string): Content to search for in the file
-- `timeout` (int, optional): Maximum time to wait in seconds (default: 30)
-- `poll_rate` (float, optional): Time between checks in seconds (default: 1)
-
-**Returns:** `bool` - `True` if file contains the content, `False` if timeout exceeded
-
-**Example:**
+**Returns:** `bool`: `True` if the file contains the content, `False` if the timeout was exceeded.
 
 ```python
-import scriptling.wait_for
+import scriptling.wait_for as wait_for
 
 # Wait for a readiness file to contain "ready=true"
 if wait_for.file_content("/tmp/service.status", "ready=true", timeout=120):
@@ -144,22 +130,19 @@ if wait_for.file_content("/var/log/app.log", "Server started", timeout=30):
     print("Application has started")
 ```
 
-### scriptling.wait_for.process_name(name, timeout=30, poll_rate=1)
+### `process_name(name, timeout=30, poll_rate=1)`
 
-Waits for a process with the specified name to be running.
+Waits for a process with the specified name to be running. Process name matching is platform-dependent (uses `/proc` on Linux, `ps` on macOS/BSD) and matches on substring, case-insensitively.
 
 **Parameters:**
+- `name` (`str`): Process name to search for.
+- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
+- `poll_rate` (`float`, optional): Time between checks in seconds. Default: `1`.
 
-- `name` (string): Process name to search for
-- `timeout` (int, optional): Maximum time to wait in seconds (default: 30)
-- `poll_rate` (float, optional): Time between checks in seconds (default: 1)
-
-**Returns:** `bool` - `True` if process is running, `False` if timeout exceeded
-
-**Example:**
+**Returns:** `bool`: `True` if the process is running, `False` if the timeout was exceeded.
 
 ```python
-import scriptling.wait_for
+import scriptling.wait_for as wait_for
 
 # Wait for nginx to start
 if wait_for.process_name("nginx", timeout=30):
@@ -170,20 +153,19 @@ if wait_for.process_name("my-app", timeout=60):
     print("Application is running")
 ```
 
-## Complete Examples
+## Examples
 
-### Database Migration Coordination
+### Database migration coordination
 
 ```python
-import scriptling.wait_for
+import scriptling.wait_for as wait_for
+import subprocess
 
 # Wait for PostgreSQL to be ready
 if not wait_for.port("localhost", 5432, timeout=60):
     print("ERROR: PostgreSQL did not start")
     exit(1)
 
-# Run migrations
-import subprocess
 subprocess.run(["python", "manage.py", "migrate"])
 
 # Wait for the migration lock file to be removed
@@ -193,40 +175,10 @@ while wait_for.file("/tmp/migration.lock", timeout=1):
 print("Migrations complete, starting application")
 ```
 
-### Multi-Service Startup Coordination
+### Multi-service HTTP health checks
 
 ```python
-import scriptling.wait_for
-import time
-
-# Start Redis in background
-import subprocess
-subprocess.Popen(["redis-server"])
-
-# Start PostgreSQL in background
-subprocess.Popen(["postgres", "-D", "/usr/local/var/postgres"])
-
-# Wait for both services
-print("Waiting for services...")
-if wait_for.port("localhost", 6379, timeout=30):
-    print("  ✓ Redis is ready")
-else:
-    print("  ✗ Redis failed to start")
-    exit(1)
-
-if wait_for.port("localhost", 5432, timeout=30):
-    print("  ✓ PostgreSQL is ready")
-else:
-    print("  ✗ PostgreSQL failed to start")
-    exit(1)
-
-print("All services are ready!")
-```
-
-### HTTP Service Health Check
-
-```python
-import scriptling.wait_for
+import scriptling.wait_for as wait_for
 
 services = [
     ("http://localhost:8080/health", "API Gateway"),
@@ -237,53 +189,21 @@ services = [
 print("Waiting for services to be healthy...")
 for url, name in services:
     if wait_for.http(url, timeout=60):
-        print(f"  ✓ {name}")
+        print(f"  OK {name}")
     else:
-        print(f"  ✗ {name} failed health check")
+        print(f"  FAIL {name} failed health check")
         exit(1)
 
 print("All services are healthy!")
 ```
 
-### Waiting for File Changes
+## Security Considerations
 
-```python
-import scriptling.wait_for
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-# Wait for an index build to complete
-# The index_ready file is created when indexing starts
-# and contains "complete" when done
+`scriptling.wait_for` can be used to probe network reachability and timing: `port()` and `http()` make outbound TCP/HTTP connections to any host or URL the script provides, with no built-in restriction on destination. There is no allowlist parameter for this library; if network access should be restricted for untrusted scripts, control it at the network/sandbox level rather than relying on this library. For a full risk breakdown across all libraries, see the [Security Guide](/docs/security/).
 
-print("Waiting for index build...")
-if wait_for.file("/data/index_ready", timeout=300):
-    print("Index build started...")
-    if wait_for.file_content("/data/index_ready", "complete", timeout=600):
-        print("Index build complete!")
-    else:
-        print("Index build timed out")
-else:
-    print("Index build never started")
-```
+## See Also
 
-### Custom Poll Rate
-
-```python
-import scriptling.wait_for
-
-# Poll more frequently for quick checks (every 0.5 seconds)
-if wait_for.port("localhost", 8080, timeout=10, poll_rate=0.5):
-    print("Port opened quickly")
-
-# Poll less frequently for long waits (every 5 seconds)
-if wait_for.file("/mnt/nas/large_file.zip", timeout=600, poll_rate=5):
-    print("File is ready")
-```
-
-## Notes
-
-- All functions return `True` if the resource became available, `False` if timeout was exceeded
-- The default timeout is 30 seconds for all functions
-- The default poll rate is 1 second (checks once per second)
-- For HTTP checks, the default expected status code is 200
-- Process name matching is platform-dependent (uses `/proc` on Linux, `ps` on macOS/BSD)
-- Port checking uses TCP connection attempts with a 1-second timeout per attempt
+- [scriptling.runtime](../../runtime/) - Background tasks and coordination primitives that often pair with wait_for
+- [Security Guide](/docs/security/) - Security guidance for host-provided libraries

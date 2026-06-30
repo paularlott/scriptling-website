@@ -250,7 +250,7 @@ def add(a, b):
 print(add(3, 4))  # 14
 ```
 
-Decorators stack — applied bottom-up (innermost first):
+Decorators stack: applied bottom-up (innermost first):
 
 ```python
 @outer

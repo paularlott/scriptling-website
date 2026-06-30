@@ -1,22 +1,22 @@
 ---
 title: scriptling.ai.agent
 linkTitle: ai.agent
-weight: 1
+weight: 2
 ---
 
-Agentic AI loop for building AI agents with automatic tool execution. The agent handles the complete agentic loop including tool calling, execution, and response formatting.
+Agentic AI loop for building AI agents with automatic tool execution. The `Agent` class handles the complete agentic loop: calling the LLM, executing tool calls, feeding results back, and repeating until the model returns a final answer.
 
 ## Available Classes & Methods
 
 | Class/Method | Description |
-| --- | --- |
-| `Agent(client, tools, system_prompt, model, memory, max_tokens, compaction_threshold, request_timeout, extra_body)` | Create AI agent |
+|--------------|-------------|
+| `Agent(client, tools, system_prompt, model, memory, max_tokens, compaction_threshold, request_timeout, extra_body)` | Create an AI agent |
 | `agent.trigger(message, max_iterations)` | One-shot trigger with response |
-| `agent.interact(max_iterations)` | Start interactive session |
+| `agent.interact(max_iterations)` | Start an interactive session (requires `scriptling.ai.agent.interact`) |
 | `agent.get_messages()` | Get conversation history |
 | `agent.set_messages(messages)` | Set conversation history |
 
-For tool registry documentation, see [AI Library](./#tool-registry).
+For tool registry documentation, see [scriptling.ai](../).
 
 ## Quick Start
 
@@ -38,29 +38,29 @@ bot = agent.Agent(client, tools=tools, system_prompt="You are a helpful assistan
 response = bot.trigger("What is the square root of 144?", max_iterations=10)
 print(response.content)
 
-# Interactive session (requires scriptling.console)
+# Interactive session (requires scriptling.ai.agent.interact + scriptling.console)
 bot.interact()
 ```
 
-## Agent Class
+## Functions
 
-### Agent(client, tools=None, system_prompt="", model="", memory=None, max_tokens=32000, compaction_threshold=80, request_timeout=300, extra_body=None)
+### `Agent(client, tools=None, system_prompt="", model="", memory=None, max_tokens=32000, compaction_threshold=80, request_timeout=300, extra_body=None)`
 
 Creates an AI agent with automatic tool execution.
 
 **Parameters:**
 
-- `client` (AIClient): AI client instance from `ai.Client()`
-- `tools` (ToolRegistry, optional): Tool registry with available tools
-- `system_prompt` (str, optional): System prompt for the agent
-- `model` (str, optional): Model to use
-- `memory` (memory object, optional): Memory store from `memory.new()` — see [Memory Integration](#memory-integration)
-- `max_tokens` (int, optional): Maximum token budget for the conversation. When estimated token usage reaches the compaction threshold, the conversation history is automatically compacted (summarized). Default: 32000
-- `compaction_threshold` (int, optional): Percentage of `max_tokens` at which auto-compaction triggers (0-100). For example, with `max_tokens=32000` and `compaction_threshold=80`, compaction triggers at ~25600 tokens. Default: 80
-- `request_timeout` (int, optional): Timeout in seconds for each LLM completion request. LLM calls can be slow, especially with tool-calling loops or large contexts. Default: 300
-- `extra_body` (dict, optional): Provider-specific fields to merge into every request body
+- `client` (`AIClient`): AI client instance from `ai.Client()`.
+- `tools` (`ToolRegistry`, optional): Tool registry with available tools. Default: `None`.
+- `system_prompt` (`str`, optional): System prompt for the agent. Default: `""`.
+- `model` (`str`, optional): Model to use. Default: `""`.
+- `memory` (memory object, optional): Memory store from `memory.new()`: see [Memory Integration](#memory-integration). Default: `None`.
+- `max_tokens` (`int`, optional): Maximum token budget for the conversation. When estimated token usage reaches the compaction threshold, the conversation history is automatically compacted (summarized). Default: `32000`.
+- `compaction_threshold` (`int`, optional): Percentage of `max_tokens` at which auto-compaction triggers (`0`-`100`). For example, with `max_tokens=32000` and `compaction_threshold=80`, compaction triggers at ~25600 tokens. Default: `80`.
+- `request_timeout` (`int`, optional): Timeout in seconds for each LLM completion request. LLM calls can be slow, especially with tool-calling loops or large contexts. Default: `300`.
+- `extra_body` (`dict`, optional): Provider-specific fields to merge into every request body. Default: `None`.
 
-**Example:**
+**Returns:** `Agent`: an agent instance.
 
 ```python
 import scriptling.ai as ai
@@ -99,26 +99,16 @@ bot = agent.Agent(
 )
 ```
 
-### agent.trigger(message, max_iterations=1)
+### `agent.trigger(message, max_iterations=1)`
 
-Processes a message with the agent, executing tools as needed.
+Processes a message with the agent, executing tools as needed. Strips `<think>...</think>` blocks from responses, maintains conversation history, and stops after `max_iterations` or once the model stops calling tools. Uses the agent's configured `request_timeout` for each LLM call.
 
 **Parameters:**
 
-- `message` (str or dict): User message to process
-- `max_iterations` (int): Maximum tool call rounds (default: 1)
+- `message` (`str` or `dict`): User message to process.
+- `max_iterations` (`int`, optional): Maximum tool call rounds. Default: `1`.
 
-**Returns:** dict — agent's response message
-
-**Behavior:**
-
-- Strips `<think>...</think>` blocks from responses
-- Executes tools automatically
-- Maintains conversation history
-- Uses configurable request timeout (default: 300 seconds) for LLM calls
-- Stops after max_iterations or when no more tool calls
-
-**Example:**
+**Returns:** `dict`: the agent's response message.
 
 ```python
 response = bot.trigger("What is 2+2?")
@@ -128,35 +118,42 @@ response = bot.trigger("Reverse the word 'hello'", max_iterations=10)
 print(response.content)
 ```
 
-### agent.interact(max_iterations=25)
+### `agent.interact(max_iterations=25)`
 
-Runs an interactive CLI session. Requires `scriptling.console` library.
+Runs an interactive CLI session. Requires the `scriptling.ai.agent.interact` library to be imported, which adds this method to the `Agent` class: see [scriptling.ai.agent.interact](../interact/) for the full reference.
 
 **Parameters:**
 
-- `max_iterations` (int, optional): Maximum tool call rounds per message. Default: 25
+- `max_iterations` (`int`, optional): Maximum tool call rounds per message. Default: `25`.
 
-**Behavior:**
-
-- Streams reasoning and assistant text into the main console panel as it arrives
-- Keeps the spinner active for the full request lifecycle
-- Shows tool call and result messages with status and preview
-- Uses streaming via `ai.collect_stream()` with configurable timeouts
-- Preserves conversation history between turns
-
-**Example:**
+**Returns:** `None`
 
 ```python
 bot = agent.Agent(client, tools=tools, system_prompt="Coding assistant")
 bot.interact()
 ```
 
-### agent.get_messages() / set_messages(messages)
+### `agent.get_messages()`
 
-Get or replace the conversation history.
+Gets the current conversation history.
+
+**Returns:** `list`: list of message dicts.
 
 ```python
 messages = bot.get_messages()
+```
+
+### `agent.set_messages(messages)`
+
+Replaces the conversation history.
+
+**Parameters:**
+
+- `messages` (`list`): List of message dicts with `role` and `content` keys.
+
+**Returns:** `None`
+
+```python
 bot.set_messages([
     {"role": "system", "content": "You are helpful"},
     {"role": "user", "content": "Hello"},
@@ -167,9 +164,9 @@ bot.set_messages([
 
 Pass a memory store to `Agent` via the `memory=` kwarg. The agent automatically:
 
-1. Registers `memory_remember`, `memory_recall`, and `memory_forget` as tools
-2. Appends memory usage instructions to the system prompt
-3. Pre-loads all stored `preference` memories into the system prompt so the LLM has immediate context on the first message without a tool call round-trip
+1. Registers `memory_remember`, `memory_recall`, and `memory_forget` as tools.
+2. Appends memory usage instructions to the system prompt.
+3. Pre-loads all stored `preference` memories into the system prompt so the LLM has immediate context on the first message without a tool call round-trip.
 
 ```python
 import scriptling.ai as ai
@@ -190,7 +187,7 @@ bot = agent.Agent(
 bot.interact()
 ```
 
-You can combine `memory=` with your own tools — the memory tools are added to the existing registry:
+You can combine `memory=` with your own tools: the memory tools are added to the existing registry:
 
 ```python
 tools = ai.ToolRegistry()
@@ -205,16 +202,18 @@ bot = agent.Agent(client, tools=tools, memory=mem, model="gpt-4")
 When `memory=` is provided, the following tools are registered automatically:
 
 | Tool | Parameters | Description |
-|------|-----------|-------------|
-| `memory_remember` | `content`, `type?`, `importance?` | Store a fact, preference, event or note |
-| `memory_recall` | `query?`, `limit?`, `type?` | Search memories by keyword; omit query for recent context |
-| `memory_forget` | `id` | Remove a memory by ID |
+|------|-----------|--------------|
+| `memory_remember` | `content`, `type?`, `importance?` | Store a fact, preference, event or note. |
+| `memory_recall` | `query?`, `limit?`, `type?` | Search memories by keyword; omit query for recent context. |
+| `memory_forget` | `id` | Remove a memory by ID. |
 
 ### System Prompt Augmentation
 
 The agent appends a `## Memory` block to the system prompt explaining when and how to use the memory tools. It also injects a `## Remembered Preferences` block containing all stored `preference` memories, so the LLM has user preferences available immediately.
 
-The original `system_prompt` you pass is always preserved — the memory content is appended after it.
+The original `system_prompt` you pass is always preserved: the memory content is appended after it.
+
+See [scriptling.ai.memory](../memory/) for full memory store documentation.
 
 ## Auto-Compaction
 
@@ -222,19 +221,17 @@ The agent automatically compacts conversation history when it grows too large, p
 
 **How it works:**
 
-1. Before each completion call, the agent estimates the token count of the current messages
-2. If the estimated tokens reach the compaction threshold (percentage of `max_tokens`), the conversation is compacted
-3. Compaction asks the AI to summarize the conversation so far, preserving key facts and context
-4. The history is rebuilt as: system prompt + summary + protected recent context
-5. Active tool rounds are preserved so assistant tool calls remain paired with their tool results
-6. The agent continues normally with the compacted history
+1. Before each completion call, the agent estimates the token count of the current messages.
+2. If the estimated tokens reach the compaction threshold (percentage of `max_tokens`), the conversation is compacted.
+3. Compaction asks the AI to summarize the conversation so far, preserving key facts and context.
+4. The history is rebuilt as: system prompt + summary + protected recent context.
+5. Active tool rounds are preserved so assistant tool calls remain paired with their tool results.
+6. The agent continues normally with the compacted history.
 
 **Parameters:**
 
-- `max_tokens` (int): Maximum token budget. Default: 32000
-- `compaction_threshold` (int): Percentage of `max_tokens` at which compaction triggers. Default: 80
-
-**Example:**
+- `max_tokens` (`int`): Maximum token budget. Default: `32000`.
+- `compaction_threshold` (`int`): Percentage of `max_tokens` at which compaction triggers. Default: `80`.
 
 ```python
 import scriptling.ai as ai
@@ -249,7 +246,7 @@ bot = agent.Agent(client, model="gpt-4")
 bot = agent.Agent(client, model="gpt-4", max_tokens=16000, compaction_threshold=50)
 ```
 
-**Note:** Set `max_tokens=0` or `compaction_threshold=0` to disable auto-compaction entirely.
+Set `max_tokens=0` or `compaction_threshold=0` to disable auto-compaction entirely.
 
 ### With LLM-based Deduplication
 
@@ -264,7 +261,37 @@ bot = agent.Agent(client, model="qwen3-8b", memory=mem)
 
 Without an AI client, deduplication is rule-based only (MinHash similarity ≥ 85% auto-merges, otherwise keeps separate).
 
-See [ai.memory](../ai-memory/) for full memory store documentation.
+## Tool Handler Interface
+
+Tool handlers receive a dict of arguments and can return any value: complex types are automatically JSON-encoded for the LLM.
+
+```python
+def get_time(args):
+    import datetime
+    return str(datetime.datetime.now())
+
+def calculate_safe(args):
+    try:
+        import math
+        return str(math.sqrt(args["number"]))
+    except ValueError as e:
+        return f"Error: {e}"
+```
+
+## Thinking Blocks
+
+The agent automatically handles `<think>...</think>` blocks:
+
+- In `trigger()`: strips thinking blocks from responses.
+- In `interact()`: displays thinking in purple, then strips from final output.
+
+```python
+import scriptling.ai as ai
+
+result = ai.extract_thinking(response_text)
+thinking_blocks = result["thinking"]
+clean_content = result["content"]
+```
 
 ## Complete Example
 
@@ -298,42 +325,14 @@ bot = agent.Agent(
 bot.interact()
 ```
 
-## Tool Handler Interface
+## Security Considerations
 
-Tool handlers receive a dict of arguments and can return any value — complex types are automatically JSON-encoded for the LLM.
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-```python
-def get_time(args):
-    import datetime
-    return str(datetime.datetime.now())
-
-def calculate_safe(args):
-    try:
-        import math
-        return str(math.sqrt(args["number"]))
-    except ValueError as e:
-        return f"Error: {e}"
-```
-
-## Thinking Blocks
-
-The agent automatically handles `<think>...</think>` blocks:
-
-- In `trigger()`: strips thinking blocks from responses
-- In `interact()`: displays thinking in purple, then strips from final output
-
-### Manual Extraction
-
-```python
-import scriptling.ai as ai
-
-result = ai.extract_thinking(response_text)
-thinking_blocks = result["thinking"]
-clean_content = result["content"]
-```
+`scriptling.ai.agent` makes outbound HTTP requests to the configured AI provider, and: when tools are registered: lets the model execute multi-step agentic loops by calling those tools automatically. Never register `scriptling.ai.agent` for untrusted code: a malicious script can supply a tool registry whose handlers do anything the host process allows. For a full risk breakdown, see the [Security Guide](/docs/security/#library-security) and [Library Registration](/docs/go-integration/library-registration/#ai--agent).
 
 ## See Also
 
-- [AI Library](./) — AI client and completion functions
-- [ai.memory](memory/) — Long-term memory store
-- [ai.agent.interact](interact/) — Interactive terminal session
+- [scriptling.ai](../): AI client and completion functions
+- [scriptling.ai.agent.interact](../interact/): Interactive terminal session
+- [scriptling.ai.memory](../memory/): Long-term memory store

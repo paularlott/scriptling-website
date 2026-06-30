@@ -1,10 +1,9 @@
 ---
 title: scriptling.provision.file
 linkTitle: provision.file
+description: Create, update, and remove files and directories idempotently, including marker-delimited managed blocks.
 weight: 5
 ---
-
-File provisioning library for creating and updating files with correct permissions.
 
 ## Overview
 
@@ -23,42 +22,30 @@ The `scriptling.provision.file` library writes files only when their content dif
 
 ## Constants
 
-| Constant | Value | Meaning |
-|----------|-------|---------|
-| `file.CREATED` | `"created"` | File or directory was newly created |
-| `file.UPDATED` | `"updated"` | File existed but content differed |
-| `file.UNCHANGED` | `"unchanged"` | File existed with identical content |
-| `file.REMOVED` | `"removed"` | File or directory was deleted |
-| `file.ABSENT` | `"absent"` | File or directory did not exist |
-| `file.EXISTS` | `"exists"` | Directory already existed |
+| Constant | Description |
+|----------|-------------|
+| `file.CREATED` | File or directory was newly created (`"created"`) |
+| `file.UPDATED` | File existed but content differed (`"updated"`) |
+| `file.UNCHANGED` | File existed with identical content (`"unchanged"`) |
+| `file.REMOVED` | File or directory was deleted (`"removed"`) |
+| `file.ABSENT` | File or directory did not exist (`"absent"`) |
+| `file.EXISTS` | Directory already existed (`"exists"`) |
 
-## ensure
+## Functions
 
-```python
-ensure(path: str, content: str, mode: int = 0o644, create_only: bool = False) -> str
-```
+### `ensure(path, content, mode=0o644, create_only=False)`
 
-Creates parent directories if needed. If the file already exists with the same content, it is left unchanged. Otherwise the file is written with the specified mode.
+Ensures a file exists with the given content. Creates parent directories if needed. If the file already exists with the same content, it is left unchanged; otherwise the file is written with the specified mode.
 
-### create_only
+When `create_only=True`, an existing file is never modified: the call returns `file.UNCHANGED` without writing, even if the content on disk differs. New files are still written normally. This is useful for seeding configuration files that should only be created once and left alone on subsequent runs.
 
-When `create_only=True`, an existing file is never modified — the call returns `file.UNCHANGED` without writing, even if the content on disk differs. New files are still written normally. This is useful for seeding configuration files that should only be created once and left alone on subsequent runs.
+**Parameters:**
+- `path` (`str`): Path to the file (supports `~` expansion).
+- `content` (`str`): File contents.
+- `mode` (`int`, optional): File permission mode. Default: `0o644`.
+- `create_only` (`bool`, optional): If `True`, never modify an existing file. Default: `False`.
 
-### Constants
-
-The return values can be compared using library constants:
-
-| Constant | Value |
-|----------|-------|
-| `file.CREATED` | `"created"` |
-| `file.UPDATED` | `"updated"` |
-| `file.UNCHANGED` | `"unchanged"` |
-
-### Returns
-
-`str` — one of `file.CREATED`, `file.UPDATED`, `file.UNCHANGED`.
-
-### Example
+**Returns:** `str`: one of `file.CREATED`, `file.UPDATED`, `file.UNCHANGED`.
 
 ```python
 import scriptling.provision.file as file
@@ -83,19 +70,14 @@ import scriptling.provision.file as file
 status = file.ensure("~/.config/myapp/defaults.toml", DEFAULTS, create_only=True)
 ```
 
-## absent
-
-```python
-absent(path: str) -> str
-```
+### `absent(path)`
 
 Removes a file if it exists. Does nothing if the file is already absent.
 
-### Returns
+**Parameters:**
+- `path` (`str`): Path to the file (supports `~` expansion).
 
-`str` — `file.REMOVED` or `file.ABSENT`.
-
-### Example
+**Returns:** `str`: `file.REMOVED` or `file.ABSENT`.
 
 ```python
 import scriptling.provision.file as file
@@ -105,19 +87,17 @@ if status == file.REMOVED:
     print("File removed")
 ```
 
-## ensure_directory
-
-```python
-ensure_directory(path: str, mode: int = 0o755) -> str
-```
+### `ensure_directory(path, mode=0o755)`
 
 Creates a directory and all parent directories if needed.
 
-### Returns
+**Parameters:**
+- `path` (`str`): Path to the directory (supports `~` expansion).
+- `mode` (`int`, optional): Directory permission mode. Default: `0o755`.
 
-`str` — `file.CREATED` or `file.EXISTS`.
+**Returns:** `str`: `file.CREATED` or `file.EXISTS`.
 
-### Example
+**Raises:** `Error`: if the path exists but is not a directory.
 
 ```python
 import scriptling.provision.file as file
@@ -127,19 +107,16 @@ if status == file.CREATED:
     print("Directory created")
 ```
 
-## absent_directory
+### `absent_directory(path)`
 
-```python
-absent_directory(path: str) -> str
-```
+Removes an empty directory if it exists.
 
-Removes an empty directory if it exists. Returns an error if the directory is not empty.
+**Parameters:**
+- `path` (`str`): Path to the directory (supports `~` expansion).
 
-### Returns
+**Returns:** `str`: `file.REMOVED` or `file.ABSENT`.
 
-`str` — `file.REMOVED` or `file.ABSENT`.
-
-### Example
+**Raises:** `Error`: if the directory is not empty, or the path exists but is not a directory.
 
 ```python
 import scriptling.provision.file as file
@@ -149,22 +126,9 @@ if status == file.REMOVED:
     print("Directory removed")
 ```
 
-## ensure_block
+### `ensure_block(path, content, id="managed", comment="#", position="end", insert_after="", mode=0o644, create_only=False)`
 
-```python
-ensure_block(
-    path: str,
-    content: str,
-    id: str = "managed",
-    comment: str = "#",
-    position: str = "end",
-    insert_after: str = "",
-    mode: int = 0o644,
-    create_only: bool = False,
-) -> str
-```
-
-Maintains a **managed block** inside a file. The block is wrapped in distinctive markers and only the text between them is replaced on each run — everything outside the markers is left byte-for-byte untouched. If the markers are not present, the block is inserted at the chosen position.
+Maintains a **managed block** inside a file. The block is wrapped in distinctive markers and only the text between them is replaced on each run: everything outside the markers is left byte-for-byte untouched. If the markers are not present, the block is inserted at the chosen position.
 
 The markers are generated from `comment` and `id` and look like this:
 
@@ -176,42 +140,29 @@ The markers are generated from `comment` and `id` and look like this:
 
 A unique `id` lets multiple independent blocks coexist in the same file. Use a different `comment` prefix for non-shell file types (for example `"//"`).
 
-### Placement
-
 When the markers are not yet present in the file, the block is inserted according to:
 
-- `position="end"` (default) — append the block to the end of the file.
-- `position="start"` — prepend the block at the start of the file.
-- `insert_after="<substring>"` — insert the block immediately after the first line containing the substring. `insert_after` takes precedence over `position`. If the anchor is not found, an error is returned and the file is left unchanged.
+- `position="end"` (default): append the block to the end of the file.
+- `position="start"`: prepend the block at the start of the file.
+- `insert_after="<substring>"`: insert the block immediately after the first line containing the substring. `insert_after` takes precedence over `position`. If the anchor is not found, an error is returned and the file is left unchanged.
 
-Once a block exists, subsequent calls only swap the content between the markers; the block is **not** moved, regardless of `position` / `insert_after`.
+Once a block exists, subsequent calls only swap the content between the markers; the block is **not** moved, regardless of `position` / `insert_after`. If the file does not exist, it is created (including parent directories) containing just the managed block, with a trailing newline.
 
-If the file does not exist, it is created (including parent directories) containing just the managed block, with a trailing newline.
+A single trailing newline in `content` is normalized, so `"foo\n"` and `"foo"` produce the same block. Empty `content` is allowed and reserves a region with just the two markers.
 
-### Parameters
+**Parameters:**
+- `path` (`str`): Path to the file (supports `~` expansion).
+- `content` (`str`): Block contents maintained between the markers.
+- `id` (`str`, optional): Block identifier embedded in the markers. Default: `"managed"`.
+- `comment` (`str`, optional): Comment prefix used to build the markers. Default: `"#"`.
+- `position` (`str`, optional): Where to insert a new block: `"end"` or `"start"`. Default: `"end"`.
+- `insert_after` (`str`, optional): Substring anchor; new block inserted after first match (overrides `position`). Default: `""`.
+- `mode` (`int`, optional): File permission mode used when creating the file. Default: `0o644`.
+- `create_only` (`bool`, optional): If `True`, never modify an existing block. Default: `False`.
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `path` | — | Path to the file (supports `~` expansion) |
-| `content` | — | Block contents maintained between the markers |
-| `id` | `"managed"` | Block identifier embedded in the markers |
-| `comment` | `"#"` | Comment prefix used to build the markers |
-| `position` | `"end"` | Where to insert a new block: `"end"` or `"start"` |
-| `insert_after` | `""` | Substring anchor; new block inserted after first match (overrides `position`) |
-| `mode` | `0o644` | File permission mode used when creating the file |
-| `create_only` | `False` | If `True`, never modify an existing block |
+**Returns:** `str`: one of `file.CREATED`, `file.UPDATED`, `file.UNCHANGED`.
 
-### Returns
-
-`str` — one of `file.CREATED`, `file.UPDATED`, `file.UNCHANGED`.
-
-### Content rules
-
-- A single trailing newline in `content` is normalized, so `"foo\n"` and `"foo"` produce the same block.
-- Empty `content` is allowed and reserves a region with just the two markers.
-- An error is raised if `content` itself contains a marker line, or if the file contains **orphaned** markers (a begin without a matching end, or duplicate markers).
-
-### Example
+**Raises:** `Error`: if `content` itself contains a marker line, if the file contains orphaned markers (a begin without a matching end, or duplicate markers), or if `insert_after` is set but no matching line is found.
 
 ```python
 import scriptling.provision.file as file
@@ -226,19 +177,18 @@ file.ensure_block("/etc/hosts", "127.0.0.1 myapp\n", insert_after="localhost")
 file.ensure_block("~/.bashrc", "alias ll='ls -la'\n", id="aliases")
 ```
 
-## absent_block
-
-```python
-absent_block(path: str, id: str = "managed", comment: str = "#") -> str
-```
+### `absent_block(path, id="managed", comment="#")`
 
 Removes the managed block (both markers and all content between them) for the given `id`. Everything else in the file is left untouched. The existing file's permission mode is preserved. If no such block exists, nothing happens.
 
-### Returns
+**Parameters:**
+- `path` (`str`): Path to the file (supports `~` expansion).
+- `id` (`str`, optional): Block identifier embedded in the markers. Default: `"managed"`.
+- `comment` (`str`, optional): Comment prefix used to build the markers. Default: `"#"`.
 
-`str` — `file.REMOVED` if the block was deleted, `file.UNCHANGED` if the block was not present. An error is raised on orphaned markers.
+**Returns:** `str`: `file.REMOVED` if the block was deleted, `file.UNCHANGED` if the block was not present.
 
-### Example
+**Raises:** `Error`: on orphaned markers.
 
 ```python
 import scriptling.provision.file as file
@@ -247,3 +197,15 @@ status = file.absent_block("~/.bashrc", id="editor")
 if status == file.REMOVED:
     print("Block removed")
 ```
+
+## Security Considerations
+
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`scriptling.provision.file` writes, modifies, and deletes files and directories on the local filesystem wherever the embedding process's own OS-level permissions allow. Unlike `os`, `fs`, or `pathlib`, it does not take an `allowedPaths` restriction: there is no per-library sandboxing of which paths it can touch. If you need to confine where provisioning writes can land, restrict it at the OS/process level (e.g. running under a dedicated user, container, or chroot) rather than relying on library-level controls. For a full risk breakdown across all libraries, see the [Security Guide](/docs/security/).
+
+## See Also
+
+- [scriptling.provision.fetch](../provision-fetch/): download remote files and unpack zip archives to disk
+- [Library Registration](/docs/go-integration/library-registration/#extended-libraries)
+- [Security Guide](/docs/security/)

@@ -234,7 +234,7 @@ class Point:
 p = Point(3, 4)
 print(str(p))   # Point(3, 4)
 print(repr(p))  # Point(x=3, y=4)
-print(f"{p}")   # Point(3, 4)  — f-strings use __str__
+print(f"{p}")   # Point(3, 4) : f-strings use __str__
 ```
 
 ### `__len__`
@@ -386,12 +386,12 @@ fh = FileHandle("/tmp/data")
 # "closing /tmp/data" printed when fh is garbage collected
 ```
 
-You can also call `__del__` explicitly — it runs each time it's called:
+You can also call `__del__` explicitly: it runs each time it's called:
 
 ```python
 fh = FileHandle("/tmp/data")
 fh.__del__()  # "closing /tmp/data"
-fh.__del__()  # "closing /tmp/data" — runs again
+fh.__del__()  # "closing /tmp/data": runs again
 ```
 
 GC finalizers are not prompt and may not run before process exit. Prefer explicit cleanup (calling `__del__` directly or using a `with` statement / context manager) for critical resources.
@@ -534,7 +534,7 @@ class Temperature:
         self._celsius = value
 
     @property
-    def fahrenheit(self):          # read-only — no setter
+    def fahrenheit(self):          # read-only: no setter
         return self._celsius * 9 / 5 + 32
 
 t = Temperature(100)
@@ -584,7 +584,7 @@ class Square(Shape):
         return self._side * 4
 
 sq = Square(3)
-print(sq.name)      # "square"  — inherited property
+print(sq.name)      # "square" : inherited property
 print(sq.perimeter) # 12
 ```
 
@@ -599,9 +599,9 @@ class MathHelper:
     def square(x):
         return x * x
 
-print(MathHelper.square(4))  # 16  — called on class
+print(MathHelper.square(4))  # 16 : called on class
 m = MathHelper()
-print(m.square(5))           # 25  — called on instance
+print(m.square(5))           # 25 : called on instance
 ```
 
 ### `@classmethod`
@@ -646,7 +646,7 @@ Class methods can be called on both the class and instances:
 ```python
 Date.from_string("2024-01-01")  # called on class
 d = Date(2024, 1, 1)
-d.from_string("2024-06-15")     # called on instance — cls is still Date
+d.from_string("2024-06-15")     # called on instance: cls is still Date
 ```
 
 ### Custom function decorators
@@ -667,7 +667,7 @@ def add(a, b):
 add(1, 2)  # prints "calling add", returns 3
 ```
 
-Decorators stack — applied bottom-up (innermost first):
+Decorators stack: applied bottom-up (innermost first):
 
 ```python
 @outer
@@ -732,15 +732,15 @@ class BankAccount:
 
     def deposit(self, amount):
         if amount <= 0:
-            raise "Deposit amount must be positive"
+            raise ValueError("Deposit amount must be positive")
         self.balance += amount
         self.transactions.append(("deposit", amount))
 
     def withdraw(self, amount):
         if amount <= 0:
-            raise "Withdrawal amount must be positive"
+            raise ValueError("Withdrawal amount must be positive")
         if amount > self.balance:
-            raise "Insufficient funds"
+            raise ValueError("Insufficient funds")
         self.balance -= amount
         self.transactions.append(("withdrawal", amount))
 

@@ -15,6 +15,7 @@ Libraries for interacting with AI/LLM APIs and building intelligent agents with 
 | [scriptling.ai.agent](agent/) | Agentic AI loop with automatic tool execution |
 | [scriptling.ai.agent.interact](interact/) | Interactive terminal interface for AI agents |
 | [scriptling.ai.memory](memory/) | Long-term memory store for AI agents |
+| [scriptling.ai.tools](tools/) | Tool schema builder for AI agents |
 
 ## Quick Start
 
@@ -35,5 +36,11 @@ tools.add("get_time", "Get current time", {}, lambda args: "12:00 PM")
 
 bot = agent.Agent(client, tools=tools, system_prompt="You are helpful", model="gpt-4")
 response = bot.trigger("What time is it?")
-print(response.content)
+print(response)
 ```
+
+## See Also
+
+- [scriptling.mcp](../mcp/) - MCP protocol client and tool authoring for AI agents
+- [Libraries](../../) - Full library reference index
+- [Security Guide](/docs/security/#library-security) - Security guidance for AI and network-enabled libraries

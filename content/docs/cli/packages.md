@@ -97,14 +97,14 @@ When you create a package, the hash is printed:
 
 ```bash
 scriptling pack ./mylib -o mylib.zip
-# Output includes: SHA256: abc123def456...
+# Output includes: sha256=abc123def456...
 ```
 
-Or use the `manifest` command:
+Or use the `manifest` command to print a package's metadata:
 
 ```bash
-scriptling manifest mylib.zip
-# Shows: Hash: abc123def456...
+scriptling pack manifest mylib.zip
+# Shows: Name, Version, Description, and Main fields from the manifest
 ```
 
 ### Custom Cache Directory
@@ -175,7 +175,7 @@ scriptling pack ./mylib -o mylib.zip
 scriptling pack ./mylib -o mylib.zip -f
 ```
 
-The SHA256 hash is printed on success — use it with `#sha256=...` to verify integrity on load.
+The SHA256 hash is printed on success: use it with `#sha256=...` to verify integrity on load.
 
 ### Unpack Command
 

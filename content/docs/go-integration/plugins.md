@@ -62,14 +62,14 @@ The manager starts each plugin executable once, or keeps one logical client per 
 
 ## Manager Scoping
 
-When each request needs its own isolated plugin namespace — for example a multi-tenant server where a script can load private endpoints at runtime — use `manager.NewScope()`. A scope is a lightweight child manager that shares the parent's pooled HTTP transports but keeps an independent plugin registry. Closing the scope unloads only its own plugins without touching the parent.
+When each request needs its own isolated plugin namespace: for example a multi-tenant server where a script can load private endpoints at runtime: use `manager.NewScope()`. A scope is a lightweight child manager that shares the parent's pooled HTTP transports but keeps an independent plugin registry. Closing the scope unloads only its own plugins without touching the parent.
 
 ```go
-// Server startup — one long-lived manager.
+// Server startup: one long-lived manager.
 manager := plugin.NewManager(appLogger)
 defer manager.Close()
 
-// Per-request handler — isolated scope, closed when the request exits.
+// Per-request handler: isolated scope, closed when the request exits.
 // HTTP/HTTPS only: scripts cannot load local executables.
 scope := manager.NewScope(plugin.WithTransport(plugin.TransportHTTP))
 defer scope.Close()
@@ -84,7 +84,7 @@ result, err := env.EvalWithContext(ctx, script)
 
 Key properties:
 
-- `scope.Get` and `scope.List` chain to the parent. A child scope may only add plugin names that do not already exist anywhere in the ancestor chain — loading a name the parent owns returns an error. Loading the exact same endpoint under the same name is idempotent and returns the ancestor's client.
+- `scope.Get` and `scope.List` chain to the parent. A child scope may only add plugin names that do not already exist anywhere in the ancestor chain: loading a name the parent owns returns an error. Loading the exact same endpoint under the same name is idempotent and returns the ancestor's client.
 - `scope.Unload(name)` only removes scope-local plugins. Attempting to unload a parent plugin from a scope returns an error.
 - All scopes derived from the same root manager share the same pooled `*http.Transport` instances (TLS-verified and TLS-skip-verify). Connections established in one request are reused in subsequent requests even though each request uses its own scope.
 - Scopes can be nested. `NewScope` on a scope creates a grandchild; lookup and transport inheritance propagate correctly through the full chain.

@@ -8,48 +8,44 @@ UDP multicast group messaging for one-to-many communication on local networks.
 
 ## Overview
 
-The `scriptling.net.multicast` library provides UDP multicast support for sending messages to a group of hosts simultaneously. It uses IP multicast addresses (224.0.0.0 - 239.255.255.255) to deliver messages to all members of a multicast group.
+The `scriptling.net.multicast` library provides UDP multicast support for sending messages to a group of hosts simultaneously. It uses IP multicast addresses (`224.0.0.0` - `239.255.255.255`) to deliver messages to all members of a multicast group.
 
 ## Available Functions
 
 | Function | Description |
 |----------|-------------|
-| `join(group_addr, port, interface="", ttl=1)` | Join a multicast group |
+| `join(group_addr, port, interface="", ttl=1)` | Join a multicast group. |
 
-## Group Object Methods
+## Group Object
 
-The `join()` function returns a group object with these methods:
+The `join()` function returns a group object with the following methods and properties.
 
 | Method | Description |
 |--------|-------------|
-| `send(message)` | Send a message to the group |
-| `receive(timeout=30)` | Receive a message from the group |
-| `close()` | Leave the group and close the connection |
-
-## Group Object Properties
+| `send(message)` | Send a message to the group. |
+| `receive(timeout=30)` | Receive a message from the group. |
+| `close()` | Leave the group and close the connection. |
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `group_addr` | string | Multicast group address |
-| `port` | int | Multicast port number |
-| `local_addr` | string | Local bound address |
+| `group_addr` | `str` | Multicast group address. |
+| `port` | `int` | Multicast port number. |
+| `local_addr` | `str` | Local bound address. |
 
 ## Functions
 
-### scriptling.net.multicast.join(group_addr, port, interface="", ttl=1)
+### `join(group_addr, port, interface="", ttl=1)`
 
-Join a multicast group.
+Joins a multicast group.
 
 **Parameters:**
+- `group_addr` (`str`): Multicast group address, e.g. `"239.1.1.1"`.
+- `port` (`int`): Port number for the multicast group.
+- `interface` (`str`, optional): Network interface to bind to. Default: `""` (auto-select).
+- `ttl` (`int`, optional): Multicast TTL / hop limit. Default: `1` (local network only; increase to route across subnets).
 
-- `group_addr` (string): Multicast group address (e.g., `"239.1.1.1"`)
-- `port` (int): Port number for the multicast group
-- `interface` (string, optional): Network interface to bind to (default: auto-select)
-- `ttl` (int, optional): Multicast TTL / hop limit (default: `1`, local network only; increase to route across subnets)
+**Returns:** `Group`: a group object with `send()`, `receive()`, `close()` methods and `group_addr`, `port`, `local_addr` properties.
 
-**Returns:** Group object with `send()`, `receive()`, `close()` methods and `group_addr`, `port`, `local_addr` properties
-
-**Example:**
 ```python
 import scriptling.net.multicast as mc
 
@@ -62,36 +58,29 @@ To route across subnets, increase the TTL:
 group = mc.join("239.1.1.1", 9999, ttl=4)
 ```
 
-## Group Methods
+### `group.send(message)`
 
-### group.send(message)
-
-Send a message to the multicast group.
+Sends a message to the multicast group.
 
 **Parameters:**
+- `message` (`str` or `dict`): Message to send. Dicts are automatically JSON encoded.
 
-- `message` (string or dict): Message to send. Dicts are automatically JSON encoded.
+**Returns:** `None`
 
-**Example:**
 ```python
 group.send("Hello group!")
 group.send({"type": "ping", "ts": 1234})
 ```
 
-### group.receive(timeout=30)
+### `group.receive(timeout=30)`
 
-Receive a message from the multicast group.
+Receives a message from the multicast group.
 
 **Parameters:**
+- `timeout` (`number`, optional): Timeout in seconds. Default: `30`.
 
-- `timeout` (number, optional): Timeout in seconds (default: 30)
+**Returns:** `dict`: a dict with `"data"` and `"source"` keys, or `None` on timeout.
 
-**Returns:**
-
-- Dict with `"data"` and `"source"` keys
-- None on timeout
-
-**Example:**
 ```python
 msg = group.receive(timeout=5)
 if msg:
@@ -100,14 +89,23 @@ else:
     print("No message received (timeout)")
 ```
 
-### group.close()
+### `group.close()`
 
-Leave the multicast group and close the connection.
+Leaves the multicast group and closes the connection.
 
-**Example:**
+**Parameters:** None
+
+**Returns:** `None`
+
 ```python
 group.close()
 ```
+
+## Security Considerations
+
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`scriptling.net.multicast` opens a raw UDP socket and joins a multicast group, allowing scripts to send and receive data with any other host on the local network segment (or further, if `ttl` is increased) that joins the same group address and port. The library does not restrict which group addresses or ports a script can join: that is the embedder's responsibility, typically enforced with OS-level firewalling or network namespacing. See [Security Considerations](/docs/security/#network-security) for a full breakdown of network-enabled libraries.
 
 ## Examples
 
@@ -199,9 +197,15 @@ finally:
 
 ## Notes
 
-- Only IP multicast addresses (224.x.x.x - 239.x.x.x) are valid
-- UDP multicast is inherently unreliable - messages may be lost
-- Maximum message size is limited by UDP (approximately 65KB)
-- Use `interface` parameter on multi-homed hosts to select the correct NIC
-- Default TTL is `1` (local network only); set `ttl` higher to cross router hops
-- Always call `close()` when done to release the socket
+- Only IP multicast addresses (`224.x.x.x` - `239.x.x.x`) are valid.
+- UDP multicast is inherently unreliable - messages may be lost.
+- Maximum message size is limited by UDP (approximately 65KB).
+- Use the `interface` parameter on multi-homed hosts to select the correct NIC.
+- Default TTL is `1` (local network only); set `ttl` higher to cross router hops.
+- Always call `close()` when done to release the socket.
+
+## See Also
+
+- [scriptling.net.unicast](../unicast/): direct point-to-point UDP/TCP messaging
+- [scriptling.net.gossip](../gossip/): gossip protocol cluster membership and messaging
+- [Security Guide](/docs/security/): full risk breakdown across all libraries

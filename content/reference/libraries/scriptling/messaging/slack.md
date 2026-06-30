@@ -4,57 +4,49 @@ linkTitle: slack
 weight: 3
 ---
 
-Slack Bot API client for building bots on the Slack platform.
+Slack Bot API client for building bots on the Slack platform, using Socket Mode for real-time events.
 
 ## Available Functions
 
 | Function | Description |
 |----------|-------------|
-| `client(bot_token, app_token, allowed_users=[])` | Create a Slack bot client |
-| `open_dm(bot, user_id)` | Open a DM channel with a user |
-| `keyboard(rows)` | Build a button keyboard |
-| `command(bot, name, handler)` | Register a command handler |
-| `on_callback(bot, handler)` | Register callback handler |
-| `on_message(bot, handler)` | Register message handler |
-| `on_file(bot, handler)` | Register file handler |
-| `auth(bot, handler)` | Register auth handler |
-| `run(bot)` | Start the bot event loop |
-| `send_message(bot, dest, text, ...)` | Send a message |
-| `send_rich_message(bot, dest, msg)` | Send a rich/embed message |
-| `edit_message(bot, dest, msg_id, text)` | Edit a message |
-| `delete_message(bot, dest, msg_id)` | Delete a message |
-| `send_file(bot, dest, source, ...)` | Send a file |
-| `typing(bot, dest)` | Send typing indicator |
-| `answer_callback(bot, id, token, text="")` | Acknowledge a callback |
-| `download(bot, ref)` | Download a file by ID |
-| `capabilities(bot)` | Get platform capabilities |
+| `client(bot_token, app_token, allowed_users=[])` | Create a Slack bot client. |
+| `open_dm(bot, user_id)` | Open or retrieve a DM channel with a user. |
+| `keyboard(rows)` | Build a button keyboard. |
+| `command(bot, name, help_text, handler)` | Register a command handler for `/command` style messages. |
+| `on_callback(bot, prefix, handler)` | Register a handler for button callback events. |
+| `on_message(bot, handler)` | Register a handler for non-command messages. |
+| `on_file(bot, handler)` | Register a handler for file uploads. |
+| `auth(bot, handler)` | Register an authentication handler. |
+| `run(bot)` | Start the bot event loop. |
+| `send_message(bot, dest, text, parse_mode="", keyboard=None)` | Send a text or rich message. |
+| `send_rich_message(bot, dest, msg)` | Send a rich/embed message (Slack Block Kit). |
+| `edit_message(bot, dest, msg_id, text)` | Edit a previously sent message. |
+| `delete_message(bot, dest, msg_id)` | Delete a message. |
+| `send_file(bot, dest, source, filename="", caption="", base64=False)` | Send a file to a channel. |
+| `typing(bot, dest)` | Send a typing indicator. |
+| `answer_callback(bot, id, token, text="")` | Acknowledge a button callback. |
+| `download(bot, ref)` | Download a file by ID or URL. |
+| `capabilities(bot)` | Get the platform's capability list. |
 
-## Creating a Client
+## Functions
 
-### slack.client(bot_token, app_token, allowed_users=[])
+### `client(bot_token, app_token, allowed_users=[])`
 
-Creates a new Slack bot client. Unlike other platforms, Slack requires two tokens.
+Creates a new Slack bot client. Unlike other platforms, Slack requires two tokens: a bot token for API calls and an app-level token for the Socket Mode WebSocket connection.
+
+To get your tokens: go to [api.slack.com/apps](https://api.slack.com/apps), create or select your app, then copy the Bot User OAuth Token (starts with `xoxb-`) from "OAuth & Permissions", and an App-Level Token (starts with `xapp-`) from "Basic Information" → "App-Level Tokens".
 
 **Parameters:**
-- `bot_token` (str): Slack bot token (starts with `xoxb-`)
-- `app_token` (str): Slack app-level token (starts with `xapp-`)
-- `allowed_users` (list, optional): List of user IDs allowed to use the bot
+- `bot_token` (`str`): Slack bot token, starts with `xoxb-`.
+- `app_token` (`str`): Slack app-level token, starts with `xapp-`.
+- `allowed_users` (`list`, optional): List of user IDs allowed to use the bot. Default: `[]` (no restriction).
 
-**Returns:** SlackClient instance
-
-**Getting Your Tokens:**
-
-1. Go to https://api.slack.com/apps
-2. Create or select your app
-3. **Bot Token**: Go to "OAuth & Permissions" → copy the "Bot User OAuth Token" (starts with `xoxb-`)
-4. **App Token**: Go to "Basic Information" → "App-Level Tokens" → create or copy a token (starts with `xapp-`)
-
-**Example:**
+**Returns:** `SlackClient`: a bot client instance.
 
 ```python
 import scriptling.messaging.slack as slack
 
-# Basic client with both tokens
 bot = slack.client(
     "xoxb-your-bot-token-here",
     "xapp-your-app-token-here"
@@ -68,45 +60,52 @@ bot = slack.client(
 )
 ```
 
-## Slack-Specific Functions
+### `open_dm(bot, user_id)`
 
-### slack.open_dm(bot, user_id)
-
-Opens or retrieves a DM channel with a user. This is Slack-specific because you need a DM channel ID to send direct messages.
+Opens or retrieves a DM channel with a user. Slack requires a DM channel ID before sending direct messages, unlike Telegram and Discord, which send directly to a user ID.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
-- `user_id` (str): Slack user ID (starts with `U`)
+- `bot` (`SlackClient`): Bot instance.
+- `user_id` (`str`): Slack user ID, starts with `U`.
 
-**Returns:** str - DM channel ID (starts with `D`)
-
-**Example:**
+**Returns:** `str`: DM channel ID, starts with `D`.
 
 ```python
 import scriptling.messaging.slack as slack
 
 bot = slack.client("xoxb-...", "xapp-...")
 
-# Open DM channel with a user
 dm_channel = slack.open_dm(bot, "U1234567890")
-
-# Send a direct message
 slack.send_message(bot, dm_channel, "Hello directly!")
 ```
 
-## Event Handlers
+### `keyboard(rows)`
 
-### slack.command(bot, name, help_text, handler)
+Builds a button keyboard grid.
+
+**Parameters:**
+- `rows` (`list`): List of button rows, each row a list of button dicts with `text` (`str`) and either `data` (`str`, for callback buttons) or `url` (`str`, for URL buttons).
+
+**Returns:** `list`: the keyboard structure, passed to `send_message()`'s `keyboard` parameter.
+
+```python
+kb = slack.keyboard([
+    [{"text": "Option 1", "data": "opt1"}, {"text": "Option 2", "data": "opt2"}],
+    [{"text": "Visit Website", "url": "https://example.com"}]
+])
+```
+
+### `command(bot, name, help_text, handler)`
 
 Registers a command handler for `/command` style messages.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
-- `name` (str): Command name (without /)
-- `help_text` (str): Help text for the command
-- `handler` (callable): Function receiving context dict
+- `bot` (`SlackClient`): Bot instance.
+- `name` (`str`): Command name, without the leading `/`.
+- `help_text` (`str`, optional): Short description shown in the platform's help/command list. May be omitted, in which case call as `command(bot, name, handler)`. Default: `""`.
+- `handler` (`callable`): Function called with a context dict when the command is invoked.
 
-**Example:**
+**Returns:** `None`
 
 ```python
 import scriptling.messaging.slack as slack
@@ -117,20 +116,19 @@ def handle_start(ctx):
     ctx.reply("Welcome to the bot!")
 
 slack.command(bot, "start", "Start the bot", handle_start)
-slack.command(bot, "help", "Show help", lambda ctx: ctx.reply("Help text..."))
-
 slack.run(bot)
 ```
 
-### slack.on_callback(bot, handler)
+### `on_callback(bot, prefix, handler)`
 
 Registers a handler for button callback events.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
-- `handler` (callable): Function receiving context dict
+- `bot` (`SlackClient`): Bot instance.
+- `prefix` (`str`, optional): Callback prefix to filter on. Omit to register a catch-all. Default: `""` (catch-all).
+- `handler` (`callable`): Function called with a context dict when a callback fires.
 
-**Example:**
+**Returns:** `None`
 
 ```python
 def handle_button(ctx):
@@ -141,15 +139,15 @@ def handle_button(ctx):
 slack.on_callback(bot, handle_button)
 ```
 
-### slack.on_message(bot, handler)
+### `on_message(bot, handler)`
 
 Registers a handler for all non-command messages.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
-- `handler` (callable): Function receiving context dict
+- `bot` (`SlackClient`): Bot instance.
+- `handler` (`callable`): Function called with a context dict for each plain message.
 
-**Example:**
+**Returns:** `None`
 
 ```python
 def handle_message(ctx):
@@ -158,15 +156,15 @@ def handle_message(ctx):
 slack.on_message(bot, handle_message)
 ```
 
-### slack.on_file(bot, handler)
+### `on_file(bot, handler)`
 
 Registers a handler for file uploads.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
-- `handler` (callable): Function receiving context dict
+- `bot` (`SlackClient`): Bot instance.
+- `handler` (`callable`): Function called with a context dict when a file is received.
 
-**Example:**
+**Returns:** `None`
 
 ```python
 def handle_file(ctx):
@@ -177,15 +175,15 @@ def handle_file(ctx):
 slack.on_file(bot, handle_file)
 ```
 
-### slack.auth(bot, handler)
+### `auth(bot, handler)`
 
 Registers an authentication handler for custom access control.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
-- `handler` (callable): Function returning True to allow, False to deny
+- `bot` (`SlackClient`): Bot instance.
+- `handler` (`callable`): Function called with a context dict; return `True` to allow, `False` to deny.
 
-**Example:**
+**Returns:** `None`
 
 ```python
 allowed_ids = {"U1234567890", "U0987654321"}
@@ -196,23 +194,37 @@ def check_auth(ctx):
 slack.auth(bot, check_auth)
 ```
 
-## Sending Messages
+### `run(bot)`
 
-### slack.send_message(bot, dest, text, parse_mode="", keyboard=None)
-
-Sends a text message.
+Starts the bot event loop over a Socket Mode WebSocket connection. Blocks until the bot is stopped.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
-- `dest` (str): Channel ID (starts with `C`) or DM channel ID (starts with `D`)
-- `text` (str or dict): Message text or rich message dict
-- `parse_mode` (str, optional): Not used for Slack
-- `keyboard` (list, optional): Button keyboard from `keyboard()`
+- `bot` (`SlackClient`): Bot instance.
 
-**Example:**
+**Returns:** `None`
 
 ```python
-# Simple text message to channel
+import scriptling.messaging.slack as slack
+
+bot = slack.client("xoxb-...", "xapp-...")
+slack.command(bot, "start", "Start", lambda ctx: ctx.reply("Hello!"))
+slack.run(bot)  # Blocks here
+```
+
+### `send_message(bot, dest, text, parse_mode="", keyboard=None)`
+
+Sends a text or rich message to a channel or DM.
+
+**Parameters:**
+- `bot` (`SlackClient`): Bot instance.
+- `dest` (`str`): Channel ID (starts with `C`) or DM channel ID (starts with `D`, see `open_dm()`).
+- `text` (`str` or `dict`): Message text, or a rich message dict (see `send_rich_message()`).
+- `parse_mode` (`str`, optional): Not used by Slack. Default: `""`.
+- `keyboard` (`list`, optional): Button keyboard from `keyboard()`. Default: `None`.
+
+**Returns:** `None`
+
+```python
 slack.send_message(bot, "C1234567890", "Hello channel!")
 
 # Direct message (need to open DM first)
@@ -226,16 +238,16 @@ kb = slack.keyboard([
 slack.send_message(bot, "C1234567890", "Choose:", keyboard=kb)
 ```
 
-### slack.send_rich_message(bot, dest, msg)
+### `send_rich_message(bot, dest, msg)`
 
-Sends a rich/embed message (Slack Block Kit).
+Sends a rich/embed message using Slack Block Kit.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
-- `dest` (str): Channel ID or DM channel ID
-- `msg` (dict): Rich message dict with title, body, color, image, url
+- `bot` (`SlackClient`): Bot instance.
+- `dest` (`str`): Channel ID or DM channel ID.
+- `msg` (`dict`): Rich message dict with `title`, `body`, `color`, `image`, `url` keys.
 
-**Example:**
+**Returns:** `None`
 
 ```python
 slack.send_rich_message(bot, "C1234567890", {
@@ -246,72 +258,67 @@ slack.send_rich_message(bot, "C1234567890", {
 })
 ```
 
-### slack.edit_message(bot, dest, msg_id, text)
+### `edit_message(bot, dest, msg_id, text)`
 
 Edits an existing message.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
-- `dest` (str): Channel ID
-- `msg_id` (str): Timestamp of the message (Slack uses timestamps as IDs)
-- `text` (str): New message text
+- `bot` (`SlackClient`): Bot instance.
+- `dest` (`str`): Channel ID.
+- `msg_id` (`str`): Timestamp of the message to edit. Slack uses message timestamps (e.g. `"1234567890.123456"`) as IDs.
+- `text` (`str`): New message text.
 
-**Example:**
+**Returns:** `None`
 
 ```python
 slack.edit_message(bot, "C1234567890", "1234567890.123456", "Updated text")
 ```
 
-### slack.delete_message(bot, dest, msg_id)
+### `delete_message(bot, dest, msg_id)`
 
 Deletes a message.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
-- `dest` (str): Channel ID
-- `msg_id` (str): Timestamp of the message
+- `bot` (`SlackClient`): Bot instance.
+- `dest` (`str`): Channel ID.
+- `msg_id` (`str`): Timestamp of the message to delete.
 
-**Example:**
+**Returns:** `None`
 
 ```python
 slack.delete_message(bot, "C1234567890", "1234567890.123456")
 ```
 
-## Sending Files
+### `send_file(bot, dest, source, filename="", caption="", base64=False)`
 
-### slack.send_file(bot, dest, source, filename="", caption="", base64=False)
-
-Sends a file to a channel.
+Sends a file to a channel or DM.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
-- `dest` (str): Channel ID or DM channel ID
-- `source` (str): File path or base64 data
-- `filename` (str, optional): Filename to display
-- `caption` (str, optional): File caption/message
-- `base64` (bool, optional): True if source is base64 data
+- `bot` (`SlackClient`): Bot instance.
+- `dest` (`str`): Channel ID or DM channel ID.
+- `source` (`str`): File path, or base64-encoded data if `base64=True`.
+- `filename` (`str`, optional): Filename to display. Default: `""`.
+- `caption` (`str`, optional): Caption/message to send alongside the file. Default: `""`.
+- `base64` (`bool`, optional): Whether `source` is base64-encoded data rather than a path. Default: `False`.
 
-**Example:**
+**Returns:** `None`
 
 ```python
-# Send from file path
 slack.send_file(bot, "C1234567890", "/path/to/file.pdf", filename="document.pdf")
 
 # Send from base64 data
 slack.send_file(bot, "C1234567890", base64_data, filename="image.png", base64=True)
 ```
 
-## Utilities
+### `typing(bot, dest)`
 
-### slack.typing(bot, dest)
-
-Sends a typing indicator to the channel.
+Sends a typing indicator to a channel.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
-- `dest` (str): Channel ID
+- `bot` (`SlackClient`): Bot instance.
+- `dest` (`str`): Channel ID.
 
-**Example:**
+**Returns:** `None`
 
 ```python
 slack.typing(bot, "C1234567890")
@@ -319,161 +326,66 @@ slack.typing(bot, "C1234567890")
 slack.send_message(bot, "C1234567890", "Done!")
 ```
 
-### slack.answer_callback(bot, id, token, text="")
+### `answer_callback(bot, id, token, text="")`
 
 Acknowledges a button callback.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
-- `id` (str): Callback ID from context
-- `token` (str): Callback token from context
-- `text` (str, optional): Text to show as notification
+- `bot` (`SlackClient`): Bot instance.
+- `id` (`str`): Callback ID from the context.
+- `token` (`str`): Callback token from the context.
+- `text` (`str`, optional): Text to show as a notification. Default: `""`.
 
-**Example:**
+**Returns:** `None`
 
 ```python
 def handle_callback(ctx):
     slack.answer_callback(bot, ctx.callback_id, ctx.callback_token, "Processing...")
     # Do work...
+
+slack.on_callback(bot, handle_callback)
 ```
 
-### slack.download(bot, ref)
+### `download(bot, ref)`
 
-Downloads a file by its ID/reference.
+Downloads a file by its ID or URL.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
-- `ref` (str): File ID or URL
+- `bot` (`SlackClient`): Bot instance.
+- `ref` (`str`): File ID or URL, typically `ctx.file.url`.
 
-**Returns:** str - Base64 encoded file data
-
-**Example:**
+**Returns:** `str`: base64-encoded file data.
 
 ```python
 def handle_file(ctx):
     data = slack.download(bot, ctx.file.url)
     # Process base64 data...
+
+slack.on_file(bot, handle_file)
 ```
 
-### slack.capabilities(bot)
+### `capabilities(bot)`
 
-Returns list of platform capabilities.
+Returns the list of capabilities the Slack platform supports.
 
 **Parameters:**
-- `bot` (SlackClient): Bot instance
+- `bot` (`SlackClient`): Bot instance.
 
-**Returns:** list - List of capability strings
-
-**Example:**
+**Returns:** `list`: list of capability strings.
 
 ```python
 caps = slack.capabilities(bot)
 # ["send_message", "edit_message", "delete_message", "typing", ...]
 ```
 
-### slack.keyboard(rows)
+## Security Considerations
 
-Builds a button keyboard grid.
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-**Parameters:**
-- `rows` (list): List of button rows, each row is a list of button dicts
+This library sends and receives messages via the Slack API using the bot and app tokens supplied to `client()`. The tokens are held by the embedder: typically passed in via `Register(p, logger)` when embedding in Go: and are not directly exposed to scripts; scripts can send and receive messages on the bot's behalf but cannot read the tokens back out. Treat both tokens as secrets: anyone who obtains them can act as your bot in your Slack workspace. See [Security Considerations](/docs/security/#network-security) for a full breakdown of network-enabled libraries.
 
-**Button Dict:**
-- `text` (str): Button label
-- `data` (str): Callback data (for callback buttons)
-- `url` (str): URL (for URL buttons)
+## See Also
 
-**Example:**
-
-```python
-kb = slack.keyboard([
-    [{"text": "Option 1", "data": "opt1"}, {"text": "Option 2", "data": "opt2"}],
-    [{"text": "Visit Website", "url": "https://example.com"}]
-])
-```
-
-## Running the Bot
-
-### slack.run(bot)
-
-Starts the bot event loop. This blocks until the bot is stopped.
-
-**Parameters:**
-- `bot` (SlackClient): Bot instance
-
-**Example:**
-
-```python
-import scriptling.messaging.slack as slack
-
-bot = slack.client("xoxb-...", "xapp-...")
-slack.command(bot, "start", "Start", lambda ctx: ctx.reply("Hello!"))
-slack.run(bot)  # Blocks here
-```
-
-## Complete Example
-
-```python
-import scriptling.messaging.slack as slack
-
-# Create bot with both tokens
-bot = slack.client(
-    "xoxb-your-bot-token",
-    "xapp-your-app-token"
-)
-
-# Register commands
-slack.command(bot, "start", "Start the bot", lambda ctx: (
-    ctx.reply("Welcome! Use /help for commands.")
-))
-
-slack.command(bot, "help", "Show help", lambda ctx: (
-    ctx.reply("Commands: /start, /help, /echo, /dm")
-))
-
-slack.command(bot, "echo", "Echo your message", lambda ctx: (
-    ctx.reply(" ".join(ctx.args) if ctx.args else "Usage: /echo <message>")
-))
-
-slack.command(bot, "dm", "Send a DM", lambda ctx: (
-    slack.send_message(bot, slack.open_dm(bot, ctx.user.id), "Hello via DM!")
-))
-
-# Handle button callbacks
-slack.on_callback(bot, lambda ctx: (
-    ctx.answer() or ctx.reply(f"You selected: {ctx.callback_data}")
-))
-
-# Handle regular messages
-slack.on_message(bot, lambda ctx: ctx.reply(f"You said: {ctx.text}"))
-
-# Start the bot
-slack.run(bot)
-```
-
-## Slack-Specific Notes
-
-### Two Token Requirement
-
-Slack requires two tokens:
-- **Bot Token (`xoxb-`)**: Used for most API calls (sending messages, etc.)
-- **App Token (`xapp-`)**: Used for WebSocket connections to receive events
-
-### Message IDs are Timestamps
-
-Slack uses timestamps as message IDs. These look like `1234567890.123456`.
-
-### DM Channels
-
-Unlike Telegram, Slack requires you to open a DM channel before sending direct messages. Use `open_dm()` to get the channel ID.
-
-### Channel Types
-
-- `C...` - Public channels
-- `G...` - Private channels (groups)
-- `D...` - Direct message channels
-- `U...` - User IDs (use with `open_dm()`)
-
-### Workspace App
-
-The bot must be installed to your Slack workspace with the appropriate OAuth scopes for the features you use.
+- [scriptling.messaging.telegram](../telegram/): Telegram Bot API client
+- [scriptling.messaging.discord](../discord/): Discord Bot API client
+- [scriptling.messaging.console](../console/): terminal-based client for local testing

@@ -1,60 +1,58 @@
 ---
 title: scriptling.mcp.tool
 linkTitle: mcp.tool
-weight: 3
+weight: 2
 ---
 
 MCP tool helper library for authoring MCP tools in scriptling. This sub-library provides functions for parameter access and result handling when implementing tool scripts.
 
-For the MCP client library (connecting to MCP servers), see the [MCP Library](../mcp/) documentation.
+For the MCP client library (connecting to MCP servers), see [scriptling.mcp](../client/).
 
 ## Enabling
 
 The tool helpers are a separate, optional sub-library. Register it explicitly when needed:
 
-```python
-mcp.RegisterToolHelpers(sl)  # Registers scriptling.mcp.tool
+```go
+mcp.RegisterToolHelpers(sl)  // Registers scriptling.mcp.tool
 ```
 
 ## Environment Variables
 
-MCP tool helpers read and write to environment variables set by the MCP tool execution environment:
+MCP tool helpers read and write environment variables set by the MCP tool execution environment:
 
-- **`__mcp_params`**: Dictionary containing tool parameters
-- **`__mcp_response`**: String containing the tool's result
+- **`__mcp_params`**: Dictionary containing tool parameters.
+- **`__mcp_response`**: String containing the tool's result.
 
 ## Available Functions
 
-| Function                            | Description                                      |
-| ----------------------------------- | ------------------------------------------------ |
-| `get_int(name, default=0)`          | Get an integer parameter                         |
-| `get_float(name, default=0.0)`      | Get a float parameter                            |
-| `get_string(name, default="")`      | Get a string parameter (trims whitespace)        |
-| `get_bool(name, default=false)`     | Get a boolean parameter                          |
-| `get_list(name, default=None)`      | Get a list parameter (splits strings by comma)   |
-| `get_string_list(name, default=None)` | Get a string array parameter                    |
-| `get_int_list(name, default=None)`  | Get an integer array parameter                   |
-| `get_float_list(name, default=None)` | Get a float array parameter                     |
-| `get_bool_list(name, default=None)` | Get a boolean array parameter                    |
-| `return_string(text)`               | Return a string result and stop execution        |
-| `return_object(obj)`                | Return an object as JSON and stop execution      |
-| `return_toon(obj)`                  | Return an object as TOON and stop execution      |
-| `return_error(message)`             | Return an error message and stop execution       |
+| Function | Description |
+|----------|-------------|
+| `get_int(name, default=0)` | Get an integer parameter |
+| `get_float(name, default=0.0)` | Get a float parameter |
+| `get_string(name, default="")` | Get a string parameter (trims whitespace) |
+| `get_bool(name, default=False)` | Get a boolean parameter |
+| `get_list(name, default=None)` | Get a list parameter (splits strings by comma) |
+| `get_string_list(name, default=None)` | Get a string array parameter |
+| `get_int_list(name, default=None)` | Get an integer array parameter |
+| `get_float_list(name, default=None)` | Get a float array parameter |
+| `get_bool_list(name, default=None)` | Get a boolean array parameter |
+| `return_string(text)` | Return a string result and stop execution |
+| `return_object(obj)` | Return an object as JSON and stop execution |
+| `return_toon(obj)` | Return an object as TOON and stop execution |
+| `return_error(message)` | Return an error message and stop execution |
 
 ## Parameter Access Functions
 
-### mcp.tool.get_int(name, default=0)
+### `mcp.tool.get_int(name, default=0)`
 
-Get an integer parameter from the tool's input arguments.
+Gets an integer parameter from the tool's input arguments. Returns the default value if the parameter doesn't exist or can't be coerced to an integer.
 
 **Parameters:**
 
-- `name` (str): Parameter name
-- `default` (int): Default value if parameter is missing (default: 0)
+- `name` (`str`): Parameter name.
+- `default` (`int`, optional): Default value if the parameter is missing. Default: `0`.
 
-**Returns:** int
-
-**Example:**
+**Returns:** `int`
 
 ```python
 import scriptling.mcp.tool as tool
@@ -63,18 +61,16 @@ project_id = tool.get_int("project_id", 0)
 limit = tool.get_int("limit", 100)
 ```
 
-### mcp.tool.get_float(name, default=0.0)
+### `mcp.tool.get_float(name, default=0.0)`
 
-Get a float parameter from the tool's input arguments.
+Gets a float parameter from the tool's input arguments. Returns the default value if the parameter doesn't exist or can't be coerced to a float.
 
 **Parameters:**
 
-- `name` (str): Parameter name
-- `default` (float): Default value if parameter is missing (default: 0.0)
+- `name` (`str`): Parameter name.
+- `default` (`float`, optional): Default value if the parameter is missing. Default: `0.0`.
 
-**Returns:** float
-
-**Example:**
+**Returns:** `float`
 
 ```python
 import scriptling.mcp.tool as tool
@@ -83,18 +79,16 @@ price = tool.get_float("price", 0.0)
 percentage = tool.get_float("percentage", 100.0)
 ```
 
-### mcp.tool.get_string(name, default="")
+### `mcp.tool.get_string(name, default="")`
 
-Get a string parameter from the tool's input arguments. Automatically trims whitespace.
+Gets a string parameter from the tool's input arguments. Automatically trims whitespace, and returns the default value if the parameter doesn't exist, is empty, or is whitespace-only.
 
 **Parameters:**
 
-- `name` (str): Parameter name
-- `default` (str): Default value if parameter is missing or empty (default: "")
+- `name` (`str`): Parameter name.
+- `default` (`str`, optional): Default value if the parameter is missing or empty. Default: `""`.
 
-**Returns:** str
-
-**Example:**
+**Returns:** `str`
 
 ```python
 import scriptling.mcp.tool as tool
@@ -103,18 +97,16 @@ name = tool.get_string("name", "guest")
 query = tool.get_string("query")
 ```
 
-### mcp.tool.get_bool(name, default=false)
+### `mcp.tool.get_bool(name, default=False)`
 
-Get a boolean parameter from the tool's input arguments. Handles "true"/"false" strings and numeric 0/1.
+Gets a boolean parameter from the tool's input arguments. Handles `"true"`/`"false"` strings (case-insensitive) and numeric `0`/`1`.
 
 **Parameters:**
 
-- `name` (str): Parameter name
-- `default` (bool): Default value if parameter is missing (default: false)
+- `name` (`str`): Parameter name.
+- `default` (`bool`, optional): Default value if the parameter is missing or can't be converted. Default: `False`.
 
-**Returns:** bool
-
-**Example:**
+**Returns:** `bool`
 
 ```python
 import scriptling.mcp.tool as tool
@@ -123,18 +115,16 @@ enabled = tool.get_bool("enabled", True)
 verbose = tool.get_bool("verbose")
 ```
 
-### mcp.tool.get_list(name, default=None)
+### `mcp.tool.get_list(name, default=None)`
 
-Get a list parameter from the tool's input arguments. If the parameter is a string, splits by comma.
+Gets a list parameter from the tool's input arguments. If the value is a string, splits it by comma.
 
 **Parameters:**
 
-- `name` (str): Parameter name
-- `default` (list): Default value if parameter is missing (default: empty list)
+- `name` (`str`): Parameter name.
+- `default` (`list`, optional): Default value if the parameter is missing. Default: empty list.
 
-**Returns:** list
-
-**Example:**
+**Returns:** `list`
 
 ```python
 import scriptling.mcp.tool as tool
@@ -143,18 +133,16 @@ ids = tool.get_list("ids")              # "1,2,3" → ["1", "2", "3"]
 tags = tool.get_list("tags", ["all"])   # "tag1, tag2" → ["tag1", "tag2"]
 ```
 
-### mcp.tool.get_string_list(name, default=None)
+### `mcp.tool.get_string_list(name, default=None)`
 
-Get a string array parameter (array:string type) from the tool's input arguments.
+Gets a string array parameter (`array:string` type) from the tool's input arguments.
 
 **Parameters:**
 
-- `name` (str): Parameter name
-- `default` (list): Default value if parameter is missing (default: empty list)
+- `name` (`str`): Parameter name.
+- `default` (`list`, optional): Default value if the parameter is missing. Default: empty list.
 
-**Returns:** list of strings
-
-**Example:**
+**Returns:** `list` of `str`
 
 ```python
 import scriptling.mcp.tool as tool
@@ -163,18 +151,16 @@ args = tool.get_string_list("arguments")  # ["--verbose", "-o", "file.txt"]
 tags = tool.get_string_list("tags", ["default"])
 ```
 
-### mcp.tool.get_int_list(name, default=None)
+### `mcp.tool.get_int_list(name, default=None)`
 
-Get an integer array parameter (array:int type) from the tool's input arguments.
+Gets an integer array parameter (`array:int` type) from the tool's input arguments.
 
 **Parameters:**
 
-- `name` (str): Parameter name
-- `default` (list): Default value if parameter is missing (default: empty list)
+- `name` (`str`): Parameter name.
+- `default` (`list`, optional): Default value if the parameter is missing. Default: empty list.
 
-**Returns:** list of integers
-
-**Example:**
+**Returns:** `list` of `int`
 
 ```python
 import scriptling.mcp.tool as tool
@@ -183,18 +169,16 @@ ids = tool.get_int_list("ids")  # [1, 2, 3, 4]
 ports = tool.get_int_list("ports", [8080])
 ```
 
-### mcp.tool.get_float_list(name, default=None)
+### `mcp.tool.get_float_list(name, default=None)`
 
-Get a float array parameter (array:float type) from the tool's input arguments.
+Gets a float array parameter (`array:float` type) from the tool's input arguments.
 
 **Parameters:**
 
-- `name` (str): Parameter name
-- `default` (list): Default value if parameter is missing (default: empty list)
+- `name` (`str`): Parameter name.
+- `default` (`list`, optional): Default value if the parameter is missing. Default: empty list.
 
-**Returns:** list of floats
-
-**Example:**
+**Returns:** `list` of `float`
 
 ```python
 import scriptling.mcp.tool as tool
@@ -203,39 +187,37 @@ prices = tool.get_float_list("prices")  # [19.99, 29.99, 39.99]
 weights = tool.get_float_list("weights", [1.0])
 ```
 
-### mcp.tool.get_bool_list(name, default=None)
+### `mcp.tool.get_bool_list(name, default=None)`
 
-Get a boolean array parameter (array:bool type) from the tool's input arguments.
+Gets a boolean array parameter (`array:bool` type) from the tool's input arguments.
 
 **Parameters:**
 
-- `name` (str): Parameter name
-- `default` (list): Default value if parameter is missing (default: empty list)
+- `name` (`str`): Parameter name.
+- `default` (`list`, optional): Default value if the parameter is missing. Default: empty list.
 
-**Returns:** list of booleans
-
-**Example:**
+**Returns:** `list` of `bool`
 
 ```python
 import scriptling.mcp.tool as tool
 
 flags = tool.get_bool_list("flags")  # [true, false, true]
-options = tool.get_bool_list("options", [false])
+options = tool.get_bool_list("options", [False])
 ```
 
 ## Result Functions
 
 Result functions set the tool's response and immediately stop script execution using `SystemExit`. No code after these calls will execute.
 
-### mcp.tool.return_string(text)
+### `mcp.tool.return_string(text)`
 
-Return a string result and stop execution.
+Returns a string result and stops execution.
 
 **Parameters:**
 
-- `text` (str): The result text
+- `text` (`str`): The result text.
 
-**Example:**
+**Returns:** `None`: execution stops before returning to caller.
 
 ```python
 import scriptling.mcp.tool as tool
@@ -244,15 +226,15 @@ tool.return_string("Search completed successfully")
 # Code here will not execute
 ```
 
-### mcp.tool.return_object(obj)
+### `mcp.tool.return_object(obj)`
 
-Return an object as JSON and stop execution.
+Returns an object as JSON and stops execution.
 
 **Parameters:**
 
-- `obj` (dict|list): The result object
+- `obj` (`dict` or `list`): The result object.
 
-**Example:**
+**Returns:** `None`: execution stops before returning to caller.
 
 ```python
 import scriptling.mcp.tool as tool
@@ -261,15 +243,15 @@ tool.return_object({"status": "success", "count": 42})
 # Code here will not execute
 ```
 
-### mcp.tool.return_toon(obj)
+### `mcp.tool.return_toon(obj)`
 
-Return an object encoded as TOON (compact text format optimized for LLMs) and stop execution.
+Returns an object encoded as TOON (compact text format optimized for LLMs) and stops execution.
 
 **Parameters:**
 
-- `obj` (dict|list): The result object
+- `obj` (`dict` or `list`): The result object.
 
-**Example:**
+**Returns:** `None`: execution stops before returning to caller.
 
 ```python
 import scriptling.mcp.tool as tool
@@ -278,15 +260,15 @@ tool.return_toon({"result": data})
 # Code here will not execute
 ```
 
-### mcp.tool.return_error(message)
+### `mcp.tool.return_error(message)`
 
-Return an error message and stop execution with error code 1.
+Returns an error message and stops execution with error code 1.
 
 **Parameters:**
 
-- `message` (str): Error message
+- `message` (`str`): Error message.
 
-**Example:**
+**Returns:** `None`: execution stops before returning to caller.
 
 ```python
 import scriptling.mcp.tool as tool
@@ -299,8 +281,6 @@ tool.return_error("Customer not found")
 ```
 
 ## Complete Tool Example
-
-Here's a complete example of an MCP tool using the helpers:
 
 ```python
 # Recommended: import as alias (cleanest)
@@ -334,7 +314,7 @@ tool.return_object(result)
 When implementing MCP tools, the execution environment sets `__mcp_params` before running your script:
 
 ```python
-# Tool script: greet_user.sl
+# Tool script: greet_user.py
 import scriptling.mcp.tool as tool
 
 name = tool.get_string("name", "guest")
@@ -347,11 +327,11 @@ tool.return_object({
 
 The tool execution environment will:
 
-1. Set `__mcp_params` dict with tool parameters
-2. Run the script
-3. Catch the `SystemExit` exception from `return_*` functions
-4. Extract the result from `__mcp_response`
-5. Return it to the MCP client
+1. Set the `__mcp_params` dict with tool parameters.
+2. Run the script.
+3. Catch the `SystemExit` exception from `return_*` functions.
+4. Extract the result from `__mcp_response`.
+5. Return it to the MCP client.
 
 ## Go Helper Function
 
@@ -392,7 +372,7 @@ response, exitCode, err := mcp.RunToolScript(context.Background(), sl, script, p
 // err: Go error if execution failed
 ```
 
-**Function Signature:**
+**Function signature:**
 
 ```go
 func RunToolScript(
@@ -405,27 +385,33 @@ func RunToolScript(
 
 **Parameters:**
 
-- `ctx`: Context for cancellation and timeouts
-- `sl`: Scriptling instance (must have tool helpers registered)
-- `script`: The tool script code
-- `params`: Map of parameter name to value
+- `ctx`: Context for cancellation and timeouts.
+- `sl`: Scriptling instance (must have tool helpers registered).
+- `script`: The tool script code.
+- `params`: Map of parameter name to value.
 
 **Returns:**
 
-- `response`: The tool response from `__mcp_response` (usually JSON)
-- `exitCode`: 0 for success, 1 for error
-- `err`: Go error if execution failed (nil for exitCode 0)
+- `response`: The tool response from `__mcp_response` (usually JSON).
+- `exitCode`: `0` for success, `1` for error.
+- `err`: Go error if execution failed (`nil` for `exitCode` `0`).
 
 ## Best Practices
 
-1. **Always use defaults**: Provide sensible default values for optional parameters
-2. **Validate early**: Check required parameters and return errors immediately
-3. **Return quickly**: Use `return_*` functions as soon as you have a result
-4. **Handle errors**: Use `return_error()` for user-facing error messages
-5. **Choose the right format**: Use `return_string` for text, `return_object` for structured data, `return_toon` for LLM-optimized output
+1. **Always use defaults**: Provide sensible default values for optional parameters.
+2. **Validate early**: Check required parameters and return errors immediately.
+3. **Return quickly**: Use `return_*` functions as soon as you have a result.
+4. **Handle errors**: Use `return_error()` for user-facing error messages.
+5. **Choose the right format**: Use `return_string` for text, `return_object` for structured data, `return_toon` for LLM-optimized output.
+
+## Security Considerations
+
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`scriptling.mcp.tool` itself has no implicit network, filesystem, or process access: it only reads `__mcp_params` and writes `__mcp_response`. Risk depends entirely on what the tool script you write does with those parameters.
 
 ## See Also
 
-- [MCP Library](../mcp/) - MCP client for connecting to MCP servers
-- [AI Library](../ai/) - AI client and completion functions
-- [Agent Library](../agent/) - Building AI agents with automatic tool execution
+- [scriptling.mcp](../client/): MCP client for connecting to MCP servers
+- [scriptling.ai](../../ai/): AI client and completion functions
+- [scriptling.ai.agent](../../ai/agent/): Building AI agents with automatic tool execution

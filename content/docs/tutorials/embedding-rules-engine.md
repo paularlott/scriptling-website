@@ -138,8 +138,10 @@ Expose Go functions to the script for data lookups:
 package main
 
 import (
+    "context"
     "fmt"
     "github.com/paularlott/scriptling"
+    "github.com/paularlott/scriptling/object"
     "github.com/paularlott/scriptling/stdlib"
 )
 
@@ -155,24 +157,31 @@ func main() {
     }
 
     // Register a lookup function
-    p.RegisterFunction("lookup_customer", func(args []interface{}) (interface{}, error) {
-        name, ok := args[0].(string)
-        if !ok {
-            return nil, fmt.Errorf("expected string argument")
+    p.RegisterFunc("lookup_customer", func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+        if len(args) < 1 {
+            return &object.Error{Message: "lookup_customer requires a name"}
+        }
+        name, err := args[0].AsString()
+        if err != nil {
+            return err
         }
         customer, exists := customers[name]
         if !exists {
-            return nil, fmt.Errorf("customer not found: %s", name)
+            return &object.Error{Message: fmt.Sprintf("customer not found: %s", name)}
         }
-        return customer, nil
-    })
+        return object.NewStringDict(map[string]object.Object{
+            "tier":        object.NewString(customer["tier"].(string)),
+            "orders":      object.NewInteger(int64(customer["orders"].(int))),
+            "total_spent": object.NewFloat(customer["total_spent"].(float64)),
+        })
+    }, "lookup_customer(name) - Look up a customer by name")
 
     // Register a logging function
-    p.RegisterFunction("log_action", func(args []interface{}) (interface{}, error) {
-        message, _ := args[0].(string)
+    p.RegisterFunc("log_action", func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+        message, _ := args[0].AsString()
         fmt.Printf("[LOG] %s\n", message)
-        return nil, nil
-    })
+        return &object.Null{}
+    }, "log_action(message) - Log an action")
 
     // Evaluate rule that uses custom functions
     result, err := p.Eval(`
@@ -255,7 +264,7 @@ import (
     "github.com/paularlott/scriptling/stdlib"
 )
 
-func evalRule(p *scriptling.Interpreter, ruleFile string) error {
+func evalRule(p *scriptling.Scriptling, ruleFile string) error {
     script, err := os.ReadFile(ruleFile)
     if err != nil {
         return fmt.Errorf("loading rule: %w", err)
@@ -298,40 +307,47 @@ For production code, use the Builder API for type-safe function registration:
 package main
 
 import (
+    "context"
     "fmt"
     "github.com/paularlott/scriptling"
+    "github.com/paularlott/scriptling/object"
     "github.com/paularlott/scriptling/stdlib"
-    "github.com/paularlott/scriptling/builder"
 )
 
 func main() {
     p := scriptling.New()
     stdlib.RegisterAll(p)
 
-    // Build a library with type-safe functions
-    lib := builder.NewLibrary("inventory")
+    // Build a library with native functions
+    lib := object.NewLibraryBuilder("inventory", "Inventory functions")
 
-    lib.Function("check_stock", func(ctx *builder.Context, sku string) (int, error) {
+    lib.FunctionWithHelp("check_stock", func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+        sku, err := args[0].AsString()
+        if err != nil {
+            return err
+        }
         // Simulate stock check
-        stock := map[string]int{
+        stock := map[string]int64{
             "widget-001": 42,
             "widget-002": 0,
             "widget-003": 7,
         }
-        return stock[sku], nil
-    }).Help("Check stock level for a product SKU")
+        return object.NewInteger(stock[sku])
+    }, "check_stock(sku) - Check stock level for a product SKU")
 
-    lib.Function("calculate_shipping", func(ctx *builder.Context, weight float64, zone string) (float64, error) {
+    lib.FunctionWithHelp("calculate_shipping", func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+        weight, _ := args[0].(*object.Float).FloatValue()
+        zone, _ := args[1].AsString()
         rates := map[string]float64{
-            "domestic":   5.99,
+            "domestic":     5.99,
             "international": 24.99,
         }
         base := rates[zone]
-        return base + (weight * 0.50), nil
-    }).Help("Calculate shipping cost based on weight and zone")
+        return object.NewFloat(base + (weight * 0.50))
+    }, "calculate_shipping(weight, zone) - Calculate shipping cost based on weight and zone")
 
     // Register the library
-    p.RegisterLibrary("inventory", lib.Build())
+    p.RegisterLibrary(lib.Build())
 
     // Use it in a script
     _, err := p.Eval(`

@@ -4,12 +4,12 @@ linkTitle: template
 weight: 7
 ---
 
-Go-powered template rendering. Two sub-libraries are available — import only what you need:
+Go-powered template rendering. Two sub-libraries are available: import only what you need:
 
 | Library | Import | Description |
 |---------|--------|-------------|
-| [`scriptling.template.html`](./html/) | `import scriptling.template.html as html` | `html/template` — automatic HTML escaping |
-| [`scriptling.template.text`](./text/) | `import scriptling.template.text as text` | `text/template` — no escaping, plain text output |
+| [`scriptling.template.html`](./html/) | `import scriptling.template.html as html` | `html/template`: automatic HTML escaping |
+| [`scriptling.template.text`](./text/) | `import scriptling.template.text as text` | `text/template`: no escaping, plain text output |
 
 Both expose a single `Set()` constructor that returns a `Set` object with `add(source)` and `render([name,] data)` methods.
 
@@ -61,3 +61,9 @@ tmpl.add(os.read_file("templates/partials.html"))
 tmpl.add(os.read_file("templates/page.html"))
 print(tmpl.render("page", {"Title": "Home"}))
 ```
+
+## See Also
+
+- [Utilities](../) - Parent utilities namespace
+- [scriptling.markdown](../markdown/) - Markdown to HTML conversion
+- [Libraries](../../../) - Full library reference index

@@ -1,164 +1,184 @@
 ---
 title: logging
+description: Python-style logging, backed by structured slog-based loggers.
 weight: 1
-
 aliases:
   - /reference/libraries/extlib/logging/
   - /reference/libraries/logging/
-requires_registration: true
 ---
 
-
-The `logging` library provides Python-style logging functionality, compatible with the basic Python logging interface. It uses the [paularlott/logger](https://github.com/paularlott/logger) library under the hood with slog integration.
-
-**Note**: This is an extended library and not enabled by default. You must register it explicitly.
+The `logging` library provides Python-style logging functionality, compatible with the basic Python `logging` interface. It uses the [paularlott/logger](https://github.com/paularlott/logger) library under the hood with `slog` integration. Reach for it instead of `print()` whenever a script's output needs levels, structured output, or to flow through the embedder's own logging pipeline.
 
 ## Available Functions
 
-| Function               | Description                               |
-| ---------------------- | ----------------------------------------- |
-| `getLogger(name=None)` | Get a logger instance with specified name |
+| Function | Description |
+|----------|-------------|
+| `getLogger(name=None)` | Get a named logger instance. |
+| `debug(msg)` | Log a debug message with the default logger. |
+| `info(msg)` | Log an info message with the default logger. |
+| `warning(msg)` | Log a warning message with the default logger. |
+| `warn(msg)` | Alias for `warning()` (Python compatibility). |
+| `error(msg)` | Log an error message with the default logger. |
+| `critical(msg)` | Log a critical message with the default logger (mapped to `error` level). |
+
+## Constants
+
+| Constant | Description |
+|----------|-------------|
+| `logging.DEBUG` | Debug level (`10`). |
+| `logging.INFO` | Info level (`20`). |
+| `logging.WARNING` | Warning level (`30`). |
+| `logging.WARN` | Alias for `WARNING` (`30`). |
+| `logging.ERROR` | Error level (`40`). |
+| `logging.CRITICAL` | Critical level (`50`). |
+
+## Functions
+
+### `getLogger(name=None)`
+
+Create and return a logger object with the specified name. The name is used as the group name in the underlying logger and is displayed as a nested group in log output, e.g. `[scriptling.componentName]`.
+
+**Parameters:**
+- `name` (`str`, optional): Logger name. Default: `None` (uses `"scriptling"`).
+
+**Returns:** `Logger`: an object with `debug()`, `info()`, `warning()`, `warn()`, `error()`, and `critical()` methods.
+
+```python
+import logging
+
+logger = logging.getLogger("myApp")
+
+logger.debug("debug message")
+logger.info("info message")
+logger.warning("warn message")
+logger.error("error message")
+logger.critical("critical message")
+```
+
+### `debug(msg)`
+
+Log a debug message using the default (module-level) logger.
+
+**Parameters:**
+- `msg` (`str`): Message to log.
+
+**Returns:** `bool`: always `True`.
+
+```python
+import logging
+
+logging.debug("Starting up")
+```
+
+### `info(msg)`
+
+Log an info message using the default logger.
+
+**Parameters:**
+- `msg` (`str`): Message to log.
+
+**Returns:** `bool`: always `True`.
+
+```python
+import logging
+
+logging.info("This is an info message")
+```
+
+### `warning(msg)`
+
+Log a warning message using the default logger.
+
+**Parameters:**
+- `msg` (`str`): Message to log.
+
+**Returns:** `bool`: always `True`.
+
+```python
+import logging
+
+logging.warning("Watch out!")
+```
+
+### `warn(msg)`
+
+Alias for `warning()`, provided for Python compatibility.
+
+**Parameters:**
+- `msg` (`str`): Message to log.
+
+**Returns:** `bool`: always `True`.
+
+```python
+import logging
+
+logging.warn("Watch out!")
+```
+
+### `error(msg)`
+
+Log an error message using the default logger.
+
+**Parameters:**
+- `msg` (`str`): Message to log.
+
+**Returns:** `bool`: always `True`.
+
+```python
+import logging
+
+logging.error("Something went wrong")
+```
+
+### `critical(msg)`
+
+Log a critical message using the default logger. Critical messages are mapped to the `error` level in the underlying Go logger (there is no separate critical level).
+
+**Parameters:**
+- `msg` (`str`): Message to log.
+
+**Returns:** `bool`: always `True`.
+
+```python
+import logging
+
+logging.critical("Unrecoverable failure")
+```
 
 ## Environment Isolation
 
-Each Scriptling environment gets its own logger instance. This means:
+Each Scriptling environment gets its own logger instance:
 
-- Multiple environments can have different loggers without interfering
-- Loggers can have different output destinations, levels, and formats
-- The logger instance is tied to the environment it's registered with
+- Multiple environments can have different loggers without interfering with each other.
+- Loggers can have different output destinations, levels, and formats.
+- The logger instance is tied to the environment it was registered with.
 
 ```go
 // Environment 1
 p1 := scriptling.New()
-logger1 := logslog.New(logslog.Config{
-    Writer: os.Stdout,
-}).WithGroup("app1")
+logger1 := logslog.New(logslog.Config{Writer: os.Stdout}).WithGroup("app1")
 extlibs.RegisterLoggingLibrary(p1, logger1)
 
 // Environment 2 (different logger)
 p2 := scriptling.New()
-logger2 := logslog.New(logslog.Config{
-    Writer: someOtherWriter,
-}).WithGroup("app2")
+logger2 := logslog.New(logslog.Config{Writer: someOtherWriter}).WithGroup("app2")
 extlibs.RegisterLoggingLibrary(p2, logger2)
-```
-
-## Functions
-
-### logging.getLogger(name=None)
-
-Creates and returns a logger object with the specified name. If no name is provided, defaults to "scriptling".
-
-**Parameters:**
-
-- `name` (str, optional): Logger name. Used as the group name in the underlying logger.
-
-The logger name will be displayed as a nested group in the log output, e.g., `[scriptling.componentName]`.
-
-**Returns:**
-
-- Logger object with methods for logging at different levels
-
-### Module-level logging functions
-
-These functions provide convenient access to logging without creating a logger instance:
-
-- `logging.debug(msg)` - Log a debug message
-- `logging.info(msg)` - Log an info message
-- `logging.warning(msg)` - Log a warning message
-- `logging.warn(msg)` - Alias for warning (Python compatibility)
-- `logging.error(msg)` - Log an error message
-- `logging.critical(msg)` - Log a critical message
-
-## Logger Methods
-
-When you get a logger using `getLogger()`, it returns an object with these methods:
-
-- `logger.debug(msg)` - Log a debug message
-- `logger.info(msg)` - Log an info message
-- `logger.warning(msg)` - Log a warning message
-- `logger.warn(msg)` - Alias for warning (Python compatibility)
-- `logger.error(msg)` - Log an error message
-- `logger.critical(msg)` - Log a critical message
-
-## Constants
-
-The library defines standard logging level constants:
-
-- `logging.DEBUG = 10`
-- `logging.INFO = 20`
-- `logging.WARNING = 30`
-- `logging.WARN = 30` (alias for WARNING)
-- `logging.ERROR = 40`
-- `logging.CRITICAL = 50`
-
-## Examples
-
-### Basic Usage
-
-```python
-import logging
-
-# Simple logging using module functions
-logging.warning('Watch out!')
-logging.info('This is an info message')
-logging.error('Something went wrong')
-```
-
-### Using Named Loggers
-
-```python
-import logging
-
-# Get a logger with a specific name
-logger = logging.getLogger('myApp')
-
-# Log messages with the logger
-logger.debug('debug message')
-logger.info('info message')
-logger.warning('warn message')
-logger.error('error message')
-logger.critical('critical message')
-```
-
-### Multiple Loggers
-
-```python
-import logging
-
-# Different loggers for different components
-app_logger = logging.getLogger('app')
-db_logger = logging.getLogger('database')
-api_logger = logging.getLogger('api')
-
-app_logger.info('Application starting')
-db_logger.debug('Connecting to database')
-api_logger.warning('Rate limit approaching')
 ```
 
 ## Configuration
 
-The default logger is configured with:
-
-- Level: INFO
-- Format: console (human-readable)
-- Output: Standard output
-- Group: "scriptling"
-
-All loggers created with `getLogger()` will inherit these settings unless specified otherwise.
+The default logger is configured with level `INFO`, console (human-readable) format, output to stdout, and group `"scriptling"`. Loggers created with `getLogger()` inherit these settings unless the embedder configures otherwise.
 
 ## Using with the `scriptling` CLI
 
-When running scripts via the `scriptling` CLI, the `logging` library is automatically wired to the CLI's own logger. The CLI exposes two flags that control both the server's internal logging and any output produced through `logging.*` / `logger.*` calls in your scripts:
+When running scripts via the `scriptling` CLI, the `logging` library is automatically wired to the CLI's own logger. Two flags control both the server's internal logging and any output produced through `logging.*`/`logger.*` calls in scripts:
 
-| Flag            | Environment Variable     | Config Path   | Values                          | Default  |
-| --------------- | ------------------------ | ------------- | ------------------------------- | -------- |
-| `--log-level`   | `SCRIPTLING_LOG_LEVEL`   | `log.level`   | `trace`, `debug`, `info`, `warn`, `error` | `info`   |
-| `--log-format`  | `SCRIPTLING_LOG_FORMAT`  | `log.format`  | `console` (coloured), `json`    | `console`|
+| Flag | Environment Variable | Config Path | Values | Default |
+|------|----------------------|--------------|--------|---------|
+| `--log-level` | `SCRIPTLING_LOG_LEVEL` | `log.level` | `trace`, `debug`, `info`, `warn`, `error` | `info` |
+| `--log-format` | `SCRIPTLING_LOG_FORMAT` | `log.format` | `console` (coloured), `json` | `console` |
 
 These flags apply to every execution mode (script file, `--code`, `--interactive`, `--server`, `--mcp-tools`, `--mcp-exec-script`, `--lint`).
-
-### Examples
 
 ```bash
 # Show debug output while running a script
@@ -167,16 +187,11 @@ scriptling --log-level debug app.py
 # JSON-formatted logs for ingestion into a log aggregator
 scriptling --log-level info --log-format json --server :8000 app.py
 
-# Enable verbose MCP / HTTP server diagnostics
-scriptling --log-level debug --server :8000 --mcp-tools ./tools --mcp-exec-script app.py
-
 # Via environment variables (useful for .env files or container deployments)
 SCRIPTLING_LOG_LEVEL=debug SCRIPTLING_LOG_FORMAT=json scriptling --server :8000 app.py
 ```
 
-When `--log-level debug` is set, the HTTP and MCP servers emit additional diagnostics such as incoming requests, dispatched handlers, MCP tool invocations, and WebSocket lifecycle events — useful for troubleshooting routing, tool loading, and handler behaviour.
-
-### Configuration file
+When `--log-level debug` is set, the HTTP and MCP servers emit additional diagnostics such as incoming requests, dispatched handlers, MCP tool invocations, and WebSocket lifecycle events.
 
 The same options can be set in `scriptling.toml`:
 
@@ -186,19 +201,22 @@ level = "debug"
 format = "json"
 ```
 
-Priority order (highest to lowest): **command-line flag** > **environment variable** > **config file** > **default**.
+Priority order (highest to lowest): command-line flag, environment variable, config file, default.
 
-## Differences from Python's logging module
+## Python Compatibility
 
-This is a simplified implementation focused on basic logging functionality:
+Compared to Python's `logging` module, this is a simplified implementation focused on basic logging:
 
-1. No configuration API - loggers use the default configuration
-2. No handlers - output is always to stdout
-3. No formatters - output format is fixed
-4. No filtering - all messages at the configured level are shown
-5. No hierarchy - named loggers are independent (except for the shared group prefix)
-6. No file logging - as per requirements
+- No configuration API: loggers use the default configuration.
+- No handlers: output always goes to the configured writer (stdout by default).
+- No formatters: output format is fixed.
+- No filtering: all messages at the configured level are shown.
+- No hierarchy: named loggers are independent except for the shared group prefix.
+- No file logging.
 
-## Integration with Scriptling
+Log messages integrate with Scriptling's output capture system alongside `print()` and other script output.
 
-The logging library integrates seamlessly with Scriptling's output capture system. All log messages will be captured along with any print statements or other output from your scripts.
+## See Also
+
+- [sys](../sys/): Access argv and stdin
+- [secrets](../secrets/): Generate tokens, separate from logging concerns

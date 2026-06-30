@@ -257,26 +257,15 @@ fmt.Println(buf.String())  // "Hello\n"
 
 ### Register Libraries
 
+Libraries are not available to scripts unless you register them. Register all standard libraries with a single call:
+
 ```go
-import (
-    "github.com/paularlott/scriptling/stdlib"
-    "github.com/paularlott/scriptling/extlibs"
-)
+import "github.com/paularlott/scriptling/stdlib"
 
-// Register all standard libraries at once
 stdlib.RegisterAll(p)
-
-// Register individual libraries
-p.RegisterLibrary(stdlib.JSONLibrary)
-p.RegisterLibrary(stdlib.MathLibrary)
-
-// Register extended libraries
-p.RegisterLibrary(extlibs.RequestsLibrary)
-
-// Register os/pathlib with security restrictions
-extlibs.RegisterOSLibrary(p, []string{"/tmp", "/data"})
-extlibs.RegisterPathlibLibrary(p, []string{"/tmp", "/data"})
 ```
+
+Extended and `scriptling.*` libraries are registered individually, and filesystem libraries take an `allowedPaths` argument for access control. See [Library Registration](library-registration/) for the complete list of libraries and their registration functions.
 
 ### Programmatic Import
 
@@ -327,7 +316,7 @@ p.SetLibraryLoader(loader)
 // Chain multiple loaders
 chain := libloader.NewChain(
     libloader.NewFilesystem("/app/libs"),
-    libloader.NewAPI("https://api.example.com/libs"),
+    libloader.NewMemoryLoader(map[string]string{}),
 )
 p.SetLibraryLoader(chain)
 ```

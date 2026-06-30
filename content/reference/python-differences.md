@@ -21,7 +21,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Nested classes | Classes cannot be defined inside other classes/functions |
 | Metaclasses | Custom metaclasses are not supported |
 | Descriptors | The descriptor protocol is not implemented |
-| Regex backreferences (`\1`, `\2`) | RE2 engine used; no backreferences, lookaheads, or lookbehinds — see [regex docs](../../reference/libraries/text-processing/regex/) |
+| Regex backreferences (`\1`, `\2`) | RE2 engine used; no backreferences, lookaheads, or lookbehinds: see [regex docs](../../reference/libraries/text-processing/regex/) |
 
 ### Built-in Functions NOT Supported
 
@@ -32,7 +32,6 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | `compile()`, `eval()`, `exec()` | Dynamic code execution not supported |
 | `globals()`, `locals()` | Scope introspection not available |
 | `vars()` | Variable introspection not supported |
-| `dir()` | Limited to `type()` |
 | `__import__()` | Use `import` statement |
 | `memoryview()`, `bytearray()`, `bytes()` | Advanced byte manipulation not supported |
 | `complex()` | Complex numbers not implemented |
@@ -43,7 +42,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Module | Notes |
 |--------|-------|
 | `asyncio` | Async I/O framework |
-| `threading`, `multiprocessing` | Use `runtime.background` — `shared=True` for shared-env threads, default for isolated parallel workers |
+| `threading`, `multiprocessing` | Use `runtime.background`: `shared=True` for shared-env threads, default for isolated parallel workers |
 | `socket` | Low-level networking; use `requests` for HTTP |
 | `pickle`, `marshal` | Use `json` for serialization |
 | `struct` | Binary data structures |
@@ -88,7 +87,7 @@ Scriptling **does support**:
 - ✅ F-strings and `.format()`
 - ✅ True division (`/` always returns float)
 - ✅ Set literals `{1, 2, 3}` and set operations
-- ✅ Set hashability: `TypeError` raised for unhashable types (lists, dicts, instances) matching Python semantics
+- ✅ Set hashability: `TypeError` raised for unhashable types (lists, dicts, sets, instances without `__hash__`) matching Python semantics
 - ✅ Bool arithmetic: `True + True == 2`, `True == 1`, `False == 0`
 - ✅ String comparison operators (`<`, `>`, `<=`, `>=`)
 - ✅ Implicit tuple packing (`x = 1, 2`, `return a, b`, `t = 42,`)
@@ -187,21 +186,21 @@ import os
 content = os.read_file("/etc/passwd")
 ```
 
-### Error vs Exception
+### Errors and Exceptions Are Both Catchable
 
-Scriptling distinguishes between fatal Errors and catchable Exceptions:
+`try`/`except` catches both runtime Errors (type errors, name errors, and so on) and explicitly raised Exceptions. When an Error is caught, Scriptling infers the exception type from the error message:
 
 ```python
-# Errors cannot be caught
+# A runtime Error is caught, with its type inferred
 try:
-    x = undefined_variable  # NameError (fatal)
-except:
-    print("Won't get here")  # Never runs
+    x = undefined_variable  # produces a NameError-flavoured Error
+except NameError:
+    print("Caught!")  # This runs
 
-# Exceptions can be caught
+# An explicitly raised Exception is caught too
 try:
-    raise "Custom error"  # Exception
-except:
+    raise ValueError("Custom error")
+except Exception:
     print("Caught!")  # This runs
 ```
 

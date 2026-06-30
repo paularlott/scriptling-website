@@ -1,5 +1,6 @@
 ---
 title: html
+description: Escape and unescape HTML special characters and entities.
 weight: 1
 
 aliases:
@@ -9,60 +10,45 @@ aliases:
 
 HTML escaping and unescaping library, matching Python's `html` module.
 
-## Import
-
-```python
-import html
-```
-
 ## Available Functions
 
-| Function      | Description                    |
-| ------------- | ------------------------------ |
-| `escape(s)`   | Escape HTML special characters |
-| `unescape(s)` | Unescape HTML entities         |
+| Function | Description |
+|----------|-------------|
+| `escape(s)` | Escape HTML special characters in a string. |
+| `unescape(s)` | Unescape HTML entities in a string. |
 
 ## Functions
 
 ### `escape(s)`
 
-Escape HTML special characters in a string.
-
-Converts:
-
-- `&` → `&amp;`
-- `<` → `&lt;`
-- `>` → `&gt;`
-- `"` → `&quot;`
-- `'` → `&#39;`
+Escapes HTML special characters in a string so it can be safely embedded in HTML. Converts `&` to `&amp;`, `<` to `&lt;`, `>` to `&gt;`, `"` to `&#34;`, and `'` to `&#39;`.
 
 **Parameters:**
 
-- `s` - String to escape
+- `s` (`str`): String to escape.
 
-**Returns:** Escaped string
+**Returns:** `str`: the escaped string.
 
 ```python
+import html
+
 safe = html.escape("<script>alert('xss')</script>")
 print(safe)  # "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;"
 ```
 
 ### `unescape(s)`
 
-Unescape HTML entities in a string.
-
-Converts HTML entities back to their corresponding characters. Handles:
-
-- Named entities: `&lt;`, `&gt;`, `&amp;`, `&quot;`, `&#39;`
-- Numeric entities: `&#60;`, `&#x3c;`
+Unescapes HTML entities in a string, converting them back to their corresponding characters. Handles named entities (`&lt;`, `&gt;`, `&amp;`, `&quot;`, `&#39;`) and numeric entities (`&#60;`, `&#x3c;`).
 
 **Parameters:**
 
-- `s` - String with HTML entities to unescape
+- `s` (`str`): String with HTML entities to unescape.
 
-**Returns:** Unescaped string
+**Returns:** `str`: the unescaped string.
 
 ```python
+import html
+
 text = html.unescape("&lt;script&gt;")
 print(text)  # "<script>"
 ```
@@ -118,7 +104,13 @@ print(original == restored)  # True
 
 ## Python Compatibility
 
-- `escape(s)` - ✅ Compatible
 - `unescape(s)` - ✅ Compatible
+- `escape(s)` - ⚠️ Mostly compatible. The implementation uses Go's `html.EscapeString`, which emits numeric character references for quotes (`"` → `&#34;`, `'` → `&#39;`) rather than Python's named/hex forms (`"` → `&quot;`, `'` → `&#x27;`). The escaped output is semantically equivalent but not byte-identical.
 
-Note: Python's `html.escape()` has an optional `quote` parameter (default `True`) which is not implemented. Our implementation always escapes quotes.
+Note: Python's `html.escape()` has an optional `quote` parameter (default `True`) which is not implemented. This implementation always escapes quotes.
+
+## See Also
+
+- [html.parser](./html.parser.md) - HTML parsing for extracting tags and data
+- [string](./string.md) - String constants for character classification
+- [regex](./regex.md) - Regular expressions for text processing

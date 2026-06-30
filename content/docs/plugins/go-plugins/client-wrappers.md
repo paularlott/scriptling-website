@@ -1,6 +1,6 @@
 ---
 title: Client Wrappers
-description: How the host wraps plugin functions and classes — auto-generated proxies and custom Scriptling wrappers.
+description: How the host wraps plugin functions and classes, auto-generated proxies and custom Scriptling wrappers.
 weight: 10
 ---
 
@@ -41,7 +41,7 @@ class Counter:
         scriptling.plugin.release(self._plugin_remote)
 ```
 
-The `__del__` method sends `object.destroy` to the plugin, which calls the plugin-side `__del__` to free resources (file handles, connections, etc.). The evaluator also installs a GC finalizer on the proxy instance, so cleanup happens automatically when the object becomes unreachable — even if `__del__` is never called explicitly.
+The `__del__` method sends `object.destroy` to the plugin, which calls the plugin-side `__del__` to free resources (file handles, connections, etc.). The evaluator also installs a GC finalizer on the proxy instance, so cleanup happens automatically when the object becomes unreachable: even if `__del__` is never called explicitly.
 
 ## Custom Wrappers
 
@@ -93,7 +93,7 @@ class Config:
 
 The host uses the supplied source instead of auto-generating a proxy. The underlying RPC function or class remains callable.
 
-**Custom class wrappers must include `__del__`** that calls `scriptling.plugin.release(self._plugin_remote)` — without it, the plugin-side object is never destroyed and resources leak.
+**Custom class wrappers must include `__del__`** that calls `scriptling.plugin.release(self._plugin_remote)`: without it, the plugin-side object is never destroyed and resources leak.
 
 ### When to Use Custom Wrappers
 
@@ -124,14 +124,14 @@ type configData struct {
 func main() {
     server := plugin.NewServer("mixed", "1.0.0", "Mixed demo")
 
-    // Auto-generated proxy — no Wrapper() call
+    // Auto-generated proxy: no Wrapper() call
     fb := object.NewFunctionBuilder()
     fb.Function(func(name string) string {
         return "generated:" + name
     })
     server.RegisterFunc("generated", fb)
 
-    // Custom wrapper — Wrapper() replaces the auto-proxy
+    // Custom wrapper: Wrapper() replaces the auto-proxy
     fbWrap := object.NewFunctionBuilder()
     fbWrap.Function(func(name string) string {
         return "wrapped:" + name

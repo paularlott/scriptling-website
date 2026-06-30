@@ -1,48 +1,35 @@
 ---
 title: glob
+description: Unix shell-style wildcard matching for filenames, similar to Python's glob module.
 weight: 1
-
 aliases:
   - /reference/libraries/extlib/glob/
   - /reference/libraries/glob/
-requires_registration: true
 ---
 
-The glob library provides Unix shell-style wildcards for filename matching, similar to Python's glob module. It allows you to find files and directories matching specific patterns.
+The `glob` library provides Unix shell-style wildcards for filename matching, similar to Python's `glob` module. Reach for it when you need to find files and directories matching a pattern rather than walking a directory tree by hand.
 
 ## Available Functions
 
-| Function                         | Description                         |
-| -------------------------------- | ----------------------------------- |
-| `glob(pattern[, root_dir="."])`  | Find all pathnames matching pattern |
-| `iglob(pattern[, root_dir="."])` | Iterator over matching pathnames    |
-
-## Basic Usage
-
-```python
-import glob
-
-# Find all Python files in the current directory
-files = glob.glob("*.py")
-print(files)  # ["script.py", "app.py", ...]
-
-# Find all text files recursively
-all_txt = glob.glob("**/*.txt")
-```
+| Function | Description |
+|----------|-------------|
+| `glob(pattern, root_dir=".")` | Find all pathnames matching a pattern. |
+| `iglob(pattern, root_dir=".")` | Iterator over pathnames matching a pattern. |
+| `escape(pattern)` | Escape special characters so a pattern is matched literally. |
 
 ## Functions
 
-### `glob(pattern[, root_dir="."])`
+### `glob(pattern, root_dir=".")`
 
-Find all pathnames matching a pattern. Returns a list of filenames.
+Find all pathnames matching a pattern. Pattern syntax: `*` matches everything, `?` matches any single character, `[seq]` matches any character in `seq`, `[!seq]` matches any character not in `seq`, and `**` matches all files and directories recursively (when supported). Results are returned in arbitrary order, and an empty list is returned if there are no matches.
 
-**Pattern Syntax:**
+**Parameters:**
+- `pattern` (`str`): Shell-style wildcard pattern to match.
+- `root_dir` (`str`, optional): Directory to search from. Default: `"."`.
 
-- `*` - Matches everything
-- `?` - Matches any single character
-- `[seq]` - Matches any character in seq
-- `[!seq]` - Matches any character not in seq
-- `**` - Matches all files and directories recursively (when supported)
+**Returns:** `list`: matching pathnames as strings.
+
+**Raises:** `Error`: if `root_dir` is outside the allowed paths (see [Security Considerations](#security-considerations)).
 
 ```python
 import glob
@@ -59,13 +46,22 @@ files = glob.glob("file?.txt")  # file1.txt, filea.txt, etc.
 # Match character ranges
 logs = glob.glob("log[0-9].txt")  # log0.txt, log1.txt, etc.
 
-# Match from specific directory
+# Recursively find all markdown files
+docs = glob.glob("**/*.md")
+
+# Search from a specific directory
 configs = glob.glob("*.json", "/etc/myapp")
 ```
 
-### `iglob(pattern[, root_dir="."])`
+### `iglob(pattern, root_dir=".")`
 
-Returns an iterator over the filenames matching the pattern. This is more memory efficient for large result sets.
+Find all pathnames matching a pattern, returned as an iterator instead of a list. This is more memory efficient for large result sets since matches are not all materialized at once.
+
+**Parameters:**
+- `pattern` (`str`): Shell-style wildcard pattern to match.
+- `root_dir` (`str`, optional): Directory to search from. Default: `"."`.
+
+**Returns:** `iterator`: yields matching pathnames as strings.
 
 ```python
 import glob
@@ -77,134 +73,29 @@ for filename in glob.iglob("**/*.py"):
 
 ### `escape(pattern)`
 
-Escape all special characters in a pattern so they are treated as literal characters rather than wildcards.
+Escape all special characters (`*`, `?`, `[`, `]`) in a pattern so they are treated as literal characters rather than wildcards.
+
+**Parameters:**
+- `pattern` (`str`): Pattern containing characters to escape.
+
+**Returns:** `str`: the escaped pattern.
 
 ```python
 import glob
 
-# Escape special characters to search for literal filenames
+# Escape special characters to search for a literal filename
 pattern = glob.escape("file*.txt")
-# Returns "file[*].txt" which matches literal "file*.txt"
+# Returns "file[*].txt" which matches the literal "file*.txt"
 ```
 
-## Pattern Examples
+## Security Considerations
 
-### Common Patterns
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-```python
-import glob
+`glob` provides read access to the host filesystem (directory listings and path matching). When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterGlobLibrary(p, allowedPaths)`: path traversal (`../`) is blocked automatically. See [Library Registration](/docs/go-integration/library-registration/#filesystem-libraries) and the [Security Guide](/docs/security/#file-system-security).
 
-# All files in current directory
-all_files = glob.glob("*")
+## See Also
 
-# All directories
-dirs = glob.glob("*/")
-
-# All hidden files (files starting with dot)
-hidden = glob.glob(".*")
-
-# Recursively find all files under a directory
-all_files_recursive = glob.glob("**/*")
-
-# Find all Python files in subdirectories
-python_files = glob.glob("*/*.py")
-
-# Multiple extensions with bracket notation
-scripts = glob.glob("*.*[py][sh]")  # Matches .py, .sh, etc.
-```
-
-### Recursive Patterns with `**`
-
-The `**` pattern matches zero or more directories:
-
-```python
-import glob
-
-# Find all markdown files recursively
-docs = glob.glob("**/*.md")
-
-# Find all files under src/
-src_files = glob.glob("src/**/*")
-
-# Find specific file pattern recursively
-configs = glob.glob("**/config.json")
-```
-
-## Examples
-
-### Finding and Processing Files
-
-```python
-import glob
-
-# Find all log files and analyze them
-logs = glob.glob("logs/*.log")
-for log_file in logs:
-    print(f"Processing {log_file}")
-    # ... process file ...
-```
-
-### Working with Different Directories
-
-```python
-import glob
-
-# Search in specific directory
-configs = glob.glob("*.conf", "/etc/myapp")
-
-# Search from current directory (default)
-current = glob.glob("*.txt")
-```
-
-### Using Iterators for Large Result Sets
-
-```python
-import glob
-
-# More memory efficient for large directories
-for filename in glob.iglob("**/*"):
-    # Process each file individually
-    print(filename)
-```
-
-### Combining with Other Libraries
-
-```python
-import glob
-import pathlib
-
-# Use glob results with pathlib
-for file_path in glob.glob("*.txt"):
-    p = pathlib.Path(file_path)
-    print(f"{file_path}: {p.stat().st_size} bytes")
-```
-
-## Security
-
-The glob library respects filesystem security restrictions. If the Scriptling interpreter is configured with allowed paths, all glob operations are restricted to those directories. Attempting to access files outside the allowed directories will result in security errors.
-
-```python
-import glob
-
-# This will fail if /etc is outside allowed directories
-files = glob.glob("/etc/passwd*")
-```
-
-## Notes
-
-- The `**` pattern for recursive matching is supported
-- Pattern matching is case-sensitive on Unix systems and may be case-insensitive on Windows depending on the filesystem
-- Results are returned in arbitrary order (not sorted)
-- Empty list is returned if no matches are found
-
-## Error Handling
-
-```python
-import glob
-
-# Security errors will be raised for disallowed paths
-try:
-    files = glob.glob("/etc/*")
-except Exception as e:
-    print(f"Access denied: {e}")
-```
+- [os](../os/): Operating system interfaces
+- [pathlib](../pathlib/): Object-oriented filesystem paths, including a `Path.glob()` method
+- [fs](../fs/): Binary file I/O

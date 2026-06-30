@@ -97,7 +97,7 @@ def print_report(users, title):
 
     for user in users:
         print(f"  {user['name']} <{user['email']}>")
-        print(f"    {user['company']['name']} — {user['address']['city']}")
+        print(f"    {user['company']['name']}: {user['address']['city']}")
         print()
 
 # Main
@@ -303,9 +303,9 @@ if resp.status_code == 204:
 ## Best Practices
 
 - **Always check status codes** before processing responses
-- **Always set timeouts** — don't rely on the default
+- **Always set timeouts**: don't rely on the default
 - **Parse JSON responses** with `json.loads()` instead of using raw body text
-- **Stringify before sending** — use `json.dumps()` to convert payloads before POST/PUT
+- **Stringify before sending**: use `json.dumps()` to convert payloads before POST/PUT
 
 ## See Also
 

@@ -46,7 +46,7 @@ When registering Go functions, provide documentation via the `HelpText` field:
 ```go
 p.RegisterFunc("my_func", func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
     // Implementation
-    return object.None
+    return &object.Null{}
 }, `my_func(arg1, arg2) - Brief description
 
   Detailed description of what the function does.
@@ -67,7 +67,7 @@ If you omit the help text, basic help will be auto-generated:
 
 ```go
 p.RegisterFunc("my_func", func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
-    return object.None
+    return &object.Null{}
 })  // Auto-generates: "my_func(...) - User-defined function"
 ```
 

@@ -1,5 +1,6 @@
 ---
 title: uuid
+description: UUID generation, matching Python's uuid module.
 weight: 1
 
 aliases:
@@ -7,68 +8,72 @@ aliases:
   - /reference/libraries/uuid/
 ---
 
-UUID generation library, matching Python's `uuid` module.
-
-## Import
-
-```python
-import uuid
-```
+The `uuid` library generates universally unique identifiers (UUIDs) using time-based, random, or sortable timestamp-based schemes.
 
 ## Available Functions
 
-| Function  | Description                                   |
-| --------- | --------------------------------------------- |
-| `uuid1()` | Generate UUID version 1 (time-based)          |
-| `uuid4()` | Generate UUID version 4 (random)              |
-| `uuid7()` | Generate UUID version 7 (timestamp, sortable) |
+| Function | Description |
+|----------|-------------|
+| `uuid1()` | Generate UUID version 1 (time-based). |
+| `uuid4()` | Generate UUID version 4 (random). |
+| `uuid7()` | Generate UUID version 7 (timestamp-based, sortable). |
 
 ## Functions
 
 ### `uuid1()`
 
-Generate a UUID version 1 (time-based).
+Generates a UUID version 1, based on the current time and MAC address. Useful for unique IDs where time ordering matters (the timestamp can be partially recovered from the value, though it isn't lexicographically sortable as a string).
 
-Based on current time and MAC address. Good for generating unique IDs where time ordering matters.
+**Returns:** `str`: a UUID in the form `xxxxxxxx-xxxx-1xxx-yxxx-xxxxxxxxxxxx`.
+
+**Raises:** `Error`: if UUID generation fails.
 
 ```python
+import uuid
+
 id = uuid.uuid1()
 print(id)  # e.g., "f47ac10b-58cc-1e4c-a26f-e3fc32165abc"
 ```
 
 ### `uuid4()`
 
-Generate a UUID version 4 (random).
+Generates a UUID version 4, fully random. The most commonly used form for general-purpose unique identifiers.
 
-Randomly generated UUID. Most commonly used for general-purpose unique identifiers.
+**Returns:** `str`: a UUID in the form `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`.
 
 ```python
+import uuid
+
 id = uuid.uuid4()
 print(id)  # e.g., "550e8400-e29b-41d4-a716-446655440000"
 ```
 
 ### `uuid7()`
 
-Generate a UUID version 7 (Unix timestamp-based, sortable).
+Generates a UUID version 7, based on the Unix timestamp in milliseconds. UUIDs generated in sequence sort in chronological order as strings, making this ideal for database primary keys.
 
-Based on Unix timestamp in milliseconds. UUIDs generated in sequence will sort in chronological order. Ideal for database primary keys.
+**Returns:** `str`: a UUID in the form `xxxxxxxx-xxxx-7xxx-yxxx-xxxxxxxxxxxx`.
+
+**Raises:** `Error`: if UUID generation fails.
 
 ```python
+import uuid
+
 id = uuid.uuid7()
 print(id)  # e.g., "018f6b1c-4e5d-7abc-8def-0123456789ab"
 ```
 
 ## UUID Versions Comparison
 
-| Version | Based On   | Sortable  | Use Case                           |
-| ------- | ---------- | --------- | ---------------------------------- |
-| uuid1() | Time + MAC | Partially | Legacy systems, audit trails       |
-| uuid4() | Random     | No        | General purpose, most common       |
-| uuid7() | Timestamp  | Yes       | Database keys, distributed systems |
+| Version | Based On | Sortable | Use Case |
+|---------|----------|----------|----------|
+| `uuid1()` | Time + MAC | Partially | Legacy systems, audit trails |
+| `uuid4()` | Random | No | General purpose, most common |
+| `uuid7()` | Timestamp | Yes | Database keys, distributed systems |
 
 ## Examples
 
-### Generate Unique Request ID
+### Generate a Unique Request ID
 
 ```python
 import uuid
@@ -76,7 +81,6 @@ import uuid
 def make_request():
     request_id = uuid.uuid4()
     print("Request ID:", request_id)
-    # Use request_id for tracking...
 
 make_request()
 ```
@@ -97,26 +101,17 @@ record = create_record({"name": "Test"})
 print(record["id"])
 ```
 
-### Batch Processing with Ordered IDs
-
-```python
-import uuid
-import time
-
-ids = []
-for i in range(3):
-    ids.append(uuid.uuid7())
-    time.sleep(0.01)  # Small delay
-
-# IDs will be in chronological order
-for id in ids:
-    print(id)
-```
-
 ## Python Compatibility
 
-- `uuid1()` - ✅ Compatible
-- `uuid4()` - ✅ Compatible
-- `uuid7()` - ✅ Compatible (Python 3.12+)
+| Function | Supported |
+|----------|-----------|
+| `uuid1()` | Yes |
+| `uuid4()` | Yes |
+| `uuid7()` | Yes (Python 3.12+) |
+| `uuid3()` | No (name-based, MD5) |
+| `uuid5()` | No (name-based, SHA-1) |
 
-Note: Python's uuid module also provides `uuid3()` and `uuid5()` (name-based) which are not currently implemented.
+## See Also
+
+- [random](../random/): random number generation.
+- [hashlib](../hashlib/): cryptographic hash functions.

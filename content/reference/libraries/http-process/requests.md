@@ -1,127 +1,158 @@
 ---
 title: requests
+description: HTTP client for making GET, POST, PUT, DELETE, and PATCH requests.
 weight: 1
-
 aliases:
   - /reference/libraries/extlib/requests/
   - /reference/libraries/requests/
-requires_registration: true
 ---
 
-Functions for making HTTP requests. Matches Python's `requests` library API.
+The `requests` library provides functions for making HTTP requests, matching Python's `requests` library API. Reach for it any time a script needs to call an HTTP/HTTPS API.
 
 ## Available Functions
 
-| Function                          | Description                                |
-| --------------------------------- | ------------------------------------------ |
-| `get(url, **kwargs)`              | Make a GET request to the specified URL    |
-| `post(url, data=None, **kwargs)`  | Make a POST request to the specified URL   |
-| `put(url, data=None, **kwargs)`   | Make a PUT request to the specified URL    |
-| `delete(url, **kwargs)`           | Make a DELETE request to the specified URL |
-| `patch(url, data=None, **kwargs)` | Make a PATCH request to the specified URL  |
-| `parallel(requests, max_parallel=4)` | Execute multiple HTTP requests in parallel |
+| Function | Description |
+|----------|-------------|
+| `get(url, **kwargs)` | Make a GET request. |
+| `post(url, data=None, **kwargs)` | Make a POST request. |
+| `put(url, data=None, **kwargs)` | Make a PUT request. |
+| `delete(url, **kwargs)` | Make a DELETE request. |
+| `patch(url, data=None, **kwargs)` | Make a PATCH request. |
+| `parallel(requests, max_parallel=4)` | Execute multiple HTTP requests concurrently. |
 
 ## Functions
 
-### requests.get(url, \*\*kwargs)
+### `get(url, **kwargs)`
 
-Makes a GET request to the specified URL.
-
-**Parameters:**
-
-- `url`: URL to request
-- `**kwargs`: Optional arguments
-  - `timeout` (int): Request timeout in seconds (default: 5)
-  - `headers` (dict): HTTP headers to send
-  - `params` (dict): Query parameters to append to the URL
-  - `auth` (tuple/list): Basic authentication as (username, password)
-
-**Returns:** Response object
-
-### requests.post(url, data=None, \*\*kwargs)
-
-Makes a POST request to the specified URL.
+Send an HTTP GET request to the specified URL.
 
 **Parameters:**
+- `url` (`str`): URL to request.
+- `**kwargs` (optional):
+  - `timeout` (`int`): Request timeout in seconds. Default: `5`.
+  - `headers` (`dict`): HTTP headers to send.
+  - `params` (`dict`): Query parameters to append to the URL.
+  - `auth` (`tuple`/`list`): Basic authentication as `(username, password)`.
 
-- `url`: URL to request
-- `data` (string, optional): Request body
-- `**kwargs`: Optional arguments
-  - `timeout` (int): Request timeout in seconds (default: 5)
-  - `headers` (dict): HTTP headers to send
-  - `params` (dict): Query parameters to append to the URL
-  - `json` (dict/list): JSON-encode as request body and set Content-Type
-  - `auth` (tuple/list): Basic authentication as (username, password)
+**Returns:** `Response`: see [Response Object](#response-object).
 
-**Returns:** Response object
+```python
+import requests
 
-### requests.put(url, data=None, \*\*kwargs)
+response = requests.get("https://api.example.com/users/1", timeout=10, headers={"Authorization": "Bearer token123"})
+if response.status_code == 200:
+    print("User data:", response.text)
+```
 
-Makes a PUT request to the specified URL.
+### `post(url, data=None, **kwargs)`
 
-**Parameters:**
-
-- `url`: URL to request
-- `data` (string, optional): Request body
-- `**kwargs`: Optional arguments
-  - `timeout` (int): Request timeout in seconds (default: 5)
-  - `headers` (dict): HTTP headers to send
-  - `params` (dict): Query parameters to append to the URL
-  - `auth` (tuple/list): Basic authentication as (username, password)
-
-**Returns:** Response object
-
-### requests.delete(url, \*\*kwargs)
-
-Makes a DELETE request to the specified URL.
+Send an HTTP POST request to the specified URL with the given data.
 
 **Parameters:**
+- `url` (`str`): URL to request.
+- `data` (`str`, optional): Request body. Default: `None`.
+- `**kwargs` (optional):
+  - `timeout` (`int`): Request timeout in seconds. Default: `5`.
+  - `headers` (`dict`): HTTP headers to send.
+  - `params` (`dict`): Query parameters to append to the URL.
+  - `json` (`dict`/`list`): Data to JSON-encode as the request body (sets `Content-Type`). Use either `data` or `json`, not both.
+  - `auth` (`tuple`/`list`): Basic authentication as `(username, password)`.
 
-- `url`: URL to request
-- `**kwargs`: Optional arguments
-  - `timeout` (int): Request timeout in seconds (default: 5)
-  - `headers` (dict): HTTP headers to send
-  - `params` (dict): Query parameters to append to the URL
-  - `auth` (tuple/list): Basic authentication as (username, password)
+**Returns:** `Response`: see [Response Object](#response-object).
 
-**Returns:** Response object
+```python
+import json
+import requests
 
-### requests.patch(url, data=None, \*\*kwargs)
+new_user = {"name": "Alice", "email": "alice@example.com"}
+response = requests.post("https://api.example.com/users", json=new_user)
 
-Makes a PATCH request to the specified URL.
+if response.status_code == 201:
+    created = response.json()
+    print("Created user:", created["id"])
+```
 
-**Parameters:**
+### `put(url, data=None, **kwargs)`
 
-- `url`: URL to request
-- `data` (string, optional): Request body
-- `**kwargs`: Optional arguments
-  - `timeout` (int): Request timeout in seconds (default: 5)
-  - `headers` (dict): HTTP headers to send
-  - `params` (dict): Query parameters to append to the URL
-  - `auth` (tuple/list): Basic authentication as (username, password)
-
-**Returns:** Response object
-
-### requests.parallel(requests, max_parallel=4)
-
-Executes multiple HTTP requests concurrently with a configurable concurrency limit. Results are returned in the same order as the input requests regardless of completion order.
+Send an HTTP PUT request to the specified URL with the given data.
 
 **Parameters:**
+- `url` (`str`): URL to request.
+- `data` (`str`, optional): Request body. Default: `None`.
+- `**kwargs` (optional):
+  - `timeout` (`int`): Request timeout in seconds. Default: `5`.
+  - `headers` (`dict`): HTTP headers to send.
+  - `params` (`dict`): Query parameters to append to the URL.
+  - `json` (`dict`/`list`): Data to JSON-encode as the request body (sets `Content-Type`). Use either `data` or `json`, not both.
+  - `auth` (`tuple`/`list`): Basic authentication as `(username, password)`.
 
-- `requests` (list): List of request specification dicts, each containing:
-  - `method` (string): HTTP method — `"GET"`, `"POST"`, `"PUT"`, `"DELETE"`, `"PATCH"` (default: `"GET"`)
-  - `url` (string, required): The URL to request
-  - `data` (string, optional): Request body as a string
-  - `json` (dict/list, optional): Data to JSON-encode as request body (sets Content-Type)
-  - `headers` (dict, optional): HTTP headers
-  - `params` (dict, optional): Query parameters to append to the URL
-  - `auth` (list/tuple, optional): Basic authentication as `[username, password]`
-  - `timeout` (int, optional): Request timeout in seconds (default: 30)
-- `max_parallel` (int): Maximum number of concurrent requests (default: 4)
+**Returns:** `Response`: see [Response Object](#response-object).
 
-**Returns:** List of Response objects in the same order as the input list. Failed requests return a Response with `status_code=0` and the error message in `body`.
+```python
+import requests
 
-**Example:**
+response = requests.put("https://api.example.com/users/1", json={"name": "Alice Updated"})
+```
+
+### `delete(url, **kwargs)`
+
+Send an HTTP DELETE request to the specified URL.
+
+**Parameters:**
+- `url` (`str`): URL to request.
+- `**kwargs` (optional):
+  - `timeout` (`int`): Request timeout in seconds. Default: `5`.
+  - `headers` (`dict`): HTTP headers to send.
+  - `params` (`dict`): Query parameters to append to the URL.
+  - `auth` (`tuple`/`list`): Basic authentication as `(username, password)`.
+
+**Returns:** `Response`: see [Response Object](#response-object).
+
+```python
+import requests
+
+response = requests.delete("https://api.example.com/users/1")
+```
+
+### `patch(url, data=None, **kwargs)`
+
+Send an HTTP PATCH request to the specified URL with the given data.
+
+**Parameters:**
+- `url` (`str`): URL to request.
+- `data` (`str`, optional): Request body. Default: `None`.
+- `**kwargs` (optional):
+  - `timeout` (`int`): Request timeout in seconds. Default: `5`.
+  - `headers` (`dict`): HTTP headers to send.
+  - `params` (`dict`): Query parameters to append to the URL.
+  - `json` (`dict`/`list`): Data to JSON-encode as the request body (sets `Content-Type`). Use either `data` or `json`, not both.
+  - `auth` (`tuple`/`list`): Basic authentication as `(username, password)`.
+
+**Returns:** `Response`: see [Response Object](#response-object).
+
+```python
+import requests
+
+response = requests.patch("https://api.example.com/users/1", json={"name": "Alice P."})
+```
+
+### `parallel(requests, max_parallel=4)`
+
+Execute multiple HTTP requests concurrently with a configurable concurrency limit. Results are returned in the same order as the input requests, regardless of completion order.
+
+**Parameters:**
+- `requests` (`list`): List of request specification dicts, each containing:
+  - `method` (`str`): HTTP method: `"GET"`, `"POST"`, `"PUT"`, `"DELETE"`, or `"PATCH"`. Default: `"GET"`.
+  - `url` (`str`): The URL to request. Required.
+  - `data` (`str`, optional): Request body as a string.
+  - `json` (`dict`/`list`, optional): Data to JSON-encode as the request body (sets `Content-Type`).
+  - `headers` (`dict`, optional): HTTP headers.
+  - `params` (`dict`, optional): Query parameters to append to the URL.
+  - `auth` (`list`/`tuple`, optional): Basic authentication as `[username, password]`.
+  - `timeout` (`int`, optional): Request timeout in seconds. Default: `30`.
+- `max_parallel` (`int`, optional): Maximum number of concurrent requests. Default: `4`.
+
+**Returns:** `list`: `Response` objects in the same order as the input list. A malformed request spec (missing `url` or un-encodable `json`) yields a `Response` with `status_code=0` and the error message in `body`; a transport-level failure (timeout, DNS, connection refused) surfaces as an `Error` object in the corresponding position.
 
 ```python
 import requests
@@ -140,27 +171,31 @@ for resp in results:
 
 ## Response Object
 
-All HTTP functions return a response object with these attributes:
+All HTTP functions return a `Response` object with the following attributes, accessible either as properties or by indexing:
 
-- `status_code` or `["status_code"]`: HTTP status code (integer)
-- `text` or `["text"]`: Response body (string)
-- `body` or `["body"]`: Response body (string, alias for text)
-- `headers` or `["headers"]`: Response headers (dictionary)
-- `url` or `["url"]`: The URL of the response
+- `status_code` / `["status_code"]` (`int`): HTTP status code.
+- `text` / `["text"]` (`str`): Response body.
+- `body` / `["body"]` (`str`): Response body (alias for `text`).
+- `headers` / `["headers"]` (`dict`): Response headers.
+- `url` / `["url"]` (`str`): The URL of the response.
 
-## Response Methods
+### `Response.json()`
 
-- `json()`: Parse response body as JSON
-- `raise_for_status()`: Raise exception if status code >= 400
+Parse the response body as JSON.
 
-## Exceptions
+**Returns:** `dict`/`list`: the parsed JSON body.
 
-The requests library provides the following exception types for error handling:
+```python
+data = response.json()
+```
 
-- `RequestException`: Base exception for all request errors
-- `HTTPError`: Exception for HTTP error responses (4xx, 5xx)
+### `Response.raise_for_status()`
 
-**Example:**
+Raise an exception if the status code indicates an error (`>= 400`).
+
+**Returns:** `None`
+
+**Raises:** `HTTPError`: if the status code is `>= 400`.
 
 ```python
 import requests
@@ -174,128 +209,27 @@ except requests.RequestException as e:
     print("Request failed:", e)
 ```
 
-## Examples
+## Exceptions
 
-### Basic GET Request
+The `requests` library exposes the following exception types for error handling:
 
-```python
-import requests
+- `RequestException`: base exception for all request errors.
+- `HTTPError`: raised by `raise_for_status()` for HTTP error responses (4xx, 5xx).
 
-response = requests.get("https://api.example.com/users/1")
-if response.status_code == 200:
-    print("User data:", response.text)
-```
+## Security Considerations
 
-### GET with Options
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-```python
-import requests
-
-# Using kwargs
-response = requests.get("https://api.example.com/users/1", timeout=10, headers={"Authorization": "Bearer token123"})
-
-# Using legacy options dict
-options = {
-    "timeout": 10,
-    "headers": {"Authorization": "Bearer token123"}
-}
-response = requests.get("https://api.example.com/users/1", options)
-```
-
-### POST Request
-
-```python
-import requests
-import json
-
-new_user = {"name": "Alice", "email": "alice@example.com"}
-body = json.dumps(new_user)
-
-# Using kwargs
-response = requests.post("https://api.example.com/users", data=body, headers={"Content-Type": "application/json"})
-
-if response.status_code == 201:
-    created = response.json()
-    print("Created user:", created["id"])
-```
-
-### Error Handling
-
-```python
-import requests
-
-try:
-    response = requests.get("https://api.example.com/data")
-    response.raise_for_status()  # Raises error if 4xx or 5xx
-    data = response.json()
-    print("Success:", data)
-except Exception as e:
-    print("Request failed:", e)
-```
-
-### Using Response Attributes
-
-```python
-import requests
-
-response = requests.get("https://api.example.com/data")
-
-# Both syntaxes work
-status = response.status_code
-# or
-status = response["status_code"]
-
-content = response.text
-headers = response.headers
-```
-
-## Complete Example
-
-```python
-import requests
-import json
-
-# GET request with error handling
-try:
-    response = requests.get("https://jsonplaceholder.typicode.com/posts/1")
-    response.raise_for_status()
-
-    post = response.json()
-    print("Post title:", post["title"])
-    print("Status code:", response.status_code)
-
-except Exception as e:
-    print("Error:", e)
-
-# POST request
-try:
-    new_post = {
-        "title": "My Post",
-        "body": "This is my post content",
-        "userId": 1
-    }
-
-    body = json.dumps(new_post)
-
-    response = requests.post(
-        url="https://jsonplaceholder.typicode.com/posts",
-        data=body,
-        timeout=15,
-        headers={"Content-Type": "application/json"}
-    )
-    response.raise_for_status()
-
-    created = response.json()
-    print("Created post ID:", created["id"])
-
-except Exception as e:
-    print("Error:", e)
-```
+`requests` can make arbitrary HTTP/HTTPS requests to any URL reachable from the host. There is no built-in URL allowlisting: if you need to restrict which hosts a script can reach, filter URLs at the application layer before passing them to script execution. See the [Security Guide](/docs/security/#network-security).
 
 ## Notes
 
-- HTTP/2 support with automatic fallback to HTTP/1.1
-- Connection pooling (100 connections per host)
-- Accepts self-signed certificates
-- Default timeout: 5 seconds
-- Python requests-compatible API
+- HTTP/2 support with automatic fallback to HTTP/1.1.
+- Connection pooling (100 connections per host).
+- Self-signed certificates are rejected by default; the embedder can opt in via `InsecureSkipVerify` on the HTTP client.
+- Default timeout: 5 seconds (30 seconds for `parallel()`).
+
+## See Also
+
+- [subprocess](../subprocess/): Run external commands
+- [secrets](../secrets/): Generate tokens for API authentication

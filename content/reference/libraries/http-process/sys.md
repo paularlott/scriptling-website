@@ -1,46 +1,88 @@
 ---
 title: sys
+description: System-specific parameters and functions, similar to Python's sys module.
 weight: 1
-
 aliases:
   - /reference/libraries/extlib/sys/
   - /reference/libraries/sys/
-requires_registration: true
 ---
 
-The `sys` library provides access to system-specific parameters and functions. This is an **extended library** that must be explicitly registered.
+The `sys` library provides access to system-specific parameters and functions: platform identification, command-line arguments, stdin, and interpreter exit: similar to Python's `sys` module.
 
-> **Note:** This library is enabled by default in the Scriptling CLI but must be manually registered when using the Go API.
+## Available Functions
 
-## Import
-
-```python
-import sys
-```
-
-## Available Constants
-
-| Constant   | Description                                            |
-| ---------- | ------------------------------------------------------ |
-| `platform` | Operating system platform string                       |
-| `version`  | Scriptling interpreter version                         |
-| `maxsize`  | Maximum signed integer value                           |
-| `path_sep` | Path separator for OS                                  |
-| `argv`     | List of command-line arguments                         |
-| `stdin`    | Standard input stream object (when stdin is available) |
+| Function | Description |
+|----------|-------------|
+| `exit(code=0)` | Raise a `SystemExit` exception to exit the interpreter. |
+| `input(prompt=None)` | Read a line from stdin, stripping the trailing newline. |
 
 ## Constants
 
-### stdin
+| Constant | Description |
+|----------|-------------|
+| `platform` | Operating system platform string (`"darwin"`, `"linux"`, `"win32"`). |
+| `version` | Scriptling interpreter version string. |
+| `maxsize` | Maximum signed integer value (`9223372036854775807`). |
+| `path_sep` | Path separator for the OS (`"/"` on Unix, `"\"` on Windows). |
+| `argv` | List of command-line arguments passed to the script. |
+| `stdin` | Standard input stream object, only present when stdin is configured. |
 
-A file-like object connected to standard input. Only available when stdin is configured — either when running via the Scriptling CLI with piped input, or when an input is defined during registration of the sys library via the Go API.
+## Functions
 
-| Method       | Description                                                        |
-| ------------ | ------------------------------------------------------------------ |
-| `read()`     | Read all remaining data from stdin                                 |
-| `readline()` | Read one line including the newline character; returns `""` at EOF |
+### `exit(code=0)`
 
-`sys.stdin` is also iterable — each iteration yields one line including its newline:
+Raise a `SystemExit` exception to exit the interpreter. Unlike most exceptions, `SystemExit` **cannot be caught** by `try`/`except` blocks: it bypasses all `except` clauses and propagates to the caller (CLI, REPL, etc.). `finally` blocks still execute before it propagates. To handle errors gracefully instead of exiting, use `raise()` with a message.
+
+**Parameters:**
+- `code` (`int`/`str`, optional): Exit status. Default: `0`. An integer produces the message `"SystemExit: <code>"`; a string is used as the message directly (and implies exit code `1`).
+
+**Returns:** `None`: does not return; propagates a `SystemExit` exception to the caller.
+
+```python
+import sys
+
+# Exit successfully (raises SystemExit: 0)
+sys.exit()
+
+# Exit with error code (raises SystemExit: 1)
+sys.exit(1)
+
+# Exit with a custom message
+sys.exit("Fatal error occurred")
+
+# except does NOT catch sys.exit(), but finally still runs:
+try:
+    sys.exit(42)
+except Exception as e:
+    print("This will never print - except is bypassed!")
+finally:
+    print("This WILL print - finally executes")
+```
+
+### `input(prompt=None)`
+
+Read a line from stdin, stripping the trailing newline. Only available when the environment is configured with a stdin reader (piped input via the CLI, or an `io.Reader` passed to `RegisterSysLibrary` in Go). The optional `prompt` argument is accepted but not printed: there is no interactive terminal in remote/server environments.
+
+**Parameters:**
+- `prompt` (`str`, optional): Ignored placeholder for Python compatibility. Default: `None`.
+
+**Returns:** `str`: the line read from stdin, without its trailing newline. Returns `""` at EOF.
+
+```python
+line = input()
+print("You typed:", line)
+```
+
+### `stdin`
+
+A file-like object connected to standard input. Only available when stdin is configured: either when running via the CLI with piped input, or when an input reader is supplied during registration of the `sys` library via the Go API.
+
+| Method | Description |
+|--------|-------------|
+| `read()` | Read all remaining data from stdin. |
+| `readline()` | Read one line including the newline character; returns `""` at EOF. |
+
+`sys.stdin` is also iterable: each iteration yields one line including its trailing newline.
 
 ```python
 import sys
@@ -56,7 +98,7 @@ for line in sys.stdin:
     print("Got:", line.rstrip())
 ```
 
-### platform
+### `platform`
 
 A string identifying the operating system platform.
 
@@ -65,7 +107,7 @@ import sys
 print(sys.platform)  # "darwin", "linux", or "win32"
 ```
 
-### version
+### `version`
 
 A string containing the version of the Scriptling interpreter.
 
@@ -74,16 +116,16 @@ import sys
 print(sys.version)  # "Scriptling 1.0"
 ```
 
-### maxsize
+### `maxsize`
 
-The maximum value of a signed integer (int64).
+The maximum value of a signed integer (`int64`).
 
 ```python
 import sys
 print(sys.maxsize)  # 9223372036854775807
 ```
 
-### path_sep
+### `path_sep`
 
 The path separator used by the operating system.
 
@@ -92,84 +134,9 @@ import sys
 print(sys.path_sep)  # "/" on Unix, "\" on Windows
 ```
 
-### argv
+### `argv`
 
 A list of command-line arguments passed to the script.
-
-```python
-import sys
-print(sys.argv)  # ["script.py", "arg1", "arg2"]
-```
-
-## Functions
-
-### input([prompt])
-
-Read a line from stdin, stripping the trailing newline. Only available when the environment is configured with a stdin reader.
-
-```python
-line = input()
-print("You typed:", line)
-```
-
-> **Note:** The optional `prompt` argument is accepted but not printed (no interactive terminal in remote environments).
-
-### exit([code])
-
-Raise a SystemExit exception to exit the interpreter.
-
-**Parameters:**
-
-- `code` - Exit status (default: 0). Can be an integer or a string message.
-
-**Behavior:**
-
-- Raises a `SystemExit` exception that can be caught with try/except
-- If not caught, terminates the script execution with an error
-- Integer codes produce exception message: "SystemExit: <code>"
-- String messages produce exception with that message directly
-
-**Examples:**
-
-```python
-import sys
-
-# Exit successfully (raises SystemExit: 0)
-sys.exit()
-
-# Exit with error code (raises SystemExit: 1)
-sys.exit(1)
-
-# Exit with custom message
-sys.exit("Fatal error occurred")
-
-# Catching sys.exit to prevent termination
-try:
-    sys.exit(42)
-    print("This won't run")
-except Exception as e:
-    print("Caught:", str(e))  # "Caught: SystemExit: 42"
-    # Continue execution instead of exiting
-```
-
-**Note:** SystemExit exceptions have an `ExceptionType` of "SystemExit" and can be detected by the caller via the returned error.
-
-## Examples
-
-### Check Platform
-
-```python
-import sys
-
-if sys.platform == "darwin":
-    print("Running on macOS")
-elif sys.platform == "linux":
-    print("Running on Linux")
-elif sys.platform == "win32":
-    print("Running on Windows")
-```
-
-### Process Arguments
 
 ```python
 import sys
@@ -182,19 +149,30 @@ input_file = sys.argv[1]
 print(f"Processing {input_file}")
 ```
 
+## Security Considerations
+
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`sys` exposes whatever `argv` and `stdin` the embedder passes to `RegisterSysLibrary(p, argv, stdin)`: if those contain secrets, a script can read them. Never register this library (or pass sensitive argv/env) for untrusted code. See the [Security Guide](/docs/security/#environment-variables).
+
 ## Python Compatibility
 
 This library implements a subset of Python's `sys` module:
 
-| Feature             | Supported                                     |
-| ------------------- | --------------------------------------------- |
-| argv                | ✅                                            |
-| exit()              | ✅                                            |
-| platform            | ✅                                            |
-| version             | ✅ (simplified)                               |
-| maxsize             | ✅                                            |
-| path                | ❌                                            |
-| modules             | ❌                                            |
-| stdin/stdout/stderr | `stdin` ✅ (when available), stdout/stderr ❌ |
-| executable          | ❌                                            |
-| version_info        | ❌                                            |
+| Feature | Supported |
+|---------|-----------|
+| `argv` | Yes |
+| `exit()` | Yes |
+| `platform` | Yes |
+| `version` | Yes (simplified) |
+| `maxsize` | Yes |
+| `path` | No |
+| `modules` | No |
+| `stdin` / `stdout` / `stderr` | `stdin` yes (when available), `stdout`/`stderr` no |
+| `executable` | No |
+| `version_info` | No |
+
+## See Also
+
+- [subprocess](../subprocess/): Spawn external commands
+- [os](../../filesystem/os/): Environment variables and filesystem access

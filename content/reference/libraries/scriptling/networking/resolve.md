@@ -4,39 +4,30 @@ linkTitle: resolve
 weight: 3
 ---
 
-DNS resolution library for IP lookup, SRV record resolution, and srv+http URL resolution.
+DNS resolution library for hostname lookup, SRV record resolution, and `srv+http(s)://` URL resolution.
 
 ## Overview
 
-The `scriptling.net.resolve` library provides DNS resolution utilities. It uses the system resolver by default, or custom nameservers when configured by the host application (e.g. knot).
+The `scriptling.net.resolve` library provides DNS resolution utilities. It uses the system resolver by default, or custom nameservers when configured by the host application (e.g. [knot](https://github.com/paularlott/knot)).
 
 ## Available Functions
 
 | Function | Description |
 |----------|-------------|
-| `lookup_ip(host)` | Resolve a hostname to a list of IP addresses |
-| `lookup_srv(service)` | Resolve an SRV record to a list of addresses |
-| `resolve_srv_http(uri)` | Resolve a srv+http(s):// URI to a concrete URL |
+| `lookup_ip(host)` | Resolve a hostname to a list of IP addresses. |
+| `lookup_srv(service)` | Resolve an SRV record to a list of addresses. |
+| `resolve_srv_http(uri)` | Resolve a `srv+http(s)://` URI to a concrete URL. |
 
-## lookup_ip
+## Functions
 
-```python
-lookup_ip(host: str) -> list[str]
-```
+### `lookup_ip(host)`
 
 Resolves a hostname to a list of IP address strings (A and AAAA records).
 
-### Parameters
+**Parameters:**
+- `host` (`str`): The hostname to resolve.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `host` | `str` | The hostname to resolve |
-
-### Returns
-
-`list[str]` — List of IP address strings.
-
-### Example
+**Returns:** `list[str]`: list of IP address strings.
 
 ```python
 import scriptling.net.resolve as resolve
@@ -48,30 +39,14 @@ for ip in ips:
     print(ip)
 ```
 
-## lookup_srv
-
-```python
-lookup_srv(service: str) -> list[dict]
-```
+### `lookup_srv(service)`
 
 Resolves an SRV service name to a list of address dicts, ordered by priority and weighted random selection per RFC 2782.
 
-### Parameters
+**Parameters:**
+- `service` (`str`): The SRV service name, e.g. `"_myservice._tcp.example.com"`.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `service` | `str` | The SRV service name (e.g. `_myservice._tcp.example.com`) |
-
-### Returns
-
-`list[dict]` — List of address dicts, each with:
-
-| Key | Type | Description |
-|-----|------|-------------|
-| `ip` | `str` | Resolved IP address |
-| `port` | `int` | Port number from the SRV record |
-
-### Example
+**Returns:** `list[dict]`: list of address dicts, each with `ip` (`str`, the resolved IP address) and `port` (`int`, the port number from the SRV record).
 
 ```python
 import scriptling.net.resolve as resolve
@@ -81,27 +56,16 @@ for addr in addrs:
     print(f"{addr['ip']}:{addr['port']}")
 ```
 
-## resolve_srv_http
-
-```python
-resolve_srv_http(uri: str) -> str
-```
+### `resolve_srv_http(uri)`
 
 Resolves a `srv+http(s)://` URI to a concrete URL. Strips the `srv+` prefix, resolves the SRV record for the host, and substitutes the resolved port. The original hostname is preserved for SNI/TLS.
 
-If the URI does not start with `srv+`, it is returned unchanged (with an `https://` prefix added if no scheme is present).
+If `uri` does not start with `srv+`, it is returned unchanged, with an `https://` prefix added if no scheme is present.
 
-### Parameters
+**Parameters:**
+- `uri` (`str`): The URI to resolve.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `uri` | `str` | The URI to resolve |
-
-### Returns
-
-`str` — The resolved URL.
-
-### Example
+**Returns:** `str`: the resolved URL.
 
 ```python
 import scriptling.net.resolve as resolve
@@ -114,6 +78,18 @@ url = resolve.resolve_srv_http("https://plain.example.com/path")
 print(url)  # "https://plain.example.com/path"
 ```
 
+## Security Considerations
+
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`scriptling.net.resolve` performs DNS lookups against the system resolver, or against custom nameservers if the embedder injects one. DNS responses are not validated against any allowlist, so a script can trigger lookups for arbitrary hostnames, which can be used for network reconnaissance or to exfiltrate data via DNS queries. Host applications can restrict or monitor this by passing a custom resolver to `resolve.Register(env, resolver)`: see [Host Application Integration](#host-application-integration) below. See [Security Considerations](/docs/security/#network-security) for a full breakdown of network-enabled libraries.
+
 ## Host Application Integration
 
-Host applications can inject a custom resolver by passing it to `resolve.Register(env, resolver)`. This allows applications like knot to configure custom nameservers, caching, and domain-specific routing. Passing `nil` uses the default system DNS resolver.
+Host applications can inject a custom resolver by passing it to `resolve.Register(env, resolver)`. This allows applications like [knot](https://github.com/paularlott/knot) to configure custom nameservers, caching, and domain-specific routing. The `resolver` argument is required; `Register` panics if it is `nil`.
+
+## See Also
+
+- [scriptling.net.unicast](../unicast/): direct point-to-point UDP/TCP messaging
+- [scriptling.net.websocket](../websocket/): WebSocket client library
+- [Security Guide](/docs/security/): full risk breakdown across all libraries

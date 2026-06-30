@@ -12,10 +12,10 @@ Scriptling has two distinct types of runtime error conditions:
 
 | Aspect | **Error** | **Exception** |
 |--------|-----------|---------------|
-| **Purpose** | Fatal runtime errors | Recoverable conditions |
-| **Can be caught?** | No (try/except won't catch them) | Yes (with try/except) |
-| **Examples** | Parse errors, syntax errors, VM errors | SystemExit, ValueError, user-defined |
-| **Propagation** | Immediately converted to Go error | Propagated for try/except |
+| **Purpose** | Runtime errors surfaced by the interpreter | Explicitly raised conditions |
+| **Can be caught?** | Yes. `try`/`except` catches both Errors and Exceptions, inferring the exception type from the error message (see [Automatic Exception Type Inference](#automatic-exception-type-inference)). | Yes (with try/except) |
+| **Examples** | Type errors, name errors, index/key errors, division by zero | SystemExit, ValueError, user-defined |
+| **Propagation** | Converted into a typed Exception when caught | Propagated for try/except |
 
 ## Try/Except/Finally
 
@@ -35,7 +35,7 @@ finally:
 
 ### Try/Except/Else
 
-The `else` clause runs only when the `try` block completes without raising an exception. This is distinct from placing code after the `try/except` block — the `else` body is skipped if an exception was caught:
+The `else` clause runs only when the `try` block completes without raising an exception. This is distinct from placing code after the `try/except` block: the `else` body is skipped if an exception was caught:
 
 ```python
 try:
@@ -82,7 +82,7 @@ except Exception as e:
 
 ```python
 try:
-    raise "something went wrong"
+    raise Exception("something went wrong")
 except Exception as e:
     print("Error: " + str(e))
 ```
@@ -175,11 +175,13 @@ raise NameError("name not defined")
 raise ImportError("module not found")
 ```
 
-### Simple String Raise
+### Raise Requires an Exception
+
+The operand of `raise` must be an `Exception` instance (or an instance of a subclass). Raising a plain string, number, or other value is rejected with `"exceptions must derive from BaseException"`:
 
 ```python
-if x < 0:
-    raise "Value must be positive"
+raise ValueError("invalid value")   # OK
+raise "invalid value"                # Error: exceptions must derive from BaseException
 ```
 
 ### Re-raising Exceptions
@@ -276,7 +278,7 @@ Use `with` when the resource implements `__enter__`/`__exit__`:
 ```python
 with open_connection() as conn:
     process(conn)
-# __exit__ called automatically — no finally needed
+# __exit__ called automatically: no finally needed
 ```
 
 Fall back to `try/finally` when no context manager is available:
@@ -304,7 +306,7 @@ try:
     response = requests.get("https://api.example.com/data", options)
 
     if response.status_code != 200:
-        raise "HTTP error: " + str(response.status_code)
+        raise RuntimeError("HTTP error: " + str(response.status_code))
 
     data = json.loads(response.body)
     print("Success: " + str(len(data)))

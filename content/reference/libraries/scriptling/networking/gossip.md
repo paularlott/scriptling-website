@@ -4,21 +4,19 @@ linkTitle: gossip
 weight: 1
 ---
 
-Gossip protocol cluster membership and messaging with automatic failure detection, metadata propagation, tag-based routing, node groups, leader election, encryption, and compression.
+Gossip protocol cluster membership and messaging, with automatic failure detection, metadata propagation, tag-based routing, node groups, leader election, encryption, and compression.
 
 ## Overview
 
-The `scriptling.net.gossip` library implements a gossip protocol for decentralized cluster management. Nodes automatically discover each other, detect failures, and propagate metadata across the cluster. It supports both unreliable (UDP) and reliable (TCP) messaging with optional AES encryption and Snappy compression.
+The `scriptling.net.gossip` library implements a gossip protocol for decentralized cluster management. Nodes automatically discover each other, detect failures, and propagate metadata across the cluster. It supports both unreliable (UDP) and reliable (TCP) messaging, with optional AES encryption and Snappy compression. Advanced features include request/reply messaging, metadata-criteria-based node groups, and quorum-based leader election with optional metadata filtering.
 
-Advanced features include request/reply messaging, metadata-criteria-based node groups, and quorum-based leader election with optional metadata filtering.
+### Handler concurrency
 
-## Handler concurrency
-
-All registered callbacks — `handle`, `handle_with_reply`, `on_state_change`, `on_metadata_change`, `on_gossip_interval`, node-group `on_node_added`/`on_node_removed`, and leader-election `on_event` — fire automatically as messages and events arrive. They run on gossip's internal goroutines under the per-environment interpreter lock (GIL). There is no event pump and no `wait()` loop — handlers invoke themselves.
+All registered callbacks: `handle()`, `handle_with_reply()`, `on_state_change()`, `on_metadata_change()`, `on_gossip_interval()`, node-group `on_node_added`/`on_node_removed`, and leader-election `on_event()`: fire automatically as messages and events arrive. They run on gossip's internal goroutines under the per-environment interpreter lock (GIL). There is no event pump and no `wait()` loop: handlers invoke themselves.
 
 Because the GIL serializes script execution, a handler never runs concurrently with the rest of your script, so you do not need locks around shared state. Handlers interleave with your script only at its blocking points (or `yield_now()`), which is memory-safe.
 
-A long-running node just stays alive — do work, or sleep — and handlers fire as traffic arrives:
+A long-running node just stays alive: do work, or sleep: and handlers fire as traffic arrives:
 
 ```python
 cluster.handle(gossip.MSG_USER, on_message)
@@ -27,139 +25,134 @@ while True:
     time.sleep(1)   # keep the process alive; handlers fire as messages arrive
 ```
 
-Ordering: gossip messages carry Hybrid Logical Clock (HLC) timestamps, so application-level ordering is resolved at the data layer — handler delivery order is not significant and may differ from arrival order.
+Ordering: gossip messages carry Hybrid Logical Clock (HLC) timestamps, so application-level ordering is resolved at the data layer: handler delivery order is not significant and may differ from arrival order.
 
-A single script can both call `send_request()` and serve its own `handle_with_reply()` responder: `send_request` releases the GIL while it blocks, letting an incoming request's handler run and reply.
+A single script can both call `send_request()` and serve its own `handle_with_reply()` responder: `send_request()` releases the GIL while it blocks, letting an incoming request's handler run and reply.
 
 ## Available Functions
 
 | Function | Description |
 |----------|-------------|
-| `create(bind_addr, ...)` | Create a gossip cluster node |
+| `create(bind_addr="127.0.0.1:8000", ...)` | Create a gossip cluster node. |
 
 ## Constants
 
-| Constant | Value | Description |
-|----------|-------|-------------|
-| `MSG_USER` | 128 | Minimum user-defined message type |
+| Constant | Description |
+|----------|-------------|
+| `MSG_USER` | Minimum user-defined message type (`128`). Message types below this are reserved for the internal protocol. |
 
-## Cluster Methods
+## Cluster Object
 
-The `create()` function returns a cluster object with these methods:
-
-| Method | Description |
-|--------|-------------|
-| `start()` | Start the cluster node |
-| `join(peers)` | Join an existing cluster |
-| `leave()` | Gracefully leave the cluster |
-| `stop()` | Stop the cluster and clean up |
-| `send(type, data, reliable=False)` | Broadcast to all nodes |
-| `send_tagged(tag, type, data, reliable=False)` | Send to nodes with matching tag |
-| `send_to(node_id, type, data, reliable=False)` | Send to a specific node |
-| `send_request(node_id, type, data)` | Send request and wait for reply |
-| `handle(type, handler)` | Register a message handler |
-| `handle_with_reply(type, handler)` | Register a request/reply handler |
-| `unhandle(type)` | Remove a registered handler |
-| `on_state_change(handler)` | Register a state change handler |
-| `on_metadata_change(handler)` | Register a metadata change handler |
-| `on_gossip_interval(handler)` | Register a periodic gossip handler |
-| `nodes()` | Get all known nodes |
-| `alive_nodes()` | Get all alive nodes |
-| `nodes_by_tag(tag)` | Get nodes with a specific tag |
-| `get_node(node_id)` | Get a specific node by ID |
-| `local_node()` | Get local node info |
-| `num_nodes()` | Get total node count |
-| `num_alive()` | Get alive node count |
-| `num_suspect()` | Get suspect node count |
-| `num_dead()` | Get dead node count |
-| `node_id()` | Get local node UUID |
-| `is_local(node_id)` | Check if node ID is local |
-| `candidates()` | Get random subset of nodes for gossiping |
-| `set_metadata(key, value)` | Set local metadata |
-| `get_metadata(key)` | Get local metadata value |
-| `all_metadata()` | Get all local metadata |
-| `delete_metadata(key)` | Delete a metadata key |
-| `create_node_group(criteria, ...)` | Create a metadata-criteria node group |
-| `create_leader_election(...)` | Create a leader election manager |
-
-## Node Group Methods
-
-The `create_node_group()` method returns a node group object:
+The `create()` function returns a cluster object with the following methods.
 
 | Method | Description |
 |--------|-------------|
-| `nodes()` | Get all nodes in the group |
-| `contains(node_id)` | Check if a node is in the group |
-| `count()` | Get number of nodes in the group |
-| `send_to_peers(type, data, reliable=False)` | Send to all group peers |
-| `close()` | Close the group and release resources |
+| `start()` | Start the cluster node. |
+| `join(peers)` | Join an existing cluster. |
+| `leave()` | Gracefully leave the cluster. |
+| `stop()` | Stop the cluster and clean up. |
+| `send(message_type, data, reliable=False)` | Broadcast to all nodes. |
+| `send_tagged(tag, message_type, data, reliable=False)` | Send to nodes with a matching tag. |
+| `send_to(node_id, message_type, data, reliable=False)` | Send to a specific node. |
+| `send_request(node_id, message_type, data)` | Send a request and wait for a reply. |
+| `handle(message_type, handler)` | Register a message handler. |
+| `handle_with_reply(message_type, handler)` | Register a request/reply handler. |
+| `unhandle(message_type)` | Remove a registered handler. |
+| `on_state_change(handler)` | Register a node state-change handler. |
+| `on_metadata_change(handler)` | Register a remote metadata-change handler. |
+| `on_gossip_interval(handler)` | Register a periodic gossip-interval handler. |
+| `nodes()` | Get all known nodes. |
+| `alive_nodes()` | Get all alive nodes. |
+| `nodes_by_tag(tag)` | Get nodes with a specific tag. |
+| `get_node(node_id)` | Get a specific node by ID. |
+| `local_node()` | Get local node info. |
+| `num_nodes()` | Get the total known node count. |
+| `num_alive()` | Get the alive node count. |
+| `num_suspect()` | Get the suspect node count. |
+| `num_dead()` | Get the dead node count. |
+| `node_id()` | Get the local node's UUID. |
+| `is_local(node_id)` | Check if a node ID is the local node. |
+| `candidates()` | Get a random subset of nodes for gossiping. |
+| `set_metadata(key, value)` | Set a local metadata value. |
+| `get_metadata(key)` | Get a local metadata value. |
+| `all_metadata()` | Get all local metadata. |
+| `delete_metadata(key)` | Delete a metadata key. |
+| `create_node_group(criteria, on_node_added=None, on_node_removed=None)` | Create a metadata-criteria node group. |
+| `create_leader_election(...)` | Create a leader-election manager. |
 
-## Leader Election Methods
+### Node group object
 
-The `create_leader_election()` method returns a leader election object:
+The `create_node_group()` method returns a node group object.
 
 | Method | Description |
 |--------|-------------|
-| `start()` | Start the election process |
-| `stop()` | Stop the election process |
-| `is_leader()` | Check if this node is the leader |
-| `has_leader()` | Check if a leader is elected |
-| `get_leader_id()` | Get the leader's node ID |
-| `send_to_peers(type, data, reliable=False)` | Send to eligible peers |
-| `on_event(event_type, handler)` | Register an election event handler |
+| `nodes()` | Get all nodes in the group. |
+| `contains(node_id)` | Check if a node is in the group. |
+| `count()` | Get the number of nodes in the group. |
+| `send_to_peers(message_type, data, reliable=False)` | Send to all group peers. |
+| `close()` | Close the group and release resources. |
 
-### Leader Election Events
+### Leader election object
+
+The `create_leader_election()` method returns a leader election object.
+
+| Method | Description |
+|--------|-------------|
+| `start()` | Start the election process. |
+| `stop()` | Stop the election process. |
+| `is_leader()` | Check if this node is the leader. |
+| `has_leader()` | Check if a leader is elected. |
+| `get_leader_id()` | Get the leader's node ID. |
+| `send_to_peers(message_type, data, reliable=False)` | Send to eligible peers. |
+| `on_event(event_type, handler)` | Register an election event handler. |
+
+Event types passed to `on_event()`:
 
 | Event | Description |
 |-------|-------------|
-| `"elected"` | A leader has been elected |
-| `"lost"` | The current leader has been lost |
-| `"became_leader"` | This node became the leader |
-| `"stepped_down"` | This node stepped down from leadership |
+| `"elected"` | A leader has been elected. |
+| `"lost"` | The current leader has been lost. |
+| `"became_leader"` | This node became the leader. |
+| `"stepped_down"` | This node stepped down from leadership. |
 
 ## Functions
 
-### scriptling.net.gossip.create(bind_addr="127.0.0.1:8000", ...)
+### `create(bind_addr="127.0.0.1:8000", ...)`
 
-Create a gossip cluster node.
+Creates a gossip cluster node.
 
 **Parameters:**
+- `bind_addr` (`str`, optional): Address to bind to. Default: `"127.0.0.1:8000"`.
+- `node_id` (`str`, optional): Unique node ID. Default: `""` (auto-generated).
+- `advertise_addr` (`str`, optional): Address to advertise to peers. Default: same as `bind_addr`.
+- `encryption_key` (`str`, optional): AES encryption key, 16, 24, or 32 bytes. Default: `""` (no encryption).
+- `tags` (`list`, optional): Tags for tag-based message routing. Default: `[]`.
+- `compression` (`bool`, optional): Enable Snappy compression. Default: `False`.
+- `bearer_token` (`str`, optional): Authentication bearer token. Default: `""`.
+- `app_version` (`str`, optional): Application version for compatibility checks. Default: `""`.
+- `transport` (`str`, optional): Transport type, `"socket"` or `"http"`. Default: `"socket"`.
+- `compress_min_size` (`int`, optional): Minimum message size for compression. Default: `256`.
+- `gossip_interval` (`str`, optional): Gossip interval duration. Default: `"5s"`.
+- `gossip_max_interval` (`str`, optional): Maximum gossip interval. Default: `"20s"`.
+- `metadata_gossip_interval` (`str`, optional): Metadata gossip interval. Default: `"500ms"`.
+- `state_gossip_interval` (`str`, optional): State exchange interval. Default: `"45s"`.
+- `fan_out_multiplier` (`float`, optional): Fan-out scaling factor. Default: `1.0`.
+- `ttl_multiplier` (`float`, optional): TTL scaling factor. Default: `1.0`.
+- `state_exchange_multiplier` (`float`, optional): State exchange scaling. Default: `0.8`.
+- `force_reliable_transport` (`bool`, optional): Force TCP for all messages. Default: `False`.
+- `prefer_ipv6` (`bool`, optional): Prefer IPv6 for DNS resolution. Default: `False`.
+- `node_cleanup_interval` (`str`, optional): Dead node cleanup interval. Default: `"20s"`.
+- `node_retention_time` (`str`, optional): How long to keep dead nodes. Default: `"1h"`.
+- `leaving_node_timeout` (`str`, optional): Timeout before moving a leaving node to dead. Default: `"30s"`.
+- `health_check_interval` (`str`, optional): Health check interval. Default: `"2s"`.
+- `suspect_timeout` (`str`, optional): Time before marking a node suspect. Default: `"1.5s"`.
+- `suspect_retry_interval` (`str`, optional): Suspect node retry interval. Default: `"1s"`.
+- `dead_node_timeout` (`str`, optional): Time before marking a suspect node dead. Default: `"15s"`.
+- `peer_recovery_interval` (`str`, optional): Peer recovery check interval. Default: `"30s"`.
+- `insecure_skip_verify` (`bool`, optional): Skip TLS verification for the `"http"` transport. Default: `False`.
 
-- `bind_addr` (string): Address to bind to (default: `"127.0.0.1:8000"`)
-- `node_id` (string): Unique node ID (auto-generated if empty)
-- `advertise_addr` (string): Address to advertise to peers (default: same as bind_addr)
-- `encryption_key` (string): Encryption key (16, 24, or 32 bytes for AES)
-- `tags` (list): Tags for tag-based message routing
-- `compression` (bool): Enable Snappy compression (default: False)
-- `bearer_token` (string): Authentication bearer token
-- `app_version` (string): Application version for compatibility checks
-- `transport` (string): Transport type: `"socket"` or `"http"` (default: `"socket"`)
+**Returns:** `Cluster`: a cluster node object.
 
-**Advanced Configuration:**
-
-- `compress_min_size` (int): Min message size for compression (default: 256)
-- `gossip_interval` (string): Gossip interval duration (default: `"5s"`)
-- `gossip_max_interval` (string): Max gossip interval (default: `"20s"`)
-- `metadata_gossip_interval` (string): Metadata gossip interval (default: `"500ms"`)
-- `state_gossip_interval` (string): State exchange interval (default: `"45s"`)
-- `fan_out_multiplier` (float): Fan-out scaling factor (default: 1.0)
-- `ttl_multiplier` (float): TTL scaling factor (default: 1.0)
-- `state_exchange_multiplier` (float): State exchange scaling (default: 0.8)
-- `force_reliable_transport` (bool): Force TCP for all messages (default: False)
-- `prefer_ipv6` (bool): Prefer IPv6 for DNS resolution (default: False)
-- `node_cleanup_interval` (string): Dead node cleanup interval (default: `"20s"`)
-- `node_retention_time` (string): How long to keep dead nodes (default: `"1h"`)
-- `leaving_node_timeout` (string): Timeout before moving leaving to dead (default: `"30s"`)
-- `health_check_interval` (string): Health check interval (default: `"2s"`)
-- `suspect_timeout` (string): Time before marking node suspect (default: `"1.5s"`)
-- `suspect_retry_interval` (string): Suspect node retry interval (default: `"1s"`)
-- `dead_node_timeout` (string): Time before marking suspect to dead (default: `"15s"`)
-- `peer_recovery_interval` (string): Peer recovery check interval (default: `"30s"`)
-- `insecure_skip_verify` (bool): Skip TLS verification for HTTP (default: False)
-
-**Returns:** Cluster object
-
-**Example:**
 ```python
 import scriptling.net.gossip as gossip
 
@@ -170,131 +163,131 @@ cluster = gossip.create(
 )
 ```
 
-## Cluster Methods
+### `cluster.start()`
 
-### cluster.start()
+Starts the cluster node. Begins the transport, health monitoring, and gossip routines.
 
-Start the cluster node. Begins transport, health monitoring, and gossip routines.
+**Parameters:** None
 
-**Example:**
+**Returns:** `None`
+
 ```python
 cluster.start()
 ```
 
-### cluster.join(peers)
+### `cluster.join(peers)`
 
-Join an existing cluster by connecting to known peers.
+Joins an existing cluster by connecting to known peers.
 
 **Parameters:**
+- `peers` (`str` or `list`): One or more peer addresses to join.
 
-- `peers` (string or list): One or more peer addresses to join
+**Returns:** `None`
 
-**Example:**
 ```python
 cluster.join("127.0.0.1:8001")
 cluster.join(["127.0.0.1:8001", "127.0.0.1:8002"])
 ```
 
-### cluster.leave()
+### `cluster.leave()`
 
-Gracefully leave the cluster. Other nodes will be notified.
+Gracefully leaves the cluster. Other nodes are notified.
 
-**Example:**
+**Parameters:** None
+
+**Returns:** `None`
+
 ```python
 cluster.leave()
 ```
 
-### cluster.stop()
+### `cluster.stop()`
 
-Stop the cluster and clean up all resources.
+Stops the cluster and cleans up all resources.
 
-**Example:**
+**Parameters:** None
+
+**Returns:** `None`
+
 ```python
 cluster.stop()
 ```
 
-### cluster.send(message_type, data, reliable=False)
+### `cluster.send(message_type, data, reliable=False)`
 
-Broadcast a message to all cluster nodes.
+Broadcasts a message to all cluster nodes.
 
 **Parameters:**
+- `message_type` (`int`): Message type. Must be `>= 128` (see `MSG_USER`).
+- `data` (`str`, `int`, `float`, `list`, or `dict`): Message payload.
+- `reliable` (`bool`, optional): Use reliable TCP transport instead of UDP. Default: `False`.
 
-- `message_type` (int): Message type (must be >= 128)
-- `data`: Message payload (string, int, float, list, dict)
-- `reliable` (bool): Use reliable TCP transport (default: False)
+**Returns:** `None`
 
-**Example:**
 ```python
 cluster.send(128, "Hello cluster!")
 cluster.send(128, {"key": "value"}, reliable=True)
 ```
 
-### cluster.send_tagged(tag, message_type, data, reliable=False)
+### `cluster.send_tagged(tag, message_type, data, reliable=False)`
 
-Send a tagged message. Only delivered to nodes that have the matching tag.
+Sends a tagged message. Only delivered to nodes that have the matching tag.
 
 **Parameters:**
+- `tag` (`str`): Tag for routing.
+- `message_type` (`int`): Message type. Must be `>= 128`.
+- `data` (`str`, `int`, `float`, `list`, or `dict`): Message payload.
+- `reliable` (`bool`, optional): Use reliable transport. Default: `False`.
 
-- `tag` (string): Tag for routing
-- `message_type` (int): Message type (must be >= 128)
-- `data`: Message payload
-- `reliable` (bool): Use reliable transport (default: False)
+**Returns:** `None`
 
-**Example:**
 ```python
 cluster.send_tagged("web", 128, "Hello web nodes!")
 ```
 
-### cluster.send_to(node_id, message_type, data, reliable=False)
+### `cluster.send_to(node_id, message_type, data, reliable=False)`
 
-Send a direct message to a specific node.
+Sends a direct message to a specific node.
 
 **Parameters:**
+- `node_id` (`str`): Target node UUID.
+- `message_type` (`int`): Message type. Must be `>= 128`.
+- `data` (`str`, `int`, `float`, `list`, or `dict`): Message payload.
+- `reliable` (`bool`, optional): Use reliable transport. Default: `False`.
 
-- `node_id` (string): Target node UUID
-- `message_type` (int): Message type (must be >= 128)
-- `data`: Message payload
-- `reliable` (bool): Use reliable transport (default: False)
+**Returns:** `None`
 
-**Example:**
 ```python
 target = cluster.nodes()[0]
 cluster.send_to(target["id"], 128, "Direct message!")
 ```
 
-### cluster.send_request(node_id, message_type, data)
+### `cluster.send_request(node_id, message_type, data)`
 
-Send a request to a specific node and wait for a reply.
+Sends a request to a specific node and waits for a reply. Releases the interpreter lock while waiting, so the calling script's own `handle_with_reply()` responders can still run.
 
 **Parameters:**
+- `node_id` (`str`): Target node UUID.
+- `message_type` (`int`): Message type. Must be `>= 128`.
+- `data` (`str`, `int`, `float`, `list`, or `dict`): Message payload.
 
-- `node_id` (string): Target node UUID
-- `message_type` (int): Message type (must be >= 128)
-- `data`: Message payload
+**Returns:** the reply payload from the target node (type depends on what the remote handler returned).
 
-**Returns:** The reply payload from the target node
-
-**Example:**
 ```python
 reply = cluster.send_request(target_id, 128, {"cmd": "ping"})
 print(reply)
 ```
 
-### cluster.handle(message_type, handler)
+### `cluster.handle(message_type, handler)`
 
-Register a handler for a specific message type.
+Registers a handler for a specific message type.
 
 **Parameters:**
+- `message_type` (`int`): Message type to handle. Must be `>= 128`.
+- `handler` (`callable`): Function called with a message dict containing `type` (`int`), `sender` (`dict` with `id`, `addr`, `state`, `metadata`, `tags`), and `payload` (the decoded message payload).
 
-- `message_type` (int): Message type to handle (must be >= 128)
-- `handler` (function): Handler function called with a message dict
+**Returns:** `None`
 
-The handler receives a dict with:
-- `type`: message type (int)
-- `sender`: dict with `id`, `addr`, `state`, `metadata`, `tags`
-- `payload`: decoded message payload
-
-**Example:**
 ```python
 def on_message(msg):
     print(f"From {msg['sender']['id']}: {msg['payload']}")
@@ -302,18 +295,16 @@ def on_message(msg):
 cluster.handle(128, on_message)
 ```
 
-### cluster.handle_with_reply(message_type, handler)
+### `cluster.handle_with_reply(message_type, handler)`
 
-Register a request/reply handler. The handler must return the reply data.
+Registers a request/reply handler. The handler's return value is sent back as the reply.
 
 **Parameters:**
+- `message_type` (`int`): Message type to handle. Must be `>= 128`.
+- `handler` (`callable`): Function called with the same message dict as `handle()`; its return value becomes the reply payload.
 
-- `message_type` (int): Message type to handle (must be >= 128)
-- `handler` (function): Handler function called with a message dict, must return reply data
+**Returns:** `None`
 
-The handler receives the same dict as `handle()`.
-
-**Example:**
 ```python
 def on_request(msg):
     return {"status": "ok", "echo": msg["payload"]}
@@ -321,32 +312,28 @@ def on_request(msg):
 cluster.handle_with_reply(128, on_request)
 ```
 
-### cluster.unhandle(message_type)
+### `cluster.unhandle(message_type)`
 
-Remove a previously registered message handler.
+Removes a previously registered message handler.
 
 **Parameters:**
+- `message_type` (`int`): Message type to unregister.
 
-- `message_type` (int): Message type to unregister (must be >= 128)
+**Returns:** `bool`: `True` if a handler was removed.
 
-**Returns:** bool - True if a handler was removed
-
-**Example:**
 ```python
 cluster.unhandle(128)
 ```
 
-### cluster.on_state_change(handler)
+### `cluster.on_state_change(handler)`
 
-Register a handler called when any node changes state.
+Registers a handler called when any node changes state.
 
 **Parameters:**
+- `handler` (`callable`): Function called as `handler(node_id, new_state)`. `new_state` is one of `"alive"`, `"suspect"`, `"dead"`, `"leaving"`.
 
-- `handler` (function): Handler function(node_id, new_state)
+**Returns:** `None`
 
-States: `"alive"`, `"suspect"`, `"dead"`, `"leaving"`
-
-**Example:**
 ```python
 def on_change(node_id, state):
     print(f"Node {node_id} is now {state}")
@@ -354,15 +341,15 @@ def on_change(node_id, state):
 cluster.on_state_change(on_change)
 ```
 
-### cluster.on_metadata_change(handler)
+### `cluster.on_metadata_change(handler)`
 
-Register a handler called when any remote node's metadata changes.
+Registers a handler called when any remote node's metadata changes.
 
 **Parameters:**
+- `handler` (`callable`): Function called as `handler(node_dict)`.
 
-- `handler` (function): Handler function(node_dict)
+**Returns:** `None`
 
-**Example:**
 ```python
 def on_meta(node):
     print(f"Node {node['id']} metadata: {node['metadata']}")
@@ -370,15 +357,15 @@ def on_meta(node):
 cluster.on_metadata_change(on_meta)
 ```
 
-### cluster.on_gossip_interval(handler)
+### `cluster.on_gossip_interval(handler)`
 
-Register a handler called every gossip interval.
+Registers a handler called at every gossip interval.
 
 **Parameters:**
+- `handler` (`callable`): Function called with no arguments at each interval.
 
-- `handler` (function): Handler function() called at each interval
+**Returns:** `None`
 
-**Example:**
 ```python
 def on_tick():
     print(f"Alive: {cluster.num_alive()}")
@@ -386,166 +373,177 @@ def on_tick():
 cluster.on_gossip_interval(on_tick)
 ```
 
-### cluster.nodes()
+### `cluster.nodes()`
 
-Get all known nodes in the cluster.
+Gets all known nodes in the cluster.
 
-**Returns:** List of node dicts with `id`, `addr`, `state`, `metadata`, `tags`
+**Parameters:** None
 
-**Example:**
+**Returns:** `list`: list of node dicts, each with `id`, `addr`, `state`, `metadata`, `tags`.
+
 ```python
 for node in cluster.nodes():
     print(f"{node['id']}: {node['state']} at {node['addr']}")
 ```
 
-### cluster.alive_nodes()
+### `cluster.alive_nodes()`
 
-Get all nodes currently in the alive state.
+Gets all nodes currently in the alive state.
 
-**Returns:** List of node dicts
+**Parameters:** None
 
-### cluster.nodes_by_tag(tag)
+**Returns:** `list`: list of node dicts.
 
-Get all nodes that have a specific tag.
+### `cluster.nodes_by_tag(tag)`
+
+Gets all nodes that have a specific tag.
 
 **Parameters:**
+- `tag` (`str`): Tag to filter by.
 
-- `tag` (string): Tag to filter by
+**Returns:** `list`: list of node dicts with the matching tag.
 
-**Returns:** List of node dicts with the matching tag
-
-**Example:**
 ```python
 web_nodes = cluster.nodes_by_tag("web")
 ```
 
-### cluster.get_node(node_id)
+### `cluster.get_node(node_id)`
 
-Get a specific node by ID.
+Gets a specific node by ID.
 
 **Parameters:**
+- `node_id` (`str`): Node UUID.
 
-- `node_id` (string): Node UUID
+**Returns:** `dict`: node dict, or `None` if not found.
 
-**Returns:** Node dict or None if not found
-
-**Example:**
 ```python
 node = cluster.get_node("some-uuid")
 if node:
     print(node["state"])
 ```
 
-### cluster.local_node()
+### `cluster.local_node()`
 
-Get the local node information.
+Gets the local node's information.
 
-**Returns:** Node dict with `id`, `addr`, `state`, `metadata`, `tags`
+**Parameters:** None
 
-### cluster.num_nodes()
+**Returns:** `dict`: node dict with `id`, `addr`, `state`, `metadata`, `tags`.
 
-Get the total number of known nodes.
+### `cluster.num_nodes()`
 
-**Returns:** int
+Gets the total number of known nodes.
 
-### cluster.num_alive()
+**Parameters:** None
 
-Get the number of alive nodes.
+**Returns:** `int`
 
-**Returns:** int
+### `cluster.num_alive()`
 
-### cluster.num_suspect()
+Gets the number of alive nodes.
 
-Get the number of suspect nodes.
+**Parameters:** None
 
-**Returns:** int
+**Returns:** `int`
 
-### cluster.num_dead()
+### `cluster.num_suspect()`
 
-Get the number of dead nodes.
+Gets the number of suspect nodes.
 
-**Returns:** int
+**Parameters:** None
 
-### cluster.node_id()
+**Returns:** `int`
 
-Get the local node's unique UUID.
+### `cluster.num_dead()`
 
-**Returns:** string
+Gets the number of dead nodes.
 
-### cluster.is_local(node_id)
+**Parameters:** None
 
-Check if a node ID refers to the local node.
+**Returns:** `int`
+
+### `cluster.node_id()`
+
+Gets the local node's unique UUID.
+
+**Parameters:** None
+
+**Returns:** `str`
+
+### `cluster.is_local(node_id)`
+
+Checks if a node ID refers to the local node.
 
 **Parameters:**
+- `node_id` (`str`): Node UUID to check.
 
-- `node_id` (string): Node UUID to check
+**Returns:** `bool`
 
-**Returns:** bool
-
-**Example:**
 ```python
 if cluster.is_local(node["id"]):
     print("That's me!")
 ```
 
-### cluster.candidates()
+### `cluster.candidates()`
 
-Get a random subset of nodes for gossiping.
+Gets a random subset of nodes for gossiping.
 
-**Returns:** List of node dicts
+**Parameters:** None
 
-### cluster.set_metadata(key, value)
+**Returns:** `list`: list of node dicts.
 
-Set a local node metadata value. Metadata is automatically gossiped to other nodes.
+### `cluster.set_metadata(key, value)`
+
+Sets a local node metadata value. Metadata is automatically gossiped to other nodes.
 
 **Parameters:**
+- `key` (`str`): Metadata key.
+- `value` (`str`, `int`, `float`, or `bool`): Metadata value.
 
-- `key` (string): Metadata key
-- `value` (string, int, float, or bool): Metadata value
+**Returns:** `None`
 
-**Example:**
 ```python
 cluster.set_metadata("role", "worker")
 cluster.set_metadata("version", 2)
 ```
 
-### cluster.get_metadata(key)
+### `cluster.get_metadata(key)`
 
-Get a local metadata value.
-
-**Parameters:**
-
-- `key` (string): Metadata key
-
-**Returns:** string or None
-
-### cluster.all_metadata()
-
-Get all local metadata.
-
-**Returns:** dict
-
-### cluster.delete_metadata(key)
-
-Delete a metadata key.
+Gets a local metadata value.
 
 **Parameters:**
+- `key` (`str`): Metadata key.
 
-- `key` (string): Metadata key to delete
+**Returns:** `str`: the value, or `None` if not set.
 
-### cluster.create_node_group(criteria, on_node_added=None, on_node_removed=None)
+### `cluster.all_metadata()`
 
-Create a metadata-criteria-based node group. The group automatically tracks nodes whose metadata matches the criteria.
+Gets all local metadata.
+
+**Parameters:** None
+
+**Returns:** `dict`
+
+### `cluster.delete_metadata(key)`
+
+Deletes a metadata key.
 
 **Parameters:**
+- `key` (`str`): Metadata key to delete.
 
-- `criteria` (dict): Metadata key-value pairs to match. Use `"*"` for any value, `"~value"` for contains
-- `on_node_added` (function, optional): Callback function(node_dict) when a node joins the group
-- `on_node_removed` (function, optional): Callback function(node_dict) when a node leaves the group
+**Returns:** `None`
 
-**Returns:** NodeGroup object
+### `cluster.create_node_group(criteria, on_node_added=None, on_node_removed=None)`
 
-**Example:**
+Creates a metadata-criteria-based node group. The group automatically tracks nodes whose metadata matches the criteria.
+
+**Parameters:**
+- `criteria` (`dict`): Metadata key-value pairs to match. Use `"*"` to match any value, or `"~value"` to match values containing `value`.
+- `on_node_added` (`callable`, optional): Function called as `on_node_added(node_dict)` when a node joins the group. Default: `None`.
+- `on_node_removed` (`callable`, optional): Function called as `on_node_removed(node_dict)` when a node leaves the group. Default: `None`.
+
+**Returns:** `NodeGroup`: a node group object.
+
 ```python
 workers = cluster.create_node_group(
     criteria={"role": "worker"},
@@ -556,21 +554,19 @@ workers.send_to_peers(128, {"task": "process"})
 workers.close()
 ```
 
-### cluster.create_leader_election(check_interval="1s", leader_timeout="3s", heartbeat_msg_type=65, quorum_percentage=60, metadata_criteria=None)
+### `cluster.create_leader_election(check_interval="1s", leader_timeout="3s", heartbeat_msg_type=65, quorum_percentage=60, metadata_criteria=None)`
 
-Create a leader election manager with quorum-based election.
+Creates a leader election manager with quorum-based election.
 
 **Parameters:**
+- `check_interval` (`str`, optional): Duration between leader checks. Default: `"1s"`.
+- `leader_timeout` (`str`, optional): Duration without a heartbeat before the leader is considered lost. Default: `"3s"`.
+- `heartbeat_msg_type` (`int`, optional): Message type for heartbeats, from the reserved (`< 128`) range. Default: `65`.
+- `quorum_percentage` (`int`, optional): Percentage of nodes required for quorum, `1`-`100`. Default: `60`.
+- `metadata_criteria` (`dict`, optional): Metadata criteria to limit eligible nodes. Default: `None` (all nodes eligible).
 
-- `check_interval` (string): Duration between leader checks (default: `"1s"`)
-- `leader_timeout` (string): Duration without heartbeat before leader lost (default: `"3s"`)
-- `heartbeat_msg_type` (int): Message type for heartbeats (default: 65, reserved range)
-- `quorum_percentage` (int): Percentage of nodes required for quorum 1-100 (default: 60)
-- `metadata_criteria` (dict, optional): Metadata criteria to limit eligible nodes
+**Returns:** `LeaderElection`: a leader election object.
 
-**Returns:** LeaderElection object
-
-**Example:**
 ```python
 election = cluster.create_leader_election(
     quorum_percentage=51,
@@ -581,6 +577,129 @@ election.on_event("became_leader", lambda e, n: print("I'm leader!"))
 election.on_event("stepped_down", lambda e, n: print("Stepped down"))
 election.start()
 ```
+
+### `node_group.nodes()`
+
+Gets all nodes currently in the group.
+
+**Parameters:** None
+
+**Returns:** `list`: list of node dicts.
+
+### `node_group.contains(node_id)`
+
+Checks if a node is in the group.
+
+**Parameters:**
+- `node_id` (`str`): Node UUID to check.
+
+**Returns:** `bool`
+
+### `node_group.count()`
+
+Gets the number of nodes in the group.
+
+**Parameters:** None
+
+**Returns:** `int`
+
+### `node_group.send_to_peers(message_type, data, reliable=False)`
+
+Sends a message to all peers in the group.
+
+**Parameters:**
+- `message_type` (`int`): Message type. Must be `>= 128`.
+- `data` (`str`, `int`, `float`, `list`, or `dict`): Message payload.
+- `reliable` (`bool`, optional): Use reliable transport. Default: `False`.
+
+**Returns:** `None`
+
+### `node_group.close()`
+
+Closes the group and releases resources.
+
+**Parameters:** None
+
+**Returns:** `None`
+
+### `leader_election.start()`
+
+Starts the election process.
+
+**Parameters:** None
+
+**Returns:** `None`
+
+### `leader_election.stop()`
+
+Stops the election process.
+
+**Parameters:** None
+
+**Returns:** `None`
+
+### `leader_election.is_leader()`
+
+Checks if this node is the current leader.
+
+**Parameters:** None
+
+**Returns:** `bool`
+
+```python
+if election.is_leader():
+    print("Performing leader-only tasks")
+```
+
+### `leader_election.has_leader()`
+
+Checks if a leader is currently elected.
+
+**Parameters:** None
+
+**Returns:** `bool`
+
+### `leader_election.get_leader_id()`
+
+Gets the current leader's node ID.
+
+**Parameters:** None
+
+**Returns:** `str`
+
+### `leader_election.send_to_peers(message_type, data, reliable=False)`
+
+Sends a message to all eligible peers (those matching `metadata_criteria`, if set).
+
+**Parameters:**
+- `message_type` (`int`): Message type. Must be `>= 128`.
+- `data` (`str`, `int`, `float`, `list`, or `dict`): Message payload.
+- `reliable` (`bool`, optional): Use reliable transport. Default: `False`.
+
+**Returns:** `None`
+
+### `leader_election.on_event(event_type, handler)`
+
+Registers a handler for a leader election event.
+
+**Parameters:**
+- `event_type` (`str`): One of `"elected"`, `"lost"`, `"became_leader"`, `"stepped_down"`.
+- `handler` (`callable`): Function called when the event fires.
+
+**Returns:** `None`
+
+```python
+election.on_event("became_leader", lambda e, n: print("I became the leader!"))
+election.on_event("stepped_down", lambda e, n: print("I stepped down"))
+election.on_event("elected", lambda e, n: print(f"Leader elected: {n}"))
+election.on_event("lost", lambda e, n: print("Leader lost"))
+```
+
+## Security Considerations
+
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`scriptling.net.gossip` opens raw UDP/TCP sockets to bind, join, and exchange traffic with other cluster nodes, and can both send and receive arbitrary script-supplied payloads over the network. The library itself does not restrict which hosts or ports a script can bind to or contact: that is the embedder's responsibility, typically enforced with OS-level firewalling, network namespacing, or by controlling which addresses are reachable from the process. Use `encryption_key` and `bearer_token` to protect traffic and authenticate peers when running across untrusted networks. See [Security Considerations](/docs/security/#network-security) for a full breakdown of network-enabled libraries.
 
 ## Examples
 
@@ -727,10 +846,16 @@ cluster.join(["10.0.0.1:8000"])
 
 ## Notes
 
-- Message types 0-127 are reserved for internal protocol use
-- User message types must be >= 128 (use `MSG_USER` constant)
-- `reliable=True` uses TCP for guaranteed delivery
-- Metadata is eventually consistent across the cluster
-- Always call `stop()` to properly clean up resources
-- Node group criteria support `"*"` wildcard and `"~value"` contains matching
-- Leader election heartbeat message types use the reserved range (< 128)
+- Message types 0-127 are reserved for internal protocol use; user message types must be `>= 128` (use the `MSG_USER` constant).
+- `reliable=True` uses TCP for guaranteed delivery.
+- Metadata is eventually consistent across the cluster.
+- Always call `stop()` to properly clean up resources.
+- Node group criteria support the `"*"` wildcard and `"~value"` contains matching.
+- Leader election heartbeat message types use the reserved (`< 128`) range.
+
+## See Also
+
+- [scriptling.net.unicast](../unicast/): direct point-to-point UDP/TCP messaging
+- [scriptling.net.multicast](../multicast/): one-to-many UDP group messaging
+- [scriptling.net.resolve](../resolve/): DNS and SRV record resolution
+- [Security Guide](/docs/security/): full risk breakdown across all libraries

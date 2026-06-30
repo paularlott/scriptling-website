@@ -1,43 +1,30 @@
 ---
 title: scriptling.markdown
 linkTitle: markdown
+description: Convert Markdown to HTML using the GitHub Flavored Markdown specification.
 weight: 5
 ---
 
-The `scriptling.markdown` library converts Markdown to HTML using the
-[GitHub Flavored Markdown (GFM)](https://github.github.com/gfm/) specification,
-backed by [goldmark](https://github.com/yuin/goldmark).
+The `scriptling.markdown` library converts Markdown to HTML using the [GitHub Flavored Markdown (GFM)](https://github.github.com/gfm/) specification, backed by [goldmark](https://github.com/yuin/goldmark). Reach for it whenever a script needs to turn Markdown text: including LLM output: into safe, ready-to-render HTML.
 
 ## Available Functions
 
 | Function | Description |
-| --- | --- |
+|----------|-------------|
 | `to_html(markdown_string)` | Convert a Markdown string to an HTML string |
 
 ## Functions
 
-### scriptling.markdown.to_html(markdown_string)
+### `to_html(markdown_string)`
 
-Converts a Markdown string to HTML.
+Converts a Markdown string to HTML. Supports ATX and setext headings; bold (`**text**`), italic (`_text_`), and strikethrough (`~~text~~`); inline and fenced code blocks with optional language hints; ordered, unordered, and nested lists; task lists (`- [x] done` / `- [ ] todo`); blockquotes; GFM tables; and auto-linked bare URLs.
 
 **Parameters:**
+- `markdown_string` (`str`): The Markdown source to convert.
 
-- `markdown_string` (string): The Markdown source to convert.
+**Returns:** `str`: HTML representation of the Markdown input.
 
-**Returns:** `string` — HTML representation of the Markdown input.
-
-**Supported syntax:**
-
-- ATX and setext headings
-- Bold (`**text**`), italic (`_text_`), strikethrough (`~~text~~`)
-- Inline and fenced code blocks (with optional language hint)
-- Ordered and unordered lists, nested lists
-- Task lists (`- [x] done` / `- [ ] todo`)
-- Blockquotes
-- GFM tables
-- Auto-linked bare URLs
-
-**Example:**
+**Raises:** `Error`: only if conversion encounters an internal error; the function never fails on well-formed UTF-8 Markdown.
 
 ```python
 import scriptling.markdown as markdown
@@ -112,12 +99,8 @@ detail_html = markdown.to_html(detail_md)
 
 ## Notes
 
-- `to_html` uses goldmark with GFM extensions enabled. Raw HTML in the Markdown
-  source is **not** passed through: goldmark's safe default drops raw HTML
-  blocks and inline HTML (replacing them with an HTML comment) so untrusted
-  input, such as LLM output, cannot inject `<script>` tags, event handlers,
-  or other dangerous markup. The output is safe for direct insertion into an
-  HTML page. HTML-like syntax inside code spans and fenced code blocks is still
-  rendered, with the angle brackets HTML-escaped.
-- The function never fails on well-formed UTF-8 Markdown; it raises an
-  exception only if conversion encounters an internal error.
+`to_html` uses goldmark with GFM extensions enabled. Raw HTML in the Markdown source is **not** passed through: goldmark's safe default drops raw HTML blocks and inline HTML (replacing them with an HTML comment) so untrusted input, such as LLM output, cannot inject `<script>` tags, event handlers, or other dangerous markup. The output is safe for direct insertion into an HTML page. HTML-like syntax inside code spans and fenced code blocks is still rendered, with the angle brackets HTML-escaped.
+
+## See Also
+
+- [scriptling.template.html](../template/html/) - Render the converted HTML into a larger page template

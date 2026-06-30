@@ -1,55 +1,42 @@
 ---
 title: subprocess
+description: Spawn and manage subprocesses, similar to Python's subprocess module.
 weight: 1
-
 aliases:
   - /reference/libraries/extlib/subprocess/
   - /reference/libraries/subprocess/
-requires_registration: true
 ---
 
-The `subprocess` library provides functions for spawning and managing subprocesses. This is an **extended library** that must be explicitly registered.
-
-> **Note:** This library is enabled by default in the Scriptling CLI and MCP server but must be manually registered when using the Go API.
-
-## Import
-
-```python
-import subprocess
-```
+The `subprocess` library provides functions for spawning and managing external commands, similar to Python's `subprocess` module.
 
 ## Available Functions
 
-| Function                | Description                             |
-| ----------------------- | --------------------------------------- |
-| `run(args, options={})` | Run command and return CompletedProcess |
+| Function | Description |
+|----------|-------------|
+| `run(args, **options)` | Run a command and return a `CompletedProcess`. |
 
 ## Functions
 
-### subprocess.run(args, options={})
+### `run(args, **options)`
 
-Run a command and return a CompletedProcess instance.
+Run a command and return a `CompletedProcess` instance.
 
 **Parameters:**
+- `args` (`str`/`list`): Command to run. A string is split on spaces (unless `shell` is `True`, in which case it is passed to the shell as-is); a list is used as the literal argument vector.
+- The following options are passed as keyword arguments:
+  - `capture_output` (`bool`): Capture stdout and stderr. Default: `False`.
+  - `shell` (`bool`): Run the command through the shell. Default: `False`.
+  - `cwd` (`str`): Working directory for the command.
+  - `timeout` (`int`/`float`): Timeout in seconds.
+  - `check` (`bool`): Raise an exception if `returncode` is non-zero. Default: `False`.
+  - `text` (`bool`): Return stdout/stderr as strings. Default: `False`.
+  - `encoding` (`str`): Encoding for stdout/stderr. Default: `"utf-8"`.
+  - `input` (`str`): String to pipe to stdin.
+  - `env` (`dict`): Environment variables for the command.
 
-- `args`: Command to run. Can be a string (split on spaces) or a list of arguments.
-- `options`: Optional dictionary with configuration options.
+**Returns:** `CompletedProcess`: see [CompletedProcess Class](#completedprocess-class).
 
-**Options:**
-
-- `capture_output` (boolean): Capture stdout and stderr. Default: `false`
-- `shell` (boolean): Run command through shell. Default: `false`
-- `cwd` (string): Working directory for command
-- `timeout` (integer): Timeout in seconds
-- `check` (boolean): Raise exception if returncode is non-zero. Default: `false`
-- `text` (boolean): Return stdout/stderr as strings. Default: `true`
-- `encoding` (string): Encoding for stdout/stderr (default: "utf-8")
-- `input` (string): String to pipe to stdin
-- `env` (dict): Environment variables for the command
-
-**Returns:** CompletedProcess instance
-
-**Examples:**
+**Raises:** `Error`: if the command cannot be executed, or if `check` is `True` and the command exits non-zero.
 
 ```python
 import subprocess
@@ -58,43 +45,39 @@ import subprocess
 result = subprocess.run("echo hello")
 print(result.returncode)  # 0
 
-# Capture output
-result = subprocess.run("echo hello world", {"capture_output": true})
+# Capture output (options are keyword arguments)
+result = subprocess.run("echo hello world", capture_output=True)
 print(result.stdout.strip())  # "hello world"
 
-# Run with arguments as list
+# Run with arguments as a list
 result = subprocess.run(["echo", "test"])
 
-# Use shell
-result = subprocess.run("echo 'hello' && echo 'world'", {"shell": true})
+# Use the shell
+result = subprocess.run("echo 'hello' && echo 'world'", shell=True)
 
 # Check for errors
 try:
-    result = subprocess.run("false", {"check": true})
-except:
+    result = subprocess.run("false", check=True)
+except Exception:
     print("Command failed")
 ```
 
 ## CompletedProcess Class
 
-The `subprocess.run()` function returns a `CompletedProcess` instance with the following attributes:
+`subprocess.run()` returns a `CompletedProcess` instance with the following attributes:
 
-### Attributes
+- `args` (`list`): Command arguments.
+- `returncode` (`int`): Exit code of the process.
+- `stdout` (`str`): Captured standard output (empty string if not captured).
+- `stderr` (`str`): Captured standard error (empty string if not captured).
 
-- `args`: List of command arguments
-- `returncode`: Exit code of the process (integer)
-- `stdout`: Captured standard output (string, empty if not captured)
-- `stderr`: Captured standard error (string, empty if not captured)
+### `CompletedProcess.check_returncode()`
 
-### Methods
+Check that the process returned successfully.
 
-#### check_returncode()
+**Returns:** `CompletedProcess`: the instance itself, if `returncode` is `0`.
 
-Check if the process returned successfully. Raises an exception if returncode is non-zero.
-
-**Returns:** The CompletedProcess instance if successful
-
-**Example:**
+**Raises:** `Error`: if `returncode` is non-zero.
 
 ```python
 import subprocess
@@ -104,20 +87,24 @@ result.check_returncode()  # OK
 
 try:
     result = subprocess.run("false")
-    result.check_returncode()  # Raises exception
-except:
+    result.check_returncode()  # Raises
+except Exception:
     print("Process failed")
 ```
 
 ## Security Considerations
 
-- Commands are executed in the host environment
-- Be careful with user-provided command strings to avoid command injection
-- The `shell` option can be dangerous with untrusted input
-- Consider using argument lists instead of shell strings when possible
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`subprocess` allows arbitrary OS command execution on the host. This is a **critical risk**: there is no built-in mitigation, sandboxing, or allowlisting. Never register this library when running untrusted scripts, and be careful with user-provided command strings or the `shell` option to avoid command injection. See [Library Registration](/docs/go-integration/library-registration/#security-considerations) and the [Security Guide](/docs/security/).
 
 ## Platform Compatibility
 
-- Works on all platforms supported by Go's `os/exec` package
-- Command syntax may vary between operating systems
-- Use the `platform` library to detect the current platform if needed
+- Works on all platforms supported by Go's `os/exec` package.
+- Command syntax may vary between operating systems.
+- Use the `sys` library's `platform` constant to detect the current platform if your script needs to branch on OS.
+
+## See Also
+
+- [sys](../sys/): Detect the current platform and access environment/argv
+- [requests](../requests/): Make HTTP requests without spawning a process

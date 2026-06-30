@@ -4,42 +4,40 @@ linkTitle: mcp
 weight: 1
 ---
 
-MCP (Model Context Protocol) tool interaction library. This library provides functions for interacting with MCP servers that expose tools for AI models to use.
+MCP (Model Context Protocol) client library. This library provides functions for connecting to MCP servers and interacting with the tools they expose for AI models to use.
 
-For MCP integration with OpenAI clients, see the [AI Library](../ai/) documentation.
+For MCP integration with AI clients, see the `remote_servers` parameter on [scriptling.ai.Client](../ai/client/).
 
 ## Available Functions
 
-| Function                     | Description                                 |
-| ---------------------------- | ------------------------------------------- |
-| `decode_response(response)`  | Decode raw MCP tool response                |
-| `Client(base_url, **kwargs)` | Create MCP client for connecting to servers |
+| Function | Description |
+|----------|-------------|
+| `decode_response(response)` | Decode a raw MCP tool response |
+| `Client(base_url, **kwargs)` | Create an MCP client for connecting to servers |
 
 ## MCPClient Methods
 
-| Method                                       | Description                                    |
-| -------------------------------------------- | ---------------------------------------------- |
-| `client.tools()`                             | List available tools                           |
-| `client.call_tool(name, arguments)`          | Execute a tool by name                         |
-| `client.call_tools_parallel(calls)`          | Execute multiple tools concurrently            |
-| `client.refresh_tools()`                     | Refresh cached tool list                       |
-| `client.tool_search(query, **kwargs)`        | Search for tools by query                      |
-| `client.execute_discovered(name, arguments)` | Execute a discovered tool                      |
-| `client.execute_discovered_parallel(calls)`  | Execute multiple discovered tools concurrently |
+| Method | Description |
+|--------|-------------|
+| `client.tools()` | List available tools |
+| `client.call_tool(name, arguments)` | Execute a tool by name |
+| `client.call_tools_parallel(calls)` | Execute multiple tools concurrently |
+| `client.refresh_tools()` | Refresh cached tool list |
+| `client.tool_search(query, **kwargs)` | Search for tools by query |
+| `client.execute_discovered(name, arguments)` | Execute a discovered tool |
+| `client.execute_discovered_parallel(calls)` | Execute multiple discovered tools concurrently |
 
-## Module Functions
+## Functions
 
-### scriptling.mcp.decode_response(response)
+### `mcp.decode_response(response)`
 
 Decodes a raw MCP tool response into scriptling objects.
 
 **Parameters:**
 
-- `response` (dict): Raw tool response dict
+- `response` (`dict`): Raw tool response dict.
 
-**Returns:** object - Decoded response (parsed JSON or string)
-
-**Example:**
+**Returns:** `object`: decoded response (parsed JSON or string).
 
 ```python
 import scriptling.mcp as mcp
@@ -47,19 +45,26 @@ import scriptling.mcp as mcp
 decoded = mcp.decode_response(raw_response)
 ```
 
-### scriptling.mcp.Client(base_url, \*\*kwargs)
+```python
+raw_response = {
+    "content": [{"type": "text", "text": '{"temp": 15}'}]
+}
+
+decoded = mcp.decode_response(raw_response)
+print(decoded)  # {"temp": 15}
+```
+
+### `mcp.Client(base_url, **kwargs)`
 
 Creates a new MCP client for connecting to a remote MCP server.
 
 **Parameters:**
 
-- `base_url` (str): URL of the MCP server
-- `namespace` (str, optional): Namespace for tool names (e.g., "scriptling" makes tools available as "scriptling/tool_name")
-- `bearer_token` (str, optional): Bearer token for authentication
+- `base_url` (`str`): URL of the MCP server.
+- `namespace` (`str`, optional): Namespace for tool names (e.g. `"scriptling"` makes tools available as `"scriptling/tool_name"`). Default: `""`.
+- `bearer_token` (`str`, optional): Bearer token for authentication. Default: `""`.
 
-**Returns:** MCPClient - A client instance with methods for interacting with the server
-
-**Example:**
+**Returns:** `MCPClient`: a client instance with methods for interacting with the server.
 
 ```python
 import scriptling.mcp as mcp
@@ -81,17 +86,15 @@ client = mcp.Client(
 )
 ```
 
-**Note:** When using a namespace, all tool names will be prefixed. For example, if the server has a tool called "execute_code" and you use namespace "scriptling", the tool will be available as "scriptling/execute_code". The namespace is automatically added to all tool names and stripped when calling tools.
+When using a namespace, all tool names are prefixed. For example, if the server has a tool called `execute_code` and you use namespace `scriptling`, the tool is available as `scriptling/execute_code`. The namespace is automatically added to all tool names and stripped when calling tools.
 
 ## MCPClient Class
 
-### client.tools()
+### `client.tools()`
 
 Lists all tools available from this MCP server.
 
-**Returns:** list - List of tool dicts with name, description, inputSchema
-
-**Example:**
+**Returns:** `list`: tool dicts with `name`, `description`, `inputSchema`.
 
 ```python
 client = mcp.Client("https://api.example.com/mcp")
@@ -103,18 +106,16 @@ for tool in tools:
         print(f"  Schema: {tool.inputSchema}")
 ```
 
-### client.call_tool(name, arguments)
+### `client.call_tool(name, arguments)`
 
 Executes a tool by name with the provided arguments.
 
 **Parameters:**
 
-- `name` (str): Tool name to execute
-- `arguments` (dict): Tool arguments
+- `name` (`str`): Tool name to execute.
+- `arguments` (`dict`): Tool arguments.
 
-**Returns:** dict - Decoded tool response
-
-**Example:**
+**Returns:** `dict`: decoded tool response.
 
 ```python
 client = mcp.Client("https://api.example.com/mcp")
@@ -127,13 +128,11 @@ result = client.call_tool("search", {
 print(result)
 ```
 
-### client.refresh_tools()
+### `client.refresh_tools()`
 
 Explicitly refreshes the cached list of tools from the server.
 
-**Returns:** null
-
-**Example:**
+**Returns:** `None`
 
 ```python
 client = mcp.Client("https://api.example.com/mcp")
@@ -144,18 +143,16 @@ client.refresh_tools()
 tools = client.tools()
 ```
 
-### client.tool_search(query, \*\*kwargs)
+### `client.tool_search(query, **kwargs)`
 
-Searches for tools using the tool_search MCP tool. This is useful when the server has many tools registered via a discovery registry.
+Searches for tools using the `tool_search` MCP tool. Useful when the server has many tools registered via a discovery registry.
 
 **Parameters:**
 
-- `query` (str): Search query for tool names, descriptions, and keywords
-- `max_results` (int, optional): Maximum number of results (default: 10)
+- `query` (`str`): Search query for tool names, descriptions, and keywords.
+- `max_results` (`int`, optional): Maximum number of results. Default: `10`.
 
-**Returns:** list - List of matching tool dicts
-
-**Example:**
+**Returns:** `list`: matching tool dicts.
 
 ```python
 client = mcp.Client("https://api.example.com/mcp")
@@ -170,17 +167,15 @@ for tool in results:
     print(f"{tool.name}: {tool.description}")
 ```
 
-### client.call_tools_parallel(calls)
+### `client.call_tools_parallel(calls)`
 
 Executes multiple tools concurrently and returns results in the same order as the input.
 
 **Parameters:**
 
-- `calls` (list): List of dicts, each with `name` (str) and `arguments` (dict) keys
+- `calls` (`list`): List of dicts, each with `name` (`str`) and `arguments` (`dict`) keys.
 
-**Returns:** list - List of result dicts with `name`, `result`, and `error` keys. `error` is an empty string on success.
-
-**Example:**
+**Returns:** `list`: result dicts with `name`, `result`, and `error` keys. `error` is an empty string on success.
 
 ```python
 client = mcp.Client("https://api.example.com/mcp")
@@ -197,18 +192,16 @@ for r in results:
         print(f"{r.name}: {r.result}")
 ```
 
-### client.execute_discovered(name, arguments)
+### `client.execute_discovered(name, arguments)`
 
-Executes a tool by name using the execute_tool MCP tool. This is the only way to call tools that were discovered via tool_search.
+Executes a tool by name using the `execute_tool` MCP tool. This is the only way to call tools that were discovered via `tool_search()`.
 
 **Parameters:**
 
-- `name` (str): Tool name to execute
-- `arguments` (dict): Tool arguments
+- `name` (`str`): Tool name to execute.
+- `arguments` (`dict`): Tool arguments.
 
-**Returns:** dict - Tool response
-
-**Example:**
+**Returns:** `dict`: tool response.
 
 ```python
 client = mcp.Client("https://api.example.com/mcp")
@@ -223,17 +216,15 @@ if results:
     print(result)
 ```
 
-### client.execute_discovered_parallel(calls)
+### `client.execute_discovered_parallel(calls)`
 
 Executes multiple discovered tools concurrently and returns results in the same order as the input.
 
 **Parameters:**
 
-- `calls` (list): List of dicts, each with `name` (str) and `arguments` (dict) keys
+- `calls` (`list`): List of dicts, each with `name` (`str`) and `arguments` (`dict`) keys.
 
-**Returns:** list - List of result dicts with `name`, `result`, and `error` keys. `error` is an empty string on success.
-
-**Example:**
+**Returns:** `list`: result dicts with `name`, `result`, and `error` keys. `error` is an empty string on success.
 
 ```python
 client = mcp.Client("https://api.example.com/mcp")
@@ -250,112 +241,16 @@ for r in results:
         print(f"{r.name}: {r.result}")
 ```
 
-## Usage Examples
-
-### Basic Tool Execution
-
-```python
-import scriptling.mcp as mcp
-
-client = mcp.Client("https://api.example.com/mcp")
-result = client.call_tool("calculator", {"expression": "2+2"})
-print(result)  # 4
-```
-
-### Listing Available Tools
-
-```python
-import scriptling.mcp as mcp
-
-client = mcp.Client("https://api.example.com/mcp")
-tools = client.tools()
-
-print(f"Available tools: {len(tools)}")
-for tool in tools:
-    print(f"  - {tool.name}")
-    print(f"    {tool.description}")
-```
-
-### Using Tool Schemas
-
-```python
-import scriptling.mcp as mcp
-
-client = mcp.Client("https://api.example.com/mcp")
-tools = client.tools()
-
-for tool in tools:
-    if tool.name == "search":
-        # Check what parameters are required
-        schema = tool.inputSchema
-        print(f"Search tool schema: {schema}")
-
-        # Call with proper arguments
-        result = client.call_tool("search", {
-            "query": "golang",
-            "limit": 5
-        })
-```
-
-### Searching for Tools
-
-```python
-import scriptling.mcp as mcp
-
-client = mcp.Client("https://api.example.com/mcp")
-
-# Find database-related tools
-db_tools = client.tool_search("database", max_results=20)
-
-for tool in db_tools:
-    print(f"{tool.name}: {tool.description}")
-
-    # Execute if found
-    if tool.name == "query_database":
-        result = client.execute_discovered("query_database", {
-            "sql": "SELECT * FROM users LIMIT 10"
-        })
-        print(result)
-```
-
-### Parallel Tool Execution
-
-```python
-import scriptling.mcp as mcp
-
-client = mcp.Client("https://api.example.com/mcp")
-
-# Execute multiple tools at the same time
-results = client.call_tools_parallel([
-    {"name": "search", "arguments": {"query": "golang"}},
-    {"name": "weather", "arguments": {"city": "London"}},
-    {"name": "translate", "arguments": {"text": "hello", "lang": "fr"}},
-])
-
-for r in results:
-    if r.error:
-        print(f"{r.name} failed: {r.error}")
-    else:
-        print(f"{r.name}: {r.result}")
-```
-
 ## Authentication
 
-### Bearer Token Authentication
-
 ```python
 import scriptling.mcp as mcp
 
+# Bearer token only
 client = mcp.Client(
     "https://api.example.com/mcp",
     bearer_token="your-api-token"
 )
-```
-
-### Bearer Token with Namespace
-
-```python
-import scriptling.mcp as mcp
 
 # Namespace and bearer token can be in any order
 client = mcp.Client(
@@ -363,58 +258,9 @@ client = mcp.Client(
     namespace="myservice",
     bearer_token="your-api-token"
 )
-```
 
-### No Authentication
-
-```python
-import scriptling.mcp as mcp
-
+# No authentication
 client = mcp.Client("https://public-api.example.com/mcp")
-```
-
-## Error Handling
-
-```python
-import scriptling.mcp as mcp
-
-try:
-    client = mcp.Client("https://api.example.com/mcp")
-    result = client.call_tool("search", {"query": "golang"})
-    print(result)
-except Exception as e:
-    print("Tool execution failed:", e)
-```
-
-## Tool Response Format
-
-Tool responses are automatically decoded from JSON:
-
-```python
-import scriptling.mcp as mcp
-
-client = mcp.Client("https://api.example.com/mcp")
-
-# Response is automatically parsed
-result = client.call_tool("get_weather", {"city": "London"})
-
-# Access response data
-print(result.temperature)  # 15
-print(result.condition)    # "Partly cloudy"
-print(result.forecast)     # [...]
-```
-
-For raw responses, use `mcp.decode_response()`:
-
-```python
-import scriptling.mcp as mcp
-
-raw_response = {
-    "content": [{"type": "text", "text": '{"temp": 15}'}]
-}
-
-decoded = mcp.decode_response(raw_response)
-print(decoded)  # {"temp": 15}
 ```
 
 ## Tool Schema
@@ -422,8 +268,6 @@ print(decoded)  # {"temp": 15}
 Tools may include an input schema defining their parameters, and an output schema describing the response structure:
 
 ```python
-import scriptling.mcp as mcp
-
 client = mcp.Client("https://api.example.com/mcp")
 tools = client.tools()
 
@@ -464,77 +308,62 @@ response = ai_client.completion(
 print(response.choices[0].message.content)
 ```
 
-### Combined Usage
-
-You can use both MCP and AI clients together - one for direct tool access and one for AI completions:
+You can use both an MCP client and an AI client together: one for direct tool access and one for AI completions:
 
 ```python
-import scriptling.ai as ai
-import scriptling.mcp as mcp
-
-# Create AI client with MCP servers configured
-ai_client = ai.Client("http://127.0.0.1:1234/v1", remote_servers=[
-    {"base_url": "http://127.0.0.1:8080/mcp", "namespace": "scriptling"},
-])
-
 # Create MCP client for direct tool access
 mcp_client = mcp.Client("http://127.0.0.1:8080/mcp", namespace="scriptling")
 
-# List tools directly
 tools = mcp_client.tools()
 print(f"Available tools: {len(tools)}")
 for tool in tools:
     print(f"  - {tool.name}: {tool.description}")
-
-# Or let the AI use them automatically
-response = ai_client.completion(
-    "gpt-4",
-    [{"role": "user", "content": "What tools are available?"}]
-)
-print(response.choices[0].message.content)
 ```
 
-### Namespace Prefixing
-
-When using MCP tools with AI, tools are prefixed with the namespace:
+When using MCP tools with AI, tools are prefixed with the namespace: with `namespace="scriptling"`, tools become `scriptling/tool_name`:
 
 ```python
-import scriptling.ai as ai
-
-# With namespace="scriptling", tools become "scriptling/tool_name"
 ai_client = ai.Client("http://127.0.0.1:1234/v1", remote_servers=[
     {"base_url": "http://127.0.0.1:8080/mcp", "namespace": "scriptling"},
 ])
 
-# AI will see tools like: scriptling/execute_code, scriptling/tool_search, etc.
 response = ai_client.completion(
     "gpt-4",
     [{"role": "user", "content": "Use scriptling/execute_code to calculate 15 + 27"}]
 )
 ```
 
-### Multiple MCP Servers
-
 You can configure multiple MCP servers for the AI client:
 
 ```python
-import scriptling.ai as ai
-
 ai_client = ai.Client("http://127.0.0.1:1234/v1", remote_servers=[
     {"base_url": "http://127.0.0.1:8080/mcp", "namespace": "scriptling"},
     {"base_url": "http://127.0.0.1:8081/mcp", "namespace": "database"},
     {"base_url": "https://api.example.com/mcp", "namespace": "search", "bearer_token": "secret"},
 ])
-
-# AI now has access to tools from all three servers
-response = ai_client.completion(
-    "gpt-4",
-    [{"role": "user", "content": "Search for recent golang news and save to database"}]
-)
 ```
+
+## Error Handling
+
+```python
+import scriptling.mcp as mcp
+
+try:
+    client = mcp.Client("https://api.example.com/mcp")
+    result = client.call_tool("search", {"query": "golang"})
+    print(result)
+except Exception as e:
+    print("Tool execution failed:", e)
+```
+
+## Security Considerations
+
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`scriptling.mcp` makes outbound network connections to MCP servers (and via `client.call_tool()`, executes whatever tools that server exposes). The trust boundary is the MCP server itself: a malicious or compromised server can expose tools that do anything its own implementation allows. For a full risk breakdown, see the [Security Guide](/docs/security/).
 
 ## See Also
 
-- [MCP Tool Helpers](../mcp-tool/) - Helper library for authoring MCP tools
-- [AI Library](../ai/) - AI client and completion functions
-- [Agent Library](../agent/) - Building AI agents with automatic tool execution
+- [scriptling.mcp.tool](../tool/): Helper library for authoring MCP tools
+- [scriptling.ai](../ai/): AI client and completion functions
+- [scriptling.ai.agent](../ai/agent/): Building AI agents with automatic tool execution

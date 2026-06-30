@@ -8,7 +8,7 @@ When embedding Scriptling in a Go application, you control which libraries are a
 
 ## Standard Libraries
 
-22 built-in libraries available without any configuration.
+23 built-in libraries available without any configuration.
 
 ### Register All at Once
 
@@ -104,15 +104,15 @@ extlibs.RegisterSedLibrary(p, []string{"/tmp"})
 ### Custom Configuration
 
 ```go
-// sys — requires argv and stdin
+// sys: requires argv and stdin
 extlibs.RegisterSysLibrary(p, []string{"script.py"}, os.Stdin)
 
-// logging — requires a logger instance (or use default)
+// logging: requires a logger instance (or use default)
 extlibs.RegisterLoggingLibraryDefault(p)
 // or with custom logger:
 // extlibs.RegisterLoggingLibrary(p, myLogger)
 
-// secrets provider — requires a secret registry
+// secrets provider: requires a secret registry
 extlibs.RegisterSecretLibrary(p, registry)
 
 // wait_for, websocket, templates
@@ -134,15 +134,16 @@ extlibs.RegisterTemplateTextLibrary(p)
 
 ## Runtime Libraries
 
-Background tasks, HTTP routing, key-value store, concurrency, and sandboxing.
+Background tasks, HTTP routing, JSON-RPC, key-value store, concurrency, and sandboxing.
 
 ```go
-// Register all runtime libraries at once
+// Register http, kv, sync, sandbox, and jsonrpc at once (not plugin, see below)
 extlibs.RegisterRuntimeLibraryAll(p, []string{"/tmp"})
 
 // Or register individually
 extlibs.RegisterRuntimeLibrary(p)          // scriptling.runtime (background tasks)
 extlibs.RegisterRuntimeHTTPLibrary(p)      // scriptling.runtime.http
+extlibs.RegisterRuntimeJSONRPCLibrary(p)   // scriptling.runtime.jsonrpc
 extlibs.RegisterRuntimeKVLibrary(p)        // scriptling.runtime.kv
 extlibs.RegisterRuntimeSyncLibrary(p)      // scriptling.runtime.sync
 extlibs.RegisterRuntimeSandboxLibrary(p, []string{"/tmp"})  // scriptling.runtime.sandbox
@@ -151,11 +152,22 @@ extlibs.RegisterRuntimeSandboxLibrary(p, []string{"/tmp"})  // scriptling.runtim
 | Namespace | Function |
 |-----------|----------|
 | `scriptling.runtime` | `RegisterRuntimeLibrary(p)` |
-| All runtime libs | `RegisterRuntimeLibraryAll(p, allowedPaths)` |
+| `scriptling.runtime.http`, `.kv`, `.sync`, `.sandbox`, `.jsonrpc` | `RegisterRuntimeLibraryAll(p, allowedPaths)` |
 | `scriptling.runtime.http` | `RegisterRuntimeHTTPLibrary(p)` |
+| `scriptling.runtime.jsonrpc` | `RegisterRuntimeJSONRPCLibrary(p)` |
 | `scriptling.runtime.kv` | `RegisterRuntimeKVLibrary(p)` or `RegisterRuntimeKVLibraryWithSecurity(p, allowedPaths)` |
 | `scriptling.runtime.sync` | `RegisterRuntimeSyncLibrary(p)` |
 | `scriptling.runtime.sandbox` | `RegisterRuntimeSandboxLibrary(p, allowedPaths)` |
+
+`scriptling.runtime.plugin` is registered separately, it is not included in `RegisterRuntimeLibraryAll` and is only meaningful in the **agent variant** of Scriptling, alongside `scriptling.ai.agent`:
+
+```go
+extlibs.RegisterRuntimePluginLibrary(p)  // scriptling.runtime.plugin
+```
+
+| Namespace | Function |
+|-----------|----------|
+| `scriptling.runtime.plugin` | `RegisterRuntimePluginLibrary(p)` |
 
 ## Scriptling-Specific Libraries
 
@@ -235,7 +247,7 @@ import (
     "github.com/paularlott/scriptling/extlibs/messaging/slack"
 )
 
-console.Register(p, nil)    // scriptling.messaging.console
+console.Register(p)          // scriptling.messaging.console
 telegram.Register(p, nil)   // scriptling.messaging.telegram
 discord.Register(p, nil)    // scriptling.messaging.discord
 slack.Register(p, nil)      // scriptling.messaging.slack
@@ -264,6 +276,7 @@ container.Register(p, "", "")              // scriptling.container (empty = defa
 similarity.Register(p)                     // scriptling.similarity
 file.Register(p)                           // scriptling.provision.file
 fetch.Register(p)                          // scriptling.provision.fetch
+extlibs.RegisterMarkdownLibrary(p)         // scriptling.markdown
 ```
 
 | Namespace | Import Path | Call |
@@ -273,6 +286,33 @@ fetch.Register(p)                          // scriptling.provision.fetch
 | `scriptling.similarity` | `extlibs/similarity` | `similarity.Register(p)` |
 | `scriptling.provision.file` | `extlibs/provision/file` | `file.Register(p)` |
 | `scriptling.provision.fetch` | `extlibs/provision/fetch` | `fetch.Register(p)` |
+| `scriptling.markdown` | root `extlibs` | `extlibs.RegisterMarkdownLibrary(p)` |
+
+### Executable Plugins
+
+`scriptling.plugin` (the control library for executable plugins, listing/calling/loading them at runtime) lives in the root `plugin` package, not `extlibs`, and needs a `*plugin.Manager` rather than just the interpreter:
+
+```go
+import (
+    "github.com/paularlott/scriptling/plugin"
+)
+
+manager := plugin.NewManager(myLogger, func(name string, err error) {
+    myLogger.Error("plugin process exited", "plugin", name, "error", err)
+})
+manager.AddDir("./plugins")
+if err := manager.Load(ctx); err != nil {
+    // handle error
+}
+
+plugin.RegisterLibraries(p, manager)  // scriptling.plugin, plus plugin.<name> for each loaded executable
+```
+
+| Namespace | Import Path | Call |
+|-----------|-------------|------|
+| `scriptling.plugin` | `plugin` | `plugin.RegisterLibraries(p, manager)` |
+
+See [Plugins](plugins/) for the full plugin embedding guide.
 
 ## Security Considerations
 
@@ -280,13 +320,13 @@ When embedding Scriptling, you have full control over what scripts can access. S
 
 **Never register these libraries when running untrusted code:**
 
-- `subprocess` — allows arbitrary command execution
-- `sys` — provides access to environment variables and system internals
-- `scriptling.runtime.sandbox` — can execute arbitrary code
-- `scriptling.ai.agent` — can execute AI-generated code with tools
+- `subprocess`: allows arbitrary command execution
+- `sys`: provides access to environment variables and system internals
+- `scriptling.runtime.sandbox`: can execute arbitrary code
+- `scriptling.ai.agent`: can execute AI-generated code with tools
 
 ## See Also
 
-- [Basics](basics/) — creating interpreters and exchanging variables
-- [Security Guide](../security/) — security best practices for embedding
-- [Libraries](../../reference/libraries/) — usage reference for all libraries
+- [Basics](basics/): creating interpreters and exchanging variables
+- [Security Guide](../security/): security best practices for embedding
+- [Libraries](../../reference/libraries/): usage reference for all libraries

@@ -159,21 +159,7 @@ fb.FunctionWithHelp(func(a, b float64) (float64, error) {
 
 ## Variadic Functions
 
-Accept variable number of arguments:
-
-```go
-fb.FunctionFromVariadicWithHelp(func(args ...interface{}) []interface{} {
-    // Process all arguments
-    result := make([]interface{}, len(args))
-    for i, arg := range args {
-        result[i] = fmt.Sprintf("Item %d: %v", i, arg)
-    }
-    return result
-}, "process_all(*args) - Process all arguments")
-
-// Usage in script:
-// result = process_all(1, "hello", True, [1, 2, 3])
-```
+For variadic functions, see [Library Builder](builder-libraries/) `FunctionFromVariadicWithHelp`.
 
 ## Builder Methods Reference
 

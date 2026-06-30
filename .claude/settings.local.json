@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(hugo:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(ls -la ../scriptling 2>/dev/null || echo \"NOT FOUND\")",
+      "Bash(xargs ls)"
     ]
   }
 }

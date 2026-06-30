@@ -1,5 +1,6 @@
 ---
 title: urllib.parse
+description: Parse, split, join, and percent-encode/decode URLs and query strings. No network access (use requests for actual HTTP calls).
 weight: 1
 
 aliases:
@@ -7,153 +8,138 @@ aliases:
   - /reference/libraries/urllib/
 ---
 
-URL parsing and encoding/decoding functions. Python-compatible with the `urllib.parse` module.
-
-```python
-import urllib.parse
-```
+The `urllib.parse` library provides URL parsing, splitting, joining, and percent-encoding/decoding, matching Python's `urllib.parse` module. It does not perform any network access: use it to take URLs and query strings apart and put them back together as plain strings.
 
 ## Available Functions
 
-| Function                    | Description                                |
-| --------------------------- | ------------------------------------------ |
-| `quote(string, safe?)`      | URL-encode a string using percent-encoding |
-| `unquote(string)`           | Decode a URL-encoded string                |
-| `quote_plus(string, safe?)` | URL-encode with spaces as plus signs       |
-| `unquote_plus(string)`      | Decode plus signs to spaces                |
-| `urlencode(dict)`           | Convert dict to URL query string           |
-| `parse_qs(string)`          | Parse query string to dict                 |
+| Function | Description |
+|----------|-------------|
+| `quote(string, safe='')` | URL-encode a string using percent-encoding. |
+| `quote_plus(string, safe='')` | URL-encode a string, encoding spaces as `+`. |
+| `unquote(string)` | Decode a percent-encoded string. |
+| `unquote_plus(string)` | Decode a percent-encoded string, decoding `+` as spaces. |
+| `urlparse(urlstring)` | Parse a URL into a `ParseResult` object. |
+| `urlunparse(components)` | Reconstruct a URL string from components. |
+| `urlsplit(urlstring)` | Split a URL into a 5-element list (no params). |
+| `urlunsplit(components)` | Reconstruct a URL string from a 5-element list. |
+| `urljoin(base, url)` | Join a base URL with a relative or absolute URL. |
+| `parse_qs(qs, keep_blank_values=False)` | Parse a query string into a dict of lists. |
+| `parse_qsl(qs, keep_blank_values=False)` | Parse a query string into a list of key/value tuples. |
+| `urlencode(query, doseq=False)` | Encode a dict or list of pairs into a query string. |
 
 ## Functions
 
-### urllib.parse.quote(string, safe?)
+### `quote(string, safe='')`
 
-URL-encode a string using percent-encoding.
+URL-encodes a string using percent-encoding. Letters, digits, and the characters `-_.~` are never encoded; spaces are encoded as `%20`. Characters listed in `safe` are also left unencoded.
 
 **Parameters:**
+- `string` (`str`): String to encode.
+- `safe` (`str`, optional): Characters that should not be encoded. Default: `''`.
 
-- `string`: String to encode
-- `safe` (optional): String of characters that should not be encoded (default: "/")
-
-**Returns:** String
-
-**Example:**
+**Returns:** `str`: the percent-encoded string.
 
 ```python
 import urllib.parse
 
-# Basic encoding
 encoded = urllib.parse.quote("hello world")
-# Returns: "hello%20world"
+# "hello%20world"
 
-# With safe characters
-encoded = urllib.parse.quote("hello/world", safe="")
-# Returns: "hello%2Fworld"
+encoded = urllib.parse.quote("hello/world", safe="/")
+# "hello/world"
+
+encoded = urllib.parse.quote("hello/world")
+# "hello%2Fworld"
 ```
 
-### urllib.parse.unquote(string)
+### `quote_plus(string, safe='')`
 
-Decode a URL-encoded string.
+Like `quote()`, but also replaces spaces with plus signs (`+`) instead of `%20`. Commonly used for encoding query string values.
 
 **Parameters:**
+- `string` (`str`): String to encode.
+- `safe` (`str`, optional): Characters that should not be encoded. Default: `''`.
 
-- `string`: URL-encoded string to decode
+**Returns:** `str`: the percent-encoded string with spaces as `+`.
 
-**Returns:** String
+```python
+import urllib.parse
 
-**Example:**
+encoded = urllib.parse.quote_plus("hello world")
+# "hello+world"
+```
+
+### `unquote(string)`
+
+Decodes a percent-encoded string back to its original form.
+
+**Parameters:**
+- `string` (`str`): Percent-encoded string to decode.
+
+**Returns:** `str`: the decoded string.
+
+**Raises:** `Error`: if the string contains invalid percent-encoding.
 
 ```python
 import urllib.parse
 
 decoded = urllib.parse.unquote("hello%20world")
-# Returns: "hello world"
+# "hello world"
 ```
 
-### urllib.parse.quote_plus(string, safe?)
+### `unquote_plus(string)`
 
-Like `quote()`, but also replaces spaces with plus signs.
-
-**Parameters:**
-
-- `string`: String to encode
-- `safe` (optional): String of characters that should not be encoded (default: "")
-
-**Returns:** String
-
-**Example:**
-
-```python
-import urllib.parse
-
-# Spaces become plus signs
-encoded = urllib.parse.quote_plus("hello world")
-# Returns: "hello+world"
-```
-
-### urllib.parse.unquote_plus(string)
-
-Like `unquote()`, but also replaces plus signs with spaces.
+Like `unquote()`, but also decodes plus signs (`+`) as spaces before decoding percent-escapes.
 
 **Parameters:**
+- `string` (`str`): Percent-encoded string to decode.
 
-- `string`: URL-encoded string to decode
+**Returns:** `str`: the decoded string.
 
-**Returns:** String
-
-**Example:**
+**Raises:** `Error`: if the string contains invalid percent-encoding.
 
 ```python
 import urllib.parse
 
 decoded = urllib.parse.unquote_plus("hello+world")
-# Returns: "hello world"
+# "hello world"
 ```
 
-### urllib.parse.urlparse(url)
+### `urlparse(urlstring)`
 
-Parse a URL into its components.
+Parses a URL into its components and returns a `ParseResult` object with `scheme`, `netloc`, `path`, `params`, `query`, and `fragment` attributes. `netloc` includes userinfo (`user:pass@host:port`), matching Python's behavior. Call `.geturl()` on the result to reconstruct the URL string.
 
 **Parameters:**
+- `urlstring` (`str`): URL string to parse.
 
-- `url`: URL string to parse
+**Returns:** `ParseResult`: object with `scheme`, `netloc`, `path`, `params`, `query`, `fragment` attributes (`params` is always `''`: Scriptling's parser does not split path parameters out separately) and a `geturl()` method.
 
-**Returns:** Dict with keys:
-
-- `scheme`: Protocol (e.g., "https")
-- `netloc`: Network location (host:port)
-- `path`: URL path
-- `params`: URL parameters
-- `query`: Query string
-- `fragment`: URL fragment
-
-**Example:**
+**Raises:** `Error`: if the URL cannot be parsed.
 
 ```python
 import urllib.parse
 
-parsed = urllib.parse.urlparse("https://example.com:8080/path?query=value#section")
-# Returns: {
-#   "scheme": "https",
-#   "netloc": "example.com:8080",
-#   "path": "/path",
-#   "params": "",
-#   "query": "query=value",
-#   "fragment": "section"
-# }
+parsed = urllib.parse.urlparse("https://user:pw@example.com:8080/path?query=value#section")
+print(parsed.scheme)    # "https"
+print(parsed.netloc)    # "user:pw@example.com:8080"
+print(parsed.path)      # "/path"
+print(parsed.query)     # "query=value"
+print(parsed.fragment)  # "section"
+
+print(parsed.geturl())
+# "https://user:pw@example.com:8080/path?query=value#section"
 ```
 
-### urllib.parse.urlunparse(components)
+### `urlunparse(components)`
 
-Reconstruct a URL from its components.
+Reconstructs a URL string from a 6-element `dict`, `list`, `tuple` (in order `scheme, netloc, path, params, query, fragment`), or a `ParseResult` object such as one returned by `urlparse()`.
 
 **Parameters:**
+- `components` (`dict`, `list`, `tuple`, or `ParseResult`): URL components. For `dict`, use keys `scheme`, `netloc`, `path`, `query`, `fragment` (the `params` key is accepted but ignored). For `list`/`tuple`, supply exactly 6 elements in order: `[scheme, netloc, path, params, query, fragment]`.
 
-- `components`: Dict or list with URL components (scheme, netloc, path, params, query, fragment)
+**Returns:** `str`: the reconstructed URL.
 
-**Returns:** String
-
-**Example:**
+**Raises:** `Error`: if a `list`/`tuple` is given without exactly 6 elements, or if `components` is not one of the supported types.
 
 ```python
 import urllib.parse
@@ -162,151 +148,138 @@ url = urllib.parse.urlunparse({
     "scheme": "https",
     "netloc": "example.com",
     "path": "/path",
-    "query": "key=value"
+    "query": "key=value",
 })
-# Returns: "https://example.com/path?key=value"
+# "https://example.com/path?key=value"
 
-# Or as a list
+# Or as a 6-element list: [scheme, netloc, path, params, query, fragment]
 url = urllib.parse.urlunparse(["https", "example.com", "/path", "", "key=value", ""])
-# Returns: "https://example.com/path?key=value"
+# "https://example.com/path?key=value"
 ```
 
-### urllib.parse.urlsplit(url)
+### `urlsplit(urlstring)`
 
-Parse a URL into 5 components (without params).
+Parses a URL into 5 components, omitting `params` (use `urlparse()` if you need that field, though it is always empty in Scriptling). `netloc` includes userinfo, matching `urlparse()`.
 
 **Parameters:**
+- `urlstring` (`str`): URL string to parse.
 
-- `url`: URL string to parse
+**Returns:** `list`: 5 elements in order `[scheme, netloc, path, query, fragment]`.
 
-**Returns:** List of 5 elements in order: `[scheme, netloc, path, query, fragment]`
-
-**Example:**
+**Raises:** `Error`: if the URL cannot be parsed.
 
 ```python
 import urllib.parse
 
 parsed = urllib.parse.urlsplit("https://example.com/path?query=value#section")
-# Returns: ["https", "example.com", "/path", "query=value", "section"]
+# ["https", "example.com", "/path", "query=value", "section"]
 
-# Access components by index
-scheme = parsed[0]    # "https"
-netloc = parsed[1]    # "example.com"
-path = parsed[2]      # "/path"
-query = parsed[3]     # "query=value"
-fragment = parsed[4]  # "section"
+scheme, netloc, path, query, fragment = parsed
 ```
 
-### urllib.parse.urlunsplit(components)
+### `urlunsplit(components)`
 
-Reconstruct a URL from 5 components.
+Reconstructs a URL string from a 5-element list, the counterpart to `urlsplit()`.
 
 **Parameters:**
+- `components` (`list`): Exactly 5 elements in order `[scheme, netloc, path, query, fragment]`.
 
-- `components`: List with 5 URL elements in order: `[scheme, netloc, path, query, fragment]`
+**Returns:** `str`: the reconstructed URL.
 
-**Returns:** String
-
-**Example:**
+**Raises:** `Error`: if `components` does not have exactly 5 elements.
 
 ```python
 import urllib.parse
 
 url = urllib.parse.urlunsplit(["https", "example.com", "/path", "key=value", "section"])
-# Returns: "https://example.com/path?key=value#section"
+# "https://example.com/path?key=value#section"
 ```
 
-### urllib.parse.urljoin(base, url)
+### `urljoin(base, url)`
 
-Join a base URL with another URL.
+Joins a base URL with another URL, resolving relative references the way a browser would. If `url` is absolute, it is returned (resolved against `base`'s scheme/host as needed); if `url` is relative, it's resolved against `base`.
 
 **Parameters:**
+- `base` (`str`): Base URL.
+- `url` (`str`): URL to join: relative or absolute.
 
-- `base`: Base URL
-- `url`: URL to join (relative or absolute)
+**Returns:** `str`: the resolved URL.
 
-**Returns:** String
-
-**Example:**
+**Raises:** `Error`: if `base` or `url` cannot be parsed.
 
 ```python
 import urllib.parse
 
-# Relative path
 full_url = urllib.parse.urljoin("https://example.com/path/", "page.html")
-# Returns: "https://example.com/path/page.html"
+# "https://example.com/path/page.html"
 
-# Absolute path
 full_url = urllib.parse.urljoin("https://example.com/path/", "/other")
-# Returns: "https://example.com/other"
+# "https://example.com/other"
 ```
 
-### urllib.parse.parse_qs(query_string, keep_blank_values?)
+### `parse_qs(qs, keep_blank_values=False)`
 
-Parse a query string into a dict with lists of values.
+Parses a URL query string into a dict where each value is a list of strings (since a key may appear multiple times).
 
 **Parameters:**
+- `qs` (`str`): Query string to parse.
+- `keep_blank_values` (`bool`, optional): Accepted for Python compatibility but has no effect; blank values are always retained. Default: `False`.
 
-- `query_string`: Query string to parse
-- `keep_blank_values` (optional): If true, keep blank values (default: false)
+**Returns:** `dict`: keys mapped to `list` of `str` values.
 
-**Returns:** Dict with lists of values
-
-**Example:**
+**Raises:** `Error`: if the query string is invalid.
 
 ```python
 import urllib.parse
 
 params = urllib.parse.parse_qs("name=John&tags=python&tags=go")
-# Returns: {"name": ["John"], "tags": ["python", "go"]}
+# {"name": ["John"], "tags": ["python", "go"]}
 ```
 
-### urllib.parse.parse_qsl(query_string, keep_blank_values?)
+### `parse_qsl(qs, keep_blank_values=False)`
 
-Parse a query string into a list of (key, value) pairs.
+Parses a URL query string into a list of `(key, value)` tuples, including repeated keys. Note: the order of keys in the result is not guaranteed to match the input order.
 
 **Parameters:**
+- `qs` (`str`): Query string to parse.
+- `keep_blank_values` (`bool`, optional): Accepted for Python compatibility but has no effect; blank values are always retained. Default: `False`.
 
-- `query_string`: Query string to parse
-- `keep_blank_values` (optional): If true, keep blank values (default: false)
+**Returns:** `list`: `(key, value)` tuples, each a `tuple` of two `str` values.
 
-**Returns:** List of [key, value] pairs
-
-**Example:**
+**Raises:** `Error`: if the query string is invalid.
 
 ```python
 import urllib.parse
 
 params = urllib.parse.parse_qsl("name=John&age=30")
-# Returns: [["name", "John"], ["age", "30"]]
+# [("name", "John"), ("age", "30")]
 ```
 
-### urllib.parse.urlencode(query, doseq?)
+### `urlencode(query, doseq=False)`
 
-Encode a dict into a URL query string.
+Encodes a `dict` or a list of `(key, value)` pairs into a URL query string, percent-encoding keys and values as needed.
 
 **Parameters:**
+- `query` (`dict` or `list`): Mapping of keys to values, or a list of `(key, value)` tuples. Dict values may be a `str` or a `list` of `str` to repeat the key.
+- `doseq` (`bool`, optional): Accepted for Python compatibility but has no effect; sequence-valued dict entries are always expanded into repeated `key=value` pairs. Default: `False`.
 
-- `query`: Dict to encode
-- `doseq` (optional): If true, handle sequences of values (default: false)
+**Returns:** `str`: the encoded query string.
 
-**Returns:** String
-
-**Example:**
+**Raises:** `Error`: if `query` is not a `dict` or `list`.
 
 ```python
 import urllib.parse
 
 query = urllib.parse.urlencode({"name": "John", "age": "30"})
-# Returns: "name=John&age=30"
+# "age=30&name=John"
 
-# With sequences
+# With a sequence value
 query = urllib.parse.urlencode({"tags": ["python", "go"]}, True)
-# Returns: "tags=python&tags=go"
+# "tags=python&tags=go"
 ```
 
-## Notes
+## See Also
 
-- Use `urllib.parse` for Python compatibility
-- All functions follow Python's urllib.parse signatures and behavior
-- `netloc` includes userinfo (user:pass@host:port) matching Python's behavior
+- [requests](../../http-process/requests/) - Make actual HTTP requests (GET/POST/etc.); use it together with `urllib.parse` for building and parsing URLs.
+- [datetime](../datetime/) - Date and time types.
+- [io](../io/) - In-memory I/O streams.

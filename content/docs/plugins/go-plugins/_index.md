@@ -156,8 +156,8 @@ func main() {
 
 `RegisterClass` takes a `*object.ClassBuilder`. Two styles are supported:
 
-- **`*Instance` methods** — manually manage instance fields via `SetField`/`Field` for in-process state (shown below). Plugin-side fields live inside the plugin process; the host only sees the methods and properties you register on the builder.
-- **Typed receivers** — use `Constructor` to auto-wrap a Go struct (see [Storing Go Structs](#storing-go-structs)). Go struct fields are private; only registered methods and properties are exposed to Scriptling.
+- **`*Instance` methods**: manually manage instance fields via `SetField`/`Field` for in-process state (shown below). Plugin-side fields live inside the plugin process; the host only sees the methods and properties you register on the builder.
+- **Typed receivers**: use `Constructor` to auto-wrap a Go struct (see [Storing Go Structs](#storing-go-structs)). Go struct fields are private; only registered methods and properties are exposed to Scriptling.
 
 `RegisterClass` calls `.Build()` internally.
 
@@ -208,7 +208,7 @@ print(c.get())
 
 ### Typed Receivers (recommended)
 
-For classes backed by Go structs, use `Constructor` to register a function that returns a pointer to your struct. The struct is automatically wrapped and stored on the instance. Methods whose first parameter matches the constructor's return type receive the unwrapped struct directly — no manual Field boxing/unboxing needed.
+For classes backed by Go structs, use `Constructor` to register a function that returns a pointer to your struct. The struct is automatically wrapped and stored on the instance. Methods whose first parameter matches the constructor's return type receive the unwrapped struct directly: no manual Field boxing/unboxing needed.
 
 ```go
 package main
@@ -244,9 +244,9 @@ func main() {
 }
 ```
 
-The constructor function can accept typed parameters (with optional `context.Context` and `object.Kwargs`) and must return a pointer type. The return type becomes the **receiver type** — all methods whose first parameter matches it receive the unwrapped struct directly.
+The constructor function can accept typed parameters (with optional `context.Context` and `object.Kwargs`) and must return a pointer type. The return type becomes the **receiver type**: all methods whose first parameter matches it receive the unwrapped struct directly.
 
-Methods registered with `Method()` are exposed to Scriptling. Go struct fields are **not** — they are private to the Go side. Use `Property()` or `PropertyWithSetter()` on the builder to expose them (see [Builder Classes: Properties](../../go-integration/builder-classes/#exposing-struct-fields-with-properties)).
+Methods registered with `Method()` are exposed to Scriptling. Go struct fields are **not**: they are private to the Go side. Use `Property()` or `PropertyWithSetter()` on the builder to expose them (see [Builder Classes: Properties](../../go-integration/builder-classes/#exposing-struct-fields-with-properties)).
 
 Constructors can also return an error as a second value:
 
@@ -262,7 +262,7 @@ Constructor(func(path string) (*Handle, error) {
 
 ### \_\_del\_\_ for Cleanup
 
-Plugin classes hold real resources inside the plugin process — file handles, database connections, network sockets, etc. Define a `__del__` method to clean up when the host releases the object:
+Plugin classes hold real resources inside the plugin process: file handles, database connections, network sockets, etc. Define a `__del__` method to clean up when the host releases the object:
 
 ```go
 type fileHandle struct {
@@ -297,7 +297,7 @@ You can also trigger cleanup explicitly:
 
 - From Scriptling: `scriptling.plugin.release(handle)` or `handle.__del__()`
 - From Go: `plugin.ReleaseWithContext(ctx, obj)` for request-scoped cleanup; `plugin.Release(obj)` uses `plugin.DefaultReleaseTimeout`
-- `__del__` can be called multiple times explicitly — each call runs the function
+- `__del__` can be called multiple times explicitly: each call runs the function
 - When triggered by GC (via `object.destroy`), the server calls `__del__` at most once per object
 
 With typed receivers, `__del__` receives the Go struct directly. With `*object.Instance`, it receives the instance and can clean up fields manually.
@@ -422,5 +422,5 @@ server.Constant("max_retries", 3)
 
 ## Further Reading
 
-- [Client Wrappers](client-wrappers/) — How the host wraps plugin functions and classes, and how to customise the wrapper source.
-- [Host-Side Scripting](host-side-scripting/) — Register pure Scriptling functions and classes that run on the host with no RPC.
+- [Client Wrappers](client-wrappers/): How the host wraps plugin functions and classes, and how to customise the wrapper source.
+- [Host-Side Scripting](host-side-scripting/): Register pure Scriptling functions and classes that run on the host with no RPC.

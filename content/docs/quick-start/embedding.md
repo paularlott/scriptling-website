@@ -86,23 +86,16 @@ fmt.Printf("Found %d users\n", count)
 
 ## Registering Libraries
 
-Standard libraries are registered with a single call:
+Libraries are not available to scripts unless you register them. Register all standard libraries with a single call:
 
 ```go
-import (
-    "github.com/paularlott/scriptling/stdlib"
-    "github.com/paularlott/scriptling/extlibs"
-)
+import "github.com/paularlott/scriptling/stdlib"
 
 // Register all standard libraries (json, math, re, time, etc.)
 stdlib.RegisterAll(p)
-
-// Register extended libraries as needed
-p.RegisterLibrary(extlibs.RequestsLibrary)         // HTTP client
-extlibs.RegisterOSLibrary(p, []string{"/tmp"})      // File access (restricted)
 ```
 
-See the [Go Integration](../basics/) guide for the full library registration reference.
+Extended and `scriptling.*` libraries are registered individually. See [Library Registration](../go-integration/library-registration/) for the complete list and signatures.
 
 ## Next Steps
 
