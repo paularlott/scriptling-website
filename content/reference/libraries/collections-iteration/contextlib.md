@@ -1,5 +1,6 @@
 ---
 title: contextlib
+description: Utilities for common tasks involving the with statement.
 weight: 2
 
 aliases:
@@ -7,23 +8,24 @@ aliases:
   - /reference/libraries/contextlib/
 ---
 
-Utilities for common tasks involving the `with` statement. Currently provides `suppress` — a context manager that silently ignores specified exception types.
+The `contextlib` library provides utilities for common tasks involving the `with` statement. Currently it provides `suppress`, a context manager that silently ignores specified exception types.
 
 ## Available Functions
 
 | Function | Description |
-| -------- | ----------- |
-| `suppress(*exc_types)` | Context manager that suppresses the given exception types |
+|----------|-------------|
+| `suppress(*exc_types)` | Context manager that suppresses the given exception types. |
 
-## suppress
+## Functions
 
-`contextlib.suppress(*exc_types)` returns a context manager that silently swallows any exception whose type matches one of the given types. If no types are given, all exceptions are suppressed.
+### `suppress(*exc_types)`
 
-Supports the `with` statement. The body runs normally when no exception occurs.
+Returns a context manager that silently swallows any exception whose type matches one of the given types. If no types are given, all exceptions are suppressed. Non-matching exception types still propagate normally.
 
-### Usage Examples
+**Parameters:**
+- `*exc_types` (`type` or `str`): Exception types to suppress (e.g. `ValueError`, or the equivalent type-name string). Omit to suppress all exceptions.
 
-#### Suppress a specific exception type
+**Returns:** `ContextManager`: supports the `with` statement.
 
 ```python
 import contextlib
@@ -34,25 +36,7 @@ with contextlib.suppress(ValueError):
 print("continues here")
 ```
 
-#### Suppress all exceptions
-
-```python
-import contextlib
-
-with contextlib.suppress(Exception):
-    raise RuntimeError("ignored")
-```
-
-#### Suppress with no types (suppress everything)
-
-```python
-import contextlib
-
-with contextlib.suppress():
-    raise Exception("also ignored")
-```
-
-#### Non-matching types still propagate
+Non-matching exceptions still propagate:
 
 ```python
 import contextlib
@@ -64,7 +48,16 @@ except TypeError as e:
     print("caught:", e)
 ```
 
-#### Using from import
+Suppress everything by omitting the types:
+
+```python
+import contextlib
+
+with contextlib.suppress():
+    raise Exception("also ignored")
+```
+
+`from ... import` works as expected:
 
 ```python
 from contextlib import suppress
@@ -73,7 +66,7 @@ with suppress(ValueError):
     raise ValueError("ignored")
 ```
 
-#### No exception — body runs normally
+When no exception occurs, the body runs normally:
 
 ```python
 import contextlib
@@ -84,3 +77,8 @@ with contextlib.suppress(ValueError):
 
 print(result)  # 42
 ```
+
+## See Also
+
+- [functools](../functools/): higher-order functions like `reduce()` and `partial()`.
+- [itertools](../itertools/): iteration and combinatorics utilities.

@@ -1,5 +1,6 @@
 ---
 title: base64
+description: Base64 encoding and decoding.
 weight: 1
 
 aliases:
@@ -7,28 +8,25 @@ aliases:
   - /reference/libraries/base64/
 ---
 
-Functions for Base64 encoding and decoding. Python-compatible function names.
+The `base64` library encodes and decodes strings using standard Base64, with Python-compatible function names. Scriptling has no dedicated `bytes` type, so strings are used as byte buffers throughout.
 
 ## Available Functions
 
-| Function       | Description               |
-| -------------- | ------------------------- |
-| `b64encode(s)` | Encode a string to Base64 |
-| `b64decode(s)` | Decode a Base64 string    |
+| Function | Description |
+|----------|-------------|
+| `b64encode(s)` | Encode a string to Base64. |
+| `b64decode(s)` | Decode a Base64 string. |
 
 ## Functions
 
-### base64.b64encode(s)
+### `b64encode(s)`
 
-Encodes a string to Base64.
+Encodes a string to standard Base64.
 
 **Parameters:**
+- `s` (`str`): String to encode (treated as raw bytes).
 
-- `s`: String to encode
-
-**Returns:** String (Base64 encoded)
-
-**Example:**
+**Returns:** `str`: the Base64-encoded result.
 
 ```python
 import base64
@@ -37,17 +35,16 @@ encoded = base64.b64encode("hello world")
 print(encoded)  # "aGVsbG8gd29ybGQ="
 ```
 
-### base64.b64decode(s)
+### `b64decode(s)`
 
-Decodes a Base64 string.
+Decodes a standard Base64 string.
 
 **Parameters:**
+- `s` (`str`): Base64-encoded string to decode.
 
-- `s`: Base64 string to decode
+**Returns:** `str`: the decoded result.
 
-**Returns:** String (decoded)
-
-**Example:**
+**Raises:** `Error`: if `s` is not valid Base64.
 
 ```python
 import base64
@@ -56,20 +53,7 @@ decoded = base64.b64decode("aGVsbG8gd29ybGQ=")
 print(decoded)  # "hello world"
 ```
 
-## Usage Example
+## See Also
 
-```python
-import base64
-
-# Encode
-original = "Hello, World!"
-encoded = base64.b64encode(original)
-print("Encoded:", encoded)
-
-# Decode
-decoded = base64.b64decode(encoded)
-print("Decoded:", decoded)
-
-# Verify
-print("Match:", original == decoded)  # True
-```
+- [hashlib](../hashlib/): cryptographic hash functions.
+- [hmac](../hmac/): message authentication codes.

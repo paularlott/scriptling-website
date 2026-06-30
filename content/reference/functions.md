@@ -250,7 +250,7 @@ def add(a, b):
 print(add(3, 4))  # 14
 ```
 
-Decorators stack — applied bottom-up (innermost first):
+Decorators stack: applied bottom-up (innermost first):
 
 ```python
 @outer
@@ -259,7 +259,7 @@ def fn(): ...
 # equivalent to: fn = outer(inner(fn))
 ```
 
-See [Classes](./classes/#decorators) for `@property`, `@<name>.setter`, `@staticmethod`, and `@classmethod`.
+See [Classes](../classes/#decorators) for `@property`, `@<name>.setter`, `@staticmethod`, and `@classmethod`.
 
 ## Lambda Functions
 
@@ -364,6 +364,6 @@ for first, *rest in [[1,2,3], [4,5,6,7]]:
 
 ## See Also
 
-- [Control Flow](./control-flow/) - Loops and conditionals
-- [Error Handling](./error-handling/) - Try/except in functions
-- [Classes](./classes/) - Methods and class functions
+- [Control Flow](../control-flow/) - Loops and conditionals
+- [Error Handling](../error-handling/) - Try/except in functions
+- [Classes](../classes/) - Methods and class functions

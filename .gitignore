@@ -1,4 +1,5 @@
 /.hugo_build.lock
+/.codegraph/
 /hugo_stats.json
 .DS_Store
 /public

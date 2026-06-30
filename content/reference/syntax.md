@@ -333,17 +333,20 @@ These words cannot be used as identifiers:
 
 ```
 False      None       True       and        as
-assert     async      await      break      class
-continue   def        del        elif       else
-except     finally    for        from       global
-if         import     in         is         lambda
-nonlocal   not        or         pass       raise
-return     try        while      with       yield
-match      case       super
+assert     break      class      continue   def
+del        elif       else       except     finally
+for        from       global     if         import
+in         is         lambda     nonlocal   not
+or         pass       raise      return     try
+while      with
 ```
+
+`match` and `case` are contextual keywords: they are only special inside a `match` statement and may be used as ordinary identifiers everywhere else (for example, `match = 5`).
+
+`async`, `await`, and `yield` are not keywords in Scriptling (the features they denote in Python are not implemented). `super` is an ordinary builtin function, not a keyword.
 
 ## See Also
 
-- [Data Types](./types/) - Available data types in Scriptling
-- [Functions](./functions/) - Function definition and parameters
-- [Python Differences](./python-differences/) - Differences from Python
+- [Data Types](../types/) - Available data types in Scriptling
+- [Functions](../functions/) - Function definition and parameters
+- [Python Differences](../python-differences/) - Differences from Python

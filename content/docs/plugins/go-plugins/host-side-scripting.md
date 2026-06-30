@@ -4,7 +4,7 @@ description: Register pure Scriptling functions and classes that run on the host
 weight: 20
 ---
 
-A plugin can register Scriptling code that runs entirely on the host side. No RPC is involved — the code executes in the host's Scriptling environment. This is useful for utility functions, data transformations, or any logic that doesn't need the plugin process.
+A plugin can register Scriptling code that runs entirely on the host side. No RPC is involved: the code executes in the host's Scriptling environment. This is useful for utility functions, data transformations, or any logic that doesn't need the plugin process.
 
 ## RegisterScriptFunc
 

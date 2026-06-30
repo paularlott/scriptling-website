@@ -1,28 +1,27 @@
 ---
 title: scriptling.container
 linkTitle: container
+description: Container lifecycle management for Docker, Podman, and Apple Containers through a unified interface.
 weight: 1
 ---
 
-The `scriptling.container` library provides container lifecycle management for Docker, Podman, and Apple Containers through a unified interface. All operations go through a `ContainerClient` obtained from `Client()`.
+The `scriptling.container` library provides container lifecycle management for Docker, Podman, and Apple Containers through a single unified interface. All operations go through a `ContainerClient` obtained from `Client()`.
 
-## Endpoint Configuration
+Docker and Podman endpoints are configured via the `--docker-host` / `--podman-host` CLI flags or the `DOCKER_HOST` / `CONTAINER_HOST` environment variables: see [CLI Basic Usage](/docs/cli/basic-usage/#container-endpoints) for details.
 
-Docker and Podman endpoints are configured via the `--docker-host` / `--podman-host` CLI flags or the `DOCKER_HOST` / `CONTAINER_HOST` environment variables. See [CLI Basic Usage](/docs/cli/basic-usage/#container-endpoints) for details.
-
-## Module Functions
+## Available Functions
 
 | Function | Description |
-|---|---|
+|----------|-------------|
 | `runtimes()` | List available container runtimes |
 | `Client(driver, **kwargs)` | Create a container client |
 
-## ContainerClient Methods
+`Client()` returns a `ContainerClient` with the following methods:
 
 | Method | Description |
-|---|---|
+|--------|-------------|
 | `driver()` | Return the active runtime name |
-| `login(registry, username, password)` | Authenticate with a container registry |
+| `login(server, username, password)` | Authenticate with a container registry |
 | `image_pull(image)` | Pull an image from a registry |
 | `image_list()` | List locally available images |
 | `image_remove(image)` | Remove a local image |
@@ -39,11 +38,11 @@ Docker and Podman endpoints are configured via the `--docker-host` / `--podman-h
 
 ## Functions
 
-### container.runtimes()
+### `runtimes()`
 
 Returns the names of container runtimes that are currently installed and running on this system.
 
-**Returns:** `list` of strings — subset of `["docker", "podman", "apple"]`
+**Returns:** `list` of `str`: subset of `["docker", "podman", "apple"]`.
 
 ```python
 import scriptling.container as container
@@ -52,16 +51,15 @@ available = container.runtimes()
 print("Available runtimes:", available)
 ```
 
-### container.Client(driver, **kwargs)
+### `Client(driver, socket="")`
 
 Creates a `ContainerClient` for the specified runtime.
 
 **Parameters:**
+- `driver` (`str`): Runtime to use: `"docker"`, `"podman"`, or `"apple"`.
+- `socket` (`str`, optional): Override the endpoint. Accepts a Unix socket path, `unix://` URI, `tcp://` address, or `https://` address (Docker/Podman only). Default: `""`: uses the `DOCKER_SOCK` / `PODMAN_SOCK` environment variables, then the built-in defaults.
 
-- `driver` (string): Runtime to use — `"docker"`, `"podman"`, or `"apple"`
-- `socket` (string, optional): Override the endpoint. Accepts a Unix socket path, `unix://` URI, `tcp://` address, or `https://` address (docker/podman only). Defaults to `DOCKER_SOCK` / `PODMAN_SOCK` env vars, then the built-in defaults.
-
-**Returns:** `ContainerClient`
+**Returns:** `ContainerClient`: a client bound to the chosen runtime.
 
 ```python
 # Local Docker (default socket)
@@ -86,17 +84,22 @@ c = container.Client("podman", socket="unix:///run/user/1000/podman/podman.sock"
 c = container.Client("apple")
 ```
 
-## ContainerClient
+### `ContainerClient.driver()`
 
-### login(server, username, password)
+Returns the name of the active runtime driver.
+
+**Returns:** `str`: `"docker"`, `"podman"`, or `"apple"`.
+
+### `ContainerClient.login(server, username, password)`
 
 Authenticates with a container registry. For Docker/Podman the credentials are stored on the client and injected automatically as `X-Registry-Auth` on subsequent `image_pull` calls for the same registry. For Apple Containers the host CLI credential store is updated via `container registry login`.
 
 **Parameters:**
+- `server` (`str`): Registry hostname, e.g. `"ghcr.io"` or `"registry.example.com"`. Pass `""` to target Docker Hub.
+- `username` (`str`): Registry username.
+- `password` (`str`): Registry password or access token.
 
-- `registry` (string): Registry hostname e.g. `"ghcr.io"` or `"registry.example.com"`. Pass `""` to target Docker Hub.
-- `username` (string): Registry username
-- `password` (string): Registry password or access token
+**Returns:** `None`
 
 ```python
 # Docker Hub
@@ -112,69 +115,62 @@ c.login("registry.example.com", "user", "pass")
 c.image_pull("registry.example.com/myimage:1.0")
 ```
 
-### driver()
-
-Returns the name of the active runtime driver.
-
-**Returns:** `str` — `"docker"`, `"podman"`, or `"apple"`
-
-### image_pull(image)
+### `ContainerClient.image_pull(image)`
 
 Pulls an image from a registry.
 
 **Parameters:**
+- `image` (`str`): Image reference, e.g. `"ubuntu:24.04"`.
 
-- `image` (string): Image reference e.g. `"ubuntu:24.04"`
+**Returns:** `None`
 
 ```python
 c.image_pull("ubuntu:24.04")
 ```
 
-### image_list()
+### `ContainerClient.image_list()`
 
 Lists locally available images.
 
-**Returns:** `list` of dicts with keys:
-
-- `id` (str): Image ID (digest for Apple, full ID for Docker/Podman)
-- `reference` (str): Image reference e.g. `"ubuntu:24.04"`
-- `digest` (str): Content digest e.g. `"sha256:abc123..."`
-- `size` (int): Manifest/layer size in bytes
+**Returns:** `list` of `dict`, each with keys:
+- `id` (`str`): Image ID (digest for Apple, full ID for Docker/Podman).
+- `reference` (`str`): Image reference, e.g. `"ubuntu:24.04"`.
+- `digest` (`str`): Content digest, e.g. `"sha256:abc123..."`.
+- `size` (`int`): Manifest/layer size in bytes.
 
 ```python
 for img in c.image_list():
     print(img["reference"], img["digest"])
 ```
 
-### image_remove(image)
+### `ContainerClient.image_remove(image)`
 
 Removes a local image.
 
 **Parameters:**
+- `image` (`str`): Image reference, e.g. `"ubuntu:24.04"`.
 
-- `image` (string): Image reference e.g. `"ubuntu:24.04"`
+**Returns:** `None`
 
 ```python
 c.image_remove("ubuntu:24.04")
 ```
 
-### exec(name_or_id, command, **kwargs)
+### `ContainerClient.exec(name_or_id, command, env=None, workdir="", user="")`
 
 Runs a command inside an already-running container and captures the full output.
 
 **Parameters:**
-
-- `name_or_id` (string): Container name or ID
-- `command` (list): Command and arguments e.g. `["/bin/sh", "-c", "echo hi"]`
-- `env` (list, optional): Environment variables e.g. `["KEY=value"]`
-- `workdir` (string, optional): Working directory inside the container
-- `user` (string, optional): User to run as e.g. `"root"` or `"1000:1000"`
+- `name_or_id` (`str`): Container name or ID.
+- `command` (`list`): Command and arguments, e.g. `["/bin/sh", "-c", "echo hi"]`.
+- `env` (`list`, optional): Environment variables, e.g. `["KEY=value"]`. Default: `None`.
+- `workdir` (`str`, optional): Working directory inside the container. Default: `""`.
+- `user` (`str`, optional): User to run as, e.g. `"root"` or `"1000:1000"`. Default: `""`.
 
 **Returns:** `dict` with keys:
-
-- `stdout` (str): Captured standard output
-- `stderr` (str): Captured standard error
-- `exit_code` (int): Process exit code
+- `stdout` (`str`): Captured standard output.
+- `stderr` (`str`): Captured standard error.
+- `exit_code` (`int`): Process exit code.
 
 ```python
 result = c.exec("app", ["/bin/sh", "-c", "cat /etc/os-release"])
@@ -182,20 +178,19 @@ print(result["stdout"])
 print("exit:", result["exit_code"])
 ```
 
-### exec_stream(name_or_id, command, callback, **kwargs)
+### `ContainerClient.exec_stream(name_or_id, command, callback, env=None, workdir="", user="")`
 
 Runs a command inside an already-running container and calls `callback(stream, line)` for each line of output as it arrives. `stream` is `"stdout"` or `"stderr"`.
 
 **Parameters:**
+- `name_or_id` (`str`): Container name or ID.
+- `command` (`list`): Command and arguments.
+- `callback` (`callable`): Function called with `(stream, line)` for each output line.
+- `env` (`list`, optional): Environment variables, e.g. `["KEY=value"]`. Default: `None`.
+- `workdir` (`str`, optional): Working directory inside the container. Default: `""`.
+- `user` (`str`, optional): User to run as. Default: `""`.
 
-- `name_or_id` (string): Container name or ID
-- `command` (list): Command and arguments
-- `callback` (callable): Function called with `(stream, line)` for each output line
-- `env` (list, optional): Environment variables e.g. `["KEY=value"]`
-- `workdir` (string, optional): Working directory inside the container
-- `user` (string, optional): User to run as
-
-**Returns:** `dict` with `exit_code` (int). `stdout` and `stderr` are empty strings — output was delivered to the callback.
+**Returns:** `dict` with `exit_code` (`int`). `stdout` and `stderr` are empty strings: output was delivered to the callback.
 
 ```python
 def on_line(stream, line):
@@ -205,22 +200,21 @@ result = c.exec_stream("app", ["/bin/sh", "-c", "for i in 1 2 3; do echo $i; don
 print("exit:", result["exit_code"])
 ```
 
-### run(image, **kwargs)
+### `ContainerClient.run(image, name="", ports=None, env=None, volumes=None, command=None, network="", privileged=False)`
 
 Creates and starts a container.
 
 **Parameters:**
+- `image` (`str`): Image reference, e.g. `"ubuntu:24.04"`.
+- `name` (`str`, optional): Container name. Default: `""`.
+- `ports` (`list`, optional): Port mappings, e.g. `["8080:80"]`. Default: `None`.
+- `env` (`list`, optional): Environment variables, e.g. `["KEY=value"]`. Default: `None`.
+- `volumes` (`list`, optional): Volume mounts, e.g. `["mydata:/data"]`. Default: `None`.
+- `command` (`list`, optional): Override command, e.g. `["/bin/sh", "-c", "echo hi"]`. Default: `None`.
+- `network` (`str`, optional): Network name. Default: `""`.
+- `privileged` (`bool`, optional): Run privileged. Default: `False`.
 
-- `image` (string): Image reference e.g. `"ubuntu:24.04"`
-- `name` (string, optional): Container name
-- `ports` (list, optional): Port mappings e.g. `["8080:80"]`
-- `env` (list, optional): Environment variables e.g. `["KEY=value"]`
-- `volumes` (list, optional): Volume mounts e.g. `["mydata:/data"]`
-- `command` (list, optional): Override command e.g. `["/bin/sh", "-c", "echo hi"]`
-- `network` (string, optional): Network name
-- `privileged` (bool, optional): Run privileged. Default: `False`
-
-**Returns:** `str` — container ID
+**Returns:** `str`: the new container's ID.
 
 ```python
 id = c.run(
@@ -232,45 +226,45 @@ id = c.run(
 )
 ```
 
-### stop(name_or_id)
+### `ContainerClient.stop(name_or_id)`
 
 Stops a running container gracefully.
 
 **Parameters:**
+- `name_or_id` (`str`): Container name or ID.
 
-- `name_or_id` (string): Container name or ID
+**Returns:** `None`
 
 ```python
 c.stop("app")
 ```
 
-### remove(name_or_id)
+### `ContainerClient.remove(name_or_id)`
 
 Removes a stopped container.
 
 **Parameters:**
+- `name_or_id` (`str`): Container name or ID.
 
-- `name_or_id` (string): Container name or ID
+**Returns:** `None`
 
 ```python
 c.remove("app")
 ```
 
-### inspect(name_or_id)
+### `ContainerClient.inspect(name_or_id)`
 
 Returns details about a container.
 
 **Parameters:**
-
-- `name_or_id` (string): Container name or ID
+- `name_or_id` (`str`): Container name or ID.
 
 **Returns:** `dict` with keys:
-
-- `id` (str): Container ID
-- `name` (str): Container name
-- `status` (str): Current status e.g. `"running"`, `"exited"`
-- `image` (str): Image reference
-- `running` (bool): `True` if the container is currently running
+- `id` (`str`): Container ID.
+- `name` (`str`): Container name.
+- `status` (`str`): Current status, e.g. `"running"`, `"exited"`.
+- `image` (`str`): Image reference.
+- `running` (`bool`): `True` if the container is currently running.
 
 ```python
 info = c.inspect("app")
@@ -278,48 +272,50 @@ print(info["status"])
 print(info["running"])
 ```
 
-### list()
+### `ContainerClient.list()`
 
 Lists all containers (running and stopped).
 
-**Returns:** `list` of dicts, each with the same keys as `inspect()`
+**Returns:** `list` of `dict`, each with the same keys as `inspect()`.
 
 ```python
 for item in c.list():
     print(item["name"], item["status"])
 ```
 
-### volume_create(name, **kwargs)
+### `ContainerClient.volume_create(name, size="")`
 
 Creates a named volume.
 
 **Parameters:**
+- `name` (`str`): Volume name.
+- `size` (`str`, optional): Volume size, e.g. `"20G"` or `"512M"`. Supported by Apple Containers only; silently ignored for Docker and Podman. Default: `""`.
 
-- `name` (string): Volume name
-- `size` (string, optional): Volume size e.g. `"20G"` or `"512M"`. Supported by Apple Containers only; silently ignored for Docker and Podman.
+**Returns:** `None`
 
 ```python
 c.volume_create("mydata")
 c.volume_create("mydata", size="20G")
 ```
 
-### volume_remove(name)
+### `ContainerClient.volume_remove(name)`
 
 Removes a named volume.
 
 **Parameters:**
+- `name` (`str`): Volume name.
 
-- `name` (string): Volume name
+**Returns:** `None`
 
 ```python
 c.volume_remove("mydata")
 ```
 
-### volume_list()
+### `ContainerClient.volume_list()`
 
 Lists all named volumes.
 
-**Returns:** `list` of volume name strings
+**Returns:** `list` of `str`: volume names.
 
 ```python
 for v in c.volume_list():
@@ -348,13 +344,22 @@ id = c.run(
 info = c.inspect("demo")
 print(f"Status: {info['status']}")
 
-# Execute a command in the running container
 result = c.exec("demo", ["/bin/bash", "-c", "cat /data/out.txt"])
 print(result["stdout"])
 
-# Cleanup
 c.stop("demo")
 c.remove("demo")
 c.volume_remove("demo-data")
 c.image_remove("ubuntu:24.04")
 ```
+
+## Security Considerations
+
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`scriptling.container` controls Docker/Podman containers over the socket paths passed to `Register(p, dockerSock, podmanSock)`, effectively granting the ability to run arbitrary containers and images on the host: this is a significant risk, on par with direct process execution. Never register this library for untrusted code. For a full risk breakdown across all libraries, see the [Security Guide](/docs/security/).
+
+## See Also
+
+- [Library Registration](/docs/go-integration/library-registration/) - Registering extended libraries when embedding in Go
+- [Security Guide](/docs/security/) - Security guidance for host-provided libraries

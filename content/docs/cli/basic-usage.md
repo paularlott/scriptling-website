@@ -85,6 +85,7 @@ The linter exits with code 0 if no errors are found, and code 1 if any errors ex
 | `--log-level`         | `SCRIPTLING_LOG_LEVEL`     | `log.level`                  | Log level (trace/debug/info/warn/error)              | info             |
 | `--log-format`        | `SCRIPTLING_LOG_FORMAT`    | `log.format`                 | Log format (console/json)                            | console          |
 | `-S`, `--server`      | `SCRIPTLING_SERVER`        | `server.address`             | HTTP server address (host:port)                      | (disabled)       |
+| `--web-root`          | `SCRIPTLING_WEB_ROOT`      | `server.web_root`            | Directory to serve static files from                 | (disabled)       |
 | `--json-rpc`          | `SCRIPTLING_JSONRPC`       | -                            | JSON-RPC server mode: stdio by default, HTTP `/json-rpc` with `--server` | false            |
 | `--mcp-tools`         | `SCRIPTLING_MCP_TOOLS`     | `mcp.tools`                  | Directory containing MCP tools                       | (disabled)       |
 | `--mcp-exec-script`   | `SCRIPTLING_MCP_EXEC_SCRIPT` | `mcp.exec_script`          | Enable MCP script execution tool                     | false            |
@@ -107,7 +108,6 @@ Scriptling looks for `scriptling.toml` in the following locations (in order):
 1. Current directory (`.`)
 2. `$HOME/`
 3. `$HOME/.config/scriptling/`
-4. `/etc/scriptling/`
 
 Use `--config` (or `-C`) to specify a different path explicitly.
 
@@ -172,7 +172,7 @@ When using the `scriptling.container` library, Docker and Podman endpoints can b
 | TCP (Docker only) | `tcp://192.168.1.10:2375` or `192.168.1.10:2375` |
 | TLS TCP (Docker only) | `https://192.168.1.10:2376` |
 
-Podman does not expose a plain TCP endpoint — use a Unix socket path or URI. For remote Podman, use `podman system service` with SSH tunnelling and point the socket at the local tunnel endpoint.
+Podman does not expose a plain TCP endpoint: use a Unix socket path or URI. For remote Podman, use `podman system service` with SSH tunnelling and point the socket at the local tunnel endpoint.
 
 ```bash
 scriptling --docker-host unix:///Users/paul/.lima/docker/sock/docker.sock script.py
@@ -182,7 +182,7 @@ scriptling --podman-host unix:///run/user/1000/podman/podman.sock script.py
 
 ## Environment Variables and .env Files
 
-The CLI automatically loads environment variables from a `.env` file in the current directory (if it exists). For persistent configuration, prefer `scriptling.toml` — the `.env` file is useful for secrets or environment-specific overrides that shouldn't be committed to version control.
+The CLI automatically loads environment variables from a `.env` file in the current directory (if it exists). For persistent configuration, prefer `scriptling.toml`: the `.env` file is useful for secrets or environment-specific overrides that shouldn't be committed to version control.
 
 **Example `.env` file:**
 
@@ -205,7 +205,7 @@ SCRIPTLING_ALLOWED_PATHS=/tmp/data,./uploads
 
 ## Library Loading
 
-Scriptling automatically searches for libraries in the same directory as the running script — matching Python's behaviour. For interactive mode or stdin, the current working directory is used.
+Scriptling automatically searches for libraries in the same directory as the running script: matching Python's behaviour. For interactive mode or stdin, the current working directory is used.
 
 ```bash
 # Libraries in ./myproject/ are found automatically
@@ -240,14 +240,14 @@ myproject/
 ```
 
 ```python
-# In script.py — no --libpath needed, same directory is searched automatically
+# In script.py: no --libpath needed, same directory is searched automatically
 import utils           # Loads from myproject/utils.py
 import knot.groups     # Loads from myproject/knot/groups.py
 ```
 
 For nested imports like `knot.groups`, the loader checks:
-1. `dir/knot/groups.py` (folder structure — preferred)
-2. `dir/knot.groups.py` (flat file — legacy fallback)
+1. `dir/knot/groups.py` (folder structure: preferred)
+2. `dir/knot.groups.py` (flat file: legacy fallback)
 
 ## Disabling and Listing Libraries
 

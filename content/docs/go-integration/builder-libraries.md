@@ -139,41 +139,24 @@ database.transaction.commit(tx)
 
 ## Library with Classes
 
-Use `lb.Class()` to attach classes to a library:
+Classes cannot be attached via `LibraryBuilder`. To expose classes from a library, build the `*object.Library` directly and put them in the `constants` map, as documented under [Native Classes](../native-classes/).
 
 ```go
-func createHTTPLibrary() *object.Library {
-    lb := object.NewLibraryBuilder("http", "HTTP utilities")
-
-    // Create first class
-    httpClientClass := object.NewClassBuilder("Client")
-    httpClientClass.MethodWithHelp("__init__", func(self *object.Instance, baseURL string) {
-        self.SetField("base_url", object.NewString(baseURL))
-        self.SetField("headers", object.NewStringDict(map[string]object.Object{}))
-    }, "__init__(base_url) - Create HTTP client")
-
-    httpClientClass.MethodWithHelp("get", func(self *object.Instance, path string) map[string]interface{} {
-        baseURL, _ := self.Field("base_url").AsString()
-        // ... HTTP GET logic
-        return map[string]interface{}{
-            "status": 200,
-            "body":   "response from " + baseURL + path,
-        }
-    }, "get(path) - Make GET request")
-
-    // Attach class to library
-    lb.Class("Client", httpClientClass.Build())
-
-    // Add helper functions
-    lb.FunctionWithHelp("get", func(url string) map[string]interface{} {
-        return map[string]interface{}{
-            "status": 200,
-            "body":   "quick GET response",
-        }
-    }, "get(url) - Quick GET request")
-
-    return lb.Build()
-}
+myLib := object.NewLibrary("http",
+    map[string]*object.Builtin{
+        "get": {
+            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
+                // ... HTTP GET logic
+                return object.NewString("quick GET response")
+            },
+            HelpText: "get(url) - Quick GET request",
+        },
+    },
+    map[string]object.Object{
+        "Client": httpClientClass,  // Class exposed via the constants map
+    },
+    "HTTP utilities",
+)
 ```
 
 Usage:
@@ -200,7 +183,6 @@ quick = http.get("https://example.com/api")
 | `SubLibrary(name, lib)` | Add a sub-library |
 | `FunctionFromVariadic(name, fn)` | Register a variadic function |
 | `Alias(alias, original)` | Create an alias for an existing function |
-| `Class(name, class)` | Attach a class to the library |
 | `Build()` | Create and return the Library |
 | `Clear()` | Remove all registered functions and constants |
 | `Merge(other)` | Merge another builder's functions and constants |
@@ -236,6 +218,6 @@ Returns:
 
 ## See Also
 
-- [Builder Functions](functions/) - Type-safe function builder
-- [Builder Classes](classes/) - Type-safe class builder
-- [Native Libraries](native-libraries/) - Direct control with maximum performance
+- [Builder Functions](../builder-functions/) - Type-safe function builder
+- [Builder Classes](../builder-classes/) - Type-safe class builder
+- [Native Libraries](../native-libraries/) - Direct control with maximum performance

@@ -41,8 +41,8 @@ Copy two files into your project:
 
 | File | Purpose |
 | --- | --- |
-| `scriptling_plugin.h` | Public API — types, constructors, registration functions |
-| `scriptling_plugin.c` | Implementation — JSON parser, transport, object store, threading |
+| `scriptling_plugin.h` | Public API: types, constructors, registration functions |
+| `scriptling_plugin.c` | Implementation: JSON parser, transport, object store, threading |
 
 Both files are in the Scriptling source under `examples/plugins/hello-c/`.
 
@@ -50,7 +50,7 @@ No external dependencies beyond the C standard library and pthreads.
 
 ## Values
 
-Scriptling values are `sl_value` tagged unions. Create them with the constructor functions — ownership transfers to the caller:
+Scriptling values are `sl_value` tagged unions. Create them with the constructor functions: ownership transfers to the caller:
 
 | Constructor | Scriptling type |
 | --- | --- |
@@ -101,13 +101,13 @@ sl_register_func_help(srv, "name", handler, "name(x) - description");
 ## Classes
 
 ```c
-// Constructor — returns heap-allocated instance data.
+// Constructor: returns heap-allocated instance data.
 void *my_ctor(int argc, sl_value **args, void *ctx);
 
-// Destructor — frees instance data.
+// Destructor: frees instance data.
 void  my_dtor(void *data);
 
-// Method — receives instance data pointer.
+// Method: receives instance data pointer.
 sl_value *my_method(void *data, int argc, sl_value **args, void *ctx);
 
 // Property getter / setter
@@ -195,7 +195,7 @@ sl_wrapper(srv, "greet",
 );
 ```
 
-See [Client Wrappers](go-plugins/client-wrappers/) for details on wrapper source conventions.
+See [Client Wrappers](../go-plugins/client-wrappers/) for details on wrapper source conventions.
 
 ## Compilation
 
@@ -209,14 +209,14 @@ Requires a C11 compiler and pthreads.
 
 ```
 your-plugin/
-  scriptling_plugin.h   — public header
-  scriptling_plugin.c   — implementation
-  main.c                — your plugin
+  scriptling_plugin.h  : public header
+  scriptling_plugin.c  : implementation
+  main.c               : your plugin
   Makefile
 ```
 
 ## Thread Safety
 
-Each incoming request is handled in its own pthread. The object store uses a read-write lock for the instance array and a per-object mutex for method serialization. Stdout writes are mutex-protected. The SDK manages all synchronization internally — handler functions do not need their own locking unless they access shared global state outside the object store.
+Each incoming request is handled in its own pthread. The object store uses a read-write lock for the instance array and a per-object mutex for method serialization. Stdout writes are mutex-protected. The SDK manages all synchronization internally: handler functions do not need their own locking unless they access shared global state outside the object store.
 
 See [JSON-RPC Protocol](../protocol/) for the complete wire format reference.

@@ -34,7 +34,7 @@ var PersonClass = &object.Class{
                 instance.SetField("name", object.NewString(name))
                 instance.SetField("age", object.NewInteger(age))
 
-                return object.None
+                return &object.Null{}
             },
             HelpText: "__init__(name, age) - Initialize Person",
         },
@@ -138,7 +138,7 @@ var RectangleClass = &object.Class{
 
                 instance.SetField("width", object.NewFloat(width))
                 instance.SetField("height", object.NewFloat(height))
-                return object.None
+                return &object.Null{}
             },
             HelpText: "__init__(width, height) - Initialize Rectangle",
         },
@@ -177,7 +177,7 @@ var AnimalClass = &object.Class{
                 instance := args[0].(*object.Instance)
                 name, _ := args[1].AsString()
                 instance.SetField("name", object.NewString(name))
-                return object.None
+                return &object.Null{}
             },
             HelpText: "__init__(name) - Initialize Animal",
         },
@@ -217,7 +217,7 @@ var DogClass = &object.Class{
                 animalInit.Fn(ctx, nil, instance, object.NewString(name))
 
                 instance.SetField("breed", object.NewString(breed))
-                return object.None
+                return &object.Null{}
             },
             HelpText: "__init__(name, breed) - Initialize Dog",
         },
@@ -263,22 +263,22 @@ print(dog.info())    # "Animal: Rex" (inherited method)
 | Method | Purpose |
 |--------|---------|
 | `__init__` | Constructor called when creating instances |
-| `__str__` | String representation — used by `str()` and f-strings |
-| `__repr__` | Debug representation — used by `repr()` |
-| `__len__` | Length — used by `len()` |
-| `__bool__` | Truthiness — falls back to `__len__` if absent |
+| `__str__` | String representation: used by `str()` and f-strings |
+| `__repr__` | Debug representation: used by `repr()` |
+| `__len__` | Length: used by `len()` |
+| `__bool__` | Truthiness: falls back to `__len__` if absent |
 | `__iter__` | Return an iterator object |
 | `__next__` | Return next value; raise `StopIteration` when done |
-| `__contains__` | Membership test — used by `in` operator |
+| `__contains__` | Membership test: used by `in` operator |
 | `__eq__` | Equality (`==`) |
 | `__ne__` | Inequality (`!=`) |
-| `__lt__` | Less-than (`<`) — also used by `sorted()` |
+| `__lt__` | Less-than (`<`): also used by `sorted()` |
 | `__gt__` | Greater-than (`>`) |
 | `__le__` | Less-than-or-equal (`<=`) |
 | `__ge__` | Greater-than-or-equal (`>=`) |
-| `__enter__` | Context manager entry — called by `with` |
-| `__exit__` | Context manager exit — always called; return truthy to suppress exceptions |
-| `__getitem__` | Custom indexing — used by `obj[key]` |
+| `__enter__` | Context manager entry: called by `with` |
+| `__exit__` | Context manager exit: always called; return truthy to suppress exceptions |
+| `__getitem__` | Custom indexing: used by `obj[key]` |
 
 All dunder methods are inherited through the class hierarchy.
 
@@ -292,7 +292,7 @@ counterClass := &object.Class{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 instance := args[0].(*object.Instance)
                 instance.SetField("data", object.NewStringDict(map[string]object.Object{}))
-                return object.None
+                return &object.Null{}
             },
         },
         "__getitem__": &object.Builtin{
@@ -314,7 +314,7 @@ counterClass := &object.Class{
                 value := args[2]
                 data := instance.Field("data").(*object.Dict)
                 data.SetByString(key, value)
-                return object.None
+                return &object.Null{}
             },
             HelpText: "set(key, value) - Set a count",
         },
@@ -330,7 +330,7 @@ print(c["oranges"])  # 0 (default)
 `)
 ```
 
-**Note:** Use `object.NewStringDict()` to create dicts and `GetByString()`/`SetByString()` for access. Never manipulate the internal `Pairs` map keys directly — they use a type-prefixed canonical format.
+**Note:** Use `object.NewStringDict()` to create dicts and `GetByString()`/`SetByString()` for access. Never manipulate the internal `Pairs` map keys directly: they use a type-prefixed canonical format.
 
 ## Properties and Static Methods
 
@@ -349,7 +349,7 @@ var CircleClass = &object.Class{
                 instance := args[0].(*object.Instance)
                 r, _ := args[1].AsFloat()
                 instance.SetField("radius", object.NewFloat(r))
-                return object.None
+                return &object.Null{}
             },
         },
         "radius": &object.Property{
@@ -380,7 +380,7 @@ var CircleClass = &object.Class{
 }
 
 // c = Circle(5.0)
-// print(c.radius)  # 5  — no parens
+// print(c.radius)  # 5 : no parens
 // c.radius = 10    # calls setter
 // print(c.area)    # read-only, assignment raises error
 ```
@@ -478,7 +478,7 @@ var HTTPClientClass = &object.Class{
                 instance.SetField("timeout", object.NewInteger(int64(timeout)))
                 instance.SetField("headers", object.NewStringDict(map[string]object.Object{}))
 
-                return object.None
+                return &object.Null{}
             },
             HelpText: "__init__(base_url='', timeout=30) - Create HTTP client",
         },
@@ -491,7 +491,7 @@ var HTTPClientClass = &object.Class{
                 headers := instance.Field("headers").(*object.Dict)
                 headers.SetByString(key, object.NewString(value))
 
-                return object.None
+                return &object.Null{}
             },
             HelpText: "set_header(key, value) - Set default header",
         },
@@ -623,14 +623,14 @@ func newClientInstance(conn net.Conn) *object.Instance {
 
 Use field accessors (`SetField`/`Field`) for data scripts can read; use `NativeData` for internal Go state. Shallow and deep copies of an instance do not copy `NativeData`, so native-backed objects should be treated as handles rather than copyable data containers.
 
-### 4. Return `object.None` for Void Methods
+### 4. Return `&object.Null{}` for Void Methods
 
-Methods without return values should return None:
+Methods without return values should return `&object.Null{}`:
 
 ```go
 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
     // ... implementation
-    return object.None
+    return &object.Null{}
 }
 ```
 
@@ -657,7 +657,7 @@ func safeMethod(ctx context.Context, kwargs object.Kwargs, args ...object.Object
 
     // Safe to use instance and value
     instance.SetField("data", object.NewString(value))
-    return object.None
+    return &object.Null{}
 }
 ```
 
@@ -675,7 +675,7 @@ func TestClass(t *testing.T) {
                 Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                     instance := args[0].(*object.Instance)
                     instance.SetField("count", object.NewInteger(0))
-                    return object.None
+                    return &object.Null{}
                 },
             },
             "increment": &object.Builtin{
@@ -713,6 +713,6 @@ result = c.increment()
 
 ## See Also
 
-- [Native Functions](functions/) - Register individual functions
-- [Native Libraries](libraries/) - Create libraries with functions and constants
-- [Builder Classes](builder-classes/) - Type-safe class builder
+- [Native Functions](../native-functions/) - Register individual functions
+- [Native Libraries](../native-libraries/) - Create libraries with functions and constants
+- [Builder Classes](../builder-classes/) - Type-safe class builder

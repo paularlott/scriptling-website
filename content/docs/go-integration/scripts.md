@@ -369,7 +369,7 @@ Chain multiple loaders to try different sources in order:
 // Try filesystem first, then fall back to API
 chain := libloader.NewChain(
     libloader.NewFilesystem("/app/libs"),
-    libloader.NewAPI("https://api.example.com/libs"),
+    libloader.NewMemoryLoader(map[string]string{}),
 )
 p.SetLibraryLoader(chain)
 ```
@@ -549,6 +549,6 @@ print(string_utils.count_vowels(text))      # 3
 
 ## See Also
 
-- [Native API](native/) - Create extensions in Go
-- [Builder API](builder/) - Type-safe Go builders
+- [Native API](../native/) - Create extensions in Go
+- [Builder API](../builder/) - Type-safe Go builders
 - [Error Handling](/reference/error-handling/) - Try/except patterns

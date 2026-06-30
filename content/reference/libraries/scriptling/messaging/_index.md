@@ -47,9 +47,8 @@ dc_bot = discord.client("YOUR_BOT_TOKEN")
 # Slack - bot token + app token
 sl_bot = slack.client("xoxb-YOUR-BOT-TOKEN", "xapp-YOUR-APP-TOKEN")
 
-# Console - wrap an existing Console instance
-import scriptling.console as con
-cons_bot = console.client(con.create())
+# Console - no arguments (uses the shared terminal console)
+cons_bot = console.client()
 ```
 
 ### Allowed Users
@@ -190,3 +189,9 @@ Common capabilities:
 | `file` | Can send/receive files |
 | `keyboard` | Supports inline keyboards |
 | `callback` | Supports button callbacks |
+
+## See Also
+
+- [scriptling libraries](../) - Parent namespace for all scriptling extended libraries
+- [scriptling.console](../utilities/console/) - Terminal console the console messaging client is built on
+- [Library Registration](/docs/go-integration/library-registration/) - How to register these extended libraries in Go

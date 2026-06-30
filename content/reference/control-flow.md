@@ -468,17 +468,17 @@ ids = {item["id"] for item in records}
 All comprehension types support multiple `for` clauses, equivalent to nested loops:
 
 ```python
-# List — cartesian product
+# List: cartesian product
 pairs = [(x, y) for x in [1, 2, 3] for y in ["a", "b"]]
 # [(1, "a"), (1, "b"), (2, "a"), (2, "b"), (3, "a"), (3, "b")]
 
 # With condition on the second clause
 filtered = [x + y for x in range(3) for y in range(3) if x != y]
 
-# Dict — flatten nested structure
+# Dict: flatten nested structure
 flat = {k: v for row in rows for k, v in row.items()}
 
-# Set — unique pairs
+# Set: unique pairs
 unique = {(x, y) for x in [1, 2] for y in [2, 3]}
 
 # Generator expression
@@ -487,6 +487,6 @@ total = sum(x * y for x in range(4) for y in range(4))
 
 ## See Also
 
-- [Functions](./functions/) - Function definitions and parameters
-- [Operators](./operators/) - Comparison and boolean operators
-- [Error Handling](./error-handling/) - Try/except and raise
+- [Functions](../functions/) - Function definitions and parameters
+- [Operators](../operators/) - Comparison and boolean operators
+- [Error Handling](../error-handling/) - Try/except and raise

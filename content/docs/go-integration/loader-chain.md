@@ -72,7 +72,7 @@ Chain multiple loaders to try different sources in order:
 // Try filesystem first, then API
 chain := libloader.NewChain(
     libloader.NewFilesystem("/app/libs"),
-    libloader.NewAPI("https://api.example.com/libs"),
+    libloader.NewMemoryLoader(map[string]string{}),
 )
 p.SetLibraryLoader(chain)
 ```
@@ -225,6 +225,6 @@ import knot.groups   # Uses loader chain
 
 ## See Also
 
-- [Script Libraries](scripts/) - Write libraries in Scriptling
-- [Native Libraries](native-libraries/) - Create Go libraries
-- [CLI Library Loading](../cli/#library-loading) - Automatic script-dir loading and `--libpath`
+- [Script Libraries](../scripts/) - Write libraries in Scriptling
+- [Native Libraries](../native-libraries/) - Create Go libraries
+- [CLI Library Loading](../../cli/#library-loading) - Automatic script-dir loading and `--libpath`

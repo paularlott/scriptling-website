@@ -14,86 +14,77 @@ The `scriptling.net.unicast` library provides both client and server functionali
 
 | Function | Description |
 |----------|-------------|
-| `connect(host, port, protocol="udp", timeout=10)` | Connect to a remote host |
-| `listen(host, port, protocol="tcp")` | Listen for incoming connections |
+| `connect(host, port, protocol="udp", timeout=10)` | Connect to a remote host. |
+| `listen(host, port=0, protocol="tcp")` | Listen for incoming connections. |
 
-## Connection Object Methods
+## Connection Object
 
-The `connect()` function returns a connection object with these methods:
+The `connect()` function returns a connection object with the following methods and properties.
 
 | Method | Description |
 |--------|-------------|
-| `send(message)` | Send a message to the remote peer |
-| `receive(timeout=30)` | Receive a message |
-| `close()` | Close the connection |
-| `connected()` | Check if connection is still open |
-
-## Connection Object Properties
+| `send(message)` | Send a message to the remote peer. |
+| `receive(timeout=30)` | Receive a message. |
+| `close()` | Close the connection. |
+| `connected()` | Check if the connection is still open. |
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `local_addr` | string | Local address of the connection |
-| `remote_addr` | string | Remote address of the connection |
+| `local_addr` | `str` | Local address of the connection. |
+| `remote_addr` | `str` | Remote address of the connection. |
 
-## TCP Listener Methods
+## TCP Listener Object
 
-The `listen(protocol="tcp")` function returns a TCP listener:
+The `listen(protocol="tcp")` function returns a TCP listener object.
 
-| Method | Description |
+| Method/Property | Description |
 |--------|-------------|
-| `accept(timeout=30)` | Accept an incoming connection |
-| `close()` | Close the listener |
-| `addr` | string property - bound address |
+| `accept(timeout=30)` | Accept an incoming connection. |
+| `close()` | Close the listener. |
+| `addr` | `str` property: bound address. |
 
-## UDP Listener Methods
+## UDP Listener Object
 
-The `listen(protocol="udp")` function returns a UDP listener:
+The `listen(protocol="udp")` function returns a UDP listener object.
 
-| Method | Description |
+| Method/Property | Description |
 |--------|-------------|
-| `receive(timeout=30)` | Receive from any sender |
-| `send_to(address, message)` | Send to a specific address |
-| `close()` | Close the listener |
-| `addr` | string property - bound address |
+| `receive(timeout=30)` | Receive from any sender. |
+| `send_to(address, message)` | Send to a specific address. |
+| `close()` | Close the listener. |
+| `addr` | `str` property: bound address. |
 
 ## Functions
 
-### scriptling.net.unicast.connect(host, port, protocol="udp", timeout=10)
+### `connect(host, port, protocol="udp", timeout=10)`
 
-Connect to a remote host.
+Connects to a remote host.
 
 **Parameters:**
+- `host` (`str`): Remote host address.
+- `port` (`int`): Remote port number.
+- `protocol` (`str`, optional): `"udp"` or `"tcp"`. Default: `"udp"`.
+- `timeout` (`number`, optional): Connection timeout in seconds. Default: `10`.
 
-- `host` (string): Remote host address
-- `port` (int): Remote port number
-- `protocol` (string): `"udp"` or `"tcp"` (default: `"udp"`)
-- `timeout` (number): Connection timeout in seconds (default: 10)
+**Returns:** `Connection`: connection object with `send()`, `receive()`, `close()`, `connected()` methods and `local_addr`, `remote_addr` properties.
 
-**Returns:** Connection object with `send()`, `receive()`, `close()`, `connected()` methods and `local_addr`, `remote_addr` properties
-
-**Example:**
 ```python
 import scriptling.net.unicast as uc
 
 conn = uc.connect("192.168.1.1", 8080, protocol="tcp")
 ```
 
-### scriptling.net.unicast.listen(host, port=0, protocol="tcp")
+### `listen(host, port=0, protocol="tcp")`
 
-Listen for incoming connections.
+Listens for incoming connections.
 
 **Parameters:**
+- `host` (`str`): Bind address. Use `"0.0.0.0"` for all interfaces.
+- `port` (`int`, optional): Port number. Default: `0` (auto-assign).
+- `protocol` (`str`, optional): `"udp"` or `"tcp"`. Default: `"tcp"`.
 
-- `host` (string): Bind address (use `"0.0.0.0"` for all interfaces)
-- `port` (int): Port number (default: 0 = auto-assign)
-- `protocol` (string): `"udp"` or `"tcp"` (default: `"tcp"`)
+**Returns:** a TCP listener with `accept()`, `close()`, `addr` if `protocol="tcp"`, or a UDP listener with `receive()`, `send_to()`, `close()`, `addr` if `protocol="udp"`.
 
-**Returns:**
-
-- TCP: Listener with `accept()`, `close()`, `addr`
-- UDP: Listener with `receive()`, `send_to()`, `close()`, `addr`
-
-**Example:**
 ```python
 import scriptling.net.unicast as uc
 
@@ -101,131 +92,135 @@ server = uc.listen("0.0.0.0", 8080)
 print(f"Listening on {server.addr}")
 ```
 
-## Connection Methods
+### `conn.send(message)`
 
-### conn.send(message)
-
-Send a message to the remote peer.
+Sends a message to the remote peer.
 
 **Parameters:**
+- `message` (`str` or `dict`): Message to send. Dicts are automatically JSON encoded.
 
-- `message` (string or dict): Message to send. Dicts are automatically JSON encoded.
+**Returns:** `None`
 
-**Example:**
 ```python
 conn.send("Hello!")
 conn.send({"action": "ping"})
 ```
 
-### conn.receive(timeout=30)
+### `conn.receive(timeout=30)`
 
-Receive a message.
+Receives a message.
 
 **Parameters:**
+- `timeout` (`number`, optional): Timeout in seconds. Default: `30`.
 
-- `timeout` (number, optional): Timeout in seconds (default: 30)
+**Returns:** `dict`: a dict with `"data"` and `"source"` keys, or `None` on timeout.
 
-**Returns:**
-
-- Dict with `"data"` and `"source"` keys
-- None on timeout
-
-**Example:**
 ```python
 msg = conn.receive(timeout=5)
 if msg:
     print(f"From {msg['source']}: {msg['data']}")
 ```
 
-### conn.close()
+### `conn.close()`
 
-Close the connection.
+Closes the connection.
 
-**Example:**
+**Parameters:** None
+
+**Returns:** `None`
+
 ```python
 conn.close()
 ```
 
-### conn.connected()
+### `conn.connected()`
 
-Check if the connection is still open.
+Checks if the connection is still open.
 
-**Returns:** True if connected, False otherwise
+**Parameters:** None
 
-**Example:**
+**Returns:** `bool`: `True` if connected, `False` otherwise.
+
 ```python
 if conn.connected():
     conn.send("Still here!")
 ```
 
-## TCP Listener Methods
+### `listener.accept(timeout=30)`
 
-### listener.accept(timeout=30)
-
-Accept an incoming TCP connection.
+Accepts an incoming TCP connection.
 
 **Parameters:**
+- `timeout` (`number`, optional): Timeout in seconds. Default: `30`.
 
-- `timeout` (number, optional): Timeout in seconds (default: 30)
+**Returns:** `Connection`: a connection object, or `None` on timeout.
 
-**Returns:** Connection object or None on timeout
-
-**Example:**
 ```python
 conn = server.accept(timeout=60)
 if conn:
     print(f"Connection from {conn.remote_addr}")
 ```
 
-### listener.close()
+### `listener.close()`
 
-Close the listener and stop accepting connections.
+Closes the listener and stops accepting connections.
 
-**Example:**
+**Parameters:** None
+
+**Returns:** `None`
+
 ```python
 server.close()
 ```
 
-### listener.addr
+### `listener.addr`
 
-The local address the listener is bound to (string).
+The local address the listener is bound to.
 
-## UDP Listener Methods
+**Type:** `str` property.
 
-### listener.receive(timeout=30)
+### `listener.receive(timeout=30)` (UDP)
 
-Receive a message from any sender.
+Receives a message from any sender.
 
 **Parameters:**
+- `timeout` (`number`, optional): Timeout in seconds. Default: `30`.
 
-- `timeout` (number, optional): Timeout in seconds (default: 30)
+**Returns:** `dict`: a dict with `"data"` and `"source"` keys, or `None` on timeout.
 
-**Returns:** Dict with `"data"` and `"source"` keys, or None on timeout
-
-**Example:**
 ```python
 msg = udp_server.receive(timeout=5)
 if msg:
     print(f"From {msg['source']}: {msg['data']}")
 ```
 
-### listener.send_to(address, message)
+### `listener.send_to(address, message)` (UDP)
 
-Send a message to a specific address.
+Sends a message to a specific address.
 
 **Parameters:**
+- `address` (`str`): Target address, e.g. `"192.168.1.1:8080"`.
+- `message` (`str` or `dict`): Message to send.
 
-- `address` (string): Target address (e.g., `"192.168.1.1:8080"`)
-- `message` (string or dict): Message to send
+**Returns:** `None`
 
-**Example:**
 ```python
 udp_server.send_to("192.168.1.1:8080", "Reply!")
 ```
 
-### listener.close()
+### `listener.close()` (UDP)
 
-Close the UDP listener.
+Closes the UDP listener.
+
+**Parameters:** None
+
+**Returns:** `None`
+
+## Security Considerations
+
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`scriptling.net.unicast` opens raw UDP and TCP sockets, letting scripts initiate outbound connections to any reachable host/port (`connect()`) or bind a listening socket to accept inbound connections (`listen()`). The library does not restrict which hosts, ports, or interfaces a script can use: that is the embedder's responsibility, typically enforced with OS-level firewalling or network namespacing around the process. See [Security Considerations](/docs/security/#network-security) for a full breakdown of network-enabled libraries.
 
 ## Examples
 
@@ -351,9 +346,16 @@ finally:
 
 ## Notes
 
-- UDP is unreliable - messages may be lost, duplicated, or reordered
-- TCP provides reliable, ordered delivery
-- Maximum UDP message size is approximately 65KB
-- `receive()` returns None on timeout - use `connected()` to check for disconnect
-- Always call `close()` on connections and listeners to release resources
-- Use `"0.0.0.0"` as the host to listen on all network interfaces
+- UDP is unreliable - messages may be lost, duplicated, or reordered.
+- TCP provides reliable, ordered delivery.
+- Maximum UDP message size is approximately 65KB.
+- `receive()` returns `None` on timeout - use `connected()` to check for disconnect.
+- Always call `close()` on connections and listeners to release resources.
+- Use `"0.0.0.0"` as the host to listen on all network interfaces.
+
+## See Also
+
+- [scriptling.net.multicast](../multicast/): one-to-many UDP group messaging
+- [scriptling.net.gossip](../gossip/): gossip protocol cluster membership and messaging
+- [scriptling.net.websocket](../websocket/): WebSocket client library
+- [Security Guide](/docs/security/): full risk breakdown across all libraries

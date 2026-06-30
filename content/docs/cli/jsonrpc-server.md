@@ -21,7 +21,7 @@ handlers via `scriptling.runtime.jsonrpc`. The server then reads newline-
 delimited JSON-RPC 2.0 requests from stdin and writes one response per line to
 stdout.
 
-> **Keeping the setup script alive:** As with the HTTP server, the setup script can call [`runtime.start_server()`](../../reference/libraries/scriptling/runtime/) to stay alive alongside the stdio server instead of exiting after registration — useful for sharing state or running background work while serving requests.
+> **Keeping the setup script alive:** As with the HTTP server, the setup script can call [`runtime.start_server()`](../../../reference/libraries/scriptling/runtime/) to stay alive alongside the stdio server instead of exiting after registration: useful for sharing state or running background work while serving requests.
 
 > **Logging goes to stderr.** In `--json-rpc` mode, all log output is
 > automatically redirected to **stderr** so it never corrupts the JSON-RPC
@@ -49,9 +49,9 @@ scriptling --server :8000 --json-rpc --mcp-tools ./tools setup.py
 | `--server`         | `SCRIPTLING_SERVER`        | HTTP server address for HTTP JSON-RPC | (disabled) |
 | `--allowed-paths` | `SCRIPTLING_ALLOWED_PATHS` | Allowed filesystem paths             | (none)     |
 | `--kv-storage`    | `SCRIPTLING_KV_STORAGE`    | Directory for persistent KV store    | in-memory  |
-| `--libpath`       | -                          | Extra library search directories     | none       |
+| `--libpath`       | `SCRIPTLING_LIBPATH`       | Extra library search directories     | none       |
 | `--package`       | -                          | Load libraries from a package (zip)  | none       |
-| `--plugin-dir`    | -                          | Load plugin libraries                | none       |
+| `--plugin-dir`    | `SCRIPTLING_PLUGIN_DIR`    | Load plugin libraries                | none       |
 
 `--json-rpc` selects one transport. Without `--server` it uses stdio; with
 `--server` it mounts HTTP JSON-RPC at `/json-rpc`.
@@ -106,7 +106,7 @@ echo '[{"jsonrpc":"2.0","method":"divide","params":{"a":1,"b":0},"id":1},
 # [{"jsonrpc":"2.0","error":{"code":-32602,"message":"division by zero","data":{"field":"b"}},"id":1},
 #  {"jsonrpc":"2.0","result":42,"id":2}]
 
-# Notification (no id) — no response is written
+# Notification (no id): no response is written
 echo '{"jsonrpc":"2.0","method":"progress","params":{"done":1}}' \
   | scriptling --json-rpc setup.py
 ```

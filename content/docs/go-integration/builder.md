@@ -21,10 +21,10 @@ Use the **Builder API** for cleaner code and type safety. Use the **Native API**
 
 ## Topics
 
-- [Functions](builder-functions/) - Type-safe function builder
-- [Libraries](builder-libraries/) - Type-safe library builder
-- [Classes](builder-classes/) - Type-safe class builder
-- [Instantiation](builder-instantiation/) - Library templates with per-instance configuration
+- [Functions](../builder-functions/) - Type-safe function builder
+- [Libraries](../builder-libraries/) - Type-safe library builder
+- [Classes](../builder-classes/) - Type-safe class builder
+- [Instantiation](../builder-instantiation/) - Library templates with per-instance configuration
 
 ## Supported Types
 
@@ -107,7 +107,7 @@ func main() {
 
 ### Blocking operations
 
-Builder and native functions both run holding the environment's interpreter lock (GIL). If a function does blocking I/O (HTTP, files, database, network, subprocess), wrap the blocking call in `object.RunBlocking(ctx, fn)` to release the lock so other shared-environment threads and handlers keep running while yours is blocked. See [Blocking operations and the interpreter lock](../native/) in the Native API guide for a full example — it applies to any function that receives a `ctx`.
+Builder and native functions both run holding the environment's interpreter lock (GIL). If a function does blocking I/O (HTTP, files, database, network, subprocess), wrap the blocking call in `object.RunBlocking(ctx, fn)` to release the lock so other shared-environment threads and handlers keep running while yours is blocked. See [Blocking operations and the interpreter lock](../native/) in the Native API guide for a full example: it applies to any function that receives a `ctx`.
 
 ## See Also
 

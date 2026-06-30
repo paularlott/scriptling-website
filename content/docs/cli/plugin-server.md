@@ -5,7 +5,7 @@ weight: 4
 ---
 
 `runtime.plugin` lets a Scriptling script expose itself as a **first-class plugin
-peer** — one that implements the full plugin handshake protocol. When loaded by
+peer**: one that implements the full plugin handshake protocol. When loaded by
 another Scriptling process with `scriptling=True`, the host generates proxy
 libraries automatically, just as if you had built a Go or C plugin executable.
 
@@ -21,11 +21,11 @@ setup script:
    declare a plugin identity.
 2. It registers functions, constants, and classes with `runtime.plugin.register_function`,
    `runtime.plugin.register_constant`, and `runtime.plugin.register_class`.
-3. It calls `runtime.start_server()` — the CLI switches from the plain JSON-RPC
+3. It calls `runtime.start_server()`: the CLI switches from the plain JSON-RPC
    loop to the full plugin protocol, serving `scriptling.handshake`,
    `function.call`, `object.*`, and constants over stdio or HTTP.
-4. A host process loads it with `scriptling.plugin.load(..., scriptling=True)` —
-   or via `--plugin-dir` if the script is wrapped in a thin shell shim — and gets
+4. A host process loads it with `scriptling.plugin.load(..., scriptling=True)`,
+   or via `--plugin-dir` if the script is wrapped in a thin shell shim, and gets
    an auto-generated `plugin.<name>` proxy library.
 
 ## Basic Example
@@ -114,7 +114,7 @@ Register a function for the plugin server.
 | `handler` | str | Handler as `"library.function"` string. |
 
 The handler receives individual positional arguments decoded from the plugin
-transport — not a raw params blob like `runtime.jsonrpc` handlers do. Each call
+transport: not a raw params blob like `runtime.jsonrpc` handlers do. Each call
 runs on a fresh, isolated evaluator (the same concurrency model as HTTP and
 JSON-RPC handlers).
 
@@ -125,7 +125,7 @@ normal call syntax:
 ```python
 # handlers.py
 def apply(fn, x):
-    return fn(x)   # fn is a callback — calling it sends callback.call back to the client
+    return fn(x)   # fn is a callback: calling it sends callback.call back to the client
 ```
 
 ```python
@@ -172,10 +172,10 @@ The exposed class name is taken from the last segment of `handler`
 (e.g. `"mymodule.Config"` → `"Config"`). The server handles the complete
 object lifecycle:
 
-- **`object.new`** — calls the class constructor (`__init__`), stores the
+- **`object.new`**: calls the class constructor (`__init__`), stores the
   instance server-side, returns a remote handle to the client.
-- **`object.call_method`** — calls a method on the stored instance.
-- **`object.destroy`** — calls `__del__` (if defined) and removes the instance.
+- **`object.call_method`**: calls a method on the stored instance.
+- **`object.destroy`**: calls `__del__` (if defined) and removes the instance.
 
 Clients use the class as if it were local:
 
@@ -222,6 +222,6 @@ while runtime.server_running():
 
 ## See Also
 
-- [`scriptling.plugin.load()`](../../plugins/using/) — Load a plugin peer.
-- [JSON-RPC Server Mode](../jsonrpc-server/) — Plain JSON-RPC without the plugin handshake.
-- [Go Plugins](../../plugins/go-plugins/) — Compiled plugin executables with full class and callback support.
+- [`scriptling.plugin.load()`](../../plugins/using/): Load a plugin peer.
+- [JSON-RPC Server Mode](../jsonrpc-server/): Plain JSON-RPC without the plugin handshake.
+- [Go Plugins](../../plugins/go-plugins/): Compiled plugin executables with full class and callback support.

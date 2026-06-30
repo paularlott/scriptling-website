@@ -1,41 +1,37 @@
 ---
 title: scriptling.sed
 linkTitle: sed
+description: In-place file content replacement and capture group extraction.
 weight: 2
 ---
 
-The `scriptling.sed` library provides in-place file content replacement and capture group extraction. Both replace functions accept a file or a directory as the path. Files are modified atomically using a temp-file rename, so a partial write cannot corrupt a file. Binary files are skipped automatically.
+The `scriptling.sed` library provides in-place file content replacement and capture group extraction. All three functions accept a file or a directory as the path. Files are modified atomically using a temp-file rename, so a partial write cannot corrupt a file, and binary files are skipped automatically.
 
 ## Available Functions
 
 | Function | Description |
-| --- | --- |
+|----------|-------------|
 | `replace(old, new, path, **kwargs)` | Replace a literal string in a file or directory |
 | `replace_pattern(regex, new, path, **kwargs)` | Replace a regex match in a file or directory |
 | `extract(regex, path, **kwargs)` | Extract regex capture groups from a file or directory |
 
-`replace` and `replace_pattern` return the number of files modified as an integer. `extract` returns a list of match dicts.
-
 ## Functions
 
-### scriptling.sed.replace(old, new, path, ...)
+### `replace(old, new, path, recursive=False, ignore_case=False, glob="", follow_links=False, max_size=1048576)`
 
-Replace all occurrences of a literal string in a file or directory.
+Replaces all occurrences of a literal string in a file or directory.
 
 **Parameters:**
+- `old` (`str`): Literal string to search for.
+- `new` (`str`): Replacement string.
+- `path` (`str`): File or directory to modify.
+- `recursive` (`bool`, optional): Recurse into subdirectories. Default: `False`.
+- `ignore_case` (`bool`, optional): Case-insensitive matching. Default: `False`.
+- `glob` (`str`, optional): Only modify files whose name matches this glob pattern, e.g. `"*.py"`. Default: `""` (all files).
+- `follow_links` (`bool`, optional): Follow symlinks if they resolve within allowed paths. Default: `False`.
+- `max_size` (`int` or `None`, optional): Skip files larger than this many bytes. Default: `1048576` (1 MiB). Pass `None` to disable.
 
-- `old` (string): Literal string to search for
-- `new` (string): Replacement string
-- `path` (string): File or directory to modify
-- `recursive` (bool, optional): Recurse into subdirectories. Default: `False`
-- `ignore_case` (bool, optional): Case-insensitive matching. Default: `False`
-- `glob` (string, optional): Only modify files whose name matches this glob pattern, e.g. `"*.py"`. Default: all files
-- `follow_links` (bool, optional): Follow symlinks if they resolve within allowed paths. Default: `False`
-- `max_size` (int or None, optional): Skip files larger than this many bytes. Default: `1048576` (1 MiB). Pass `None` to disable.
-
-**Returns:** `int` — number of files modified
-
-**Example:**
+**Returns:** `int`: number of files modified.
 
 ```python
 import scriptling.sed as sed
@@ -51,24 +47,21 @@ print(f"{n} file(s) modified")
 n = sed.replace("TODO", "DONE", "./src", ignore_case=True, recursive=True)
 ```
 
-### scriptling.sed.replace_pattern(regex, new, path, ...)
+### `replace_pattern(regex, new, path, recursive=False, ignore_case=False, glob="", follow_links=False, max_size=1048576)`
 
-Replace all regex matches in a file or directory. Capture groups are referenced in the replacement string using `${1}`, `${2}`, or named groups `${name}`.
+Replaces all regex matches in a file or directory. Capture groups are referenced in the replacement string using `${1}`, `${2}`, or named groups `${name}`.
 
 **Parameters:**
+- `regex` (`str`): Regular expression pattern.
+- `new` (`str`): Replacement string (may reference capture groups as `${1}`, `${2}`, etc.).
+- `path` (`str`): File or directory to modify.
+- `recursive` (`bool`, optional): Recurse into subdirectories. Default: `False`.
+- `ignore_case` (`bool`, optional): Case-insensitive matching. Default: `False`.
+- `glob` (`str`, optional): Only modify files whose name matches this glob pattern, e.g. `"*.py"`. Default: `""` (all files).
+- `follow_links` (`bool`, optional): Follow symlinks if they resolve within allowed paths. Default: `False`.
+- `max_size` (`int` or `None`, optional): Skip files larger than this many bytes. Default: `1048576` (1 MiB). Pass `None` to disable.
 
-- `regex` (string): Regular expression pattern
-- `new` (string): Replacement string (may reference capture groups as `${1}`, `${2}`, etc.)
-- `path` (string): File or directory to modify
-- `recursive` (bool, optional): Recurse into subdirectories. Default: `False`
-- `ignore_case` (bool, optional): Case-insensitive matching. Default: `False`
-- `glob` (string, optional): Only modify files whose name matches this glob pattern, e.g. `"*.py"`. Default: all files
-- `follow_links` (bool, optional): Follow symlinks if they resolve within allowed paths. Default: `False`
-- `max_size` (int or None, optional): Skip files larger than this many bytes. Default: `1048576` (1 MiB). Pass `None` to disable.
-
-**Returns:** `int` — number of files modified
-
-**Example:**
+**Returns:** `int`: number of files modified.
 
 ```python
 import scriptling.sed as sed
@@ -93,32 +86,24 @@ n = sed.replace_pattern(
 )
 ```
 
-### scriptling.sed.extract(regex, path, ...)
+### `extract(regex, path, recursive=False, ignore_case=False, glob="", follow_links=False, max_size=1048576)`
 
-Extract regex capture groups from a file or directory. Returns a list of match dicts with the captured groups for each match.
+Extracts regex capture groups from a file or directory. Returns a list of match dicts with the captured groups for each match.
 
 **Parameters:**
+- `regex` (`str`): Regular expression with capture groups.
+- `path` (`str`): File or directory to search.
+- `recursive` (`bool`, optional): Recurse into subdirectories. Default: `False`.
+- `ignore_case` (`bool`, optional): Case-insensitive matching. Default: `False`.
+- `glob` (`str`, optional): Only search files whose name matches this glob pattern, e.g. `"*.py"`. Default: `""` (all files).
+- `follow_links` (`bool`, optional): Follow symlinks if they resolve within allowed paths. Default: `False`.
+- `max_size` (`int` or `None`, optional): Skip files larger than this many bytes. Default: `1048576` (1 MiB). Pass `None` to disable.
 
-- `regex` (string): Regular expression with capture groups
-- `path` (string): File or directory to search
-- `recursive` (bool, optional): Recurse into subdirectories. Default: `False`
-- `ignore_case` (bool, optional): Case-insensitive matching. Default: `False`
-- `glob` (string, optional): Only search files whose name matches this glob pattern, e.g. `"*.py"`. Default: all files
-- `follow_links` (bool, optional): Follow symlinks if they resolve within allowed paths. Default: `False`
-- `max_size` (int or None, optional): Skip files larger than this many bytes. Default: `1048576` (1 MiB). Pass `None` to disable.
-
-**Returns:** `list` of match dicts:
-
-```python
-{"file": str, "line": int, "text": str, "groups": list}
-```
-
-- `file` — path to the matched file
-- `line` — 1-based line number
-- `text` — full content of the matched line
-- `groups` — list of captured group strings (empty list if no capture groups)
-
-**Example:**
+**Returns:** `list` of `dict`, each with keys:
+- `file` (`str`): Path to the matched file.
+- `line` (`int`): 1-based line number.
+- `text` (`str`): Full content of the matched line.
+- `groups` (`list`): List of captured group strings (empty list if no capture groups).
 
 ```python
 import scriptling.sed as sed
@@ -141,7 +126,7 @@ versions = [m["groups"][0] for m in matches]
 
 ## Pairing with scriptling.grep
 
-`scriptling.grep` and `scriptling.sed` are designed to work together — grep finds, sed transforms:
+`scriptling.grep` and `scriptling.sed` are designed to work together: grep finds, sed transforms:
 
 ```python
 import scriptling.grep as grep
@@ -177,10 +162,18 @@ sed.replace_pattern(r"(\w+)_old", "${1}_new", "./src", recursive=True)
 sed.replace_pattern(r"(?P<fn>\w+)\(self\)", "${fn}(self, ctx)", "./src", recursive=True)
 ```
 
-## Security
-
-`scriptling.sed` respects the path restrictions configured at registration time. Any path outside the allowed directories returns a permission error. Symlinks are only followed if `follow_links=True` **and** the resolved target is within the allowed paths.
-
 ## Performance
 
-Directory operations use the same concurrent worker pool as `scriptling.grep` — bounded at `max(4, NumCPU/2)` goroutines. Each file is written atomically: content is written to a temp file in the same directory, then renamed over the original, which is an atomic operation on all supported platforms.
+Directory operations use the same concurrent worker pool as `scriptling.grep`: bounded at `max(4, NumCPU/2)` goroutines. Each file is written atomically: content is written to a temp file in the same directory, then renamed over the original, which is an atomic operation on all supported platforms.
+
+## Security Considerations
+
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`scriptling.sed` has filesystem read-write access, restricted via the `allowedPaths` parameter to `RegisterSedLibrary(p, allowedPaths)`. Any path outside the allowed directories returns a permission error, and symlinks are only followed if `follow_links=True` **and** the resolved target is within the allowed paths. See [Library Registration](/docs/go-integration/library-registration/#filesystem-libraries) for configuration details.
+
+## See Also
+
+- [scriptling.grep](../grep/) - Pair with sed to find-then-transform file content
+- [Library Registration](/docs/go-integration/library-registration/) - Registering extended libraries when embedding in Go
+- [Security Guide](/docs/security/) - Security guidance for host-provided libraries

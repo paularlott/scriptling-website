@@ -1,5 +1,6 @@
 ---
 title: collections
+description: Specialized container datatypes, counters, double-ended queues, named tuples, and chained dicts.
 weight: 1
 
 aliases:
@@ -7,273 +8,241 @@ aliases:
   - /reference/libraries/collections/
 ---
 
-The `collections` library provides Python-compatible specialized container datatypes.
-
-## Import
-
-```python
-import collections
-```
+The `collections` library provides Python-compatible specialized container datatypes: counters, double-ended queues, named tuples, default-value dicts, and chained dicts.
 
 ## Available Functions
 
-| Function                        | Description                             |
-| ------------------------------- | --------------------------------------- |
-| `Counter([iterable])`           | Create a counter of element occurrences |
-| `most_common(counter[, n])`     | Get n most common elements              |
-| `OrderedDict([items])`          | Create order-preserving dict            |
-| `deque([iterable[, maxlen]])`   | Create a double-ended queue             |
-| `deque_appendleft(deque, elem)` | Add element to left of deque            |
-| `deque_popleft(deque)`          | Remove and return element from left     |
-| `deque_extendleft(deque, iter)` | Extend deque on left side               |
+| Function | Description |
+|----------|-------------|
+| `Counter([iterable])` | Create a counter of element occurrences. |
+| `most_common(counter[, n])` | Get the `n` most common elements from a `Counter`. |
+| `OrderedDict([items])` | Create an order-preserving dict. |
+| `deque([iterable[, maxlen]])` | Create a double-ended queue. |
+| `deque_appendleft(deque, elem)` | Add an element to the left of a deque. |
+| `deque_popleft(deque)` | Remove and return the leftmost element of a deque. |
+| `deque_extendleft(deque, iterable)` | Extend the left side of a deque with an iterable. |
+| `deque_rotate(deque, n)` | Rotate a deque `n` steps to the right (or left if negative). |
+| `namedtuple(typename, field_names)` | Create a class for named tuple instances. |
+| `defaultdict(default_factory)` | Create a dict with default values for missing keys. |
+| `ChainMap(*maps)` | Group multiple dicts for a single lookup. |
 
 ## Functions
 
-### Counter
+### `Counter([iterable])`
 
-#### `Counter([iterable])`
+Creates a dict-like object that counts occurrences of elements. Counting a missing key returns `0` instead of raising an error.
 
-Create a dict-like object that counts occurrences of elements.
+**Parameters:**
+- `iterable` (`list`, `tuple`, `str`, or `dict`, optional): Elements to count. A list/tuple/string counts each element/character; a dict is copied directly as counts.
+
+**Returns:** `Counter`: an instance supporting `c[key]`, `c.most_common([n])`, and `c.elements()`.
 
 ```python
-# Count list elements
-c = collections.Counter([1, 1, 2, 3, 3, 3])
-# {1: 2, 2: 1, 3: 3}
+import collections
 
-# Count characters in string
+c = collections.Counter([1, 1, 2, 3, 3, 3])
+print(c[1])  # 2
+print(c[4])  # 0 (missing keys return 0, not KeyError)
+
 c = collections.Counter("hello")
-# {"h": 1, "e": 1, "l": 2, "o": 1}
-
-# Access counts (returns 0 for missing keys)
-c["l"]  # 2
-c["x"]  # 0 (not KeyError like regular dict)
+print(c["l"])  # 2
 ```
 
-#### Counter Methods
+Counter instances support these methods:
 
-Counter objects support the following methods:
+- `c[key]`: get the count for `key` (returns `0` if absent).
+- `c.most_common([n])`: return the `n` most common `(element, count)` tuples, sorted by count descending. Omit `n` to return all.
+- `c.elements()`: return a list of elements, each repeated by its count.
 
-- `c[key]` - Get count for key (returns 0 if key not present)
-- `c.most_common([n])` - Return n most common elements as (element, count) tuples
-- `c.elements()` - Return iterator over elements (repeating each by its count)
+### `most_common(counter[, n])`
 
-#### `most_common(counter[, n])`
+Returns the `n` most common elements and their counts from a `Counter`, sorted by count descending. Function form of `counter.most_common(n)`.
 
-Return the n most common elements and their counts.
+**Parameters:**
+- `counter` (`Counter`): The counter to read from.
+- `n` (`int`, optional): Number of elements to return. Default: all elements.
+
+**Returns:** `list`: a list of `(element, count)` tuples.
 
 ```python
+import collections
+
 c = collections.Counter([1, 1, 2, 3, 3, 3])
-collections.most_common(c, 2)
-# [(3, 3), (1, 2)]  - 3 appears 3 times, 1 appears 2 times
+print(collections.most_common(c, 2))
+# [(3, 3), (1, 2)]
 ```
 
-### OrderedDict
+### `OrderedDict([items])`
 
-#### `OrderedDict([items])`
+Creates a dict that maintains insertion order. Scriptling's regular dicts already maintain insertion order, so this is equivalent to `dict()` and exists for Python-compatibility.
 
-Create a dict that maintains insertion order.
+**Parameters:**
+- `items` (`list` of 2-tuples, or `dict`, optional): Initial key-value pairs.
+
+**Returns:** `dict`
 
 ```python
+import collections
+
 od = collections.OrderedDict([("a", 1), ("b", 2), ("c", 3)])
-od["a"]  # 1
-
-# Note: Regular dicts in Scriptling already maintain order
+print(od["a"])  # 1
 ```
 
-### deque (Double-Ended Queue)
+### `deque([iterable[, maxlen]])`
 
-#### `deque([iterable[, maxlen]])`
+Creates a double-ended queue from an iterable. The returned value is a regular list; use the `deque_*` functions for deque-specific operations (`append()`/`pop()` work directly via the list's own methods for the right side).
 
-Create a double-ended queue.
+**Parameters:**
+- `iterable` (`list`, `tuple`, or `str`, optional): Initial elements.
+- `maxlen` (`int`, optional): If given and the deque is longer, elements are trimmed from the left so only the last `maxlen` elements remain.
+
+**Returns:** `list`: usable as a deque with the `deque_*` functions.
 
 ```python
+import collections
+
 d = collections.deque([1, 2, 3])
 ```
 
-#### `deque_appendleft(deque, elem)`
+### `deque_appendleft(deque, elem)`
 
-Add element to the left side.
+Adds an element to the left side of a deque, in place.
+
+**Parameters:**
+- `deque` (`list`): The deque to modify.
+- `elem` (`any`): Element to add.
+
+**Returns:** `None`
 
 ```python
+import collections
+
 d = collections.deque([1, 2, 3])
 collections.deque_appendleft(d, 0)
-# d is now [0, 1, 2, 3]
+print(d)  # [0, 1, 2, 3]
 ```
 
-#### `deque_popleft(deque)`
+### `deque_popleft(deque)`
 
-Remove and return element from the left side.
+Removes and returns the leftmost element of a deque, in place.
+
+**Parameters:**
+- `deque` (`list`): The deque to modify.
+
+**Returns:** `any`: the removed element.
+
+**Raises:** `Error`: if the deque is empty.
 
 ```python
+import collections
+
 d = collections.deque([1, 2, 3])
 x = collections.deque_popleft(d)
-# x = 1, d is now [2, 3]
+print(x, d)  # 1 [2, 3]
 ```
 
-#### `deque_extendleft(deque, iterable)`
+### `deque_extendleft(deque, iterable)`
 
-Extend the left side with elements (in reverse order).
+Extends the left side of a deque with elements from `iterable`, in place. Elements are added in reverse order, so the first element of `iterable` ends up closest to the front.
+
+**Parameters:**
+- `deque` (`list`): The deque to modify.
+- `iterable` (`list` or `tuple`): Elements to add.
+
+**Returns:** `None`
 
 ```python
+import collections
+
 d = collections.deque([1, 2, 3])
 collections.deque_extendleft(d, [4, 5])
-# d is now [5, 4, 1, 2, 3]
+print(d)  # [5, 4, 1, 2, 3]
 ```
 
-#### `deque_rotate(deque, n)`
+### `deque_rotate(deque, n)`
 
-Rotate the deque n steps to the right (negative for left).
+Rotates a deque `n` steps to the right, in place. Negative `n` rotates left.
+
+**Parameters:**
+- `deque` (`list`): The deque to modify.
+- `n` (`int`): Number of steps to rotate.
+
+**Returns:** `None`
 
 ```python
+import collections
+
 d = collections.deque([1, 2, 3, 4])
 collections.deque_rotate(d, 1)
-# d is now [4, 1, 2, 3]
+print(d)  # [4, 1, 2, 3]
 
 d = collections.deque([1, 2, 3, 4])
 collections.deque_rotate(d, -1)
-# d is now [2, 3, 4, 1]
+print(d)  # [2, 3, 4, 1]
 ```
 
-### namedtuple
+### `namedtuple(typename, field_names)`
 
-#### `namedtuple(typename, field_names)`
+Creates a class for named tuple instances, supporting both attribute access (`p.x`) and dict-style access (`p["x"]`).
 
-Create a class for named tuple instances.
+**Parameters:**
+- `typename` (`str`): Name of the generated class.
+- `field_names` (`list` or `tuple` of `str`, or a space-separated `str`): Field names. A string is split on spaces and/or commas.
+
+**Returns:** `type`: a class whose instances expose the given fields.
 
 ```python
-# Create a Point type
+import collections
+
 Point = collections.namedtuple("Point", ["x", "y"])
-
-# Create instances
 p = Point(1, 2)
+print(p.x, p.y)    # 1 2
+print(p["x"])      # 1
 
-# Access fields by name (direct attribute access)
-p.x  # 1
-p.y  # 2
-
-# Access fields by name (dict-style)
-p["x"]  # 1
-p["y"]  # 2
-
-# Field names can also be a string
 Person = collections.namedtuple("Person", "name age")
 ```
 
-### defaultdict
+### `defaultdict(default_factory)`
 
-#### `defaultdict(default_factory)`
+Creates a dict that automatically creates a default value (using `default_factory`) when a missing key is accessed.
 
-Create a dict with default values for missing keys.
+**Parameters:**
+- `default_factory` (callable or `type`): Called with no arguments to produce the default value for a missing key (e.g. `list`, `int`, `dict`, or a custom function).
+
+**Returns:** `defaultdict`: a dict-like instance with automatic default value creation.
 
 ```python
-# Create with factory function or type
-d = collections.defaultdict(list)
-d = collections.defaultdict(int)
+import collections
 
-# Accessing missing key creates default value automatically
-d["items"].append(1)  # Creates empty list, then appends
-d["count"] = d["count"] + 1  # Creates 0, then increments
+d = collections.defaultdict(list)
+d["items"].append(1)  # creates [] then appends -> [1]
+
+counts = collections.defaultdict(int)
+counts["x"] = counts["x"] + 1  # creates 0 then increments -> 1
 ```
 
-### ChainMap
+### `ChainMap(*maps)`
 
-#### `ChainMap(*maps)`
+Merges multiple dicts into a single dict. Earlier dicts take priority over later ones for duplicate keys. Unlike Python's `ChainMap`, the result is a snapshot: later writes to the original dicts are not reflected in it.
 
-Group multiple dicts for single lookup (first has priority).
+**Parameters:**
+- `*maps` (`dict`): Dicts to merge, highest priority first.
+
+**Returns:** `dict`: a new dict with keys from all inputs, first dict wins on conflicts.
 
 ```python
+import collections
+
 d1 = {"a": 1, "b": 2}
 d2 = {"b": 20, "c": 3}
 cm = collections.ChainMap(d1, d2)
 
-cm["a"]  # 1 (from d1)
-cm["b"]  # 2 (from d1 - first has priority)
-cm["c"]  # 3 (from d2)
+print(cm["a"])  # 1 (from d1)
+print(cm["b"])  # 2 (d1 has priority over d2)
+print(cm["c"])  # 3 (from d2)
 ```
 
-## Examples
+## See Also
 
-### Word frequency counter
-
-```python
-import collections
-
-text = "the quick brown fox jumps over the lazy dog"
-words = text.split(" ")
-word_counts = collections.Counter(words)
-
-# Most common words
-top_words = collections.most_common(word_counts, 3)
-```
-
-### Using deque as a queue
-
-```python
-import collections
-
-# Create a task queue
-queue = collections.deque()
-
-# Add tasks
-queue.append("task1")
-queue.append("task2")
-queue.append("task3")
-
-# Process tasks (FIFO)
-while len(queue) > 0:
-    task = collections.deque_popleft(queue)
-    print("Processing:", task)
-```
-
-### Using deque as a stack
-
-```python
-import collections
-
-# Create a stack
-stack = collections.deque()
-
-# Push items
-stack.append("first")
-stack.append("second")
-stack.append("third")
-
-# Pop items (LIFO)
-while len(stack) > 0:
-    item = stack.pop()
-    print("Popped:", item)
-```
-
-### Using namedtuple for data records
-
-```python
-import collections
-
-# Define a record type
-Employee = collections.namedtuple("Employee", ["name", "department", "salary"])
-
-# Create records
-emp1 = Employee("Alice", "Engineering", 75000)
-emp2 = Employee("Bob", "Marketing", 65000)
-
-# Access fields
-print(emp1.name, "works in", emp1.department)
-```
-
-### Merging configurations with ChainMap
-
-```python
-import collections
-
-# Default configuration
-defaults = {"debug": False, "timeout": 30, "retries": 3}
-
-# User overrides
-user_config = {"debug": True, "timeout": 60}
-
-# Merge (user config takes priority)
-config = collections.ChainMap(user_config, defaults)
-
-config["debug"]    # True (from user_config)
-config["retries"]  # 3 (from defaults)
-```
+- [itertools](../itertools/): iteration and combinatorics utilities.
+- [functools](../functools/): higher-order functions like `reduce()` and `partial()`.

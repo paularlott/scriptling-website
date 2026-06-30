@@ -1,48 +1,40 @@
 ---
 title: yaml
+description: Parse and generate YAML (YAML Ain't Markup Language) data.
 weight: 1
 
 aliases:
   - /reference/libraries/extlib/yaml/
   - /reference/libraries/yaml/
-requires_registration: true
 ---
 
-Parse and generate YAML (YAML Ain't Markup Language) data.
-
-## Import
-
-```python
-import yaml
-```
+The `yaml` library parses YAML strings into Scriptling objects and serializes Scriptling objects back to YAML strings. Commonly used for configuration files, infrastructure-as-code manifests, and CI/CD pipelines.
 
 ## Available Functions
 
-| Function                 | Description                            |
-| ------------------------ | -------------------------------------- |
-| `safe_load(yaml_string)` | Parse YAML string to Scriptling object |
-| `load(yaml_string)`      | Alias for safe_load()                  |
-| `safe_dump(obj)`         | Convert object to YAML string          |
-| `dump(obj)`              | Alias for safe_dump()                  |
+| Function | Description |
+|----------|-------------|
+| `safe_load(yaml_string)` | Parse a YAML string into a Scriptling object. |
+| `load(yaml_string)` | Alias for `safe_load()`. |
+| `safe_dump(obj)` | Convert a Scriptling object to a YAML string. |
+| `dump(obj)` | Alias for `safe_dump()`. |
 
 ## Functions
 
-### yaml.safe_load(yaml_string)
+### `safe_load(yaml_string)`
 
-Parse a YAML string and return the corresponding Scriptling object.
+Parses a YAML string and returns the corresponding Scriptling object.
 
 **Parameters:**
+- `yaml_string` (`str`): YAML-formatted string to parse.
 
-- `yaml_string` (string): YAML formatted string to parse
+**Returns:** `dict`, `list`, `str`, `int`, `float`, `bool`, or `None`: depending on the parsed YAML value.
 
-**Returns:** Parsed data as Scriptling object (dict, list, string, number, boolean, or None)
-
-**Example:**
+**Raises:** `Error`: if `yaml_string` is not valid YAML.
 
 ```python
 import yaml
 
-# Parse YAML string
 data = yaml.safe_load("""
 name: John Doe
 age: 30
@@ -57,23 +49,30 @@ print(data["age"])   # 30
 print(data["tags"])  # ["python", "yaml"]
 ```
 
-### yaml.load(yaml_string)
+### `load(yaml_string)`
 
-Alias for `safe_load()`. Both functions are safe and identical in Scriptling.
-
-**Note:** In PyYAML, `load()` is deprecated in favor of `safe_load()`. Scriptling provides both for compatibility, but they behave identically.
-
-### yaml.safe_dump(obj)
-
-Convert a Scriptling object to a YAML formatted string.
+Alias for `safe_load()`. In PyYAML, `load()` is deprecated in favor of `safe_load()` because it can execute arbitrary Python objects; in Scriptling both functions are identical and safe, since there is no equivalent unsafe loader.
 
 **Parameters:**
+- `yaml_string` (`str`): YAML-formatted string to parse.
 
-- `obj`: Scriptling object to convert (dict, list, string, number, boolean, or None)
+**Returns:** `dict`, `list`, `str`, `int`, `float`, `bool`, or `None`
 
-**Returns:** YAML formatted string
+```python
+import yaml
 
-**Example:**
+data = yaml.load("name: John\nage: 30")
+print(data["name"])
+```
+
+### `safe_dump(obj)`
+
+Converts a Scriptling object to a YAML-formatted string.
+
+**Parameters:**
+- `obj` (`dict`, `list`, `str`, `int`, `float`, `bool`, or `None`): Value to serialize.
+
+**Returns:** `str`: the YAML-formatted output.
 
 ```python
 import yaml
@@ -82,12 +81,11 @@ data = {
     "name": "Jane Smith",
     "age": 25,
     "skills": ["Go", "Python", "JavaScript"],
-    "active": true
+    "active": True
 }
 
 yaml_str = yaml.safe_dump(data)
 print(yaml_str)
-# Output:
 # active: true
 # age: 25
 # name: Jane Smith
@@ -97,16 +95,26 @@ print(yaml_str)
 # - JavaScript
 ```
 
-### yaml.dump(obj)
+### `dump(obj)`
 
 Alias for `safe_dump()`. Both functions are identical in Scriptling.
+
+**Parameters:**
+- `obj` (`dict`, `list`, `str`, `int`, `float`, `bool`, or `None`): Value to serialize.
+
+**Returns:** `str`: the YAML-formatted output.
+
+```python
+import yaml
+
+yaml_str = yaml.dump({"name": "John", "age": 30})
+```
 
 ## Complete Example
 
 ```python
 import yaml
 
-# Parse YAML configuration
 config_yaml = """
 database:
   host: localhost
@@ -125,55 +133,38 @@ debug: false
 
 config = yaml.safe_load(config_yaml)
 
-# Access parsed data
 print("Database host:", config["database"]["host"])
-print("Database port:", config["database"]["port"])
 print("Features:", config["features"])
-print("Debug mode:", config["debug"])
 
-# Modify and generate YAML
-config["debug"] = true
+config["debug"] = True
 config["features"].append("monitoring")
 
 updated_yaml = yaml.safe_dump(config)
-print("\nUpdated configuration:")
 print(updated_yaml)
 ```
 
 ## Supported Types
 
 | YAML Type | Scriptling Type |
-| --------- | --------------- |
-| String    | String          |
-| Integer   | Integer         |
-| Float     | Float           |
-| Boolean   | Boolean         |
-| Null      | None            |
-| Sequence  | List            |
-| Mapping   | Dict            |
+|-----------|------------------|
+| String | `str` |
+| Integer | `int` |
+| Float | `float` |
+| Boolean | `bool` |
+| Null | `None` |
+| Sequence | `list` |
+| Mapping | `dict` |
 
-## Differences from PyYAML
+## Python Compatibility
 
-**Similarities:**
+- No `load_all()` / `dump_all()` for multiple documents.
+- No file I/O: only string input/output.
+- No custom constructors or representers.
+- No `Loader` / `Dumper` class parameters.
+- No YAML tags or anchors support.
+- `load()` and `safe_load()` are identical (both safe), unlike PyYAML where `load()` without a `Loader` is deprecated and unsafe by default.
 
-- ✅ `safe_load()` and `safe_dump()` functions
-- ✅ `load()` and `dump()` aliases
-- ✅ Handles all standard YAML types
-- ✅ Python-compatible API
+## See Also
 
-**Differences:**
-
-- ❌ No `load_all()` / `dump_all()` for multiple documents
-- ❌ No file I/O (only string input/output)
-- ❌ No custom constructors or representers
-- ❌ No `Loader` / `Dumper` class parameters
-- ❌ No YAML tags or anchors support
-- ⚠️ `load()` and `safe_load()` are identical (both safe)
-
-## Use Cases
-
-- Configuration files
-- API specifications (OpenAPI/Swagger)
-- Data serialization
-- Infrastructure as Code (Kubernetes, Docker Compose)
-- CI/CD pipelines (GitHub Actions, GitLab CI)
+- [json](../json/): parse and generate JSON data.
+- [toml](../toml/): parse and generate TOML configuration data.

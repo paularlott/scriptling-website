@@ -1,52 +1,33 @@
 ---
 title: scriptling.secret
 linkTitle: secret
+description: Resolve secrets through host-configured provider aliases without exposing provider credentials to scripts.
 weight: 1
 ---
 
-Resolve secrets through host-configured provider aliases without exposing provider credentials to scripts.
+The `scriptling.secret` library resolves secrets through host-configured provider aliases. The host application owns the provider configuration (Vault, 1Password, etc.): scripts only ever see a provider `alias`, a provider-specific `path`, and an optional `field`, which keeps provider URLs, access tokens, namespaces, and similar private data out of Scriptling code.
 
-## Overview
-
-The `scriptling.secret` library gives scripts a single provider-agnostic API:
-
-```python
-import scriptling.secret as secret
-
-db_password = secret.get("prod_vault", "secret/data/app", "password")
-api_key = secret.get("op", "Engineering/api-key", "credential")
-```
-
-The host application owns the provider configuration. Scripts only see:
-
-- A provider `alias`
-- A provider-specific `path`
-- An optional `field`
-
-This keeps provider URLs, access tokens, namespaces, and similar private data out of Scriptling code.
-
-## Library Function
+## Available Functions
 
 | Function | Description |
-| -------- | ----------- |
-| `scriptling.secret.get(alias, path, field="")` | Resolve a secret using a host-configured provider alias |
-| `scriptling.secret.list(alias, path)` | List keys/items at a path |
+|----------|-------------|
+| `get(alias, path, field="")` | Resolve a secret using a host-configured provider alias |
+| `list(alias, path)` | List keys/items at a path |
 
 ## Functions
 
-### scriptling.secret.get(alias, path, field="")
+### `get(alias, path, field="")`
 
-Resolve a secret using the provider alias registered by the host.
+Resolves a secret using the provider alias registered by the host.
 
 **Parameters:**
+- `alias` (`str`): Registered provider alias, such as `"prod_vault"` or `"op"`.
+- `path` (`str`): Provider-specific secret path or identifier.
+- `field` (`str`, optional): Field to extract from a multi-value secret. Default: `""`.
 
-- `alias` (string): Registered provider alias such as `prod_vault` or `op`.
-- `path` (string): Provider-specific secret path or identifier.
-- `field` (string, optional): Field to extract from a multi-value secret. Default: `""`.
+**Returns:** `str`: the resolved secret value.
 
-**Returns:** `string` - The resolved secret value.
-
-**Example:**
+**Raises:** `Error`: when the alias is unknown or the underlying provider returns an error.
 
 ```python
 import scriptling.secret as secret
@@ -55,18 +36,17 @@ db_password = secret.get("prod_vault", "secret/data/app", "password")
 api_key = secret.get("op", "Engineering/api-key", "credential")
 ```
 
-### scriptling.secret.list(alias, path)
+### `list(alias, path)`
 
-List keys at a path using the provider alias registered by the host. For Vault, returns the key names at a secret path. For 1Password, returns item titles in a vault.
+Lists keys at a path using the provider alias registered by the host. For Vault, returns the key names at a secret path. For 1Password, returns item titles in a vault.
 
 **Parameters:**
+- `alias` (`str`): Registered provider alias, such as `"prod_vault"` or `"op"`.
+- `path` (`str`): Provider-specific path. For Vault, a secret engine path (e.g. `"secret/data/app"`). For 1Password, a vault name or UUID.
 
-- `alias` (string): Registered provider alias such as `prod_vault` or `op`.
-- `path` (string): Provider-specific path. For Vault, a secret engine path (e.g., `secret/data/app`). For 1Password, a vault name or UUID.
+**Returns:** `list` of `str`: key or item name strings.
 
-**Returns:** `list[string]` - List of key or item name strings.
-
-**Example:**
+**Raises:** `Error`: when the alias is unknown or the underlying provider returns an error.
 
 ```python
 import scriptling.secret as secret
@@ -105,24 +85,16 @@ Run a script with the config file:
 scriptling --secret-config ./secrets.toml script.py
 ```
 
-## Supported CLI Providers
-
-The built-in CLI loader currently supports:
-
-- `vault`
-- `onepassword`
-
-Embedded applications can construct and register providers directly in Go.
+The built-in CLI loader currently supports `vault` and `onepassword`. Embedded applications can construct and register providers directly in Go.
 
 ## Security Considerations
 
-- Provider credentials stay in the host application or CLI config file.
-- Scripts only see aliases and logical secret paths.
-- Secret resolution fails closed when an alias is missing or the provider returns an error.
-- Cache TTL is configured by the host, not by the script.
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+
+`scriptling.secret` grants access to credentials, but the risk is mitigated by design: scripts only ever see a provider alias and a logical path/field name, never the actual secret value's source, provider URL, or access token. The host application owns the real `secretprovider.Registry` passed to `RegisterSecretLibrary(p, registry)`, and resolution fails closed when an alias is missing or the provider errors. See [Secret Provider Security](/docs/security/#secret-provider-security) for the full model.
 
 ## See Also
 
 - [CLI Reference](/docs/cli/) - Command-line flags and runtime behavior
+- [Library Registration](/docs/go-integration/library-registration/) - Registering extended libraries when embedding in Go
 - [Security Guide](/docs/security/) - Security guidance for host-provided libraries
-- [Scriptling Libraries](../) - Other Scriptling-specific libraries

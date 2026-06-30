@@ -262,5 +262,4 @@ benchmark("join()    ", func=lambda: fast_concat(), iterations=100)
 
 ## See Also
 
-- [Built-in Functions](./builtins/) - String and list functions
-- [HTTP Requests & JSON](/docs/tutorials/http-requests-json/) - JSON processing patterns
+- [Built-in Functions](../builtins/) - String and list functions

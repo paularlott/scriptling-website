@@ -64,14 +64,14 @@ print(cfg.get("name"))
 scriptling.plugin.release(cfg)
 ```
 
-Prefer explicit `release()` for deterministic cleanup. Embedded Go applications can call `plugin.ReleaseWithContext(ctx, obj)` when release should follow a request context. The contextless `plugin.Release(obj)` and GC finalizer fallback use `plugin.DefaultReleaseTimeout`. All class instances with `__del__` get a GC finalizer installed automatically — both in-process and plugin objects — as a best-effort fallback.
+Prefer explicit `release()` for deterministic cleanup. Embedded Go applications can call `plugin.ReleaseWithContext(ctx, obj)` when release should follow a request context. The contextless `plugin.Release(obj)` and GC finalizer fallback use `plugin.DefaultReleaseTimeout`. All class instances with `__del__` get a GC finalizer installed automatically: both in-process and plugin objects: as a best-effort fallback.
 
 ## Loading JSON-RPC Peers at Runtime
 
 The `--plugin-dir` flag loads plugins eagerly at startup. For ad-hoc loading
 from inside a script, use `scriptling.plugin.load` and `unload`. These can
 spawn executable peers over stdio or connect to HTTP(S) JSON-RPC endpoints.
-They are always available — even without `--plugin-dir` — in run, server, and
+They are always available: even without `--plugin-dir`: in run, server, and
 `--json-rpc` modes.
 
 `load` takes the library `name` first and the executable path or HTTP endpoint
@@ -134,7 +134,7 @@ Callback arguments are not supported in `batch_call`.
 
 ### Passing command-line arguments
 
-Use the `args` keyword to pass command-line arguments to the executable — for
+Use the `args` keyword to pass command-line arguments to the executable: for
 example when loading `scriptling` itself in `--json-rpc` mode:
 
 ```python
@@ -196,7 +196,7 @@ callbacks back to the client. Use stdio plugins when host callbacks or
   on the second call).
 - Loading an already-loaded path or URL under a **different** name raises an error.
 - Loading a **new** path or URL under a name already in use raises an error. The
-  name must not collide with any existing plugin library — including ones
+  name must not collide with any existing plugin library: including ones
   discovered via `--plugin-dir`.
 - `unload(name)` sends a best-effort shutdown, closes the process, removes the
   client, and removes any dynamic `plugin.*` proxy registered for that peer.

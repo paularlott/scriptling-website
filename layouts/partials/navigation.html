@@ -62,7 +62,7 @@
   {{- $sections := .sections -}}
   {{- $mobile := .mobile -}}
   {{- $currentSection := .currentSection -}}
-  {{- $maxDepth := 4 -}}
+  {{- $maxDepth := 5 -}}
   {{- if $sections -}}
     <ul class="{{ if $mobile }}space-y-0{{ else }}space-y-1{{ end }}">
       {{- range (where $sections "Params.nav-skip" "ne" true) -}}

@@ -176,7 +176,7 @@ The `schema` object:
 
 If the plugin returns any other protocol version, the host refuses to load it and records a manager warning. Breaking protocol changes require a new protocol version and older hosts will reject the plugin during handshake.
 
-When `source` is empty or absent the host auto-generates an RPC proxy. When `source` is provided the host uses it directly — either as a wrapper around RPC calls or as pure host-side Scriptling code.
+When `source` is empty or absent the host auto-generates an RPC proxy. When `source` is provided the host uses it directly: either as a wrapper around RPC calls or as pure host-side Scriptling code.
 
 Class `properties` are auto-generated as Scriptling @property descriptors. `settable: true` means the host also generates a setter. Getter-only properties are read-only from Scriptling.
 
@@ -199,7 +199,7 @@ Class `properties` are auto-generated as Scriptling @property descriptors. `sett
 ### `plugin.shutdown`
 
 **Direction:** Host → Plugin
-**When:** Host is shutting down the plugin process. Sent with a 1-second timeout.
+**When:** Host is shutting down the plugin process. Sent with a 10-second timeout.
 
 **Request params:** None
 **Response result:** `null`
@@ -219,7 +219,7 @@ The plugin should release resources and exit after responding.
 | `args` | [Value] | Yes | Positional arguments |
 | `kwargs` | {string: Value} | Yes | Keyword arguments |
 
-**Response result:** A single `Value` — the function's return value.
+**Response result:** A single `Value`: the function's return value.
 
 Example:
 
@@ -243,7 +243,7 @@ Callback calls are ordinary JSON-RPC requests sent over the same stdio stream wh
 | `args` | [Value] | Yes | Positional callback arguments |
 | `kwargs` | {string: Value} | Yes | Keyword callback arguments |
 
-**Response result:** A single `Value` — the callback return value.
+**Response result:** A single `Value`: the callback return value.
 
 Example:
 
@@ -318,7 +318,7 @@ The host forwards the record to the plugin manager logger if one is configured. 
 | `args` | [Value] | Yes | Positional arguments |
 | `kwargs` | {string: Value} | Yes | Keyword arguments |
 
-**Response result:** A single `Value` — the method return value.
+**Response result:** A single `Value`: the method return value.
 
 Class properties also use `object.call_method`. A getter call sends the property name with no `args`; a setter call sends the property name with one positional argument containing the new value. Read-only properties return a JSON-RPC error when called as a setter.
 
@@ -335,7 +335,7 @@ Class properties also use `object.call_method`. A getter call sends the property
 
 **Response result:** `null`
 
-The plugin removes the instance and calls `__del__` if defined. Destroy is idempotent — destroying an already-destroyed ID succeeds silently.
+The plugin removes the instance and calls `__del__` if defined. Destroy is idempotent: destroying an already-destroyed ID succeeds silently.
 
 ## Lifecycle
 
@@ -351,7 +351,7 @@ they arrive.
 ## Skipping the handshake
 
 Executables loaded via `scriptling.plugin.load(name, path)` (without
-`scriptling=True`) skip the plugin handshake — no `scriptling.handshake`
+`scriptling=True`) skip the plugin handshake: no `scriptling.handshake`
 exchange and no schema/version metadata collected. The host still reports
 `transport` as `"json"` because raw peers use the same JSON-RPC-over-stdio
 codec. In this raw JSON-RPC mode,

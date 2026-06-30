@@ -114,7 +114,7 @@ numbers.extend([7, 8]) # Add multiple
 
 ## Dictionary
 
-Key-value pairs with string keys:
+Key-value pairs. Any hashable type can be used as a key: integers, floats, booleans, strings, `None`, tuples of hashable elements, and class instances that define `__hash__`.
 
 ```python
 person = {"name": "Alice", "age": 30}
@@ -140,7 +140,7 @@ items(person)     # [["name", "Alice"], ["age", 31], ...]
 
 ## Set
 
-Unordered collections of unique elements. Only **hashable** types can be stored in a set: integers, floats, booleans, strings, `None`, and tuples of hashable elements. Attempting to add a list, dict, set, or instance raises `TypeError`.
+Unordered collections of unique elements. Only **hashable** types can be stored in a set: integers, floats, booleans, strings, `None`, tuples of hashable elements, and class instances that define `__hash__`. Attempting to add a list, dict, set, or an instance without `__hash__` raises `TypeError`.
 
 ```python
 numbers = set([1, 2, 3])
@@ -189,7 +189,7 @@ coords = (10, 20)
 nested = ((1, 2), (3, 4))
 empty  = ()
 
-# Single-element tuple — trailing comma is required
+# Single-element tuple: trailing comma is required
 # Without it, parentheses are just grouping, not a tuple
 single = (42,)   # tuple of length 1
 not_tuple = (42) # just the integer 42
@@ -198,7 +198,7 @@ not_tuple = (42) # just the integer 42
 x = coords[0]  # 10
 y = coords[1]  # 20
 
-# Cannot modify — tuples are immutable
+# Cannot modify: tuples are immutable
 # coords[0] = 5  # Error!
 
 # Slicing returns a tuple
@@ -208,9 +208,9 @@ coords[0:1]  # (10,)
 x, y = coords
 a, b, c = (1, 2, 3)
 
-# Implicit packing — parentheses are optional
+# Implicit packing: parentheses are optional
 t = 1, 2, 3      # (1, 2, 3)
-s = 42,          # (42,)  — trailing comma makes it a tuple
+s = 42,          # (42,) : trailing comma makes it a tuple
 
 # Multiple return values use implicit packing
 def min_max(lst):
@@ -335,7 +335,7 @@ type("hello")   # "STRING"
 type([1, 2])    # "LIST"
 type({"a": 1})  # "DICT"
 type(True)      # "BOOLEAN"
-type(None)      # "NONE"
+type(None)      # "NULL"
 type((1, 2))    # "TUPLE"
 type(math.array([1.0]))  # "FLOAT_ARRAY"
 
@@ -387,6 +387,6 @@ set([1, 2, 2, 3])  # {1, 2, 3}
 
 ## See Also
 
-- [Operators](./operators/) - Operations on different types
-- [Built-in Functions](./builtins/) - Type conversion and checking functions
-- [Slicing](./slicing/) - Indexing and slicing operations
+- [Operators](../operators/) - Operations on different types
+- [Built-in Functions](../builtins/) - Type conversion and checking functions
+- [Slicing](../slicing/) - Indexing and slicing operations

@@ -1,46 +1,38 @@
 ---
 title: toml
+description: Parse and generate TOML (Tom's Obvious Minimal Language) data.
 weight: 1
 
 aliases:
   - /reference/libraries/extlib/toml/
   - /reference/libraries/toml/
-requires_registration: true
 ---
 
-Parse and generate TOML (Tom's Obvious Minimal Language) data.
-
-## Import
-
-```python
-import toml
-```
+The `toml` library parses TOML strings into Scriptling objects and serializes Scriptling objects back to TOML strings. Commonly used for configuration files such as `pyproject.toml` or `Cargo.toml`.
 
 ## Available Functions
 
-| Function             | Description                            |
-| -------------------- | -------------------------------------- |
-| `loads(toml_string)` | Parse TOML string to Scriptling object |
-| `dumps(obj)`         | Convert object to TOML string          |
+| Function | Description |
+|----------|-------------|
+| `loads(toml_string)` | Parse a TOML string into a Scriptling object. |
+| `dumps(obj)` | Convert a Scriptling object to a TOML string. |
 
 ## Functions
 
-### toml.loads(toml_string)
+### `loads(toml_string)`
 
-Parse a TOML string and return the corresponding Scriptling object.
+Parses a TOML string and returns the corresponding Scriptling object.
 
 **Parameters:**
+- `toml_string` (`str`): TOML-formatted string to parse.
 
-- `toml_string` (string): TOML formatted string to parse
+**Returns:** `dict`, `list`, `str`, `int`, `float`, `bool`, or `None`: depending on the parsed TOML value. Datetimes are returned as ISO-formatted strings.
 
-**Returns:** Parsed data as Scriptling object (dict, list, string, number, boolean, or None)
-
-**Example:**
+**Raises:** `Error`: if `toml_string` is not valid TOML.
 
 ```python
 import toml
 
-# Parse TOML string
 data = toml.loads("""
 [database]
 host = "localhost"
@@ -57,17 +49,14 @@ print(data["database"]["port"])  # 5432
 print(data["servers"]["alpha"])  # 10.0.0.1
 ```
 
-### toml.dumps(obj)
+### `dumps(obj)`
 
-Convert a Scriptling object to a TOML formatted string.
+Converts a Scriptling object to a TOML-formatted string.
 
 **Parameters:**
+- `obj` (`dict`, `list`, `str`, `int`, `float`, `bool`, or `None`): Value to serialize.
 
-- `obj`: Scriptling object to convert (dict, list, string, number, boolean, or None)
-
-**Returns:** TOML formatted string
-
-**Example:**
+**Returns:** `str`: the TOML-formatted output.
 
 ```python
 import toml
@@ -83,14 +72,12 @@ data = {
 
 toml_str = toml.dumps(data)
 print(toml_str)
-# Output:
 # title = "My App"
+# features = ["auth", "logging", "api"]
 #
 # [database]
 # host = "localhost"
 # port = 5432
-#
-# features = ["auth", "logging", "api"]
 ```
 
 ## Complete Example
@@ -98,7 +85,6 @@ print(toml_str)
 ```python
 import toml
 
-# Parse TOML configuration
 config_toml = """
 [server]
 host = "0.0.0.0"
@@ -109,10 +95,6 @@ workers = 4
 url = "postgres://localhost/mydb"
 pool_size = 10
 timeout = 30.5
-
-[features]
-debug = true
-caching = false
 
 [[servers]]
 name = "web1"
@@ -125,70 +107,40 @@ ip = "10.0.0.2"
 
 config = toml.loads(config_toml)
 
-# Access parsed data
 print("Server host:", config["server"]["host"])
-print("Server port:", config["server"]["port"])
 print("Database URL:", config["database"]["url"])
-print("Debug mode:", config["features"]["debug"])
 
-# Access array of tables
 for server in config["servers"]:
     print(f"Server {server['name']}: {server['ip']}")
 
-# Modify and generate TOML
 config["server"]["workers"] = 8
-config["features"]["caching"] = true
-
 updated_toml = toml.dumps(config)
-print("\nUpdated configuration:")
 print(updated_toml)
 ```
 
 ## Supported Types
 
-| TOML Type    | Scriptling Type     |
-| ------------ | ------------------- |
-| String       | String              |
-| Integer      | Integer             |
-| Float        | Float               |
-| Boolean      | Boolean             |
-| Array        | List                |
-| Table        | Dict                |
-| Inline Table | Dict                |
-| Datetime     | String (ISO format) |
+| TOML Type | Scriptling Type |
+|-----------|------------------|
+| String | `str` |
+| Integer | `int` |
+| Float | `float` |
+| Boolean | `bool` |
+| Array | `list` |
+| Table | `dict` |
+| Inline Table | `dict` |
+| Datetime | `str` (ISO format) |
 
-## Differences from Python's tomllib
+## Python Compatibility
 
-**Similarities:**
+Compared to Python's `tomllib`/`tomli-w`:
 
-- `loads()` function for parsing TOML strings
-- Handles all standard TOML 1.0 types
-- Python-compatible API
+- No `load()` / `dump()` for file I/O: only string input/output.
+- `dumps()` is provided for writing TOML; Python's `tomllib` is read-only (the `tomli-w` package adds `dumps()` separately, which this follows the convention of).
+- No `TOMLDecodeError` exception class: parse errors raise a generic Scriptling error.
+- Datetime values are returned as ISO-formatted strings rather than datetime objects.
 
-**Differences:**
+## See Also
 
-- No `load()` for file reading (only string input)
-- `dumps()` for writing TOML (Python's tomllib is read-only)
-- No file I/O (only string input/output)
-- Datetime values returned as strings rather than datetime objects
-
-## Differences from tomli/tomli-w
-
-**Similarities:**
-
-- `loads()` for parsing
-- `dumps()` for writing
-
-**Differences:**
-
-- No `load()` / `dump()` for file operations
-- No `TOMLDecodeError` exception class
-- Datetime values as strings instead of datetime objects
-
-## Use Cases
-
-- Configuration files (pyproject.toml, Cargo.toml)
-- Build system configuration
-- Package metadata
-- Application settings
-- Infrastructure configuration
+- [json](../json/): parse and generate JSON data.
+- [yaml](../yaml/): parse and generate YAML data.

@@ -19,9 +19,9 @@ Scriptling is a minimal, sandboxed interpreter for Python-like scripting designe
 
 Step-by-step guides for real-world scenarios:
 
-- [Fetching and Processing API Data](tutorials/api-data-fetching/) — HTTP requests, JSON processing, and file output
-- [Embedding a Rules Engine](tutorials/embedding-rules-engine/) — Go integration with custom functions
-- [Building an MCP Tool Server](tutorials/mcp-tool-server/) — Custom tools for AI assistants
+- [Fetching and Processing API Data](tutorials/api-data-fetching/): HTTP requests, JSON processing, and file output
+- [Embedding a Rules Engine](tutorials/embedding-rules-engine/): Go integration with custom functions
+- [Building an MCP Tool Server](tutorials/mcp-tool-server/): Custom tools for AI assistants
 
 ## Reference
 

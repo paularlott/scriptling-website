@@ -254,11 +254,11 @@ Wrapped constructor injects config into context
     ↓
 Constructor retrieves config via InstanceDataFromContext(ctx)
     ↓
-Constructor stores config in instance.Field("__config__")
+Constructor stores config in instance.NativeData
     ↓
 User calls method (e.g., p.exists())
     ↓
-Method retrieves config from self.Field("__config__")
+Method retrieves config from self.NativeData
     ↓
 Method uses config
 ```
@@ -295,19 +295,26 @@ var PathClass = &object.Class{
         "exists": &object.Builtin{
             Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
                 self := args[0].(*object.Instance)
-                config := self.Field("__config__").(FSConfig)
-                pathStr := self.Field("__path__").(*object.String).StringValue()
+                data, ok := self.NativeData.(*pathData)
+                if !ok {
+                    return &object.Error{Message: "invalid Path instance"}
+                }
 
-                if !config.IsPathAllowed(pathStr) {
+                if !data.config.IsPathAllowed(data.path) {
                     return &object.Error{Message: "access denied"}
                 }
 
-                _, err := os.Stat(pathStr)
+                _, err := os.Stat(data.path)
                 return object.NewBoolean(err == nil)
             },
             HelpText: "exists() - Check if path exists",
         },
     },
+}
+
+type pathData struct {
+    config FSConfig
+    path   string
 }
 
 func createPath(config FSConfig, ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
@@ -324,11 +331,10 @@ func createPath(config FSConfig, ctx context.Context, kwargs object.Kwargs, args
         return &object.Error{Message: "access denied"}
     }
 
-    instance := object.NewInstance(PathClass)
-    instance.SetField("__config__", config)
-    instance.SetField("__path__", object.NewString(pathStr))
-
-    return instance
+    return object.NewInstanceWithData(PathClass, nil, &pathData{
+        config: config,
+        path:   pathStr,
+    })
 }
 
 func createPathlibLibrary() *object.Library {
@@ -379,7 +385,7 @@ Each environment carries a per-environment interpreter lock (GIL) that serialize
 - Functions can be called concurrently without data crossover
 
 ```go
-// Safe to run concurrently — separate environments (parallel, isolated)...
+// Safe to run concurrently: separate environments (parallel, isolated)...
 go func() {
     interpreter1.Eval("mylib.do_something()")
 }()
@@ -410,11 +416,9 @@ func getConfig(ctx context.Context) (MyConfig, error) {
 }
 ```
 
-### Consistent Field Names
+### Store Go-Only State in NativeData
 
-- `__config__` - for instance configuration
-- `__data__` - for instance data
-- Regular names for user-visible fields
+Keep Go-only state (config, parsed paths, handles) on `instance.NativeData` rather than as script-visible fields. Regular names are for fields the script can read and write.
 
 ### Validate in Constructor
 
@@ -451,7 +455,11 @@ When a method needs to create a new instance of the same class, retrieve config 
 ```go
 func pathJoinpath(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
     self := args[0].(*object.Instance)
-    config := self.Field("__config__").(FSConfig)
+    data, ok := self.NativeData.(*pathData)
+    if !ok {
+        return &object.Error{Message: "invalid Path instance"}
+    }
+    config := data.config
 
     // ... compute newPath ...
 
@@ -482,10 +490,10 @@ interpreter.Import("mylib")
 interpreter.Eval("mylib.func()")
 ```
 
-For classes, add constructor that stores config in instance fields via `SetField`, and methods retrieve it via `self.Field("__config__")`.
+For classes, add a constructor that stores config on `instance.NativeData`, and methods retrieve it via `self.NativeData.(*yourType)`.
 
 ## See Also
 
-- [Builder Libraries](libraries/) - Basic library building
-- [Native Classes](native-classes/) - Native class creation
-- [Builder Classes](classes/) - Builder class creation
+- [Builder Libraries](../builder-libraries/) - Basic library building
+- [Native Classes](../native-classes/) - Native class creation
+- [Builder Classes](../builder-classes/) - Builder class creation

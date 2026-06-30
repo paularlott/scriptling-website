@@ -245,7 +245,7 @@ If you omit the help text, basic help will be auto-generated:
 ```go
 p.RegisterFunc("my_func", func(...) object.Object {
     // Auto-generates: "my_func(...) - User-defined function"
-    return object.NULL
+    return &object.Null{}
 })
 ```
 
@@ -273,8 +273,8 @@ return object.NewString("hello")
 
 ```go
 return object.NewBoolean(true)
-return object.True
-return object.False
+return object.NewBoolean(true)
+return object.NewBoolean(false)
 ```
 
 ### Lists
@@ -298,7 +298,7 @@ return object.NewStringDict(map[string]object.Object{
 ### None/Null
 
 ```go
-return object.None
+return &object.Null{}
 ```
 
 ### Errors
@@ -422,6 +422,6 @@ p.RegisterFunc("connect", func(ctx context.Context, kwargs object.Kwargs, args .
 
 ## See Also
 
-- [Native Libraries](libraries/) - Create libraries with functions and constants
-- [Native Classes](classes/) - Define custom classes
-- [Builder Functions](builder-functions/) - Type-safe function builder
+- [Native Libraries](../native-libraries/) - Create libraries with functions and constants
+- [Native Classes](../native-classes/) - Define custom classes
+- [Builder Functions](../builder-functions/) - Type-safe function builder

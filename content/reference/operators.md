@@ -225,24 +225,26 @@ x not in y   # True if x is not contained in y
 
 ## Operator Precedence
 
-From highest to lowest:
+From highest to lowest. Parentheses `()` override precedence and group explicitly.
 
 | Precedence | Operators |
 |------------|-----------|
-| 1 (highest) | Parentheses `()` |
-| 2 | Function calls, indexing `func()`, `list[0]` |
-| 3 | Exponentiation `**` |
-| 4 | Unary `-`, `not`, `~` |
-| 5 | `*`, `/`, `%` |
-| 6 | `+`, `-` |
-| 7 | `<<`, `>>` (bitwise shift) |
-| 8 | `&` (bitwise AND) |
-| 9 | `^` (bitwise XOR) |
-| 10 | `\|` (bitwise OR) |
-| 11 | `<`, `>`, `<=`, `>=` |
-| 12 | `==`, `!=`, `is`, `in` |
-| 13 | `and` |
-| 14 (lowest) | `or` |
+| 1 (highest) | Calls, indexing, attribute access: `f()`, `x[0]`, `obj.attr` |
+| 2 | Unary: `-x`, `not x`, `~x` |
+| 3 | Exponentiation: `**` |
+| 4 | Multiplicative: `*`, `/`, `//`, `%` |
+| 5 | Additive: `+`, `-` |
+| 6 | Shifts: `<<`, `>>` |
+| 7 | Comparisons: `<`, `>`, `<=`, `>=` |
+| 8 | Equality, membership, identity: `==`, `!=`, `is`, `in` |
+| 9 | `and` |
+| 10 | Bitwise AND: `&` |
+| 11 | Bitwise XOR: `^` |
+| 12 | Bitwise OR: `\|` |
+| 13 | `or` |
+| 14 (lowest) | Conditional expression: `x if cond else y` |
+
+> **Note:** Scriptling's precedence differs from Python in two places. Unary `not` binds tighter than `**` (so `-2 ** 2` evaluates to `4`, not `-4`), and `and`/`or` bind tighter than the bitwise operators `&`, `^`, `|` (so `a & b and c` parses as `a & (b and c)`). Add parentheses when porting Python expressions that mix these.
 
 ### Examples
 
@@ -252,6 +254,9 @@ From highest to lowest:
 
 # Multiplication before addition
 2 + 3 * 4     # 2 + 12 = 14
+
+# Unary binds tighter than exponentiation (differs from Python)
+-2 ** 2       # (-2) ** 2 = 4
 
 # Use parentheses for clarity
 (2 + 3) * 4   # 20
@@ -265,5 +270,5 @@ result = 2 ** 3 + 4 * 5 - 6 / 2
 
 ## See Also
 
-- [Data Types](./types/) - Available data types
-- [Control Flow](./control-flow/) - Using operators in conditions
+- [Data Types](../types/) - Available data types
+- [Control Flow](../control-flow/) - Using operators in conditions

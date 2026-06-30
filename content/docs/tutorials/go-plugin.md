@@ -87,7 +87,7 @@ Use `scriptling.plugin.release(cfg)` for deterministic cleanup. A GC finalizer i
 
 ## Class Styles
 
-The example above uses a **typed receiver** — the constructor returns a Go struct pointer and methods receive it directly. You can also use `*object.Instance` for manual field management:
+The example above uses a **typed receiver**: the constructor returns a Go struct pointer and methods receive it directly. You can also use `*object.Instance` for manual field management:
 
 ### Typed Receiver (recommended)
 
@@ -109,7 +109,7 @@ cb := object.NewClassBuilder("Counter").
     })
 ```
 
-The constructor returns a pointer type. All methods whose first parameter matches that type receive the unwrapped struct directly — no manual field boxing.
+The constructor returns a pointer type. All methods whose first parameter matches that type receive the unwrapped struct directly: no manual field boxing.
 
 ### Instance Fields
 

@@ -1,168 +1,308 @@
 ---
 title: scriptling.runtime.http
 linkTitle: runtime.http
+description: Register HTTP routes, middleware, and response helpers for a Scriptling-backed server.
 weight: 1
 ---
 
-HTTP server route registration and response helpers.
+## Overview
+
+The `scriptling.runtime.http` library lets a setup script register routes, middleware, and static file serving, then build JSON/HTML/text/redirect responses from handlers. Reach for it when you want a Scriptling script to act as (or contribute routes to) an HTTP server.
 
 ## Available Functions
 
-| Function                           | Description                         |
-| ---------------------------------- | ----------------------------------- |
-| `get(path, handler)`               | Register a GET route                |
-| `post(path, handler)`              | Register a POST route               |
-| `put(path, handler)`               | Register a PUT route                |
-| `delete(path, handler)`            | Register a DELETE route             |
-| `route(path, handler, methods=[])` | Register route for multiple methods |
-| `middleware(handler)`              | Register global middleware          |
-| `not_found(handler)`               | Register custom 404 handler         |
-| `static(path, directory)`          | Register static file serving        |
-| `json(status_code, data)`          | Create JSON response                |
-| `html(status_code, content)`       | Create HTML response                |
-| `text(status_code, content)`       | Create text response                |
-| `redirect(location, status=302)`   | Create redirect response            |
+| Function | Description |
+|----------|-------------|
+| `get(path, handler)` | Register a GET route |
+| `post(path, handler)` | Register a POST route |
+| `put(path, handler)` | Register a PUT route |
+| `delete(path, handler)` | Register a DELETE route |
+| `route(path, handler, methods=["GET", "POST", "PUT", "DELETE"])` | Register a route for multiple methods |
+| `middleware(handler)` | Register global middleware |
+| `not_found(handler)` | Register a custom 404 handler |
+| `static(path, directory)` | Register static file serving |
+| `websocket(path, handler)` | Register a WebSocket route |
+| `json(status_code, data)` | Create a JSON response |
+| `html(status_code, content)` | Create an HTML response |
+| `text(status_code, content)` | Create a plain text response |
+| `redirect(location, status=302)` | Create a redirect response |
+| `parse_query(query_string)` | Parse a URL query string |
 
-## Route Registration
+## Functions
 
-### scriptling.runtime.http.get(path, handler)
+### `get(path, handler)`
 
-Register a GET route.
-
-**Parameters:**
-
-- `path` (string): URL path (e.g., "/api/users")
-- `handler` (string): Handler function as "library.function"
-
-### scriptling.runtime.http.post(path, handler)
-
-Register a POST route.
-
-### scriptling.runtime.http.put(path, handler)
-
-Register a PUT route.
-
-### scriptling.runtime.http.delete(path, handler)
-
-Register a DELETE route.
-
-### scriptling.runtime.http.route(path, handler, methods=[])
-
-Register a route for multiple HTTP methods.
+Registers a GET route.
 
 **Parameters:**
+- `path` (`str`): URL path (e.g. `"/api/users"`).
+- `handler` (`str`): Handler function as `"library.function"`.
 
-- `path` (string): URL path
-- `handler` (string): Handler function
-- `methods` (list, optional): HTTP methods (default: all)
+**Returns:** `None`
 
-### scriptling.runtime.http.not_found(handler)
+```python
+import scriptling.runtime as runtime
 
-Register a custom 404 Not Found handler.
+runtime.http.get("/users", "handlers.list_users")
+```
 
-**Parameters:**
+### `post(path, handler)`
 
-- `handler` (string): Handler function as "library.function"
-
-The handler receives the request object and should return a response. It is called when:
-- No route matches the request path, or
-- The `--web-root` directory is configured but the requested file is not found
-
-### scriptling.runtime.http.middleware(handler)
-
-Register global middleware.
+Registers a POST route.
 
 **Parameters:**
+- `path` (`str`): URL path.
+- `handler` (`str`): Handler function as `"library.function"`.
 
-- `handler` (string): Middleware function
+**Returns:** `None`
 
-The middleware receives the request and should return:
+```python
+import scriptling.runtime as runtime
 
-- `None` to continue to the handler
-- A response dict to short-circuit
+runtime.http.post("/users", "handlers.create_user")
+```
 
-### scriptling.runtime.http.static(path, directory)
+### `put(path, handler)`
 
-Register static file serving.
-
-**Parameters:**
-
-- `path` (string): URL path prefix (e.g., "/assets")
-- `directory` (string): Local directory to serve
-
-## Response Helpers
-
-### scriptling.runtime.http.json(status_code, data)
-
-Create a JSON response.
+Registers a PUT route.
 
 **Parameters:**
+- `path` (`str`): URL path.
+- `handler` (`str`): Handler function as `"library.function"`.
 
-- `status_code` (int): HTTP status code
-- `data`: Data to serialize as JSON
+**Returns:** `None`
 
-**Returns:** Response dict
+```python
+import scriptling.runtime as runtime
 
-### scriptling.runtime.http.html(status_code, content)
+runtime.http.put("/users/:id", "handlers.update_user")
+```
 
-Create an HTML response.
+### `delete(path, handler)`
 
-**Parameters:**
-
-- `status_code` (int): HTTP status code
-- `content` (string): HTML content
-
-**Returns:** Response dict
-
-### scriptling.runtime.http.text(status_code, content)
-
-Create a plain text response.
+Registers a DELETE route.
 
 **Parameters:**
+- `path` (`str`): URL path.
+- `handler` (`str`): Handler function as `"library.function"`.
 
-- `status_code` (int): HTTP status code
-- `content` (string): Text content
+**Returns:** `None`
 
-**Returns:** Response dict
+```python
+import scriptling.runtime as runtime
 
-### scriptling.runtime.http.redirect(location, status=302)
+runtime.http.delete("/users/:id", "handlers.delete_user")
+```
 
-Create a redirect response.
+### `route(path, handler, methods=["GET", "POST", "PUT", "DELETE"])`
 
-**Parameters:**
-
-- `location` (string): URL to redirect to
-- `status` (int, optional): HTTP status code (default: 302)
-
-**Returns:** Response dict
-
-### scriptling.runtime.http.parse_query(query_string)
-
-Parse a URL query string.
+Registers a route for multiple HTTP methods.
 
 **Parameters:**
+- `path` (`str`): URL path.
+- `handler` (`str`): Handler function as `"library.function"`.
+- `methods` (`list`, optional): HTTP methods to match. Default: `["GET", "POST", "PUT", "DELETE"]` (all of the standard methods).
 
-- `query_string` (string): Query string to parse
+**Returns:** `None`
 
-**Returns:** Dict of key-value pairs
+```python
+import scriptling.runtime as runtime
+
+runtime.http.route("/users/:id", "handlers.user_resource", methods=["GET", "PUT", "DELETE"])
+```
+
+### `middleware(handler)`
+
+Registers global middleware that runs before every route handler. The middleware receives the request and should return `None` to continue to the handler, or a response dict to short-circuit the request.
+
+**Parameters:**
+- `handler` (`str`): Middleware function as `"library.function"`.
+
+**Returns:** `None`
+
+```python
+import scriptling.runtime as runtime
+
+def auth(request):
+    if "authorization" not in request.headers:
+        return runtime.http.json(401, {"error": "Unauthorized"})
+    return None  # Continue to handler
+
+runtime.http.middleware("handlers.auth")
+```
+
+### `not_found(handler)`
+
+Registers a custom 404 Not Found handler. The handler receives the request object and should return a response. It is called when no route matches the request path, or when the `--web-root` directory is configured but the requested file is not found.
+
+**Parameters:**
+- `handler` (`str`): Handler function as `"library.function"`.
+
+**Returns:** `None`
+
+```python
+import scriptling.runtime as runtime
+
+def not_found(request):
+    return runtime.http.html(404, f"<h1>404 - {request.path} not found</h1>")
+
+runtime.http.not_found("handlers.not_found")
+```
+
+### `static(path, directory)`
+
+Registers static file serving under a URL path prefix.
+
+**Parameters:**
+- `path` (`str`): URL path prefix (e.g. `"/assets"`).
+- `directory` (`str`): Local directory to serve.
+
+**Returns:** `None`
+
+```python
+import scriptling.runtime as runtime
+
+runtime.http.static("/assets", "./public/assets")
+```
+
+### `websocket(path, handler)`
+
+Registers a WebSocket route. The handler receives a `WebSocketClient` object and runs for the lifetime of the connection: it should loop while `client.connected()` and use `client.receive()` / `client.send()`.
+
+**Parameters:**
+- `path` (`str`): URL path for the WebSocket endpoint (e.g. `"/ws"`).
+- `handler` (`str`): Handler function as a `"library.function"` string.
+
+**Returns:** `None`
+
+```python
+import scriptling.runtime as runtime
+
+runtime.http.websocket("/chat", "handlers.chat_handler")
+
+# In handlers.py:
+def chat_handler(client):
+    client.send("Welcome!")
+    while client.connected():
+        msg = client.receive(timeout=60)
+        if msg:
+            client.send(f"Echo: {msg}")
+```
+
+#### WebSocketClient Object
+
+The object passed to a `websocket()` handler:
+
+| Member | Description |
+|--------|-------------|
+| `connected()` | Returns `True` while the connection is open. |
+| `receive(timeout=30)` | Receives the next message, blocking up to `timeout` seconds. |
+| `send(text)` | Sends a text message. |
+| `send_binary(data)` | Sends a `list` of byte values (0-255) as a binary message. |
+| `close()` | Closes the connection. |
+| `remote_addr` | The client's remote address as a `str`. |
+
+This is the server-side counterpart to the client documented on the [scriptling.net.websocket](/reference/libraries/scriptling/networking/websocket/) page: the two expose the same `connected()`/`receive()`/`send()`/`send_binary()`/`close()`/`remote_addr` surface. Use `scriptling.net.websocket.is_text()` / `is_binary()` to inspect a received message's type.
+
+### `json(status_code, data)`
+
+Creates a JSON response.
+
+**Parameters:**
+- `status_code` (`int`): HTTP status code.
+- `data` (any): Data to serialize as JSON.
+
+**Returns:** `dict`: response dict compatible with the server.
+
+```python
+import scriptling.runtime as runtime
+
+def list_users(request):
+    users = runtime.kv.default.get("users", default=[])
+    return runtime.http.json(200, {"users": users})
+```
+
+### `html(status_code, content)`
+
+Creates an HTML response.
+
+**Parameters:**
+- `status_code` (`int`): HTTP status code.
+- `content` (`str`): HTML content.
+
+**Returns:** `dict`: response dict compatible with the server.
+
+```python
+import scriptling.runtime as runtime
+
+runtime.http.html(200, "<h1>Hello</h1>")
+```
+
+### `text(status_code, content)`
+
+Creates a plain text response.
+
+**Parameters:**
+- `status_code` (`int`): HTTP status code.
+- `content` (`str`): Text content.
+
+**Returns:** `dict`: response dict compatible with the server.
+
+```python
+import scriptling.runtime as runtime
+
+runtime.http.text(200, "pong")
+```
+
+### `redirect(location, status=302)`
+
+Creates a redirect response.
+
+**Parameters:**
+- `location` (`str`): URL to redirect to.
+- `status` (`int`, optional): HTTP status code. Default: `302`.
+
+**Returns:** `dict`: response dict compatible with the server.
+
+```python
+import scriptling.runtime as runtime
+
+runtime.http.redirect("/login")
+```
+
+### `parse_query(query_string)`
+
+Parses a URL query string.
+
+**Parameters:**
+- `query_string` (`str`): Query string to parse.
+
+**Returns:** `dict`: key-value pairs.
+
+```python
+import scriptling.runtime as runtime
+
+params = runtime.http.parse_query("page=2&limit=10")
+print(params["page"])  # "2"
+```
 
 ## Request Object
 
 Handlers receive a Request object with these fields:
 
-- `method` (string): HTTP method
-- `path` (string): Request path
-- `body` (string): Request body
-- `headers` (dict): Request headers (lowercase keys)
-- `query` (dict): Query parameters
+- `method` (`str`): HTTP method.
+- `path` (`str`): Request path.
+- `body` (`str`): Request body.
+- `headers` (`dict`): Request headers (lowercase keys).
+- `query` (`dict`): Query parameters.
 
 **Methods:**
 
-- `json()`: Parse body as JSON
+- `json()`: parse the body as JSON.
 
 ## Examples
 
-### Basic Routes with 404 Handler
+### Basic routes with a 404 handler
 
 ```python
 # setup.py
@@ -173,8 +313,6 @@ runtime.http.post("/users", "handlers.create_user")
 runtime.http.middleware("handlers.auth")
 runtime.http.not_found("handlers.not_found")
 ```
-
-### Handler with Response
 
 ```python
 # handlers.py
@@ -192,30 +330,17 @@ def create_user(request):
     return runtime.http.json(201, {"user": data})
 ```
 
-### Middleware
+Routes are registered during setup script execution. Use `--web-root <dir>` to serve static files from the CLI; unmatched requests fall through to the `not_found` handler.
 
-```python
-import scriptling.runtime as runtime
+## Security Considerations
 
-def auth(request):
-    if "authorization" not in request.headers:
-        return runtime.http.json(401, {"error": "Unauthorized"})
-    return None  # Continue to handler
-```
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-### Custom 404 Handler
+`scriptling.runtime.http` does not make outbound requests: it registers routes and handlers that turn the embedding process into (or adds to) an HTTP **server**, exposing a network listener. The risk shape is therefore about what gets exposed: every registered route, middleware, and static directory becomes reachable by anyone who can reach the listening address. Review handler logic for authorization, and be deliberate about what `static()` directories you expose. For a full risk breakdown across all libraries, see the [Security Guide](/docs/security/).
 
-```python
-import scriptling.runtime as runtime
+## See Also
 
-def not_found(request):
-    return runtime.http.html(404, f"<h1>404 - {request.path} not found</h1>")
-```
-
-## Notes
-
-- Routes are registered during setup script execution
-- Response helpers return dicts compatible with the server
-- Middleware can short-circuit requests by returning a response
-- The `not_found` handler is called when no route matches or a static asset is not found
-- Use `--web-root <dir>` CLI flag to serve static files; unmatched requests fall through to the `not_found` handler
+- [scriptling.runtime](../runtime/): background tasks, `start_server()`, and the rest of the runtime namespace
+- [scriptling.runtime.jsonrpc](../jsonrpc/): JSON-RPC 2.0 server sharing the same handler model
+- [scriptling.runtime.kv](../kv/): share state across HTTP handlers
+- [Security Guide](/docs/security/)

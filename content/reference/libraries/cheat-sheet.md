@@ -421,5 +421,4 @@ for batch in itertools.batched(items, 100):
 ## See Also
 
 - [Language Guide](/reference/) - Complete language reference
-- [Standard Libraries](stdlib/) - Standard library documentation
-- [Extended Libraries](../extlib/) - Extended library documentation
+- [Libraries](/reference/libraries/) - Standard and extended library reference

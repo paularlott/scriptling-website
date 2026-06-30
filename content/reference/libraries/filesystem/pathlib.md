@@ -1,50 +1,56 @@
 ---
 title: pathlib
+description: Object-oriented filesystem paths, similar to Python's pathlib module.
 weight: 1
-
 aliases:
   - /reference/libraries/extlib/pathlib/
   - /reference/libraries/pathlib/
-requires_registration: true
 ---
 
-The pathlib library provides object-oriented filesystem path operations, similar to Python's pathlib module. It offers a more convenient and readable way to work with file paths compared to string manipulation.
+The `pathlib` library provides object-oriented filesystem path operations, similar to Python's `pathlib` module. It offers a more convenient and readable way to work with file paths than plain string manipulation, and is the recommended way to work with paths in new code.
 
-## Available Properties & Methods
+## Available Functions
 
-| Property/Method    | Description                        |
-| ------------------ | ---------------------------------- |
-| `name`             | Final path component (filename)    |
-| `stem`             | Final component without suffix     |
-| `suffix`           | File extension                     |
-| `parent`           | Parent directory                   |
-| `parts`            | Tuple of path components           |
-| `joinpath(*other)` | Combine with other path components |
-| `exists()`         | Check if path exists               |
-| `is_file()`        | Check if path is a file            |
-| `is_dir()`         | Check if path is a directory       |
-| `mkdir(mode=0o777, parents=False, exist_ok=False)` | Create directory |
-| `chmod(mode)`      | Change file or directory permissions |
-| `rmdir()`          | Remove empty directory             |
-| `unlink(missing_ok=False)` | Remove file or link        |
-| `read_text()`      | Read file contents as string       |
-| `write_text(data)` | Write string to file               |
-| `read_bytes()`     | Read file contents as bytes        |
-| `write_bytes(data)` | Write bytes to file               |
-| `copy(target)`     | Copy file or directory to target   |
-| `rename(target)`   | Rename/move file or directory      |
-| `iterdir()`        | List directory contents as Paths   |
-| `glob(pattern)`    | Match pattern, return list of Paths |
+| Function | Description |
+|----------|-------------|
+| `Path(path)` | Create a new `Path` object. |
+| `name` | Final path component (filename). |
+| `stem` | Final component without its suffix. |
+| `suffix` | File extension of the final component. |
+| `parent` | Parent directory. |
+| `parts` | Tuple of the path's components. |
+| `joinpath(*other)` | Combine with other path components. |
+| `exists()` | Check if the path exists. |
+| `is_file()` | Check if the path is a regular file. |
+| `is_dir()` | Check if the path is a directory. |
+| `mkdir(mode=0o777, parents=False, exist_ok=False)` | Create a directory at this path. |
+| `chmod(mode)` | Change file or directory permissions. |
+| `rmdir()` | Remove an empty directory. |
+| `unlink(missing_ok=False)` | Remove a file or symbolic link. |
+| `read_text()` | Read file contents as a string. |
+| `write_text(data)` | Write a string to a file. |
+| `read_bytes()` | Read file contents as bytes. |
+| `write_bytes(data)` | Write bytes to a file. |
+| `copy(target)` | Copy this file or directory to a target path. |
+| `rename(target)` | Rename/move this file or directory to a target path. |
+| `iterdir()` | List directory contents as `Path` objects. |
+| `glob(pattern)` | Match a pattern, returning a list of `Path` objects. |
 
-## Basic Usage
+## Functions
+
+### `Path(path)`
+
+Create a new `Path` object representing a filesystem path.
+
+**Parameters:**
+- `path` (`str`): The filesystem path.
+
+**Returns:** `Path`: a new `Path` instance.
 
 ```python
 import pathlib
 
-# Create a Path object
 p = pathlib.Path("/home/user/documents/file.txt")
-
-# Access path components
 print(p.name)      # "file.txt"
 print(p.stem)      # "file"
 print(p.suffix)    # ".txt"
@@ -56,6 +62,8 @@ print(p.parent)    # "/home/user/documents"
 ### `name`
 
 The final path component (file or directory name).
+
+**Returns:** `str`: the final component of the path.
 
 ```python
 p = pathlib.Path("/home/user/file.txt")
@@ -69,6 +77,8 @@ print(p2.name)  # "myfolder"
 
 The final path component without its suffix.
 
+**Returns:** `str`: the final component, with the suffix removed.
+
 ```python
 p = pathlib.Path("/home/user/file.txt")
 print(p.stem)  # "file"
@@ -80,6 +90,8 @@ print(p2.stem)  # "README"
 ### `suffix`
 
 The file extension of the final path component.
+
+**Returns:** `str`: the suffix, including the leading `.`, or `""` if there is none.
 
 ```python
 p = pathlib.Path("/home/user/file.txt")
@@ -93,17 +105,18 @@ print(p2.suffix)  # ""
 
 The parent directory of the path.
 
+**Returns:** `str`: the parent directory.
+
 ```python
 p = pathlib.Path("/home/user/file.txt")
 print(p.parent)  # "/home/user"
-
-p2 = pathlib.Path("/home/user/folder/")
-print(p2.parent)  # "/home/user"
 ```
 
 ### `parts`
 
 A tuple of the path's components.
+
+**Returns:** `tuple`: the path components.
 
 ```python
 p = pathlib.Path("/home/user/file.txt")
@@ -115,6 +128,11 @@ print(p.parts)  # ("/", "home", "user", "file.txt")
 ### `joinpath(*other)`
 
 Combine this path with other path components.
+
+**Parameters:**
+- `*other` (`str`): Path components to append.
+
+**Returns:** `Path`: the combined path.
 
 ```python
 p = pathlib.Path("/home/user")
@@ -130,17 +148,19 @@ print(p3)  # "a/b/c"
 
 Check if the path exists.
 
+**Returns:** `bool`: `True` if the path exists, `False` otherwise.
+
 ```python
 p = pathlib.Path("/home/user/file.txt")
 if p.exists():
     print("File exists")
-else:
-    print("File does not exist")
 ```
 
 ### `is_file()`
 
 Check if the path is a regular file.
+
+**Returns:** `bool`: `True` if the path is a regular file, `False` otherwise.
 
 ```python
 p = pathlib.Path("/home/user/file.txt")
@@ -152,6 +172,8 @@ if p.is_file():
 
 Check if the path is a directory.
 
+**Returns:** `bool`: `True` if the path is a directory, `False` otherwise.
+
 ```python
 p = pathlib.Path("/home/user/myfolder")
 if p.is_dir():
@@ -162,7 +184,11 @@ if p.is_dir():
 
 ### `read_text()`
 
-Read the contents of a file as a string.
+Read the contents of the file as a string.
+
+**Returns:** `str`: the file's contents.
+
+**Raises:** `Error`: if the path is outside the allowed paths, or the file cannot be read.
 
 ```python
 p = pathlib.Path("/home/user/file.txt")
@@ -172,7 +198,14 @@ print(content)
 
 ### `write_text(data)`
 
-Write a string to a file.
+Write a string to the file, creating or overwriting it.
+
+**Parameters:**
+- `data` (`str`): Content to write.
+
+**Returns:** `None`
+
+**Raises:** `Error`: if the path is outside the allowed paths.
 
 ```python
 p = pathlib.Path("/home/user/newfile.txt")
@@ -181,7 +214,11 @@ p.write_text("Hello, World!")
 
 ### `read_bytes()`
 
-Read the contents of a file as bytes.
+Read the contents of the file as bytes.
+
+**Returns:** `str`: the file's raw bytes.
+
+**Raises:** `Error`: if the path is outside the allowed paths, or the file cannot be read.
 
 ```python
 p = pathlib.Path("/home/user/data.bin")
@@ -190,7 +227,14 @@ data = p.read_bytes()
 
 ### `write_bytes(data)`
 
-Write bytes to a file.
+Write bytes to the file, creating or overwriting it.
+
+**Parameters:**
+- `data` (`str`): Raw bytes to write.
+
+**Returns:** `None`
+
+**Raises:** `Error`: if the path is outside the allowed paths.
 
 ```python
 p = pathlib.Path("/home/user/data.bin")
@@ -199,7 +243,16 @@ p.write_bytes("raw bytes")
 
 ### `mkdir(mode=0o777, parents=False, exist_ok=False)`
 
-Create a directory.
+Create a directory at this path. The `mode` argument uses permission bits such as `0o700` or `0o755`. As in Python, the final permissions are still subject to the process umask.
+
+**Parameters:**
+- `mode` (`int`, optional): Permission bits. Default: `0o777`.
+- `parents` (`bool`, optional): If `True`, create any missing parent directories. Default: `False`.
+- `exist_ok` (`bool`, optional): If `True`, do not error when the directory already exists. Default: `False`.
+
+**Returns:** `None`
+
+**Raises:** `Error`: if the path is outside the allowed paths, or the directory already exists and `exist_ok` is `False`.
 
 ```python
 # Create a single directory
@@ -211,11 +264,16 @@ p2 = pathlib.Path("/home/user/a/b/c")
 p2.mkdir(parents=True, exist_ok=True)
 ```
 
-The `mode` argument uses permission bits such as `0o700` or `0o755`. Like Python, the final permissions are still subject to the process umask when creating directories.
-
 ### `chmod(mode)`
 
-Change the permissions of a file or directory.
+Change the permissions of the file or directory.
+
+**Parameters:**
+- `mode` (`int`): Permission bits, such as `0o600`, `0o644`, or `0o755`.
+
+**Returns:** `None`
+
+**Raises:** `Error`: if the path is outside the allowed paths.
 
 ```python
 p = pathlib.Path("/home/user/script.sh")
@@ -224,7 +282,11 @@ p.chmod(0o755)
 
 ### `rmdir()`
 
-Remove an empty directory.
+Remove the empty directory.
+
+**Returns:** `None`
+
+**Raises:** `Error`: if the path is outside the allowed paths, or the directory is not empty.
 
 ```python
 p = pathlib.Path("/home/user/emptyfolder")
@@ -233,7 +295,14 @@ p.rmdir()
 
 ### `unlink(missing_ok=False)`
 
-Remove a file or symbolic link.
+Remove this file or symbolic link.
+
+**Parameters:**
+- `missing_ok` (`bool`, optional): If `True`, do not error if the file does not exist. Default: `False`.
+
+**Returns:** `None`
+
+**Raises:** `Error`: if the path is outside the allowed paths, or the file does not exist and `missing_ok` is `False`.
 
 ```python
 p = pathlib.Path("/home/user/file.txt")
@@ -245,7 +314,14 @@ p.unlink(missing_ok=True)
 
 ### `copy(target)`
 
-Copy this file or directory to the target path. Returns a new `Path` pointing to the target.
+Copy this file or directory to the target path.
+
+**Parameters:**
+- `target` (`str`): Destination path.
+
+**Returns:** `Path`: a new `Path` pointing to `target`.
+
+**Raises:** `Error`: if either path is outside the allowed paths.
 
 ```python
 p = pathlib.Path("/home/user/file.txt")
@@ -259,7 +335,14 @@ src.copy("/home/user/project_backup")
 
 ### `rename(target)`
 
-Rename or move this file or directory to the target path. Returns a new `Path` pointing to the target.
+Rename or move this file or directory to the target path.
+
+**Parameters:**
+- `target` (`str`): Destination path.
+
+**Returns:** `Path`: a new `Path` pointing to `target`.
+
+**Raises:** `Error`: if either path is outside the allowed paths.
 
 ```python
 p = pathlib.Path("/home/user/old_name.txt")
@@ -270,6 +353,10 @@ print(new_path)  # "/home/user/new_name.txt"
 ### `iterdir()`
 
 Return a list of `Path` objects for the contents of this directory. The path must point to an existing directory.
+
+**Returns:** `list`: `Path` objects for each directory entry.
+
+**Raises:** `Error`: if the path is outside the allowed paths, or cannot be read.
 
 ```python
 p = pathlib.Path("/home/user/documents")
@@ -284,6 +371,13 @@ for child in p.iterdir():
 
 Return a list of `Path` objects matching the given pattern in this directory. Supports `*`, `?`, and `**` (recursive) wildcards.
 
+**Parameters:**
+- `pattern` (`str`): Shell-style wildcard pattern.
+
+**Returns:** `list`: matching `Path` objects.
+
+**Raises:** `Error`: if the path is outside the allowed paths.
+
 ```python
 p = pathlib.Path("/home/user/documents")
 
@@ -294,83 +388,14 @@ txt_files = p.glob("*.txt")
 all_py = p.glob("**/*.py")
 ```
 
-## Security
+## Security Considerations
 
-The pathlib library respects filesystem security restrictions. If the Scriptling interpreter is configured with allowed paths, all pathlib operations are restricted to those directories. Attempting to access files outside the allowed directories will result in security errors.
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-## Examples
+`pathlib` provides read/write access to the host filesystem. When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterPathlibLibrary(p, allowedPaths)`: path traversal (`../`) is blocked automatically. See [Library Registration](/docs/go-integration/library-registration/#filesystem-libraries) and the [Security Guide](/docs/security/#file-system-security).
 
-### Reading and Writing Files
+## See Also
 
-```python
-import pathlib
-
-# Write to a file
-file_path = pathlib.Path("/tmp/example.txt")
-file_path.write_text("This is some content")
-
-# Read from the file
-content = file_path.read_text()
-print(content)  # "This is some content"
-
-# Clean up
-file_path.unlink()
-```
-
-### Directory Operations
-
-```python
-import pathlib
-
-# Create a directory structure
-base_dir = pathlib.Path("/tmp/myproject")
-base_dir.mkdir()
-
-src_dir = base_dir.joinpath("src")
-src_dir.mkdir()
-
-# Check what we created
-print(src_dir.exists())  # True
-print(src_dir.is_dir())  # True
-
-# List would show the directory, but pathlib doesn't have it yet
-```
-
-### Path Manipulation
-
-```python
-import pathlib
-
-# Parse a path
-p = pathlib.Path("/var/log/apache2/access.log")
-
-print(f"Name: {p.name}")        # "access.log"
-print(f"Stem: {p.stem}")        # "access"
-print(f"Suffix: {p.suffix}")    # ".log"
-print(f"Parent: {p.parent}")    # "/var/log/apache2"
-
-# Build new paths
-config_path = p.parent.joinpath("apache2.conf")
-print(config_path)  # "/var/log/apache2/apache2.conf"
-```
-
-## Error Handling
-
-All pathlib operations that can fail return errors as Scriptling error objects. Always check for errors in production code:
-
-```python
-import pathlib
-
-p = pathlib.Path("/tmp/myfile.txt")
-try:
-    content = p.read_text()
-    print("Content:", content)
-except:
-    print("Could not read file")
-```
-
-## Performance Notes
-
-- Path objects are lightweight and can be created frequently
-- File operations involve actual filesystem access and may be slow
-- Use `exists()`, `is_file()`, and `is_dir()` before operations when appropriate
+- [os](../os/): Operating system interfaces and file operations
+- [os.path](../os.path/): Path manipulation functions
+- [glob](../glob/): Standalone shell-style wildcard matching

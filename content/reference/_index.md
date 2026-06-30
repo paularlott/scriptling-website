@@ -130,7 +130,7 @@ finally:
 
 # Raise errors
 if x < 0:
-    raise "Invalid value"
+    raise ValueError("Invalid value")
 
 # Assert
 assert x > 0, "x must be positive"

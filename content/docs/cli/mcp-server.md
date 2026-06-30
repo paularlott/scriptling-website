@@ -10,8 +10,8 @@ Scriptling can run as an MCP (Model Context Protocol) server, enabling AI assist
 
 When running in MCP server mode, Scriptling provides:
 
-1. **Custom MCP Tools** — Your own tools defined in `--mcp-tools` directory
-2. **Script Execution Tool** — Allow AI to execute Scriptling code directly (`--mcp-exec-script`)
+1. **Custom MCP Tools**: Your own tools defined in `--mcp-tools` directory
+2. **Script Execution Tool**: Allow AI to execute Scriptling code directly (`--mcp-exec-script`)
 
 ## Starting an MCP Server
 
@@ -146,8 +146,8 @@ help('json')
 
 Custom tools are loaded from the directory specified by `--mcp-tools`. Each tool consists of two files:
 
-- `toolname.toml` — Metadata (description, parameters)
-- `toolname.py` — Implementation script
+- `toolname.toml`: Metadata (description, parameters)
+- `toolname.py`: Implementation script
 
 ### Directory Structure
 
@@ -288,4 +288,4 @@ This configuration:
 - [HTTP Server Mode](../http-server/) - HTTP server without MCP
 - [Writing MCP Tools](../../../reference/libraries/scriptling/mcp/writing-mcp-tools/) - Creating custom MCP tools
 - [MCP Library](../../../reference/libraries/scriptling/mcp/) - MCP library reference
-- [MCP Tool Library](../../../reference/libraries/scriptling/mcp-tool/) - Tool implementation API
+- [MCP Tool Library](../../../reference/libraries/scriptling/mcp/tool/) - Tool implementation API
