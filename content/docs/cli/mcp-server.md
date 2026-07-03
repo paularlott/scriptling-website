@@ -44,12 +44,61 @@ scriptling --server :8000 --mcp-tools ./tools --mcp-exec-script \
   --allowed-paths "/tmp/sandbox,./data" setup.py
 ```
 
+### Choosing the transport: HTTP vs stdio
+
+The MCP tool flags (`--mcp-tools` and/or `--mcp-exec-script`) enable the MCP
+server; the presence of `--server` selects the transport:
+
+- **With `--server`** — MCP is served over HTTP at `/mcp` (as shown above).
+- **Without `--server`** — MCP is served over **stdio** (stdin/stdout,
+  newline-delimited JSON-RPC 2.0), the transport MCP hosts use to launch a
+  server as a subprocess.
+
+This mirrors `--json-rpc`, which serves over stdio by default and over HTTP at
+`/json-rpc` when combined with `--server`.
+
+```bash
+# Serve tools over stdio
+scriptling --mcp-tools ./tools
+
+# Or the built-in script execution tool
+scriptling --mcp-exec-script
+```
+
+> **Logging goes to stderr** in stdio mode so it never corrupts the protocol
+> stream on stdout, exactly like `--json-rpc`.
+
+Configure it in an MCP host (e.g. Claude Desktop) as a command rather than a URL:
+
+```json
+{
+  "mcpServers": {
+    "scriptling": {
+      "command": "scriptling",
+      "args": ["--mcp-tools", "/absolute/path/to/tools"]
+    }
+  }
+}
+```
+
+Test it by piping requests in:
+
+```bash
+printf '%s\n' \
+  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' \
+  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+  | scriptling --mcp-exec-script
+```
+
 ## MCP Options
 
 | Flag                | Environment Variable       | Description                              | Default    |
 | ------------------- | -------------------------- | ---------------------------------------- | ---------- |
 | `--mcp-tools`       | `SCRIPTLING_MCP_TOOLS`     | Directory containing MCP tool files      | (disabled) |
 | `--mcp-exec-script` | -                          | Enable MCP script execution tool         | false      |
+
+Either flag enables the MCP server. Add `--server <addr>` to serve over HTTP at
+`/mcp`; without it, the server runs over stdio.
 
 ## Script Execution Tool
 

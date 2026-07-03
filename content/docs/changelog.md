@@ -7,6 +7,57 @@ nav-skip: true
 
 ## June 2026
 
+{{< version "v0.16.0" >}}
+
+{{< changelog-item "added" >}}
+**MCP over stdio: Scriptling can run as a stdio MCP server, and consume stdio MCP servers.**
+
+Scriptling can now serve the Model Context Protocol over stdin/stdout
+(newline-delimited JSON-RPC 2.0) — the transport MCP hosts use to launch a
+server as a subprocess — in addition to HTTP. The MCP tool flags enable the
+server; leaving off `--server` serves it over stdio:
+
+```bash
+scriptling --mcp-tools ./tools      # serve your tools over stdio
+scriptling --mcp-exec-script        # serve the code-execution tool
+```
+
+This mirrors `--json-rpc`: stdio by default, HTTP with `--server`. As with
+`--json-rpc`, logs are redirected to stderr so stdout stays a clean protocol
+stream. With `--server`, the same tools continue to be served over HTTP at
+`/mcp`.
+
+**`scriptling.mcp.Client()` now chooses HTTP or stdio from its argument.**
+
+The client transport is selected from the first argument: an `http://` or
+`https://` URL connects over HTTP; anything else is launched as a local stdio
+MCP server subprocess. A new `args` keyword supplies the server's command-line
+arguments, and a new `client.close()` method shuts a stdio subprocess down.
+
+```python
+import scriptling.mcp as mcp
+
+# HTTP server
+remote = mcp.Client("https://example.com/mcp", namespace="t2", bearer_token="secret")
+
+# stdio server (a local executable)
+local = mcp.Client("/usr/local/bin/thebinary", args=["--server"], namespace="t1")
+print(local.call_tool("t1__greet", {"name": "Ada"}))
+local.close()
+```
+
+`bearer_token` is HTTP-only and `args` is stdio-only; using either with the
+wrong transport raises an error. This is backward compatible: existing
+`mcp.Client("https://…", namespace=…, bearer_token=…)` calls are unchanged.
+
+The JSON-RPC framing for both the stdio server and client is provided by the
+reusable [`github.com/paularlott/jsonrpc`](https://github.com/paularlott/jsonrpc)
+package via the [`github.com/paularlott/mcp`](https://github.com/paularlott/mcp)
+library.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.15.1" >}}
 
 {{< changelog-item "fixed" >}}
