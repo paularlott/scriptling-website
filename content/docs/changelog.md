@@ -10,6 +10,55 @@ nav-skip: true
 {{< version "v0.16.0" >}}
 
 {{< changelog-item "added" >}}
+**MCP server now exposes Resources and Prompts, and pushes listChanged notifications.**
+
+Scriptling's MCP server implements the remaining two MCP primitives alongside
+tools, all defined as files in folders — no Go code, no startup registration:
+
+- **Tools** (`--mcp-tools`): `name.toml` + `name.py`, as before.
+- **Resources** (`--mcp-resources`): just files — the path is the URI (the first
+  directory is the scheme, the rest mirrors the URI). A `{var}` segment with a
+  `.py` is a **template** (the script runs with the extracted variable); every
+  other file is served verbatim (a `.py` with no `{var}` is served as source
+  text). No metadata files.
+- **Prompts** (`--mcp-prompts`): `name.md` for a static prompt, or
+  `name.toml` + `name.py` for an arg-driven prompt (args declared in the toml,
+  the script returns messages).
+
+Two built-in resources (`scriptling://server`, `scriptling://script/{name}`) and
+a `write_script` prompt are always available. The `scriptling.mcp.Client` class
+gained `list_resources`, `list_resource_templates`, `read_resource`,
+`list_prompts`, and `get_prompt` for reading them on remote servers.
+
+```bash
+# A templated resource from a file: resources/greeting/{name}.py -> greeting://{name}
+scriptling --mcp-resources ./resources
+curl -X POST http://127.0.0.1:8000/mcp -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"resources/read","params":{"uri":"greeting://Ada"}}'
+```
+
+**`scriptling.mcp.Client` can read resources and prompts from MCP servers.**
+
+The MCP client class gained five methods for the resource and prompt primitives:
+
+| Method | Description |
+| --- | --- |
+| `client.list_resources()` | List static resources (`uri`, `name`, `description`, `mimeType`) |
+| `client.list_resource_templates()` | List resource templates (`uriTemplate`, …) |
+| `client.read_resource(uri)` | Read a resource (static or expanded from a template) |
+| `client.list_prompts()` | List prompts (`name`, `description`, `arguments`) |
+| `client.get_prompt(name, arguments)` | Render a prompt into messages |
+
+```python
+import scriptling.mcp as mcp
+
+c = mcp.Client("https://example.com/mcp")
+data = c.read_resource("config://app")      # -> {uri, mimeType, text|blob}
+out = c.get_prompt("write_script", {"task": "greet a user"})
+for msg in out.messages:
+    print(msg.role, msg.content)
+```
+
 **MCP over stdio: Scriptling can run as a stdio MCP server, and consume stdio MCP servers.**
 
 Scriptling can now serve the Model Context Protocol over stdin/stdout

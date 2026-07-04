@@ -26,6 +26,11 @@ For MCP integration with AI clients, see the `remote_servers` parameter on [scri
 | `client.tool_search(query, **kwargs)` | Search for tools by query |
 | `client.execute_discovered(name, arguments)` | Execute a discovered tool |
 | `client.execute_discovered_parallel(calls)` | Execute multiple discovered tools concurrently |
+| `client.list_resources()` | List resources exposed by the server |
+| `client.list_resource_templates()` | List resource templates (URIs with `{var}` placeholders) |
+| `client.read_resource(uri)` | Read a resource by URI (static or expanded from a template) |
+| `client.list_prompts()` | List prompts exposed by the server |
+| `client.get_prompt(name, arguments)` | Render a prompt by name into messages |
 | `client.close()` | Close the client (shuts a stdio subprocess down) |
 
 ## Functions
@@ -240,6 +245,98 @@ for r in results:
         print(f"{r.name} failed: {r.error}")
     else:
         print(f"{r.name}: {r.result}")
+```
+
+## Resources and Prompts
+
+As well as tools, an MCP server may expose **resources** (addressable data read
+by URI) and **prompts** (reusable message templates rendered into messages for
+the model). Scriptling's client can read both.
+
+### `client.list_resources()`
+
+Lists the static resources exposed by the server.
+
+**Returns:** `list`: resource dicts with `uri`, `name`, `description`, `mimeType`.
+
+```python
+client = mcp.Client("https://api.example.com/mcp")
+for res in client.list_resources():
+    print(res.uri, res.name, res.mimeType)
+```
+
+### `client.list_resource_templates()`
+
+Lists resource **templates** — URIs containing `{var}` placeholders that the
+client expands before reading. Expand a template by substituting the variable
+and pass the result to `read_resource`.
+
+**Returns:** `list`: dicts with `uriTemplate`, `name`, `description`, `mimeType`.
+
+```python
+client = mcp.Client("https://api.example.com/mcp")
+for t in client.list_resource_templates():
+    print(t.uriTemplate, t.name)
+
+# Expand a template and read it
+data = client.read_resource("scriptling://script/greet")  # from scriptling://script/{name}
+```
+
+### `client.read_resource(uri)`
+
+Reads a resource by URI. The URI may be a static resource or a template already
+expanded by the caller.
+
+**Parameters:**
+
+- `uri` (`str`): The resource URI to read.
+
+**Returns:** `dict` (single content block) or `list` of dicts. Each content dict
+has `uri`, `mimeType`, and either `text` (parsed JSON if valid, else a string)
+or `blob` (base64).
+
+```python
+client = mcp.Client("https://api.example.com/mcp")
+
+data = client.read_resource("config://app")
+print(data.uri, data.mimeType)
+print(data.text)  # parsed JSON object, or plain string
+```
+
+### `client.list_prompts()`
+
+Lists the prompts exposed by the server.
+
+**Returns:** `list`: prompt dicts with `name`, `description`, and `arguments`
+(each argument has `name`, `description`, `required`).
+
+```python
+client = mcp.Client("https://api.example.com/mcp")
+for p in client.list_prompts():
+    print(p.name, p.description)
+    for a in getattr(p, "arguments", []):
+        print("  -", a.name, "(required)" if a.required else "(optional)")
+```
+
+### `client.get_prompt(name, arguments)`
+
+Renders a prompt by name with the given arguments into messages for the model.
+Prompt arguments are always strings; non-string values are coerced.
+
+**Parameters:**
+
+- `name` (`str`): Prompt name.
+- `arguments` (`dict`): Argument values.
+
+**Returns:** `dict` with `description` and `messages` (a list of
+`{role, content}` where `content` is a decoded content block).
+
+```python
+client = mcp.Client("https://api.example.com/mcp")
+
+out = client.get_prompt("write_script", {"task": "greet a user by name"})
+for m in out.messages:
+    print(m.role, m.content)
 ```
 
 ### `client.close()`
