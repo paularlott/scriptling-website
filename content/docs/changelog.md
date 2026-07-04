@@ -7,6 +7,108 @@ nav-skip: true
 
 ## June 2026
 
+{{< version "v0.16.0" >}}
+
+{{< changelog-item "added" >}}
+**MCP server now exposes Resources and Prompts, and pushes listChanged notifications.**
+
+Scriptling's MCP server implements the remaining two MCP primitives alongside
+tools, all defined as files in folders — no Go code, no startup registration:
+
+- **Tools** (`--mcp-tools`): `name.toml` + `name.py`, as before.
+- **Resources** (`--mcp-resources`): just files — the path is the URI (the first
+  directory is the scheme, the rest mirrors the URI). A `{var}` segment with a
+  `.py` is a **template** (the script runs with the extracted variable); every
+  other file is served verbatim (a `.py` with no `{var}` is served as source
+  text). A template or static resource may have an optional `_stem.toml`
+  metadata file providing a human-readable name, description, and MIME type
+  (`_` prefix files are never served).
+- **Prompts** (`--mcp-prompts`): `name.md` for a static prompt, or
+  `name.toml` + `name.py` for an arg-driven prompt (args declared in the toml,
+  the script returns messages).
+
+A built-in `scriptling://script/{name}` resource template (tool source code)
+and a `write_script` prompt are always available. The `scriptling.mcp.Client` class
+gained `list_resources`, `list_resource_templates`, `read_resource`,
+`list_prompts`, and `get_prompt` for reading them on remote servers.
+
+```bash
+# A templated resource from a file: resources/greeting/{name}.py -> greeting://{name}
+scriptling --mcp-resources ./resources
+curl -X POST http://127.0.0.1:8000/mcp -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"resources/read","params":{"uri":"greeting://Ada"}}'
+```
+
+**`scriptling.mcp.Client` can read resources and prompts from MCP servers.**
+
+The MCP client class gained five methods for the resource and prompt primitives:
+
+| Method | Description |
+| --- | --- |
+| `client.list_resources()` | List static resources (`uri`, `name`, `description`, `mimeType`) |
+| `client.list_resource_templates()` | List resource templates (`uriTemplate`, …) |
+| `client.read_resource(uri)` | Read a resource (static or expanded from a template) |
+| `client.list_prompts()` | List prompts (`name`, `description`, `arguments`) |
+| `client.get_prompt(name, arguments)` | Render a prompt into messages |
+
+```python
+import scriptling.mcp as mcp
+
+c = mcp.Client("https://example.com/mcp")
+data = c.read_resource("config://app")      # -> {uri, mimeType, text|blob}
+out = c.get_prompt("write_script", {"task": "greet a user"})
+for msg in out.messages:
+    print(msg.role, msg.content)
+```
+
+**MCP over stdio: Scriptling can run as a stdio MCP server, and consume stdio MCP servers.**
+
+Scriptling can now serve the Model Context Protocol over stdin/stdout
+(newline-delimited JSON-RPC 2.0) — the transport MCP hosts use to launch a
+server as a subprocess — in addition to HTTP. The MCP tool flags enable the
+server; leaving off `--server` serves it over stdio:
+
+```bash
+scriptling --mcp-tools ./tools      # serve your tools over stdio
+scriptling --mcp-exec-script        # serve the code-execution tool
+```
+
+This mirrors `--json-rpc`: stdio by default, HTTP with `--server`. As with
+`--json-rpc`, logs are redirected to stderr so stdout stays a clean protocol
+stream. With `--server`, the same tools continue to be served over HTTP at
+`/mcp`.
+
+**`scriptling.mcp.Client()` now chooses HTTP or stdio from its argument.**
+
+The client transport is selected from the first argument: an `http://` or
+`https://` URL connects over HTTP; anything else is launched as a local stdio
+MCP server subprocess. A new `args` keyword supplies the server's command-line
+arguments, and a new `client.close()` method shuts a stdio subprocess down.
+
+```python
+import scriptling.mcp as mcp
+
+# HTTP server
+remote = mcp.Client("https://example.com/mcp", namespace="t2", bearer_token="secret")
+
+# stdio server (a local executable)
+local = mcp.Client("/usr/local/bin/thebinary", args=["--server"], namespace="t1")
+print(local.call_tool("t1__greet", {"name": "Ada"}))
+local.close()
+```
+
+`bearer_token` is HTTP-only and `args` is stdio-only; using either with the
+wrong transport raises an error. This is backward compatible: existing
+`mcp.Client("https://…", namespace=…, bearer_token=…)` calls are unchanged.
+
+The JSON-RPC framing for both the stdio server and client is provided by the
+reusable [`github.com/paularlott/jsonrpc`](https://github.com/paularlott/jsonrpc)
+package via the [`github.com/paularlott/mcp`](https://github.com/paularlott/mcp)
+library.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.15.1" >}}
 
 {{< changelog-item "fixed" >}}

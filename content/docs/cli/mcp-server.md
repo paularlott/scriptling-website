@@ -12,6 +12,9 @@ When running in MCP server mode, Scriptling provides:
 
 1. **Custom MCP Tools**: Your own tools defined in `--mcp-tools` directory
 2. **Script Execution Tool**: Allow AI to execute Scriptling code directly (`--mcp-exec-script`)
+3. **Resources**: Files served by URI from `--mcp-resources` (a `{var}` + `.py` path is a template), plus built-in server/script resources
+4. **Prompts**: Static `.md` or dynamic `.toml` + `.py` prompts from `--mcp-prompts`, plus a built-in `write_script` prompt
+5. **Live reload & notifications**: All three folders hot-reload on change and push `listChanged` notifications so clients refresh automatically
 
 ## Starting an MCP Server
 
@@ -44,12 +47,66 @@ scriptling --server :8000 --mcp-tools ./tools --mcp-exec-script \
   --allowed-paths "/tmp/sandbox,./data" setup.py
 ```
 
+### Choosing the transport: HTTP vs stdio
+
+The MCP tool flags (`--mcp-tools` and/or `--mcp-exec-script`) enable the MCP
+server; the presence of `--server` selects the transport:
+
+- **With `--server`** — MCP is served over HTTP at `/mcp` (as shown above).
+- **Without `--server`** — MCP is served over **stdio** (stdin/stdout,
+  newline-delimited JSON-RPC 2.0), the transport MCP hosts use to launch a
+  server as a subprocess.
+
+This mirrors `--json-rpc`, which serves over stdio by default and over HTTP at
+`/json-rpc` when combined with `--server`.
+
+```bash
+# Serve tools over stdio
+scriptling --mcp-tools ./tools
+
+# Or the built-in script execution tool
+scriptling --mcp-exec-script
+```
+
+> **Logging goes to stderr** in stdio mode so it never corrupts the protocol
+> stream on stdout, exactly like `--json-rpc`. Some MCP hosts (e.g. the MCP
+> Inspector) forward every stderr line to the client before the connection is
+> fully established, which can cause errors. Use `--log-format null` to suppress
+> all log output when this is an issue.
+
+Configure it in an MCP host (e.g. Claude Desktop) as a command rather than a URL:
+
+```json
+{
+  "mcpServers": {
+    "scriptling": {
+      "command": "scriptling",
+      "args": ["--mcp-tools", "/absolute/path/to/tools"]
+    }
+  }
+}
+```
+
+Test it by piping requests in:
+
+```bash
+printf '%s\n' \
+  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' \
+  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+  | scriptling --mcp-exec-script
+```
+
 ## MCP Options
 
 | Flag                | Environment Variable       | Description                              | Default    |
 | ------------------- | -------------------------- | ---------------------------------------- | ---------- |
-| `--mcp-tools`       | `SCRIPTLING_MCP_TOOLS`     | Directory containing MCP tool files      | (disabled) |
+| `--mcp-tools`       | `SCRIPTLING_MCP_TOOLS`     | Directory of MCP tools (`name.toml` + `name.py`) | (disabled) |
+| `--mcp-resources`   | `SCRIPTLING_MCP_RESOURCES` | Directory of MCP resources (files served verbatim; `{var}` + `.py` = template, optional `.toml` metadata) | (disabled) |
+| `--mcp-prompts`     | `SCRIPTLING_MCP_PROMPTS`   | Directory of MCP prompts (`name.md` static, or `name.toml` + `name.py` dynamic) | (disabled) |
 | `--mcp-exec-script` | -                          | Enable MCP script execution tool         | false      |
+
+Any of these flags enables the MCP server. Add `--server <addr>` to serve over
+HTTP at `/mcp`; without it, the server runs over stdio.
 
 ## Script Execution Tool
 
@@ -239,6 +296,51 @@ curl -X POST http://127.0.0.1:8000/mcp \
       "arguments":{"name":"add","arguments":{"a":5,"b":3}}
     }
   }'
+```
+
+## Resources and Prompts
+
+As well as tools, the MCP server exposes resources and prompts. They are defined
+as **files in folders** — no Go code, no startup registration — the same model
+as tools.
+
+- **Resources** (`--mcp-resources`): a file is served verbatim at the URI formed
+  from its path (first directory = scheme, rest = URI). A path containing a
+  `{var}` segment and ending in `.py` is a **template** whose script runs with
+  the extracted variable. An optional `_stem.toml` sibling provides a
+  human-readable name, description, and MIME type; without it the URI is used as
+  the name. Files starting with `_` are metadata, never served.
+- **Prompts** (`--mcp-prompts`): `name.md` for a static prompt (one user
+  message), or `name.toml` + `name.py` for a dynamic, arg-driven prompt. The
+  dynamic `.toml` uses **the same format as a tool's `.toml`** — `description`
+  plus an array of tables — but `[[arguments]]` instead of `[[parameters]]`,
+  and prompt arguments are string-only (no `type`).
+
+A built-in `scriptling://script/{name}` resource template (tool source code,
+when `--mcp-tools` is set) and a `write_script` prompt are always available.
+
+**For a walkthrough of creating resources and prompts** — including the shared
+`.toml` format — see the [Building an MCP Resources & Prompts Server tutorial](../../tutorials/mcp-resources-prompts/).
+The [tool metadata reference](../../../reference/libraries/scriptling/mcp/writing-mcp-tools/)
+covers the `.toml` fields prompts share. To read resources and prompts from a
+server in a script, see the [scriptling.mcp client](../../../reference/libraries/scriptling/mcp/client/#resources-and-prompts).
+
+## Live Reload and Change Notifications
+
+When `--mcp-tools`, `--mcp-resources`, or `--mcp-prompts` point at folders,
+Scriptling watches them for changes. Adding, editing, or removing a file reloads
+that primitive automatically (debounced); `SIGHUP`/`SIGUSR1` force an immediate
+reload of all three.
+
+Reloads mutate the live server in place and emit `notifications/tools/listChanged`,
+`notifications/resources/listChanged`, and `notifications/prompts/listChanged` so
+connected clients drop their cached list and re-fetch — over both HTTP
+(Server-Sent Events) and stdio. The server advertises `listChanged` support for
+all three primitives in its capabilities.
+
+```bash
+# Force a reload
+kill -HUP $(pidof scriptling)
 ```
 
 ## Security Considerations

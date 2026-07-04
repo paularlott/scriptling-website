@@ -13,7 +13,7 @@ For MCP integration with AI clients, see the `remote_servers` parameter on [scri
 | Function | Description |
 |----------|-------------|
 | `decode_response(response)` | Decode a raw MCP tool response |
-| `Client(base_url, **kwargs)` | Create an MCP client for connecting to servers |
+| `Client(target, **kwargs)` | Create an MCP client over HTTP or stdio |
 
 ## MCPClient Methods
 
@@ -26,6 +26,12 @@ For MCP integration with AI clients, see the `remote_servers` parameter on [scri
 | `client.tool_search(query, **kwargs)` | Search for tools by query |
 | `client.execute_discovered(name, arguments)` | Execute a discovered tool |
 | `client.execute_discovered_parallel(calls)` | Execute multiple discovered tools concurrently |
+| `client.list_resources()` | List resources exposed by the server |
+| `client.list_resource_templates()` | List resource templates (URIs with `{var}` placeholders) |
+| `client.read_resource(uri)` | Read a resource by URI (static or expanded from a template) |
+| `client.list_prompts()` | List prompts exposed by the server |
+| `client.get_prompt(name, arguments)` | Render a prompt by name into messages |
+| `client.close()` | Close the client (shuts a stdio subprocess down) |
 
 ## Functions
 
@@ -54,39 +60,39 @@ decoded = mcp.decode_response(raw_response)
 print(decoded)  # {"temp": 15}
 ```
 
-### `mcp.Client(base_url, **kwargs)`
+### `mcp.Client(target, **kwargs)`
 
-Creates a new MCP client for connecting to a remote MCP server.
+Creates a new MCP client. The transport is chosen from `target`: an `http://` or
+`https://` URL connects over **HTTP**; any other value is treated as a local
+executable that is launched as a **stdio** MCP server subprocess.
 
 **Parameters:**
 
-- `base_url` (`str`): URL of the MCP server.
-- `namespace` (`str`, optional): Namespace for tool names (e.g. `"scriptling"` makes tools available as `"scriptling/tool_name"`). Default: `""`.
-- `bearer_token` (`str`, optional): Bearer token for authentication. Default: `""`.
+- `target` (`str`): HTTP(S) URL of the server, or the path/command of a stdio server.
+- `namespace` (`str`, optional): Namespace for tool names (e.g. `"scriptling"` makes tools available as `"scriptling__tool_name"`). Default: `""`.
+- `bearer_token` (`str`, optional): Bearer token for authentication. **HTTP only.** Default: `""`.
+- `args` (`list`, optional): Command-line arguments for the stdio server. **stdio only.**
+
+Passing `args` with an HTTP URL, or `bearer_token` with a command, raises an error.
 
 **Returns:** `MCPClient`: a client instance with methods for interacting with the server.
 
 ```python
 import scriptling.mcp as mcp
 
-# Without namespace or auth
-client = mcp.Client("https://api.example.com/mcp")
+# HTTP server
+client = mcp.Client("https://api.example.com/mcp", namespace="scriptling", bearer_token="your-token-here")
 
-# With namespace only
-client = mcp.Client("https://api.example.com/mcp", namespace="scriptling")
+# stdio server: launch a local executable as a subprocess
+client = mcp.Client("/usr/local/bin/thebinary", args=["--server"], namespace="t1")
 
-# With bearer token only
-client = mcp.Client("https://api.example.com/mcp", bearer_token="your-token-here")
-
-# With both namespace and bearer token
-client = mcp.Client(
-    "https://api.example.com/mcp",
-    namespace="scriptling",
-    bearer_token="your-token-here"
-)
+# Scriptling itself can be a stdio MCP server
+client = mcp.Client("scriptling", args=["--mcp-exec-script"], namespace="local")
 ```
 
-When using a namespace, all tool names are prefixed. For example, if the server has a tool called `execute_code` and you use namespace `scriptling`, the tool is available as `scriptling/execute_code`. The namespace is automatically added to all tool names and stripped when calling tools.
+When using a namespace, all tool names are prefixed. For example, if the server has a tool called `execute_code` and you use namespace `scriptling`, the tool is available as `scriptling__execute_code`. The namespace is automatically added to all tool names and stripped when calling tools.
+
+> **Close stdio clients.** A stdio client owns a subprocess; call `client.close()` when finished to shut it down. For HTTP clients `close()` is a harmless no-op.
 
 ## MCPClient Class
 
@@ -241,6 +247,140 @@ for r in results:
         print(f"{r.name}: {r.result}")
 ```
 
+## Resources and Prompts
+
+As well as tools, an MCP server may expose **resources** (addressable data read
+by URI) and **prompts** (reusable message templates rendered into messages for
+the model). Scriptling's client can read both.
+
+### `client.list_resources()`
+
+Lists the static resources exposed by the server.
+
+**Returns:** `list`: resource dicts with `uri`, `name`, `description`, `mimeType`.
+
+```python
+client = mcp.Client("https://api.example.com/mcp")
+for res in client.list_resources():
+    print(res.uri, res.name, res.mimeType)
+```
+
+### `client.list_resource_templates()`
+
+Lists resource **templates** — URIs containing `{var}` placeholders that the
+client expands before reading. Expand a template by substituting the variable
+and pass the result to `read_resource`.
+
+**Returns:** `list`: dicts with `uriTemplate`, `name`, `description`, `mimeType`.
+
+```python
+client = mcp.Client("https://api.example.com/mcp")
+for t in client.list_resource_templates():
+    print(t.uriTemplate, t.name)
+
+# Expand a template and read it
+data = client.read_resource("scriptling://script/greet")  # from scriptling://script/{name}
+```
+
+### `client.read_resource(uri)`
+
+Reads a resource by URI. The URI may be a static resource or a template already
+expanded by the caller.
+
+**Parameters:**
+
+- `uri` (`str`): The resource URI to read.
+
+**Returns:** `dict` (single content block) or `list` of dicts. Each content dict
+has `uri`, `mimeType`, and either `text` (parsed JSON if valid, else a string)
+or `blob` (base64).
+
+```python
+client = mcp.Client("https://api.example.com/mcp")
+
+data = client.read_resource("config://app")
+print(data.uri, data.mimeType)
+print(data.text)  # parsed JSON object, or plain string
+```
+
+### `client.list_prompts()`
+
+Lists the prompts exposed by the server.
+
+**Returns:** `list`: prompt dicts with `name`, `description`, and `arguments`
+(each argument has `name`, `description`, `required`).
+
+```python
+client = mcp.Client("https://api.example.com/mcp")
+for p in client.list_prompts():
+    print(p.name, p.description)
+    for a in getattr(p, "arguments", []):
+        print("  -", a.name, "(required)" if a.required else "(optional)")
+```
+
+### `client.get_prompt(name, arguments)`
+
+Renders a prompt by name with the given arguments into messages for the model.
+Prompt arguments are always strings; non-string values are coerced.
+
+**Parameters:**
+
+- `name` (`str`): Prompt name.
+- `arguments` (`dict`): Argument values.
+
+**Returns:** `dict` with `description` and `messages` (a list of
+`{role, content}` where `content` is a decoded content block).
+
+```python
+client = mcp.Client("https://api.example.com/mcp")
+
+out = client.get_prompt("write_script", {"task": "greet a user by name"})
+for m in out.messages:
+    print(m.role, m.content)
+```
+
+### `client.close()`
+
+Closes the client and releases its transport. For a **stdio** client this shuts
+down the launched server subprocess; for an **HTTP** client it is a no-op. Safe
+to call more than once.
+
+**Returns:** `None`
+
+```python
+client = mcp.Client("scriptling", args=["--mcp-exec-script"], namespace="local")
+try:
+    result = client.call_tool("local__execute_script", {"code": "print(6 * 7)"})
+    print(result)
+finally:
+    client.close()
+```
+
+## Stdio Servers
+
+`mcp.Client()` can launch a local executable as an MCP server communicating over
+stdin/stdout (newline-delimited JSON-RPC 2.0), the transport MCP hosts use for
+local servers. Pass the command as `target` and any flags as `args`:
+
+```python
+import scriptling.mcp as mcp
+
+# Launch a stdio MCP server subprocess
+client = mcp.Client("scriptling", args=["--mcp-tools", "./tools"], namespace="tools")
+
+for tool in client.tools():
+    print(tool.name)
+
+result = client.call_tool("tools__greet", {"name": "Ada"})
+print(result)
+
+client.close()  # shut the subprocess down
+```
+
+Scriptling can itself run as a stdio MCP server (`scriptling --mcp-exec-script`
+or `--mcp-tools <dir>`, without `--server`) — see
+[MCP Server Mode](../../../../docs/cli/mcp-server/).
+
 ## Authentication
 
 ```python
@@ -360,7 +500,7 @@ except Exception as e:
 
 This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-`scriptling.mcp` makes outbound network connections to MCP servers (and via `client.call_tool()`, executes whatever tools that server exposes). The trust boundary is the MCP server itself: a malicious or compromised server can expose tools that do anything its own implementation allows. For a full risk breakdown, see the [Security Guide](/docs/security/).
+`scriptling.mcp` makes outbound network connections to MCP servers (and via `client.call_tool()`, executes whatever tools that server exposes). The trust boundary is the MCP server itself: a malicious or compromised server can expose tools that do anything its own implementation allows. When `target` is a command rather than a URL, `mcp.Client()` also **launches a local subprocess** — treat the command and its arguments as trusted input, since they run with the same permissions as the interpreter. For a full risk breakdown, see the [Security Guide](/docs/security/).
 
 ## See Also
 
