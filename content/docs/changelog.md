@@ -20,13 +20,15 @@ tools, all defined as files in folders — no Go code, no startup registration:
   directory is the scheme, the rest mirrors the URI). A `{var}` segment with a
   `.py` is a **template** (the script runs with the extracted variable); every
   other file is served verbatim (a `.py` with no `{var}` is served as source
-  text). No metadata files.
+  text). A template or static resource may have an optional `_stem.toml`
+  metadata file providing a human-readable name, description, and MIME type
+  (`_` prefix files are never served).
 - **Prompts** (`--mcp-prompts`): `name.md` for a static prompt, or
   `name.toml` + `name.py` for an arg-driven prompt (args declared in the toml,
   the script returns messages).
 
-Two built-in resources (`scriptling://server`, `scriptling://script/{name}`) and
-a `write_script` prompt are always available. The `scriptling.mcp.Client` class
+A built-in `scriptling://script/{name}` resource template (tool source code)
+and a `write_script` prompt are always available. The `scriptling.mcp.Client` class
 gained `list_resources`, `list_resource_templates`, `read_resource`,
 `list_prompts`, and `get_prompt` for reading them on remote servers.
 

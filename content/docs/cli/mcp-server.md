@@ -69,7 +69,10 @@ scriptling --mcp-exec-script
 ```
 
 > **Logging goes to stderr** in stdio mode so it never corrupts the protocol
-> stream on stdout, exactly like `--json-rpc`.
+> stream on stdout, exactly like `--json-rpc`. Some MCP hosts (e.g. the MCP
+> Inspector) forward every stderr line to the client before the connection is
+> fully established, which can cause errors. Use `--log-format null` to suppress
+> all log output when this is an issue.
 
 Configure it in an MCP host (e.g. Claude Desktop) as a command rather than a URL:
 
@@ -98,7 +101,7 @@ printf '%s\n' \
 | Flag                | Environment Variable       | Description                              | Default    |
 | ------------------- | -------------------------- | ---------------------------------------- | ---------- |
 | `--mcp-tools`       | `SCRIPTLING_MCP_TOOLS`     | Directory of MCP tools (`name.toml` + `name.py`) | (disabled) |
-| `--mcp-resources`   | `SCRIPTLING_MCP_RESOURCES` | Directory of MCP resources (files served verbatim; `{var}` + `.py` = template) | (disabled) |
+| `--mcp-resources`   | `SCRIPTLING_MCP_RESOURCES` | Directory of MCP resources (files served verbatim; `{var}` + `.py` = template, optional `.toml` metadata) | (disabled) |
 | `--mcp-prompts`     | `SCRIPTLING_MCP_PROMPTS`   | Directory of MCP prompts (`name.md` static, or `name.toml` + `name.py` dynamic) | (disabled) |
 | `--mcp-exec-script` | -                          | Enable MCP script execution tool         | false      |
 
@@ -304,15 +307,17 @@ as tools.
 - **Resources** (`--mcp-resources`): a file is served verbatim at the URI formed
   from its path (first directory = scheme, rest = URI). A path containing a
   `{var}` segment and ending in `.py` is a **template** whose script runs with
-  the extracted variable. No metadata files.
+  the extracted variable. An optional `_stem.toml` sibling provides a
+  human-readable name, description, and MIME type; without it the URI is used as
+  the name. Files starting with `_` are metadata, never served.
 - **Prompts** (`--mcp-prompts`): `name.md` for a static prompt (one user
   message), or `name.toml` + `name.py` for a dynamic, arg-driven prompt. The
   dynamic `.toml` uses **the same format as a tool's `.toml`** — `description`
   plus an array of tables — but `[[arguments]]` instead of `[[parameters]]`,
   and prompt arguments are string-only (no `type`).
 
-Two built-in resources (`scriptling://server`, `scriptling://script/{name}`) and
-a `write_script` prompt are always available.
+A built-in `scriptling://script/{name}` resource template (tool source code,
+when `--mcp-tools` is set) and a `write_script` prompt are always available.
 
 **For a walkthrough of creating resources and prompts** — including the shared
 `.toml` format — see the [Building an MCP Resources & Prompts Server tutorial](../../tutorials/mcp-resources-prompts/).

@@ -52,6 +52,23 @@ A static resource: drop a file in the folder and it is readable by URI.
 That's the whole resource. The MIME type comes from the extension
 (`text/markdown`).
 
+### Optional `_` metadata
+
+To give a static resource a human-readable name and description, add a
+`_{stem}.toml` sibling (the `_` prefix hides it from listings):
+
+Create `resources/docs/_about.toml`:
+
+```toml
+name = "About"
+description = "Information about this MCP server example"
+mimeType = "text/markdown"
+```
+
+All three fields are optional — without metadata, the resource's name defaults
+to its full URI (`docs://about.md`), the MIME type is auto-detected from the
+file extension, and no description is set. Files starting with `_` are never
+served as resources.
 ## Step 3: A templated resource
 
 A path containing a `{var}` segment and ending in `.py` is a **template**: the
@@ -74,6 +91,23 @@ tool.return_string("Hello, " + name + "!")
 ```
 
 Reading `greeting://Ada` invokes the script with `name = "Ada"`.
+
+### Optional `.toml` metadata
+
+Without metadata, the template's name defaults to its full URI
+(`greeting://{name}`). To give it a human-readable name, description, and MIME
+type, add a `_{stem}.toml` sibling (the `_` prefix hides it from listings):
+
+Create `resources/greeting/_{name}.toml`:
+
+```toml
+name = "Greeting"
+description = "A personalized greeting for a name"
+mimeType = "text/plain"
+```
+
+The `.toml` is optional — if absent the template still works, just with the URI
+as its name and no description. Files starting with `_` are never served.
 
 > A `.py` with **no** `{var}` in its path is served as source text, not
 > executed. Only templated resources run scripts.
@@ -190,7 +224,7 @@ clients re-fetch. `SIGHUP` / `SIGUSR1` force a reload.
 | Primitive | Folder flag | Files |
 | --- | --- | --- |
 | Tools | `--mcp-tools` | `name.toml` + `name.py` |
-| Resources | `--mcp-resources` | files served verbatim; `{var}` + `.py` = template |
+| Resources | `--mcp-resources` | files served verbatim; `{var}` + `.py` = template; optional `_stem.toml` for name/description/mimeType |
 | Prompts | `--mcp-prompts` | `name.md` static, or `name.toml` + `name.py` dynamic |
 
 ## See also
