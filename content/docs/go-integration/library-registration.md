@@ -266,6 +266,7 @@ slack.Register(p, nil)      // scriptling.messaging.slack
 import (
     "github.com/paularlott/scriptling/extlibs/console"
     "github.com/paularlott/scriptling/extlibs/container"
+    "github.com/paularlott/scriptling/extlibs/nomad"
     "github.com/paularlott/scriptling/extlibs/similarity"
     "github.com/paularlott/scriptling/extlibs/provision/fetch"
     "github.com/paularlott/scriptling/extlibs/provision/file"
@@ -273,6 +274,7 @@ import (
 
 console.Register(p)                        // scriptling.console
 container.Register(p, "", "")              // scriptling.container (empty = default sockets)
+nomad.Register(p)                          // scriptling.nomad
 similarity.Register(p)                     // scriptling.similarity
 file.Register(p)                           // scriptling.provision.file
 fetch.Register(p)                          // scriptling.provision.fetch
@@ -283,6 +285,7 @@ extlibs.RegisterMarkdownLibrary(p)         // scriptling.markdown
 |-----------|-------------|------|
 | `scriptling.console` | `extlibs/console` | `console.Register(p)` |
 | `scriptling.container` | `extlibs/container` | `container.Register(p, dockerSock, podmanSock)` |
+| `scriptling.nomad` | `extlibs/nomad` | `nomad.Register(p)` |
 | `scriptling.similarity` | `extlibs/similarity` | `similarity.Register(p)` |
 | `scriptling.provision.file` | `extlibs/provision/file` | `file.Register(p)` |
 | `scriptling.provision.fetch` | `extlibs/provision/fetch` | `fetch.Register(p)` |
@@ -322,6 +325,8 @@ When embedding Scriptling, you have full control over what scripts can access. S
 
 - `subprocess`: allows arbitrary command execution
 - `sys`: provides access to environment variables and system internals
+- `scriptling.container`: controls Docker/Podman containers on the host
+- `scriptling.nomad`: grants full control over a Nomad cluster (CSI volumes, jobs)
 - `scriptling.runtime.sandbox`: can execute arbitrary code
 - `scriptling.ai.agent`: can execute AI-generated code with tools
 

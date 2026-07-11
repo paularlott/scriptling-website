@@ -44,6 +44,7 @@ Scriptling-specific libraries that provide functionality not available in Python
 #### Utilities
 - [Console](utilities/console/): Console input/output functions
 - [Container](utilities/container/): Container lifecycle management for Docker, Podman, and Apple Containers
+- [Nomad](utilities/nomad/): HashiCorp Nomad client covering CSI volumes and jobs
 - [Grep](utilities/grep/): Fast file content search with regex or literal patterns
 - [Sed](utilities/sed/): In-place file content replacement with literal strings or regex patterns
 - [Secrets](utilities/secret/): Resolve secrets through host-configured provider aliases

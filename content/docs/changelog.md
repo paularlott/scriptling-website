@@ -5,6 +5,55 @@ layout: changelog
 nav-skip: true
 ---
 
+## July 2026
+
+{{< version "v0.17.0" >}}
+
+{{< changelog-item "added" >}}
+**New `scriptling.nomad` library: manage HashiCorp Nomad CSI volumes and jobs.**
+
+A `NomadClient` obtained from `nomad.Client(addr, token=...)` talks directly to
+the Nomad HTTP API, covering CSI storage volumes and jobs. Requests default to
+a 10 second timeout, adjustable via `timeout=` on `Client()`:
+
+- CSI volumes: `csi_volumes_list`, `csi_volume_get`, `csi_volume_register`,
+  `csi_volume_deregister`.
+- Jobs: `jobs_list`, `job_get`, `job_register`, `job_stop`,
+  `wait_job_stopped`, `job_validate`, `job_plan`, `jobs_parse` (HCL to JSON).
+
+This is aimed at cluster housekeeping tasks, such as reconciling CSI volumes
+against a source of truth and removing orphaned ones after confirmation.
+
+```python
+import scriptling.nomad as nomad
+
+c = nomad.Client("https://nomad.example.com:4646", token="secret")
+
+expected = set(open("expected_volumes.txt").read().split())
+for v in c.csi_volumes_list(namespace="*"):
+    if v["id"].startswith("qaprod") and v["id"] not in expected:
+        c.csi_volume_deregister(v["id"], force=True)
+```
+
+See [scriptling.nomad](/reference/libraries/scriptling/utilities/nomad/) for
+the full method reference.
+
+**`scriptling.container`: `wait_stopped()` confirms a container has fully stopped.**
+
+`ContainerClient.stop()` already blocks until the container reports stopped
+for Docker, Podman, and Apple Containers, but there was no way to
+independently re-check that state afterwards. `wait_stopped(name_or_id,
+timeout=30)` polls the container's running state until it stops or the
+timeout elapses, and treats a container that no longer exists as already
+stopped.
+
+```python
+c.stop("web")
+if not c.wait_stopped("web", timeout=15):
+    print("container did not stop in time")
+```
+{{< /changelog-item >}}
+
 ## June 2026
 
 {{< version "v0.16.0" >}}
