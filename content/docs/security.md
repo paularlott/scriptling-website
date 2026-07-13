@@ -108,7 +108,7 @@ These libraries extend functionality but require explicit registration:
 
 ### Restricting File Access
 
-When registering the `os`, `os.path`, `pathlib`, or `glob` libraries, you **must** specify allowed paths:
+When registering filesystem libraries, you **must** specify allowed paths:
 
 ```go
 // Safe: Only allows access to specific directories
@@ -120,11 +120,18 @@ extlibs.RegisterPathlibLibrary(p, []string{
     "/tmp/myapp/data",
     "/home/user/documents",
 })
+extlibs.RegisterTempfileLibrary(p, []string{"/tmp/myapp"})
+extlibs.RegisterShutilLibrary(p, []string{
+    "/tmp/myapp/data",
+    "/home/user/documents",
+})
 
 // Dangerous: Allows access to entire file system
 extlibs.RegisterOSLibrary(p, nil)        // Nil = no restriction (full read/write access)
 extlibs.RegisterOSLibrary(p, []string{}) // Empty = deny all (no paths allowed)
 ```
+
+All filesystem libraries (`os`, `pathlib`, `fs`, `glob`, `tempfile`, `shutil`, `scriptling.grep`, `scriptling.find`, `scriptling.sed`) accept `allowedPaths` and enforce the same path traversal and symlink protections.
 
 ### Path Traversal Protection
 

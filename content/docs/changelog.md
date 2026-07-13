@@ -78,6 +78,42 @@ bounded worker pool, the same model as `scriptling.grep`. See
 [scriptling.find](/reference/libraries/scriptling/utilities/find/) for the full
 reference.
 
+**New `shlex`, `tempfile`, and `shutil` standard libraries.**
+
+Three new standard libraries fill gaps in filesystem and command-line tooling:
+
+| Library | Key functions | Description |
+|---------|--------------|-------------|
+| `shlex` | `quote`, `split`, `join` | Shell-style quoting and splitting — safe command-line construction for `subprocess` |
+| `tempfile` | `mkstemp`, `mkdtemp`, `gettempdir` | Temporary file and directory creation with restrictive permissions |
+| `shutil` | `copy`, `copytree`, `rmtree`, `move`, `disk_usage` | High-level file operations including recursive delete and disk usage |
+
+All three enforce `allowedPaths` restrictions when registered with explicit
+paths (except `shlex`, which is pure string processing with no filesystem
+access). `tempfile` creates files with mode `0600` and directories with `0700`,
+and falls back to the first allowed path when the system temp directory is
+outside the sandbox.
+
+```python
+import shlex, subprocess
+import tempfile, shutil
+
+# Safe command construction
+subprocess.run(shlex.split("echo " + shlex.quote(user_input)))
+
+# Atomic write via temp file
+tmp = tempfile.mkstemp(suffix=".tmp")
+try:
+    # ... write to tmp ...
+    shutil.move(tmp, "output.final")
+except:
+    shutil.rmtree(tmp)
+```
+
+See [shlex](/reference/libraries/text-processing/shlex/),
+[tempfile](/reference/libraries/filesystem/tempfile/), and
+[shutil](/reference/libraries/filesystem/shutil/) for the full references.
+
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}

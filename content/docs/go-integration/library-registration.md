@@ -68,6 +68,7 @@ extlibs.RegisterTOMLLibrary(p)
 extlibs.RegisterSecretsLibrary(p)
 extlibs.RegisterSubprocessLibrary(p)
 extlibs.RegisterHTMLParserLibrary(p)
+extlibs.RegisterShlexLibrary(p)
 ```
 
 | Namespace | Function |
@@ -78,6 +79,7 @@ extlibs.RegisterHTMLParserLibrary(p)
 | `secrets` | `RegisterSecretsLibrary(p)` |
 | `subprocess` | `RegisterSubprocessLibrary(p)` |
 | `html.parser` | `RegisterHTMLParserLibrary(p)` |
+| `shlex` | `RegisterShlexLibrary(p)` |
 
 ### Filesystem Libraries
 
@@ -88,6 +90,8 @@ extlibs.RegisterOSLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterPathlibLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterFSLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterGlobLibrary(p, []string{"/tmp", "/data"})
+extlibs.RegisterTempfileLibrary(p, []string{"/tmp"})
+extlibs.RegisterShutilLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterGrepLibrary(p, []string{"/tmp"})
 extlibs.RegisterFindLibrary(p, []string{"/tmp"})
 extlibs.RegisterSedLibrary(p, []string{"/tmp"})
@@ -99,6 +103,8 @@ extlibs.RegisterSedLibrary(p, []string{"/tmp"})
 | `pathlib` | `RegisterPathlibLibrary(p, allowedPaths)` |
 | `fs` | `RegisterFSLibrary(p, allowedPaths)` |
 | `glob` | `RegisterGlobLibrary(p, allowedPaths)` |
+| `tempfile` | `RegisterTempfileLibrary(p, allowedPaths)` |
+| `shutil` | `RegisterShutilLibrary(p, allowedPaths)` |
 | `scriptling.grep` | `RegisterGrepLibrary(p, allowedPaths)` |
 | `scriptling.find` | `RegisterFindLibrary(p, allowedPaths)` |
 | `scriptling.sed` | `RegisterSedLibrary(p, allowedPaths)` |
