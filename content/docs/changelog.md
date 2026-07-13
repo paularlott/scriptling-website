@@ -54,6 +54,40 @@ if not c.wait_stopped("web", timeout=15):
 ```
 {{< /changelog-item >}}
 
+{{< changelog-item "changed" >}}
+**`glob`: `recursive` and `include_hidden` keyword arguments, with bounded parallel recursive search.**
+
+`glob.glob()` and `glob.iglob()` gain two keyword-only parameters, both
+defaulting to `False`:
+
+- `recursive=True` makes `**` match files and directories recursively,
+  descending into every subdirectory. When `False` (the default), `**` is
+  treated as `*`, matching Python's `glob` module.
+- `include_hidden=True` matches entries whose name starts with `.`; when
+  `False` (the default) dot-files and dot-directories are skipped.
+
+Recursive searches now run as a **bounded parallel directory walk**, using the
+same worker-pool model as `scriptling.grep`, so large trees are scanned
+concurrently rather than sequentially.
+
+```python
+import glob
+
+# Recursively find all Python files (descends into subdirectories)
+py_files = glob.glob("**/*.py", recursive=True)
+
+# Include dot-directories such as .github
+all_py = glob.glob("**/*.py", recursive=True, include_hidden=True)
+```
+
+`glob.iglob()` accepts the same keyword arguments; the recursive path uses the
+same parallel walk internally.
+
+Note that with the new default (`include_hidden=False`), dot-files are now
+**skipped** by wildcard patterns, matching Python's behaviour. Previously Go's
+glob included them; pass `include_hidden=True` to restore the old behaviour.
+{{< /changelog-item >}}
+
 ## June 2026
 
 {{< version "v0.16.0" >}}
