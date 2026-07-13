@@ -80,6 +80,7 @@ extlibs.RegisterShlexLibrary(p)
 | `subprocess` | `RegisterSubprocessLibrary(p)` |
 | `html.parser` | `RegisterHTMLParserLibrary(p)` |
 | `shlex` | `RegisterShlexLibrary(p)` |
+| `scriptling.csv` | `RegisterCsvLibrary(p)` |
 
 ### Filesystem Libraries
 

@@ -172,6 +172,33 @@ for r in sim.most_similar(sim.vectorize("hi world"), docs, top_k=2):
     print(r["index"], r["score"])
 ```
 
+**New `scriptling.csv` library: CSV parsing and formatting (string-based).**
+
+A string-based CSV library backed by Go's `encoding/csv` (RFC 4180 compliant).
+Unlike Python's `csv` module (which requires file objects), this operates on
+strings — available in all environments including MCP (no filesystem access
+needed).
+
+- **`parse(content, delimiter=",")`** — CSV text → list of lists.
+- **`parse_dict(content, delimiter=",")`** — CSV text → list of dicts (first row = headers).
+- **`format(rows, delimiter=",")`** — list of lists → CSV text (auto-quotes values with commas).
+- **`format_dict(rows, delimiter=",", columns=None)`** — list of dicts → CSV text with header row.
+
+```python
+import scriptling.csv as csv
+import os
+
+# Read and parse
+people = csv.parse_dict(os.read_file("users.csv"))
+for p in people:
+    print(p["name"], p["email"])
+
+# Write
+os.write_file("output.csv", csv.format_dict(people, columns=["name", "email"]))
+```
+
+See [scriptling.csv](/reference/libraries/scriptling/utilities/csv/) for the full reference.
+
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
