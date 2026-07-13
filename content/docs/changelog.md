@@ -52,6 +52,32 @@ c.stop("web")
 if not c.wait_stopped("web", timeout=15):
     print("container did not stop in time")
 ```
+
+**New `scriptling.find` library: locate files and directories by name, type, mtime, and size.**
+
+A new utility library inspired by the Unix `find` command, filling the gap
+between `glob` (name matching only) and a hand-rolled `os.walk` loop:
+
+```python
+import scriptling.find as find
+import time
+
+# Markdown files modified in the last 24 hours
+recent = find.path("/docs", name="*.md", type="file",
+                   mtime_min=time.time() - 86400)
+
+# Large log files
+big = find.path("/var/log", name="*.log", type="file", size_min=104857600)
+```
+
+`find.path(path, *, recursive=True, type="any", name="", mtime_min=None,
+mtime_max=None, size_min=None, size_max=None, include_hidden=False,
+follow_links=False, max_depth=None)` returns matching paths as a list of
+strings. Recursive searches stat and filter entries concurrently using a
+bounded worker pool, the same model as `scriptling.grep`. See
+[scriptling.find](/reference/libraries/scriptling/utilities/find/) for the full
+reference.
+
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
@@ -86,6 +112,7 @@ same parallel walk internally.
 Note that with the new default (`include_hidden=False`), dot-files are now
 **skipped** by wildcard patterns, matching Python's behaviour. Previously Go's
 glob included them; pass `include_hidden=True` to restore the old behaviour.
+
 {{< /changelog-item >}}
 
 ## June 2026
