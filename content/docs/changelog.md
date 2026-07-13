@@ -145,6 +145,33 @@ zf.write("/etc/app.conf")
 zf.close()
 ```
 
+**`scriptling.similarity`: vector operations — `cosine_similarity`, `most_similar`, `vectorize`.**
+
+The similarity library gains three vector functions for text-matching workflows:
+
+- **`cosine_similarity(a, b)`** — compare two numeric vectors (-1.0 to 1.0).
+  Now exposed in `similarity` (its natural home) in addition to `scriptling.ai`.
+  The implementation is shared — no code duplication.
+- **`most_similar(query, vectors, top_k=5)`** — rank a list of vectors by
+  similarity to a query; returns `[{"index": int, "score": float}, …]`.
+- **`vectorize(text, dims=256)`** — generate a vector from text using the
+  feature-hashing trick. CPU-only, deterministic, no model or API call required.
+  Texts sharing words produce similar vectors.
+
+```python
+import scriptling.similarity as sim
+
+# CPU-only text matching — no embedding API needed
+v1 = sim.vectorize("the quick brown fox")
+v2 = sim.vectorize("the quick red fox")
+print(sim.cosine_similarity(v1, v2))  # high — shares 3 of 4 words
+
+# Rank documents against a query
+docs = [sim.vectorize(d) for d in ["hello world", "quick fox", "goodbye"]]
+for r in sim.most_similar(sim.vectorize("hi world"), docs, top_k=2):
+    print(r["index"], r["score"])
+```
+
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}

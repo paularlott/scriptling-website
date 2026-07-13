@@ -17,6 +17,9 @@ The `scriptling.similarity` library provides text similarity utilities for fuzzy
 | `tokenize(text)` | Split text into lowercase alphanumeric tokens |
 | `minhash(text, num_hashes=64)` | Compute a MinHash signature for text |
 | `minhash_similarity(a, b)` | Compare two MinHash signatures |
+| `cosine_similarity(a, b)` | Compare two numeric vectors (-1.0 to 1.0) |
+| `most_similar(query, vectors, top_k=5)` | Rank vectors by similarity to a query |
+| `vectorize(text, dims=256)` | Generate a vector from text (CPU-only, no model) |
 
 ## Functions
 
@@ -132,6 +135,62 @@ import scriptling.similarity as sim
 a = sim.minhash("The quick brown fox")
 b = sim.minhash("A quick brown fox")
 score = sim.minhash_similarity(a, b)
+```
+
+### `cosine_similarity(a, b)`
+
+Compute the cosine of the angle between two numeric vectors. Returns a score from -1.0 (opposite) to 1.0 (identical direction); 0.0 means orthogonal. Works with embedding vectors from [`scriptling.ai`](../ai/)'s `client.embedding()` or with vectors from `vectorize()`.
+
+**Parameters:**
+- `a` (`list[float]`): First vector.
+- `b` (`list[float]`): Second vector (same length as `a`).
+
+**Returns:** `float`: similarity score from -1.0 to 1.0.
+
+```python
+import scriptling.similarity as sim
+
+v1 = sim.vectorize("the quick brown fox")
+v2 = sim.vectorize("the quick red fox")
+score = sim.cosine_similarity(v1, v2)  # high — shares most words
+```
+
+### `most_similar(query, vectors, top_k=5)`
+
+Rank a list of vectors by cosine similarity to a query vector, returning the top results.
+
+**Parameters:**
+- `query` (`list[float]`): Query vector.
+- `vectors` (`list[list[float]]`): Candidate vectors to search.
+- `top_k` (`int`, keyword-only): Maximum results to return. Default: `5`.
+
+**Returns:** `list[dict]`: `[{"index": int, "score": float}, ...]` sorted by descending score.
+
+```python
+import scriptling.similarity as sim
+
+docs = ["hello world", "quick fox", "goodbye world"]
+vectors = [sim.vectorize(d) for d in docs]
+results = sim.most_similar(sim.vectorize("hi world"), vectors, top_k=2)
+for r in results:
+    print(f"  {docs[r['index']]}: {r['score']:.3f}")
+```
+
+### `vectorize(text, dims=256)`
+
+Generate a fixed-dimensional vector from text using the feature-hashing trick (CPU-only, no model or API call). Each word is hashed to a dimension with a +1/−1 sign, then the vector is L2-normalised so it can be compared directly with `cosine_similarity()`. Similar texts (sharing words) produce similar vectors.
+
+**Parameters:**
+- `text` (`str`): Text to vectorise.
+- `dims` (`int`, keyword-only): Output dimension. Default: `256`.
+
+**Returns:** `list[float]`: normalised vector of length `dims`.
+
+```python
+import scriptling.similarity as sim
+
+v = sim.vectorize("hello world", dims=128)
+print(len(v))  # 128
 ```
 
 ## Notes
