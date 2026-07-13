@@ -114,6 +114,37 @@ See [shlex](/reference/libraries/text-processing/shlex/),
 [tempfile](/reference/libraries/filesystem/tempfile/), and
 [shutil](/reference/libraries/filesystem/shutil/) for the full references.
 
+**New `zipfile` and `tarfile` libraries: read and write compressed archives.**
+
+Two new standard libraries bring archive handling to Scriptling, matching
+Python's `zipfile` and `tarfile` modules:
+
+- **`zipfile`** — `ZipFile(path, mode)` with `namelist()`, `read()`, `extract()`,
+  `extractall()`, `write()`, `writestr()`, `is_zipfile()`.
+- **`tarfile`** — `TarFile(path, mode)` with the same method set plus gzip
+  support (`"r:gz"`, `"w:gz"` modes), `add()`, `addstr()`, `is_tarfile()`.
+
+Both enforce `allowedPaths` and block zip/tar-slip (path traversal via crafted
+entry names). See
+[zipfile](/reference/libraries/filesystem/zipfile/) and
+[tarfile](/reference/libraries/filesystem/tarfile/) for the full references.
+
+```python
+import tarfile
+
+# Extract a .tar.gz
+tf = tarfile.TarFile("release.tar.gz", "r:gz")
+tf.extractall("/opt/app")
+tf.close()
+
+# Create a zip from files + inline data
+import zipfile
+zf = zipfile.ZipFile("config.zip", "w")
+zf.writestr("version.txt", "1.0.0")
+zf.write("/etc/app.conf")
+zf.close()
+```
+
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}

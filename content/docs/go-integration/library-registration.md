@@ -92,6 +92,8 @@ extlibs.RegisterFSLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterGlobLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterTempfileLibrary(p, []string{"/tmp"})
 extlibs.RegisterShutilLibrary(p, []string{"/tmp", "/data"})
+extlibs.RegisterZipfileLibrary(p, []string{"/tmp", "/data"})
+extlibs.RegisterTarfileLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterGrepLibrary(p, []string{"/tmp"})
 extlibs.RegisterFindLibrary(p, []string{"/tmp"})
 extlibs.RegisterSedLibrary(p, []string{"/tmp"})
@@ -105,6 +107,8 @@ extlibs.RegisterSedLibrary(p, []string{"/tmp"})
 | `glob` | `RegisterGlobLibrary(p, allowedPaths)` |
 | `tempfile` | `RegisterTempfileLibrary(p, allowedPaths)` |
 | `shutil` | `RegisterShutilLibrary(p, allowedPaths)` |
+| `zipfile` | `RegisterZipfileLibrary(p, allowedPaths)` |
+| `tarfile` | `RegisterTarfileLibrary(p, allowedPaths)` |
 | `scriptling.grep` | `RegisterGrepLibrary(p, allowedPaths)` |
 | `scriptling.find` | `RegisterFindLibrary(p, allowedPaths)` |
 | `scriptling.sed` | `RegisterSedLibrary(p, allowedPaths)` |

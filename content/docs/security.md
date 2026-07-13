@@ -131,7 +131,7 @@ extlibs.RegisterOSLibrary(p, nil)        // Nil = no restriction (full read/writ
 extlibs.RegisterOSLibrary(p, []string{}) // Empty = deny all (no paths allowed)
 ```
 
-All filesystem libraries (`os`, `pathlib`, `fs`, `glob`, `tempfile`, `shutil`, `scriptling.grep`, `scriptling.find`, `scriptling.sed`) accept `allowedPaths` and enforce the same path traversal and symlink protections.
+All filesystem libraries (`os`, `pathlib`, `fs`, `glob`, `tempfile`, `shutil`, `zipfile`, `tarfile`, `scriptling.grep`, `scriptling.find`, `scriptling.sed`) accept `allowedPaths` and enforce the same path traversal and symlink protections. Archive libraries (`zipfile`, `tarfile`) additionally block zip-slip / tar-slip attacks (path traversal via crafted entry names).
 
 ### Path Traversal Protection
 
