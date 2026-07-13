@@ -11,3 +11,7 @@ weight: 7
 | [pathlib](pathlib/) | Object-oriented filesystem paths |
 | [fs](fs/) | Binary file reading, writing, and struct packing |
 | [glob](glob/) | Unix shell-style wildcards |
+| [tempfile](tempfile/) | Temporary file and directory creation |
+| [shutil](shutil/) | High-level file operations (copy, rmtree, disk_usage) |
+| [zipfile](zipfile/) | Read and write ZIP archives |
+| [tarfile](tarfile/) | Read and write TAR archives (uncompressed and gzipped) |

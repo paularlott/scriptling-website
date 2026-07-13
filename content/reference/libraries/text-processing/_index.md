@@ -12,3 +12,4 @@ weight: 3
 | [html](html/) | HTML escaping and unescaping |
 | [html.parser](html.parser/) | HTML/XHTML parser |
 | [difflib](difflib/) | Sequence comparison and diff generation |
+| [shlex](shlex/) | Shell-style quoting, splitting, and joining |

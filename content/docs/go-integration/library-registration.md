@@ -68,6 +68,7 @@ extlibs.RegisterTOMLLibrary(p)
 extlibs.RegisterSecretsLibrary(p)
 extlibs.RegisterSubprocessLibrary(p)
 extlibs.RegisterHTMLParserLibrary(p)
+extlibs.RegisterShlexLibrary(p)
 ```
 
 | Namespace | Function |
@@ -78,6 +79,9 @@ extlibs.RegisterHTMLParserLibrary(p)
 | `secrets` | `RegisterSecretsLibrary(p)` |
 | `subprocess` | `RegisterSubprocessLibrary(p)` |
 | `html.parser` | `RegisterHTMLParserLibrary(p)` |
+| `shlex` | `RegisterShlexLibrary(p)` |
+| `scriptling.csv` | `RegisterCsvLibrary(p)` |
+| `scriptling.xml` | `RegisterXmlLibrary(p)` |
 
 ### Filesystem Libraries
 
@@ -88,7 +92,12 @@ extlibs.RegisterOSLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterPathlibLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterFSLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterGlobLibrary(p, []string{"/tmp", "/data"})
+extlibs.RegisterTempfileLibrary(p, []string{"/tmp"})
+extlibs.RegisterShutilLibrary(p, []string{"/tmp", "/data"})
+extlibs.RegisterZipfileLibrary(p, []string{"/tmp", "/data"})
+extlibs.RegisterTarfileLibrary(p, []string{"/tmp", "/data"})
 extlibs.RegisterGrepLibrary(p, []string{"/tmp"})
+extlibs.RegisterFindLibrary(p, []string{"/tmp"})
 extlibs.RegisterSedLibrary(p, []string{"/tmp"})
 ```
 
@@ -98,7 +107,12 @@ extlibs.RegisterSedLibrary(p, []string{"/tmp"})
 | `pathlib` | `RegisterPathlibLibrary(p, allowedPaths)` |
 | `fs` | `RegisterFSLibrary(p, allowedPaths)` |
 | `glob` | `RegisterGlobLibrary(p, allowedPaths)` |
+| `tempfile` | `RegisterTempfileLibrary(p, allowedPaths)` |
+| `shutil` | `RegisterShutilLibrary(p, allowedPaths)` |
+| `zipfile` | `RegisterZipfileLibrary(p, allowedPaths)` |
+| `tarfile` | `RegisterTarfileLibrary(p, allowedPaths)` |
 | `scriptling.grep` | `RegisterGrepLibrary(p, allowedPaths)` |
+| `scriptling.find` | `RegisterFindLibrary(p, allowedPaths)` |
 | `scriptling.sed` | `RegisterSedLibrary(p, allowedPaths)` |
 
 ### Custom Configuration
@@ -266,6 +280,7 @@ slack.Register(p, nil)      // scriptling.messaging.slack
 import (
     "github.com/paularlott/scriptling/extlibs/console"
     "github.com/paularlott/scriptling/extlibs/container"
+    "github.com/paularlott/scriptling/extlibs/nomad"
     "github.com/paularlott/scriptling/extlibs/similarity"
     "github.com/paularlott/scriptling/extlibs/provision/fetch"
     "github.com/paularlott/scriptling/extlibs/provision/file"
@@ -273,6 +288,7 @@ import (
 
 console.Register(p)                        // scriptling.console
 container.Register(p, "", "")              // scriptling.container (empty = default sockets)
+nomad.Register(p)                          // scriptling.nomad
 similarity.Register(p)                     // scriptling.similarity
 file.Register(p)                           // scriptling.provision.file
 fetch.Register(p)                          // scriptling.provision.fetch
@@ -283,6 +299,7 @@ extlibs.RegisterMarkdownLibrary(p)         // scriptling.markdown
 |-----------|-------------|------|
 | `scriptling.console` | `extlibs/console` | `console.Register(p)` |
 | `scriptling.container` | `extlibs/container` | `container.Register(p, dockerSock, podmanSock)` |
+| `scriptling.nomad` | `extlibs/nomad` | `nomad.Register(p)` |
 | `scriptling.similarity` | `extlibs/similarity` | `similarity.Register(p)` |
 | `scriptling.provision.file` | `extlibs/provision/file` | `file.Register(p)` |
 | `scriptling.provision.fetch` | `extlibs/provision/fetch` | `fetch.Register(p)` |
@@ -322,6 +339,8 @@ When embedding Scriptling, you have full control over what scripts can access. S
 
 - `subprocess`: allows arbitrary command execution
 - `sys`: provides access to environment variables and system internals
+- `scriptling.container`: controls Docker/Podman containers on the host
+- `scriptling.nomad`: grants full control over a Nomad cluster (CSI volumes, jobs)
 - `scriptling.runtime.sandbox`: can execute arbitrary code
 - `scriptling.ai.agent`: can execute AI-generated code with tools
 

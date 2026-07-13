@@ -29,6 +29,7 @@ Docker and Podman endpoints are configured via the `--docker-host` / `--podman-h
 | `exec_stream(name_or_id, command, callback, **kwargs)` | Run a command in a running container and stream output line by line |
 | `run(image, **kwargs)` | Create and start a container |
 | `stop(name_or_id)` | Stop a running container |
+| `wait_stopped(name_or_id, **kwargs)` | Wait for a container to reach a stopped state |
 | `remove(name_or_id)` | Remove a stopped container |
 | `inspect(name_or_id)` | Get container details |
 | `list()` | List all containers |
@@ -239,6 +240,22 @@ Stops a running container gracefully.
 c.stop("app")
 ```
 
+### `ContainerClient.wait_stopped(name_or_id, timeout=30)`
+
+Polls the container's running state until it stops or the timeout elapses. Useful after `stop()` to confirm the container has fully stopped, and safe to call on containers that no longer exist: they're treated as already stopped.
+
+**Parameters:**
+- `name_or_id` (`str`): Container name or ID.
+- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
+
+**Returns:** `bool`: `True` if the container is stopped, `False` if the timeout was reached.
+
+```python
+c.stop("web")
+if not c.wait_stopped("web", timeout=15):
+    print("container did not stop in time")
+```
+
 ### `ContainerClient.remove(name_or_id)`
 
 Removes a stopped container.
@@ -348,6 +365,7 @@ result = c.exec("demo", ["/bin/bash", "-c", "cat /data/out.txt"])
 print(result["stdout"])
 
 c.stop("demo")
+c.wait_stopped("demo", timeout=15)
 c.remove("demo")
 c.volume_remove("demo-data")
 c.image_remove("ubuntu:24.04")

@@ -5,6 +5,264 @@ layout: changelog
 nav-skip: true
 ---
 
+## July 2026
+
+{{< version "v0.17.0" >}}
+
+{{< changelog-item "added" >}}
+**New `scriptling.nomad` library: manage HashiCorp Nomad CSI volumes and jobs.**
+
+A `NomadClient` obtained from `nomad.Client(addr, token=...)` talks directly to
+the Nomad HTTP API, covering CSI storage volumes and jobs. Requests default to
+a 10 second timeout, adjustable via `timeout=` on `Client()`:
+
+- CSI volumes: `csi_volumes_list`, `csi_volume_get`, `csi_volume_register`,
+  `csi_volume_deregister`.
+- Jobs: `jobs_list`, `job_get`, `job_register`, `job_stop`,
+  `wait_job_stopped`, `job_validate`, `job_plan`, `jobs_parse` (HCL to JSON).
+
+This is aimed at cluster housekeeping tasks, such as reconciling CSI volumes
+against a source of truth and removing orphaned ones after confirmation.
+
+```python
+import scriptling.nomad as nomad
+
+c = nomad.Client("https://nomad.example.com:4646", token="secret")
+
+expected = set(open("expected_volumes.txt").read().split())
+for v in c.csi_volumes_list(namespace="*"):
+    if v["id"].startswith("qaprod") and v["id"] not in expected:
+        c.csi_volume_deregister(v["id"], force=True)
+```
+
+See [scriptling.nomad](/reference/libraries/scriptling/utilities/nomad/) for
+the full method reference.
+
+**`scriptling.container`: `wait_stopped()` confirms a container has fully stopped.**
+
+`ContainerClient.stop()` already blocks until the container reports stopped
+for Docker, Podman, and Apple Containers, but there was no way to
+independently re-check that state afterwards. `wait_stopped(name_or_id,
+timeout=30)` polls the container's running state until it stops or the
+timeout elapses, and treats a container that no longer exists as already
+stopped.
+
+```python
+c.stop("web")
+if not c.wait_stopped("web", timeout=15):
+    print("container did not stop in time")
+```
+
+**New `scriptling.find` library: locate files and directories by name, type, mtime, and size.**
+
+A new utility library inspired by the Unix `find` command, filling the gap
+between `glob` (name matching only) and a hand-rolled `os.walk` loop:
+
+```python
+import scriptling.find as find
+import time
+
+# Markdown files modified in the last 24 hours
+recent = find.path("/docs", name="*.md", type="file",
+                   mtime_min=time.time() - 86400)
+
+# Large log files
+big = find.path("/var/log", name="*.log", type="file", size_min=104857600)
+```
+
+`find.path(path, *, recursive=True, type="any", name="", mtime_min=None,
+mtime_max=None, size_min=None, size_max=None, include_hidden=False,
+follow_links=False, max_depth=None)` returns matching paths as a list of
+strings. Recursive searches stat and filter entries concurrently using a
+bounded worker pool, the same model as `scriptling.grep`. See
+[scriptling.find](/reference/libraries/scriptling/utilities/find/) for the full
+reference.
+
+**New `shlex`, `tempfile`, and `shutil` standard libraries.**
+
+Three new standard libraries fill gaps in filesystem and command-line tooling:
+
+| Library | Key functions | Description |
+|---------|--------------|-------------|
+| `shlex` | `quote`, `split`, `join` | Shell-style quoting and splitting — safe command-line construction for `subprocess` |
+| `tempfile` | `mkstemp`, `mkdtemp`, `gettempdir` | Temporary file and directory creation with restrictive permissions |
+| `shutil` | `copy`, `copytree`, `rmtree`, `move`, `disk_usage` | High-level file operations including recursive delete and disk usage |
+
+All three enforce `allowedPaths` restrictions when registered with explicit
+paths (except `shlex`, which is pure string processing with no filesystem
+access). `tempfile` creates files with mode `0600` and directories with `0700`,
+and falls back to the first allowed path when the system temp directory is
+outside the sandbox.
+
+```python
+import shlex, subprocess
+import tempfile, shutil
+
+# Safe command construction
+subprocess.run(shlex.split("echo " + shlex.quote(user_input)))
+
+# Atomic write via temp file
+tmp = tempfile.mkstemp(suffix=".tmp")
+try:
+    # ... write to tmp ...
+    shutil.move(tmp, "output.final")
+except:
+    shutil.rmtree(tmp)
+```
+
+See [shlex](/reference/libraries/text-processing/shlex/),
+[tempfile](/reference/libraries/filesystem/tempfile/), and
+[shutil](/reference/libraries/filesystem/shutil/) for the full references.
+
+**New `zipfile` and `tarfile` libraries: read and write compressed archives.**
+
+Two new standard libraries bring archive handling to Scriptling, matching
+Python's `zipfile` and `tarfile` modules:
+
+- **`zipfile`** — `ZipFile(path, mode)` with `namelist()`, `read()`, `extract()`,
+  `extractall()`, `write()`, `writestr()`, `is_zipfile()`.
+- **`tarfile`** — `TarFile(path, mode)` with the same method set plus gzip
+  support (`"r:gz"`, `"w:gz"` modes), `add()`, `addstr()`, `is_tarfile()`.
+
+Both enforce `allowedPaths` and block zip/tar-slip (path traversal via crafted
+entry names). See
+[zipfile](/reference/libraries/filesystem/zipfile/) and
+[tarfile](/reference/libraries/filesystem/tarfile/) for the full references.
+
+```python
+import tarfile
+
+# Extract a .tar.gz
+tf = tarfile.TarFile("release.tar.gz", "r:gz")
+tf.extractall("/opt/app")
+tf.close()
+
+# Create a zip from files + inline data
+import zipfile
+zf = zipfile.ZipFile("config.zip", "w")
+zf.writestr("version.txt", "1.0.0")
+zf.write("/etc/app.conf")
+zf.close()
+```
+
+**`scriptling.similarity`: vector operations — `cosine_similarity`, `most_similar`, `vectorize`.**
+
+The similarity library gains three vector functions for text-matching workflows:
+
+- **`cosine_similarity(a, b)`** — compare two numeric vectors (-1.0 to 1.0).
+  Now exposed in `similarity` (its natural home) in addition to `scriptling.ai`.
+  The implementation is shared — no code duplication.
+- **`most_similar(query, vectors, top_k=5)`** — rank a list of vectors by
+  similarity to a query; returns `[{"index": int, "score": float}, …]`.
+- **`vectorize(text, dims=256)`** — generate a vector from text using the
+  feature-hashing trick. CPU-only, deterministic, no model or API call required.
+  Texts sharing words produce similar vectors.
+
+```python
+import scriptling.similarity as sim
+
+# CPU-only text matching — no embedding API needed
+v1 = sim.vectorize("the quick brown fox")
+v2 = sim.vectorize("the quick red fox")
+print(sim.cosine_similarity(v1, v2))  # high — shares 3 of 4 words
+
+# Rank documents against a query
+docs = [sim.vectorize(d) for d in ["hello world", "quick fox", "goodbye"]]
+for r in sim.most_similar(sim.vectorize("hi world"), docs, top_k=2):
+    print(r["index"], r["score"])
+```
+
+**New `scriptling.csv` library: CSV parsing and formatting (string-based).**
+
+A string-based CSV library backed by Go's `encoding/csv` (RFC 4180 compliant).
+Unlike Python's `csv` module (which requires file objects), this operates on
+strings — available in all environments including MCP (no filesystem access
+needed).
+
+- **`loads(content, delimiter=",")`** — CSV text → list of lists.
+- **`loads_dict(content, delimiter=",")`** — CSV text → list of dicts (first row = headers).
+- **`dumps(rows, delimiter=",")`** — list of lists → CSV text (auto-quotes values with commas).
+- **`dumps_dict(rows, delimiter=",", columns=None)`** — list of dicts → CSV text with header row.
+
+```python
+import scriptling.csv as csv
+import os
+
+# Read and parse
+people = csv.loads_dict(os.read_file("users.csv"))
+for p in people:
+    print(p["name"], p["email"])
+
+# Write
+os.write_file("output.csv", csv.dumps_dict(people, columns=["name", "email"]))
+```
+
+See [scriptling.csv](/reference/libraries/scriptling/utilities/csv/) for the full reference.
+
+**New `scriptling.xml` library: XML parsing and formatting (dict-based).**
+
+A simple dict-based XML library (similar to Python's `xmltodict`), using the
+`loads`/`dumps` convention consistent with `json`, `yaml`, `toml`, and `csv`.
+No filesystem access required — available in all environments including MCP.
+
+- **`loads(content)`** — XML string → nested dict. Element tags become dict
+  keys, attributes become `@`-prefixed keys, repeated elements become lists,
+  text alongside attributes/children uses `#text`.
+- **`dumps(data, indent="")`** — dict → XML string. Supports attributes,
+  repeated elements (list values), and optional indentation.
+
+```python
+import scriptling.xml as xml
+
+data = xml.loads('<user id="123"><name>Alice</name></user>')
+# {"user": {"@id": "123", "name": "Alice"}}
+
+text = xml.dumps({"users": {"user": ["Alice", "Bob"]}}, indent="  ")
+# <users>
+#   <user>Alice</user>
+#   <user>Bob</user>
+# </users>
+```
+
+See [scriptling.xml](/reference/libraries/scriptling/utilities/xml/) for the full reference.
+
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**`glob`: `recursive` and `include_hidden` keyword arguments, with bounded parallel recursive search.**
+
+`glob.glob()` and `glob.iglob()` gain two keyword-only parameters, both
+defaulting to `False`:
+
+- `recursive=True` makes `**` match files and directories recursively,
+  descending into every subdirectory. When `False` (the default), `**` is
+  treated as `*`, matching Python's `glob` module.
+- `include_hidden=True` matches entries whose name starts with `.`; when
+  `False` (the default) dot-files and dot-directories are skipped.
+
+Recursive searches now run as a **bounded parallel directory walk**, using the
+same worker-pool model as `scriptling.grep`, so large trees are scanned
+concurrently rather than sequentially.
+
+```python
+import glob
+
+# Recursively find all Python files (descends into subdirectories)
+py_files = glob.glob("**/*.py", recursive=True)
+
+# Include dot-directories such as .github
+all_py = glob.glob("**/*.py", recursive=True, include_hidden=True)
+```
+
+`glob.iglob()` accepts the same keyword arguments; the recursive path uses the
+same parallel walk internally.
+
+Note that with the new default (`include_hidden=False`), dot-files are now
+**skipped** by wildcard patterns, matching Python's behaviour. Previously Go's
+glob included them; pass `include_hidden=True` to restore the old behaviour.
+
+{{< /changelog-item >}}
+
 ## June 2026
 
 {{< version "v0.16.0" >}}
