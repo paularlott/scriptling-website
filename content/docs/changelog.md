@@ -179,25 +179,52 @@ Unlike Python's `csv` module (which requires file objects), this operates on
 strings — available in all environments including MCP (no filesystem access
 needed).
 
-- **`parse(content, delimiter=",")`** — CSV text → list of lists.
-- **`parse_dict(content, delimiter=",")`** — CSV text → list of dicts (first row = headers).
-- **`format(rows, delimiter=",")`** — list of lists → CSV text (auto-quotes values with commas).
-- **`format_dict(rows, delimiter=",", columns=None)`** — list of dicts → CSV text with header row.
+- **`loads(content, delimiter=",")`** — CSV text → list of lists.
+- **`loads_dict(content, delimiter=",")`** — CSV text → list of dicts (first row = headers).
+- **`dumps(rows, delimiter=",")`** — list of lists → CSV text (auto-quotes values with commas).
+- **`dumps_dict(rows, delimiter=",", columns=None)`** — list of dicts → CSV text with header row.
 
 ```python
 import scriptling.csv as csv
 import os
 
 # Read and parse
-people = csv.parse_dict(os.read_file("users.csv"))
+people = csv.loads_dict(os.read_file("users.csv"))
 for p in people:
     print(p["name"], p["email"])
 
 # Write
-os.write_file("output.csv", csv.format_dict(people, columns=["name", "email"]))
+os.write_file("output.csv", csv.dumps_dict(people, columns=["name", "email"]))
 ```
 
 See [scriptling.csv](/reference/libraries/scriptling/utilities/csv/) for the full reference.
+
+**New `scriptling.xml` library: XML parsing and formatting (dict-based).**
+
+A simple dict-based XML library (similar to Python's `xmltodict`), using the
+`loads`/`dumps` convention consistent with `json`, `yaml`, `toml`, and `csv`.
+No filesystem access required — available in all environments including MCP.
+
+- **`loads(content)`** — XML string → nested dict. Element tags become dict
+  keys, attributes become `@`-prefixed keys, repeated elements become lists,
+  text alongside attributes/children uses `#text`.
+- **`dumps(data, indent="")`** — dict → XML string. Supports attributes,
+  repeated elements (list values), and optional indentation.
+
+```python
+import scriptling.xml as xml
+
+data = xml.loads('<user id="123"><name>Alice</name></user>')
+# {"user": {"@id": "123", "name": "Alice"}}
+
+text = xml.dumps({"users": {"user": ["Alice", "Bob"]}}, indent="  ")
+# <users>
+#   <user>Alice</user>
+#   <user>Bob</user>
+# </users>
+```
+
+See [scriptling.xml](/reference/libraries/scriptling/utilities/xml/) for the full reference.
 
 {{< /changelog-item >}}
 

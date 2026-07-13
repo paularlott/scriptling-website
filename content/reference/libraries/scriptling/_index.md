@@ -48,6 +48,7 @@ Scriptling-specific libraries that provide functionality not available in Python
 - [Grep](utilities/grep/): Fast file content search with regex or literal patterns
 - [Find](utilities/find/): Find files and directories by name, type, mtime, and size
 - [CSV](utilities/csv/): CSV parsing and formatting (string-based, no filesystem access)
+- [XML](utilities/xml/): XML parsing and formatting (dict-based, string-only)
 - [Sed](utilities/sed/): In-place file content replacement with literal strings or regex patterns
 - [Secrets](utilities/secret/): Resolve secrets through host-configured provider aliases
 - [Wait For](utilities/wait_for/): Wait for resources to become available

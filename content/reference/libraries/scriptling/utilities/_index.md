@@ -17,6 +17,7 @@ General purpose utility libraries for common scripting tasks.
 | [scriptling.grep](grep/) | Fast file content search with regex or literal patterns |
 | [scriptling.find](find/) | Find files and directories by name, type, mtime, and size |
 | [scriptling.csv](csv/) | CSV parsing and formatting (string-based) |
+| [scriptling.xml](xml/) | XML parsing and formatting (dict-based, string-only) |
 | [scriptling.sed](sed/) | In-place file content replacement with literal strings or regex patterns |
 | [scriptling.secret](secret/) | Resolve secrets through host-configured provider aliases |
 | [scriptling.wait_for](wait_for/) | Wait for resources to become available |

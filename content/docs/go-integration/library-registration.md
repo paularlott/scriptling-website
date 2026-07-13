@@ -81,6 +81,7 @@ extlibs.RegisterShlexLibrary(p)
 | `html.parser` | `RegisterHTMLParserLibrary(p)` |
 | `shlex` | `RegisterShlexLibrary(p)` |
 | `scriptling.csv` | `RegisterCsvLibrary(p)` |
+| `scriptling.xml` | `RegisterXmlLibrary(p)` |
 
 ### Filesystem Libraries
 

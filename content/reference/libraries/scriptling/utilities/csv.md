@@ -13,14 +13,14 @@ Available in all environments (including MCP — no filesystem access required).
 
 | Function | Description |
 |----------|-------------|
-| `parse(content, delimiter=",")` | Parse CSV text into a list of rows (lists). |
-| `parse_dict(content, delimiter=",")` | Parse CSV text into a list of dicts (first row = headers). |
-| `format(rows, delimiter=",")` | Format a list of lists into CSV text. |
-| `format_dict(rows, delimiter=",", columns=None)` | Format a list of dicts into CSV text. |
+| `loads(content, delimiter=",")` | Parse CSV text into a list of rows (lists). |
+| `loads_dict(content, delimiter=",")` | Parse CSV text into a list of dicts (first row = headers). |
+| `dumps(rows, delimiter=",")` | Format a list of lists into CSV text. |
+| `dumps_dict(rows, delimiter=",", columns=None)` | Format a list of dicts into CSV text. |
 
 ## Functions
 
-### `parse(content, delimiter=",")`
+### `loads(content, delimiter=",")`
 
 Parse a CSV string into a list of rows. Handles quoting, embedded commas, and embedded newlines per RFC 4180.
 
@@ -42,7 +42,7 @@ rows = csv.parse('a,b\n"hello, world",x\n')
 # [["a", "b"], ["hello, world", "x"]]
 ```
 
-### `parse_dict(content, delimiter=",")`
+### `loads_dict(content, delimiter=",")`
 
 Parse CSV text where the first row contains column headers. Each subsequent row becomes a dict mapping header names to cell values.
 
@@ -56,7 +56,7 @@ people = csv.parse_dict("name,age\nAlice,30\nBob,25\n")
 print(people[0]["name"])  # "Alice"
 ```
 
-### `format(rows, delimiter=",")`
+### `dumps(rows, delimiter=",")`
 
 Format a list of lists into CSV text. Values containing commas, quotes, or newlines are automatically quoted.
 
@@ -73,7 +73,7 @@ text = csv.format([["a", "b"], ["1,000", "2"]])
 # 'a,b\n"1,000",2\n'
 ```
 
-### `format_dict(rows, delimiter=",", columns=None)`
+### `dumps_dict(rows, delimiter=",", columns=None)`
 
 Format a list of dicts into CSV text with a header row. Column headers are taken from the `columns` kwarg if provided, otherwise from the sorted keys of the first dict.
 
