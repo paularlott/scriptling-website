@@ -1,11 +1,11 @@
 ---
 title: scriptling.nomad
 linkTitle: nomad
-description: HashiCorp Nomad client covering CSI volumes and jobs.
+description: HashiCorp Nomad client covering CSI volumes, dynamic host volumes, and jobs.
 weight: 1
 ---
 
-The `scriptling.nomad` library provides a client for the HashiCorp Nomad HTTP API, covering CSI storage volumes and jobs. All operations go through a `NomadClient` obtained from `Client()`.
+The `scriptling.nomad` library provides a client for the HashiCorp Nomad HTTP API, covering CSI storage volumes, dynamic host volumes, and jobs. All operations go through a `NomadClient` obtained from `Client()`.
 
 ## Available Functions
 
@@ -19,8 +19,15 @@ The `scriptling.nomad` library provides a client for the HashiCorp Nomad HTTP AP
 |--------|-------------|
 | `csi_volumes_list(**kwargs)` | List CSI volumes |
 | `csi_volume_get(id, **kwargs)` | Get details for a CSI volume |
-| `csi_volume_register(id, volume, **kwargs)` | Register (create) a CSI volume |
-| `csi_volume_deregister(id, **kwargs)` | Deregister (delete) a CSI volume |
+| `csi_volume_register(id, volume, **kwargs)` | Register a pre-existing CSI volume with Nomad |
+| `csi_volume_create(id, volume, **kwargs)` | Create a CSI volume and provision backing storage |
+| `csi_volume_deregister(id, **kwargs)` | Deregister a CSI volume from Nomad (backing storage is preserved) |
+| `csi_volume_delete(id, **kwargs)` | Delete a CSI volume and its backing storage |
+| `host_volumes_list(**kwargs)` | List dynamic host volumes |
+| `host_volume_get(id, **kwargs)` | Get details for a dynamic host volume |
+| `host_volume_register(id, volume, **kwargs)` | Register a pre-existing dynamic host volume |
+| `host_volume_create(id, volume, **kwargs)` | Create a dynamic host volume via a plugin |
+| `host_volume_delete(id, **kwargs)` | Delete a dynamic host volume |
 | `jobs_list(**kwargs)` | List jobs |
 | `job_get(id, **kwargs)` | Get the full specification and status for a job |
 | `job_register(job)` | Register (create or update) a job |
@@ -92,7 +99,7 @@ print(vol["Provider"])
 
 ### `NomadClient.csi_volume_register(id, volume, namespace="")`
 
-Registers (creates) a CSI volume.
+Registers a pre-existing CSI volume with Nomad. The backing storage must already exist on the storage provider. Use `csi_volume_create` instead to have the CSI plugin provision new storage.
 
 **Parameters:**
 - `id` (`str`): Volume ID.
@@ -111,9 +118,29 @@ c.csi_volume_register("qaprod-data-01", {
 })
 ```
 
+### `NomadClient.csi_volume_create(id, volume, namespace="")`
+
+Creates a CSI volume by instructing the CSI controller plugin to provision new backing storage (e.g. a Ceph RBD image) and registers the volume in Nomad.
+
+**Parameters:**
+- `id` (`str`): Volume ID.
+- `volume` (`dict`): Volume specification in Nomad's CSI volume JSON format.
+- `namespace` (`str`, optional): Namespace. Default: `""`: Nomad's default namespace.
+
+**Returns:** `None`
+
+```python
+c.csi_volume_create("qaprod-data-01", {
+    "Name": "qaprod-data-01",
+    "PluginID": "ceph-csi",
+    "RequestedCapacityMin": 10 * 1024 * 1024 * 1024,
+    "RequestedCapabilities": [{"AccessMode": "single-node-writer", "AttachmentMode": "file-system"}],
+}, namespace="fortixqa")
+```
+
 ### `NomadClient.csi_volume_deregister(id, namespace="", force=False)`
 
-Deregisters (deletes) a CSI volume.
+Deregisters a CSI volume from Nomad without removing the backing storage. The underlying data (e.g. Ceph RBD image) remains intact. Use `csi_volume_delete` to also remove the backing storage.
 
 **Parameters:**
 - `id` (`str`): Volume ID.
@@ -124,6 +151,117 @@ Deregisters (deletes) a CSI volume.
 
 ```python
 c.csi_volume_deregister("qaprod-orphaned-01", force=True)
+```
+
+### `NomadClient.csi_volume_delete(id, namespace="")`
+
+Deletes a CSI volume by instructing the CSI controller plugin to destroy the backing storage (e.g. Ceph RBD image), then deregisters the volume from Nomad. This permanently removes the data.
+
+**Parameters:**
+- `id` (`str`): Volume ID.
+- `namespace` (`str`, optional): Namespace. Default: `""`: Nomad's default namespace.
+
+**Returns:** `None`
+
+```python
+c.csi_volume_delete("qaprod-orphaned-01", namespace="fortixqa")
+```
+
+### `NomadClient.host_volumes_list(namespace="*", node_id="", node_pool="", plugin_id="")`
+
+Lists dynamic host volumes.
+
+**Parameters:**
+- `namespace` (`str`, optional): Namespace to list, `"*"` for all namespaces. Default: `"*"`.
+- `node_id` (`str`, optional): Filter by node ID. Default: `""`: no filter.
+- `node_pool` (`str`, optional): Filter by node pool. Default: `""`: no filter.
+- `plugin_id` (`str`, optional): Filter by host volume plugin ID. Default: `""`: no filter.
+
+**Returns:** `list` of `dict`, each with keys:
+- `id` (`str`): Volume ID.
+- `name` (`str`): Volume name.
+- `namespace` (`str`): Namespace.
+- `plugin_id` (`str`): Host volume plugin ID.
+- `node_id` (`str`): Node the volume is on.
+- `node_pool` (`str`): Node pool.
+- `state` (`str`): Volume state.
+
+```python
+for v in c.host_volumes_list():
+    print(v["name"], v["node_id"], v["state"])
+```
+
+### `NomadClient.host_volume_get(id, namespace="")`
+
+Returns full details for a single dynamic host volume.
+
+**Parameters:**
+- `id` (`str`): Volume ID.
+- `namespace` (`str`, optional): Namespace. Default: `""`: Nomad's default namespace.
+
+**Returns:** `dict`: the full volume specification and status, as returned by the Nomad API.
+
+```python
+vol = c.host_volume_get("abc123-def456")
+print(vol["Name"], vol["HostPath"], vol["State"])
+```
+
+### `NomadClient.host_volume_register(id, volume, namespace="")`
+
+Registers a pre-existing dynamic host volume with Nomad. The backing storage (e.g. a pre-mounted NFS or CephFS path) must already exist on the node. Use `host_volume_create` instead to have the host volume plugin provision storage.
+
+**Parameters:**
+- `id` (`str`): Volume ID.
+- `volume` (`dict`): Volume specification in Nomad's host volume JSON format.
+- `namespace` (`str`, optional): Namespace. Default: `""`: Nomad's default namespace.
+
+**Returns:** `None`
+
+```python
+c.host_volume_register("vol-abc123", {
+    "Name": "cephfs-code",
+    "PluginID": "mkdir",
+    "NodeID": "node-1",
+    "HostPath": "/cephfs/sys-code/Freedom3",
+    "Capacity": 100 * 1024 * 1024 * 1024,
+    "RequestedCapabilities": [{"AccessMode": "single-node-writer", "AttachmentMode": "file-system"}],
+})
+```
+
+### `NomadClient.host_volume_create(id, volume, namespace="")`
+
+Creates a dynamic host volume by instructing the host volume plugin to provision storage on the target node and registers the volume in Nomad.
+
+**Parameters:**
+- `id` (`str`): Volume ID.
+- `volume` (`dict`): Volume specification in Nomad's host volume JSON format.
+- `namespace` (`str`, optional): Namespace. Default: `""`: Nomad's default namespace.
+
+**Returns:** `None`
+
+```python
+c.host_volume_create("vol-new-01", {
+    "Name": "app-data",
+    "PluginID": "mkdir",
+    "NodePool": "production",
+    "RequestedCapacityMinBytes": 50 * 1024 * 1024 * 1024,
+    "RequestedCapabilities": [{"AccessMode": "single-node-writer", "AttachmentMode": "file-system"}],
+    "Parameters": {"path": "/opt/volumes/app-data"},
+})
+```
+
+### `NomadClient.host_volume_delete(id, namespace="")`
+
+Deletes a dynamic host volume by instructing the host volume plugin to destroy the backing storage on the node and deregistering it from Nomad.
+
+**Parameters:**
+- `id` (`str`): Volume ID.
+- `namespace` (`str`, optional): Namespace. Default: `""`: Nomad's default namespace.
+
+**Returns:** `None`
+
+```python
+c.host_volume_delete("vol-abc123", namespace="production")
 ```
 
 ### `NomadClient.jobs_list(namespace="*", prefix="")`

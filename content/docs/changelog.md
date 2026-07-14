@@ -7,6 +7,71 @@ nav-skip: true
 
 ## July 2026
 
+{{< version "v0.17.2" >}}
+
+{{< changelog-item "added" >}}
+**`scriptling.nomad`: dynamic host volume support.**
+
+The nomad library now covers Nomad's dynamic host volumes (introduced in Nomad 1.8+):
+
+- `host_volumes_list` — list dynamic host volumes, with optional filters for
+  namespace, node_id, node_pool, and plugin_id.
+- `host_volume_get` — fetch full details for a single host volume.
+- `host_volume_register` — register a pre-existing host volume (e.g. a
+  pre-mounted CephFS path) with Nomad.
+- `host_volume_create` — provision storage via a host volume plugin and
+  register it with Nomad.
+- `host_volume_delete` — destroy backing storage via the plugin and deregister
+  from Nomad.
+
+```python
+import scriptling.nomad as nomad
+
+c = nomad.Client("https://nomad.example.com:4646", token="secret")
+
+# List all host volumes
+for v in c.host_volumes_list():
+    print(v["name"], v["node_id"], v["state"])
+
+# Create a new host volume via plugin
+c.host_volume_create("vol-new-01", {
+    "Name": "app-data",
+    "PluginID": "mkdir",
+    "NodePool": "production",
+    "RequestedCapacityMinBytes": 50 * 1024 * 1024 * 1024,
+    "RequestedCapabilities": [{"AccessMode": "single-node-writer", "AttachmentMode": "file-system"}],
+})
+```
+
+The nomad library now covers the complete CSI volume lifecycle:
+
+- `csi_volume_create` — provisions new backing storage via the CSI controller
+  plugin (e.g. creates a Ceph RBD image) and registers it in Nomad.
+- `csi_volume_delete` — destroys backing storage via the CSI controller plugin
+  and deregisters the volume from Nomad.
+
+These complement the existing `csi_volume_register` (register pre-existing
+storage) and `csi_volume_deregister` (un-track without destroying data).
+
+```python
+# Create a new volume with backing storage
+c.csi_volume_create("qaprod-data-01", {
+    "Name": "qaprod-data-01",
+    "PluginID": "ceph-csi",
+    "RequestedCapacityMin": 10 * 1024 * 1024 * 1024,
+    "RequestedCapabilities": [{"AccessMode": "single-node-writer", "AttachmentMode": "file-system"}],
+}, namespace="fortixqa")
+
+# Delete volume and its Ceph backing store
+c.csi_volume_delete("qaprod-orphaned-01", namespace="fortixqa")
+```
+
+See [scriptling.nomad](/reference/libraries/scriptling/utilities/nomad/) for
+the full method reference.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.17.0" >}}
 
 {{< changelog-item "added" >}}
