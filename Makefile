@@ -13,7 +13,7 @@ architecture: asset-src/distributed-architecture.d2 asset-src/architecture-singl
 okf:
 	scriptling scripts/okf.py
 
-## Run the OKF MCP server (tools: list_bundles, list_files, get_file, search)
+## Run the OKF MCP server (tools: skb_list, skb_get, skb_search, skb_grep)
 mcp-server:
 	scriptling --server :8765 --mcp-tools mcp/tools
 
@@ -24,7 +24,28 @@ pack: okf
 	cd mcp && zip -qr ../dist/scriptling-kb.zip tools okf README.md
 	@echo "Built dist/scriptling-kb.zip"
 
-.PHONY: help okf mcp-server pack
+## Pack just the OKF bundles into dist/scriptling-okf-bundles.zip
+bundle-pack: okf
+	@rm -f dist/scriptling-okf-bundles.zip
+	@mkdir -p dist
+	cd mcp/okf && zip -qr ../../dist/scriptling-okf-bundles.zip scriptling-docs scriptling-reference scriptling-libraries
+	@echo "Built dist/scriptling-okf-bundles.zip"
+
+## Tag and publish a GitHub release with the KB + OKF bundles archives
+release: pack bundle-pack
+	@test -d ../scriptling || { echo "scriptling repo not found at ../scriptling"; exit 1; }
+	@command -v gh >/dev/null 2>&1 || { echo "gh CLI not installed"; exit 1; }
+	@V=$$(cd ../scriptling && go run ./tools/getversion); \
+	echo "Releasing scriptling-kb v$$V"; \
+	if git tag -l v$$V | grep -q v$$V; then \
+		echo "Tag v$$V already exists, skipping tag creation"; \
+	else \
+		git tag -a v$$V -m "Release $$V" && git push origin v$$V; \
+	fi; \
+	gh release create v$$V dist/scriptling-kb.zip dist/scriptling-okf-bundles.zip \
+		-t "Release $$V" -n "Scriptling knowledge bundles and MCP server $$V"
+
+.PHONY: help okf mcp-server pack bundle-pack release
 ## This help screen
 help:
 	@printf "Available targets:\n\n"
