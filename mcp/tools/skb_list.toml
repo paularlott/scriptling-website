@@ -1,0 +1,7 @@
+description = "List what's at a path: a folder's contents (concept files and subfolders), or a single file's metadata. Pass an empty path to list the bundles themselves. Use this to browse/navigate before reading a file."
+keywords = ["okf", "list", "files", "browse", "folder", "navigate", "dir"]
+
+[[parameters]]
+name = "path"
+type = "string"
+description = "Path relative to the OKF root: a folder (e.g. 'reference', 'reference/libraries'), a file (e.g. 'libraries/cheat-sheet.md'), or empty to list the bundles."

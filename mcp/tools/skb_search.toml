@@ -1,0 +1,13 @@
+description = "Search the OKF bundles for any of the given terms (OR, case-insensitive) across file names, frontmatter, and body text. Returns matching paths with line numbers and the matched line. Scope to a bundle/folder via path, or leave empty to search everything."
+keywords = ["okf", "search", "find", "grep", "query", "match"]
+
+[[parameters]]
+name = "path"
+type = "string"
+description = "Scope: a bundle or folder path (e.g. 'reference', 'reference/libraries/scriptling'). Empty searches all bundles."
+
+[[parameters]]
+name = "terms"
+type = "array:string"
+description = "Search terms; a file matches if any term appears (OR semantics, case-insensitive)."
+required = true
