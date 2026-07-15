@@ -4,4 +4,4 @@ keywords = ["scriptling", "documentation", "docs", "reference", "libraries", "li
 [[parameters]]
 name = "path"
 type = "string"
-description = "Path relative to the OKF root: a folder (e.g. 'reference', 'reference/libraries'), a file (e.g. 'libraries/cheat-sheet.md'), or empty to list the bundles."
+description = "Path relative to the OKF root: a folder (e.g. 'scriptling-reference', 'scriptling-libraries'), a file (e.g. 'scriptling-libraries/cheat-sheet.md'), or empty to list the bundles."

@@ -25,7 +25,7 @@ This produces, under `mcp/`:
 
 | Path | Contents |
 |------|----------|
-| `mcp/okf/docs/`, `mcp/okf/reference/`, `mcp/okf/libraries/` | The three OKF knowledge bundles. |
+| `mcp/okf/scriptling-docs/`, `mcp/okf/scriptling-reference/`, `mcp/okf/scriptling-libraries/` | The three OKF knowledge bundles. |
 | `mcp/tools/` | The `skb_*` MCP tools. |
 | `mcp/okf/<bundle>/.vector.json` | Per-bundle vector index powering `skb_search`. |
 

@@ -4,4 +4,4 @@ keywords = ["scriptling", "documentation", "docs", "get", "read", "file", "page"
 [[parameters]]
 name = "path"
 type = "string"
-description = "Path relative to the OKF root. A concept file (e.g. 'reference/builtins.md'), a folder (e.g. 'reference/libraries'), '<folder>/index.md' for a synthesized listing, or empty for the root bundle list."
+description = "Path relative to the OKF root. A concept file (e.g. 'scriptling-reference/builtins.md'), a folder (e.g. 'scriptling-libraries'), '<folder>/index.md' for a synthesized listing, or empty for the root bundle list."

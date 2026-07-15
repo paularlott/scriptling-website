@@ -10,7 +10,7 @@ required = true
 [[parameters]]
 name = "path"
 type = "string"
-description = "Scope: a bundle or folder path (e.g. 'reference', 'reference/libraries'). Empty searches all bundles."
+description = "Scope: a bundle or folder path (e.g. 'scriptling-reference', 'scriptling-libraries'). Empty searches all bundles."
 
 [[parameters]]
 name = "top_k"

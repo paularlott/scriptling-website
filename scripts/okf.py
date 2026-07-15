@@ -9,13 +9,13 @@ import re
 import scriptling.similarity as sim
 
 OUT = "mcp/okf"
-VECTORS_DIMS = 512
+VECTORS_DIMS = 768
 
 # (name, source_dir, default_type, excluded_subdirs)
 BUNDLES = [
-    ("docs", "content/docs", "Guide", []),
-    ("reference", "content/reference", "Reference", ["libraries"]),
-    ("libraries", "content/reference/libraries", "API Reference", []),
+    ("scriptling-docs", "content/docs", "Guide", []),
+    ("scriptling-reference", "content/reference", "Reference", ["libraries"]),
+    ("scriptling-libraries", "content/reference/libraries", "API Reference", []),
 ]
 
 
@@ -24,11 +24,11 @@ BUNDLES = [
 def bundle_of(path):
     p = path.rstrip("/")
     if p == "content/reference/libraries" or p.startswith("content/reference/libraries/"):
-        return "libraries"
+        return "scriptling-libraries"
     if p == "content/reference" or p.startswith("content/reference/"):
-        return "reference"
+        return "scriptling-reference"
     if p == "content/docs" or p.startswith("content/docs/"):
-        return "docs"
+        return "scriptling-docs"
     return None
 
 

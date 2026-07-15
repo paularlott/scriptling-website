@@ -1,8 +1,8 @@
 # Scriptling KB — MCP Server
 
 Browse and search Scriptling's documentation (OKF knowledge bundles) from any
-MCP-compatible AI client. Ships three bundles — `docs`, `reference`,
-`libraries` — exposed as four tools.
+MCP-compatible AI client. Ships three bundles — `scriptling-docs`, `scriptling-reference`,
+`scriptling-libraries` — exposed as four tools.
 
 ## Requirements
 
@@ -22,7 +22,7 @@ You should have:
 ```
 scriptling-kb/
 ├── tools/           # the skb_* MCP tools (+ okf_lib.py helper)
-└── okf/             # the knowledge bundles (docs/, reference/, libraries/)
+└── okf/             # the knowledge bundles (scriptling-docs/, scriptling-reference/, scriptling-libraries/)
 ```
 
 The tools read the bundles from `$OKF_ROOT`, so every command below sets it to
