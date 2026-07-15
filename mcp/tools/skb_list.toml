@@ -1,5 +1,5 @@
-description = "List what's at a path: a folder's contents (concept files and subfolders), or a single file's metadata. Pass an empty path to list the bundles themselves. Use this to browse/navigate before reading a file."
-keywords = ["okf", "list", "files", "browse", "folder", "navigate", "dir"]
+description = "Browse Scriptling's documentation (language reference, libraries, and guides). List the bundles (empty path), a folder's contents, or a single file's metadata. Use this to navigate before reading a page."
+keywords = ["scriptling", "documentation", "docs", "reference", "libraries", "list", "browse", "folder", "navigate"]
 
 [[parameters]]
 name = "path"

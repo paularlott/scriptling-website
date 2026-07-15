@@ -6,7 +6,7 @@ MCP-compatible AI client. Ships three bundles — `docs`, `reference`,
 
 ## Requirements
 
-- The `scriptling` CLI installed and on your `PATH` (`scriptling --version`).
+- The `scriptling` CLI, **0.17.4 or later**, installed and on your `PATH` (`scriptling --version`).
 
 ## Install
 
@@ -22,8 +22,7 @@ You should have:
 ```
 scriptling-kb/
 ├── tools/           # the skb_* MCP tools (+ okf_lib.py helper)
-├── okf/             # the knowledge bundles (docs/, reference/, libraries/)
-└── manifest.json    # bundle metadata used by skb_bundles
+└── okf/             # the knowledge bundles (docs/, reference/, libraries/)
 ```
 
 The tools read the bundles from `$OKF_ROOT`, so every command below sets it to
@@ -31,12 +30,15 @@ this folder's `okf/`. Substitute your real absolute path where shown.
 
 ## Tools
 
-| Tool          | What it does                                                                 |
-|---------------|------------------------------------------------------------------------------|
-| `skb_bundles` | List the knowledge bundles with titles/descriptions. Start here.            |
-| `skb_list`    | List the contents of a folder (`""` = bundles; e.g. `reference/libraries`). |
-| `skb_get`     | Read a concept file as markdown; synthesizes a listing for a folder.        |
-| `skb_search`  | Parallel OR/case-insensitive search across names, metadata, and bodies.     |
+| Tool          | What it does                                                             |
+| ------------- | ------------------------------------------------------------------------ |
+| `skb_list`    | List what's at a path: a folder's contents, a file's metadata, or the bundles (empty path). |
+| `skb_get`     | Read a concept file as markdown; synthesizes a listing for a folder.     |
+| `skb_search`  | Semantic search: rank concepts by relevance to a natural-language query. |
+| `skb_grep`    | Exact/fast keyword search (parallel grep, OR, case-insensitive).         |
+
+The bundles also carry a per-bundle vector index (`.vector.json`) computed by
+`make okf`, which powers `skb_search`. It's a hidden file, ignored by `skb_list`.
 
 ## Option A — stdio (for MCP hosts like Claude Desktop)
 
@@ -63,7 +65,7 @@ Smoke test from a shell (after `cd scriptling-kb`):
 export OKF_ROOT="$PWD/okf"
 printf '%s\n' \
   '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' \
-  '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"skb_bundles","arguments":{}}}' \
+  '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"skb_list","arguments":{"path":""}}}' \
   | scriptling --mcp-tools "$PWD/tools"
 ```
 
@@ -88,9 +90,9 @@ Call it with curl (JSON-RPC 2.0):
 curl -s -X POST http://127.0.0.1:8765/mcp -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 
-# call skb_bundles
+# list the bundles (empty path)
 curl -s -X POST http://127.0.0.1:8765/mcp -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"skb_bundles","arguments":{}}}'
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"skb_list","arguments":{"path":""}}}'
 
 # search everywhere for "sandbox"
 curl -s -X POST http://127.0.0.1:8765/mcp -H "Content-Type: application/json" \

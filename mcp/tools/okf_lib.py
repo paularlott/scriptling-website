@@ -2,11 +2,11 @@
 # can `import okf_lib`. All paths are relative to OKF_ROOT (default mcp/okf).
 import os
 import os.path
-import json
 import re
 import yaml
 
 OKF_ROOT = os.getenv("OKF_ROOT", "mcp/okf")
+BUNDLE_ORDER = ["docs", "reference", "libraries"]
 
 FM_RE = re.compile(r"^---\n(.*?)\n---\n?(.*)$", re.S)
 
@@ -30,12 +30,25 @@ def resolve(rel):
 
 
 def bundles():
-    # manifest.json is tooling metadata, kept outside the OKF root.
-    return json.loads(os.read_file(os.path.dirname(OKF_ROOT) + "/manifest.json"))
+    # Derive the bundle list and titles/descriptions from the filesystem: each
+    # bundle has a <bundle>/<bundle>.md overview whose frontmatter holds metadata.
+    out = []
+    for name in BUNDLE_ORDER:
+        d = OKF_ROOT + "/" + name
+        if not os.path.isdir(d):
+            continue
+        title, desc = name.title(), ""
+        ov = d + "/" + name + ".md"
+        if os.path.isfile(ov):
+            fm, _ = frontmatter(ov)
+            title = fm.get("title") or title
+            desc = fm.get("description") or ""
+        out.append({"name": name, "title": title, "description": desc})
+    return out
 
 
 def bundle_entries():
-    # Uniform bundle listing (with `path`) shared by skb_bundles and skb_list("").
+    # Uniform bundle listing (with `path`) used by skb_list("") to show the bundles.
     out = []
     for b in bundles():
         out.append({"name": b["name"], "type": "bundle", "path": b["name"] + "/",

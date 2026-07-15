@@ -21,7 +21,7 @@ mcp-server:
 pack: okf
 	@rm -f dist/scriptling-kb.zip
 	@mkdir -p dist
-	cd mcp && zip -qr ../dist/scriptling-kb.zip tools okf manifest.json README.md
+	cd mcp && zip -qr ../dist/scriptling-kb.zip tools okf README.md
 	@echo "Built dist/scriptling-kb.zip"
 
 .PHONY: help okf mcp-server pack

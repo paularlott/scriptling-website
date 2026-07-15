@@ -1,5 +1,5 @@
-description = "Read one OKF concept file as raw markdown. If the path is a folder, or ends with /index.md, a directory listing is synthesized on the fly (no index.md files are committed). Use list_files first to find a path."
-keywords = ["okf", "get", "read", "file", "concept", "fetch", "cat"]
+description = "Read a page of Scriptling's documentation (language reference, libraries, guides). If the path is a folder or ends with /index.md, a directory listing is synthesized on the fly. Use skb_list first to find a path."
+keywords = ["scriptling", "documentation", "docs", "get", "read", "file", "page", "fetch"]
 
 [[parameters]]
 name = "path"

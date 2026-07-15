@@ -1,13 +1,18 @@
-description = "Search the OKF bundles for any of the given terms (OR, case-insensitive) across file names, frontmatter, and body text. Returns matching paths with line numbers and the matched line. Scope to a bundle/folder via path, or leave empty to search everything."
-keywords = ["okf", "search", "find", "grep", "query", "match"]
+description = "Semantic search of Scriptling's documentation (language, libraries, guides): rank pages by relevance to a natural-language query. Best for conceptual or paraphrased questions where you don't know the exact term (e.g. 'how do I make an HTTP request'). For exact keyword or identifier matching, use skb_grep."
+keywords = ["scriptling", "documentation", "docs", "search", "semantic", "query", "find", "natural", "ask"]
+
+[[parameters]]
+name = "query"
+type = "string"
+description = "Natural-language query, e.g. 'how do I make an HTTP request' or 'concurrency and background tasks'."
+required = true
 
 [[parameters]]
 name = "path"
 type = "string"
-description = "Scope: a bundle or folder path (e.g. 'reference', 'reference/libraries/scriptling'). Empty searches all bundles."
+description = "Scope: a bundle or folder path (e.g. 'reference', 'reference/libraries'). Empty searches all bundles."
 
 [[parameters]]
-name = "terms"
-type = "array:string"
-description = "Search terms; a file matches if any term appears (OR semantics, case-insensitive)."
-required = true
+name = "top_k"
+type = "int"
+description = "Maximum number of results to return. Default 10."

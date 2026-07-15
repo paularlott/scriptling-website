@@ -1,30 +1,53 @@
 import os
-import re
+import os.path
+import json
 import scriptling.mcp.tool as tool
-import scriptling.grep as grep
+import scriptling.similarity as sim
 import okf_lib as lib
 
+# Per-field cosine weights. td (title+description+path) is favoured because the
+# short, curated field resists the hash collisions that long bodies suffer.
+W_TD = 0.6
+W_BODY = 0.4
+
+query = tool.get_string("query", "")
 path = lib.norm(tool.get_string("path", ""))
-terms = [t for t in tool.get_list("terms", []) if t]
+top_k = tool.get_int("top_k", 10)
 
-scope = lib.resolve(path)
-if scope is None:
-    tool.return_error("Invalid path: " + path)
-elif not terms:
-    tool.return_error("No search terms provided")
+if not query:
+    tool.return_error("No query provided")
 
-# single parallel OR scan (scriptling.grep uses a concurrent worker pool)
-pattern = "|".join(re.escape(t) for t in terms)
-matches = grep.pattern(pattern, scope, recursive=True, ignore_case=True)
+td_vecs = []
+body_vecs = []
+meta = []
+dims = 512
+for b in lib.bundles():
+    bname = b["name"]
+    vf = lib.OKF_ROOT + "/" + bname + "/.vector.json"
+    if not os.path.isfile(vf):
+        continue
+    data = json.loads(os.read_file(vf))
+    dims = data.get("dims", dims)
+    for e in data["entries"]:
+        full = bname + "/" + e["path"]
+        if path and not (full == path or full.startswith(path + "/")):
+            continue
+        td_vecs.append(e["td"])
+        body_vecs.append(e["body"])
+        meta.append({"path": full, "title": e["title"]})
 
-root = lib.root_abs()
+if not td_vecs:
+    tool.return_error("No vectors found for scope (run 'make okf' to build them)")
+
+q = sim.vectorize(query, dims=dims)
+scored = []
+for i in range(len(td_vecs)):
+    combined = W_TD * sim.cosine_similarity(q, td_vecs[i]) + W_BODY * sim.cosine_similarity(q, body_vecs[i])
+    if combined > 0:
+        scored.append((combined, i))
+scored.sort(reverse=True)
+
 out = []
-for m in matches:
-    f = m["file"]
-    if f.startswith(root + os.sep):
-        f = f[len(root) + 1:]
-    out.append({"path": f, "line": m["line"], "text": m["text"].strip()})
-    if len(out) >= 200:
-        break
-
-tool.return_object({"matches": out, "count": len(out), "truncated": len(out) >= 200})
+for combined, i in scored[:top_k]:
+    out.append({"path": meta[i]["path"], "title": meta[i]["title"], "score": round(combined, 4)})
+tool.return_object({"query": query, "scope": path or "(all bundles)", "results": out})
