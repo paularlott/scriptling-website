@@ -1,0 +1,7 @@
+description = "Read a page of Scriptling's documentation (language reference, libraries, guides). If the path is a folder or ends with /index.md, a directory listing is synthesized on the fly. Use skb_list first to find a path."
+keywords = ["scriptling", "documentation", "docs", "get", "read", "file", "page", "fetch"]
+
+[[parameters]]
+name = "path"
+type = "string"
+description = "Path relative to the OKF root. A concept file (e.g. 'reference/builtins.md'), a folder (e.g. 'reference/libraries'), '<folder>/index.md' for a synthesized listing, or empty for the root bundle list."

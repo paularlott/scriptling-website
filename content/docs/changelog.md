@@ -7,6 +7,23 @@ nav-skip: true
 
 ## July 2026
 
+{{< version "v0.17.4" >}}
+
+{{< changelog-item "fixed" >}}
+**`sorted()` and `list.sort()` now order tuples and lists lexicographically.**
+
+Previously, sorting a list of tuples or lists was a silent no-op (`list.sort()`) or raised `unsupported type for sorting: TUPLE` (`sorted()`), because the comparator only handled numbers and strings. Tuples and lists now compare element-by-element (Python-style), so nested structures sort correctly too.
+
+```python
+sorted([(3, "c"), (1, "a"), (2, "b")])  # [(1, "a"), (2, "b"), (3, "c")]
+
+rows = [(1, 9), (1, 3), (1, 7)]
+rows.sort()                              # in-place: [(1, 3), (1, 7), (1, 9)]
+```
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.17.2" >}}
 
 {{< changelog-item "added" >}}

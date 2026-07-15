@@ -9,7 +9,22 @@ architecture: asset-src/distributed-architecture.d2 asset-src/architecture-singl
 	d2 --sketch --bundle --layout elk asset-src/multi-server-cluster.d2 content/docs/quick-start/local-containers/multi-server-cluster.svg
 	d2 --sketch --bundle --layout elk asset-src/multi-server-load-balancer.d2 content/docs/quick-start/local-containers/multi-server-load-balancer.svg
 
-.PHONY: help
+## Generate OKF knowledge bundles into mcp/okf/ (generated; not published)
+okf:
+	scriptling scripts/okf.py
+
+## Run the OKF MCP server (tools: list_bundles, list_files, get_file, search)
+mcp-server:
+	scriptling --server :8765 --mcp-tools mcp/tools
+
+## Pack the KB MCP server + OKF bundles into dist/scriptling-kb.zip (portable)
+pack: okf
+	@rm -f dist/scriptling-kb.zip
+	@mkdir -p dist
+	cd mcp && zip -qr ../dist/scriptling-kb.zip tools okf README.md
+	@echo "Built dist/scriptling-kb.zip"
+
+.PHONY: help okf mcp-server pack
 ## This help screen
 help:
 	@printf "Available targets:\n\n"

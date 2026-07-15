@@ -298,6 +298,7 @@ list_a.extend(list_b)              # list_a is now [1, 2, 3, 4]
 sorted([3, 1, 4, 1, 5])            # [1, 1, 3, 4, 5]
 sorted(["banana", "apple"])        # ["apple", "banana"]
 sorted([3, 1, 2], reverse=True)    # [3, 2, 1]
+sorted([(2, "b"), (1, "a")])       # [(1, "a"), (2, "b")]  (tuples/lists compare element-by-element)
 
 # sorted with key function
 sorted(["ccc", "a", "bb"], key=lambda s: len(s))  # ["a", "bb", "ccc"]

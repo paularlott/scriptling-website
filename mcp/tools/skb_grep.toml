@@ -1,0 +1,13 @@
+description = "Exact keyword search across Scriptling's documentation (language reference, libraries, guides): matches any of the terms (OR, case-insensitive) in page names, frontmatter, and bodies. Use when you know exact terms or identifiers (function or parameter names); use skb_search for natural-language or conceptual queries."
+keywords = ["scriptling", "documentation", "docs", "grep", "exact", "keyword", "find", "match", "identifier"]
+
+[[parameters]]
+name = "path"
+type = "string"
+description = "Scope: a bundle or folder path (e.g. 'reference', 'reference/libraries'). Empty searches all bundles."
+
+[[parameters]]
+name = "terms"
+type = "array:string"
+description = "Terms to match (OR semantics, case-insensitive)."
+required = true

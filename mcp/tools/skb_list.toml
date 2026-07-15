@@ -1,0 +1,7 @@
+description = "Browse Scriptling's documentation (language reference, libraries, and guides). List the bundles (empty path), a folder's contents, or a single file's metadata. Use this to navigate before reading a page."
+keywords = ["scriptling", "documentation", "docs", "reference", "libraries", "list", "browse", "folder", "navigate"]
+
+[[parameters]]
+name = "path"
+type = "string"
+description = "Path relative to the OKF root: a folder (e.g. 'reference', 'reference/libraries'), a file (e.g. 'libraries/cheat-sheet.md'), or empty to list the bundles."
