@@ -27,7 +27,7 @@ This produces, under `mcp/`:
 |------|----------|
 | `mcp/okf/scriptling-docs/`, `mcp/okf/scriptling-reference/`, `mcp/okf/scriptling-libraries/` | The three OKF knowledge bundles. |
 | `mcp/tools/` | The `skb_*` MCP tools. |
-| `mcp/okf/<bundle>/.vector.json` | Per-bundle vector index powering `skb_search`. |
+| `mcp/okf/<bundle>/.vector.json` | Per-bundle vector index powering `skb_search`, generated automatically on first search (not shipped with the bundles). |
 
 ## 2. Start the MCP server
 

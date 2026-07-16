@@ -7,6 +7,8 @@ import yaml
 
 OKF_ROOT = os.getenv("OKF_ROOT", "mcp/okf")
 BUNDLE_ORDER = ["scriptling-docs", "scriptling-reference", "scriptling-libraries"]
+VECTORS_DIMS = 768
+VECTOR_FILE = ".vector.json"
 
 FM_RE = re.compile(r"^---\n(.*?)\n---\n?(.*)$", re.S)
 

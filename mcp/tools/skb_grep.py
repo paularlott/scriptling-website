@@ -13,9 +13,10 @@ if scope is None:
 elif not terms:
     tool.return_error("No search terms provided")
 
-# single parallel OR scan (scriptling.grep uses a concurrent worker pool)
+# single parallel OR scan (scriptling.grep uses a concurrent worker pool).
+# glob="*.md" excludes generated sidecars like .vector.json.
 pattern = "|".join(re.escape(t) for t in terms)
-matches = grep.pattern(pattern, scope, recursive=True, ignore_case=True)
+matches = grep.pattern(pattern, scope, recursive=True, ignore_case=True, glob="*.md")
 
 root = lib.root_abs()
 out = []

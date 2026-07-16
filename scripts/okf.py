@@ -3,13 +3,10 @@
 import os
 import os.path
 import shutil
-import json
 import yaml
 import re
-import scriptling.similarity as sim
 
 OUT = "mcp/okf"
-VECTORS_DIMS = 768
 
 # (name, source_dir, default_type, excluded_subdirs)
 BUNDLES = [
@@ -232,50 +229,12 @@ def emit_bundle(name, src, default_type, exclude):
     emit("")
 
 
-# Per-bundle vector indexes ---------------------------------------------------
-# No index.md files are generated: directory listings are synthesized on the
-# fly by the MCP server (OKF §6 permits this). Each bundle gets a .vector.json
-# sidecar (title/description + body vectors) powering skb_search.
-
-def walk_md(d):
-    out = []
-    for e in sorted(os.listdir(d)):
-        full = d + "/" + e
-        if os.path.isdir(full):
-            out.extend(walk_md(full))
-        elif e.endswith(".md"):
-            out.append(full)
-    return out
-
-
-def write_vectors(name):
-    # Per-bundle sidecar of concept vectors (CPU vectorize, no model) used by
-    # skb_search for semantic ranking. Two fields per concept: a short
-    # title+description+path field (concentrated, low collision) and the body
-    # (concept coverage). skb_search combines their cosines.
-    bdir = OUT + "/" + name
-    entries = []
-    for f in walk_md(bdir):
-        raw = os.read_file(f)
-        fm, body = parse(raw)
-        title = fm.get("title") or os.path.splitext(os.path.basename(f))[0]
-        desc = fm.get("description") or ""
-        rel = f[len(bdir) + 1:]
-        td_text = title + " " + desc + " " + rel.replace("/", " ")
-        entries.append({"path": rel, "title": title,
-                        "td": sim.vectorize(td_text, dims=VECTORS_DIMS),
-                        "body": sim.vectorize(body, dims=VECTORS_DIMS)})
-    os.write_file(bdir + "/.vector.json",
-                  json.dumps({"dims": VECTORS_DIMS, "entries": entries}))
-
-
 def main():
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     os.makedirs(OUT, exist_ok=True)
     for name, src, default_type, exclude in BUNDLES:
         emit_bundle(name, src, default_type, exclude)
-        write_vectors(name)
     print("OKF bundles generated at " + OUT + "/")
 
 
