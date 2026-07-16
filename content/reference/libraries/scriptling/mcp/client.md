@@ -72,8 +72,9 @@ executable that is launched as a **stdio** MCP server subprocess.
 - `namespace` (`str`, optional): Namespace for tool names (e.g. `"scriptling"` makes tools available as `"scriptling__tool_name"`). Default: `""`.
 - `bearer_token` (`str`, optional): Bearer token for authentication. **HTTP only.** Default: `""`.
 - `args` (`list`, optional): Command-line arguments for the stdio server. **stdio only.**
+- `env` (`list`, optional): Extra `KEY=value` environment variables for the stdio subprocess. **stdio only.** Merged on top of the inherited environment, so `PATH`, `HOME`, etc. are preserved.
 
-Passing `args` with an HTTP URL, or `bearer_token` with a command, raises an error.
+Passing `args` or `env` with an HTTP URL, or `bearer_token` with a command, raises an error.
 
 **Returns:** `MCPClient`: a client instance with methods for interacting with the server.
 
@@ -85,6 +86,9 @@ client = mcp.Client("https://api.example.com/mcp", namespace="scriptling", beare
 
 # stdio server: launch a local executable as a subprocess
 client = mcp.Client("/usr/local/bin/thebinary", args=["--server"], namespace="t1")
+
+# stdio server with extra environment variables (merged on top of the inherited env)
+client = mcp.Client("npx", args=["-y", "@modelcontextprotocol/server-filesystem", "/data"], env=["FS_ROOT=/data", "LOG_LEVEL=debug"])
 
 # Scriptling itself can be a stdio MCP server
 client = mcp.Client("scriptling", args=["--mcp-exec-script"], namespace="local")
@@ -375,6 +379,18 @@ result = client.call_tool("tools__greet", {"name": "Ada"})
 print(result)
 
 client.close()  # shut the subprocess down
+```
+
+Pass `env` to set extra environment variables on the subprocess. Entries use the
+`KEY=value` form and are merged on top of the inherited environment, so
+`PATH`, `HOME`, and other defaults remain available:
+
+```python
+client = mcp.Client("npx",
+    args=["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+    env=["FS_ROOT=/data", "LOG_LEVEL=debug"],
+    namespace="fs",
+)
 ```
 
 Scriptling can itself run as a stdio MCP server (`scriptling --mcp-exec-script`

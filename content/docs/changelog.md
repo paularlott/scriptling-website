@@ -7,6 +7,42 @@ nav-skip: true
 
 ## July 2026
 
+{{< version "v0.17.5" >}}
+
+{{< changelog-item "added" >}}
+**`scriptling.template.html` / `scriptling.template.text`: custom action delimiters.**
+
+`Set()` now accepts optional `left` and `right` keyword arguments to override Go's default `{{` `}}` template markers. This lets you render templates that contain literal `{{ }}` — for client-side frameworks (Vue, Handlebars), CSS, JSON, or upstream config files that already use those characters.
+
+```python
+import scriptling.template.text as text
+
+# Use {% %} so {{ }} survives into the output untouched
+tmpl = text.Set(left="{%", right="%}")
+tmpl.add("Hello, {%.Name%}! Upstream var: {{ service.tag }}")
+print(tmpl.render({"Name": "Alice"}))
+# Output: Hello, Alice! Upstream var: {{ service.tag }}
+```
+
+Both arguments default to the standard delimiters (`{{` and `}}`); pass an empty string to fall back to the default for that side.
+
+**`scriptling.mcp.Client`: environment variables for stdio servers.**
+
+`mcp.Client()` now accepts an `env` keyword argument (stdio servers only) — a list of `KEY=value` strings applied to the launched subprocess. Variables are merged on top of the inherited environment, so `PATH`, `HOME`, and other defaults remain available. Passing `env` with an HTTP URL raises an error.
+
+```python
+import scriptling.mcp as mcp
+
+client = mcp.Client("npx",
+    args=["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+    env=["FS_ROOT=/data", "LOG_LEVEL=debug"],
+    namespace="fs",
+)
+```
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.17.4" >}}
 
 {{< changelog-item "fixed" >}}

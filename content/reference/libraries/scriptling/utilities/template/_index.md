@@ -48,6 +48,20 @@ tmpl.add('{{define "page"}}{{template "header" .}}<main>{{.Body}}</main>{{end}}'
 print(tmpl.render("page", {"Title": "Home", "Body": "Welcome"}))
 ```
 
+## Custom Delimiters
+
+By default both libraries use Go's standard `{{` `}}` action delimiters. Pass `left` and `right` to `Set()` to change them — useful when your template content contains literal `{{` `}}` (e.g. a client-side framework like Vue or Handlebars, JSON, or CSS):
+
+```python
+import scriptling.template.text as text
+
+tmpl = text.Set(left="{%", right="%}")
+tmpl.add("Hello, {%.Name%}! Your balance is {%.Balance%}.")
+print(tmpl.render({"Name": "Alice", "Balance": 42}))
+```
+
+Both arguments are optional and default to the standard delimiters (`{{` and `}}`). Pass an empty string to fall back to a default for that side.
+
 ## Loading Templates from Files
 
 The template libraries are intentionally filesystem-free. Load template source with `os.read_file()`, which respects path restrictions:

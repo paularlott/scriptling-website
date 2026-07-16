@@ -11,7 +11,7 @@ The `scriptling.template.html` library renders HTML templates using Go's `html/t
 
 | Function | Description |
 |----------|-------------|
-| `Set()` | Create a template set |
+| `Set(left="{{", right="}}")` | Create a template set with optional custom delimiters |
 
 `Set()` returns a `Set` object with two methods:
 
@@ -22,9 +22,13 @@ The `scriptling.template.html` library renders HTML templates using Go's `html/t
 
 ## Functions
 
-### `Set()`
+### `Set(left="{{", right="}}")`
 
 Creates a new, empty HTML template set.
+
+**Parameters:**
+- `left` (`str`, optional): Left action delimiter. Defaults to `{{`. Pass an empty string to keep the default.
+- `right` (`str`, optional): Right action delimiter. Defaults to `}}`. Pass an empty string to keep the default.
 
 **Returns:** `Set`: a template set with `add(source)` and `render([name,] data)` methods.
 
@@ -34,6 +38,11 @@ import scriptling.template.html as html
 tmpl = html.Set()
 tmpl.add("<h1>Hello, {{.Name}}!</h1>")
 print(tmpl.render({"Name": "Alice"}))
+
+# Custom delimiters, e.g. to embed Vue/Handlebars/{{ }} content literally
+vue = html.Set(left="[[", right="]]")
+vue.add("<p>[[.Message]] {{ user.name }}</p>")
+print(vue.render({"Message": "Hello"}))
 ```
 
 ### `Set.add(source)`
@@ -112,6 +121,18 @@ tmpl = html.Set()
 tmpl.add("<p>{{.Content}}</p>")
 print(tmpl.render({"Content": "<script>alert('xss')</script>"}))
 # Output: <p>&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;</p>
+```
+
+### Custom delimiters
+
+Use `left` and `right` when template content should contain literal `{{ }}` (e.g. a client-side framework, CSS, or JSON):
+
+```python
+# Embed Vue-style {{ }} in the output without Scriptling interpreting them
+tmpl = html.Set(left="[[", right="]]")
+tmpl.add('<div>Hello [[.Name]]! Your settings: {{ user.prefs }}</div>')
+print(tmpl.render({"Name": "Alice"}))
+# Output: <div>Hello Alice! Your settings: {{ user.prefs }}</div>
 ```
 
 ### From file

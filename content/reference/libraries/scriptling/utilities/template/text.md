@@ -11,7 +11,7 @@ The `scriptling.template.text` library renders text templates using Go's `text/t
 
 | Function | Description |
 |----------|-------------|
-| `Set()` | Create a template set |
+| `Set(left="{{", right="}}")` | Create a template set with optional custom delimiters |
 
 `Set()` returns a `Set` object with two methods:
 
@@ -22,9 +22,13 @@ The `scriptling.template.text` library renders text templates using Go's `text/t
 
 ## Functions
 
-### `Set()`
+### `Set(left="{{", right="}}")`
 
 Creates a new, empty text template set.
+
+**Parameters:**
+- `left` (`str`, optional): Left action delimiter. Defaults to `{{`. Pass an empty string to keep the default.
+- `right` (`str`, optional): Right action delimiter. Defaults to `}}`. Pass an empty string to keep the default.
 
 **Returns:** `Set`: a template set with `add(source)` and `render([name,] data)` methods.
 
@@ -34,6 +38,11 @@ import scriptling.template.text as text
 tmpl = text.Set()
 tmpl.add("Hello, {{.Name}}! You have {{.Count}} messages.")
 print(tmpl.render({"Name": "Alice", "Count": 5}))
+
+# Custom delimiters, e.g. to keep {{ }} literally in the output
+cfg = text.Set(left="{%", right="%}")
+cfg.add("server {{ name }}: {%.Host%}:{%.Port%}")
+print(cfg.render({"Host": "127.0.0.1", "Port": 8080}))
 ```
 
 ### `Set.add(source)`
@@ -96,6 +105,17 @@ tmpl = text.Set()
 tmpl.add('{{define "greeting"}}Hello, {{.Name}}!{{end}}')
 tmpl.add('{{define "email"}}{{template "greeting" .}}\n\nYour {{.Product}} trial expires in {{.Days}} days.{{end}}')
 print(tmpl.render("email", {"Name": "Alice", "Product": "Scriptling Pro", "Days": 14}))
+```
+
+### Custom delimiters
+
+Use `left` and `right` when template content should contain literal `{{ }}` (e.g. a config file that already uses `{{ }}` for its own placeholders):
+
+```python
+tmpl = text.Set(left="{%", right="%}")
+tmpl.add("Hello, {%.Name%}! Config from upstream: {{ service.tag }}")
+print(tmpl.render({"Name": "Alice"}))
+# Output: Hello, Alice! Config from upstream: {{ service.tag }}
 ```
 
 ### From file
