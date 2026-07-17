@@ -1,6 +1,7 @@
 ---
 title: Basics
 description: Creating interpreters, variable exchange, and calling functions.
+tags: [go-integration, embedding, go]
 weight: 1
 ---
 

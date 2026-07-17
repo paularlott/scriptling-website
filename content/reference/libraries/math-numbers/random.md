@@ -1,6 +1,7 @@
 ---
 title: random
 description: Random number generation, compatible with Python's random module.
+tags: [libraries, math]
 weight: 1
 
 aliases:

@@ -1,6 +1,7 @@
 ---
 title: Data Types
 description: Integers, floats, strings, booleans, lists, dictionaries, sets, and tuples in Scriptling.
+tags: [reference, types]
 weight: 2
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Builder Libraries
 description: Type-safe library builder with functions, constants, and sub-libraries.
+tags: [go-integration, embedding, go]
 weight: 8
 aliases:
   - /docs/go-integration/builder/libraries/

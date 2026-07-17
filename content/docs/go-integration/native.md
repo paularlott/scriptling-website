@@ -1,6 +1,7 @@
 ---
 title: Native API
 description: Direct control with maximum performance for extending Scriptling.
+tags: [go-integration, embedding, go]
 weight: 2
 aliases:
   - /docs/go-integration/native/

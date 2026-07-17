@@ -1,6 +1,7 @@
 ---
 title: Builder Functions
 description: Type-safe function builder with automatic type conversion.
+tags: [go-integration, embedding, go]
 weight: 7
 aliases:
   - /docs/go-integration/builder/functions/

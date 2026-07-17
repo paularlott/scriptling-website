@@ -1,6 +1,8 @@
 ---
 title: scriptling.ai.memory
 linkTitle: ai.memory
+description: Long-term, deduplicated memory store for AI agents backed by a KV store.
+tags: [libraries, ai, agents]
 weight: 4
 ---
 

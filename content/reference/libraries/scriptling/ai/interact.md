@@ -1,6 +1,8 @@
 ---
 title: scriptling.ai.agent.interact
 linkTitle: ai.agent.interact
+description: Interactive terminal interface for conversing with AI agents via a REPL-style loop.
+tags: [libraries, ai, agents]
 weight: 3
 ---
 

@@ -1,6 +1,8 @@
 ---
 title: Building an MCP Tool Server
+linkTitle: MCP Tool Server
 description: Create a Model Context Protocol server with custom tools for AI assistants.
+tags: [tutorials, mcp, ai]
 weight: 3
 ---
 

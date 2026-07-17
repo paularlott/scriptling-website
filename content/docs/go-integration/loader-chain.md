@@ -1,6 +1,7 @@
 ---
 title: Library Loader Chain
 description: Flexible library loading from multiple sources.
+tags: [go-integration, embedding, go]
 weight: 12
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Go Integration
 description: Embed Scriptling in your Go application.
+tags: [go-integration, embedding]
 weight: 3
 stream: embedding
 ---

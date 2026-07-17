@@ -1,6 +1,7 @@
 ---
 title: Host-Side Scripting
 description: Register pure Scriptling functions and classes that run on the host with no RPC.
+tags: [plugins, go]
 weight: 20
 ---
 

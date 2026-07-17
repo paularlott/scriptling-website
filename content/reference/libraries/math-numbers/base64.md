@@ -1,6 +1,7 @@
 ---
 title: base64
 description: Base64 encoding and decoding.
+tags: [libraries, math]
 weight: 1
 
 aliases:

@@ -2,6 +2,7 @@
 title: scriptling.template.text
 linkTitle: text
 description: Text template rendering using Go's text/template, with no escaping.
+tags: [libraries, utilities, template]
 weight: 2
 ---
 

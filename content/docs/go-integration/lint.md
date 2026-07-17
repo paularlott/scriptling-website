@@ -1,6 +1,7 @@
 ---
 title: Linting
 description: Code analysis for detecting syntax errors without execution.
+tags: [go-integration, embedding, go]
 weight: 15
 ---
 

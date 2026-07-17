@@ -1,6 +1,7 @@
 ---
 title: shutil
 description: High-level file and directory operations — copy, move, rmtree, disk_usage.
+tags: [libraries, filesystem]
 weight: 7
 ---
 

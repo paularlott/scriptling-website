@@ -1,6 +1,7 @@
 ---
 title: Security Guide
 description: Security best practices for embedding and running Scriptling in your applications.
+tags: [docs, security]
 weight: 6
 ---
 

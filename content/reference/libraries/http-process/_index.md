@@ -1,6 +1,7 @@
 ---
 title: HTTP & Process
 description: HTTP client, subprocess management, and system libraries. All require registration when embedding.
+tags: [libraries, http]
 weight: 8
 ---
 

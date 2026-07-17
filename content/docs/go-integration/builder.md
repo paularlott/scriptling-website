@@ -1,6 +1,7 @@
 ---
 title: Builder API
 description: Type-safe builder pattern for functions, classes, and libraries.
+tags: [go-integration, embedding, go]
 weight: 6
 aliases:
   - /docs/go-integration/builder/

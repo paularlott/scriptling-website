@@ -1,6 +1,7 @@
 ---
 title: Bash Plugins
 description: Implement the plugin JSON-RPC protocol directly from a shell script.
+tags: [plugins, bash, json-rpc]
 weight: 7
 ---
 

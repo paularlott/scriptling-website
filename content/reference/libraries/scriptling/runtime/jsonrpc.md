@@ -2,6 +2,7 @@
 title: scriptling.runtime.jsonrpc
 linkTitle: runtime.jsonrpc
 description: Register JSON-RPC 2.0 server methods and notifications served over stdio or HTTP.
+tags: [libraries, runtime, json-rpc]
 weight: 2
 ---
 

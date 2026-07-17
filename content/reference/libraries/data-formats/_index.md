@@ -1,6 +1,7 @@
 ---
 title: Data Formats
 description: Libraries for parsing and generating structured data formats.
+tags: [libraries, data-formats]
 weight: 2
 ---
 

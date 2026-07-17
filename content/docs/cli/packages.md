@@ -1,6 +1,7 @@
 ---
 title: Packages
 description: Create, distribute, and load Scriptling packages.
+tags: [cli]
 weight: 4
 ---
 

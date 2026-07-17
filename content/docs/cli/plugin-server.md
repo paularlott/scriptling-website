@@ -1,6 +1,7 @@
 ---
 title: Plugin Server Mode
 description: Run a Scriptling script as a first-class plugin that clients can load with scriptling=True.
+tags: [cli, plugins, json-rpc]
 weight: 4
 ---
 

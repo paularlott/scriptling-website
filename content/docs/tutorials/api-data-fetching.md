@@ -1,6 +1,8 @@
 ---
 title: Fetching and Processing API Data
+linkTitle: Fetching API Data
 description: Write a CLI script that fetches data from a public API and processes the results.
+tags: [tutorials, http, data-formats]
 weight: 1
 ---
 

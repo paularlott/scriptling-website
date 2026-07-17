@@ -1,6 +1,7 @@
 ---
 title: Operators
 description: Arithmetic, comparison, boolean, bitwise operators and precedence in Scriptling.
+tags: [reference, operators]
 weight: 3
 ---
 
@@ -184,6 +185,36 @@ state ^= 5   # Toggle bits 0 and 2, result: 10 (0b1010)
 # Fast multiplication/division
 fast_mult = 7 << 3   # 7 * 8 = 56
 fast_div = 56 >> 3   # 56 / 8 = 7
+```
+
+## Set Operators
+
+The `&`, `|`, `-`, and `^` operators double as set algebra when both operands are sets (matching Python). They return new sets and never mutate their inputs.
+
+```python
+a = set([1, 2, 3])
+b = set([2, 3, 4])
+
+a & b   # {2, 3}        intersection — elements in both
+a | b   # {1, 2, 3, 4}  union — elements in either
+a - b   # {1}           difference — elements in a but not in b
+a ^ b   # {1, 4}        symmetric difference — in one set but not both
+```
+
+Both operands must be sets; combining a set with a list, tuple, or other iterable raises a type error. For arbitrary iterables, use the equivalent methods: `.intersection()`, `.union()`, `.difference()`, `.symmetric_difference()`.
+
+The augmented-assignment forms (`&=`, `|=`, `-=`, `^=`) work on sets too — they rebind the name to the resulting set:
+
+```python
+tags = set([1, 2, 3])
+tags &= set([2, 3, 4])   # tags is now {2, 3}
+```
+
+Set equality (`==` / `!=`) compares contents order-independently:
+
+```python
+set([1, 2, 3]) == set([3, 2, 1])   # True
+set([1, 2]) != set([1, 2, 3])      # True
 ```
 
 ## Identity Operators

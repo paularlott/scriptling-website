@@ -1,6 +1,7 @@
 ---
 title: AI
 description: AI integration libraries for building intelligent agents.
+tags: [libraries, ai]
 weight: 1
 ---
 

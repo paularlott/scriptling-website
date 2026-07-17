@@ -1,6 +1,7 @@
 ---
 title: File System
 description: File and directory access libraries. All require registration when embedding.
+tags: [libraries, filesystem]
 weight: 7
 ---
 

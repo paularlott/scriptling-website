@@ -2,6 +2,7 @@
 title: scriptling.csv
 linkTitle: csv
 description: CSV parsing and formatting (string-based, no filesystem access).
+tags: [libraries, utilities, data-formats]
 weight: 2
 ---
 

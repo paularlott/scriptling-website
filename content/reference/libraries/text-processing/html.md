@@ -1,6 +1,7 @@
 ---
 title: html
 description: Escape and unescape HTML special characters and entities.
+tags: [libraries, text]
 weight: 1
 
 aliases:

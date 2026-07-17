@@ -2,6 +2,7 @@
 title: scriptling.template.html
 linkTitle: html
 description: HTML template rendering using Go's html/template, with automatic escaping.
+tags: [libraries, utilities, template]
 weight: 1
 ---
 

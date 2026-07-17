@@ -1,6 +1,7 @@
 ---
 title: tarfile
 description: Read and write TAR archives (uncompressed and gzipped).
+tags: [libraries, filesystem]
 weight: 9
 ---
 

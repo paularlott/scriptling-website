@@ -1,6 +1,7 @@
 ---
 title: io
 description: In-memory text I/O streams, providing StringIO as a buffer that behaves like a text file.
+tags: [libraries, text]
 weight: 3
 
 aliases:

@@ -1,6 +1,7 @@
 ---
 title: Libraries
 description: Available libraries and APIs in Scriptling.
+tags: [libraries]
 weight: 10
 ---
 

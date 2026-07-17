@@ -1,6 +1,7 @@
 ---
 title: Scriptling Libraries
 description: Scriptling-specific libraries for AI, MCP, messaging, networking, and runtime functionality.
+tags: [libraries]
 weight: 9
 ---
 

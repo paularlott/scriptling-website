@@ -1,6 +1,7 @@
 ---
 title: requests
 description: HTTP client for making GET, POST, PUT, DELETE, and PATCH requests.
+tags: [libraries, http]
 weight: 1
 aliases:
   - /reference/libraries/extlib/requests/

@@ -1,6 +1,7 @@
 ---
 title: JSON-RPC Protocol
 description: The wire protocol between Scriptling and plugin executables.
+tags: [plugins, json-rpc]
 weight: 8
 ---
 

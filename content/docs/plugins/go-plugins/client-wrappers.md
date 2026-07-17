@@ -1,6 +1,7 @@
 ---
 title: Client Wrappers
 description: How the host wraps plugin functions and classes, auto-generated proxies and custom Scriptling wrappers.
+tags: [plugins, go]
 weight: 10
 ---
 

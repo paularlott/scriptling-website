@@ -1,6 +1,8 @@
 ---
 title: scriptling.messaging.console
 linkTitle: console
+description: Console-based messaging client for building and testing interactive terminal bots.
+tags: [libraries, messaging]
 weight: 4
 ---
 

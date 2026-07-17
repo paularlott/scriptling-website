@@ -1,6 +1,7 @@
 ---
 title: regex
 description: Regular expression matching and text processing, following Python's re module conventions.
+tags: [libraries, text]
 weight: 1
 
 aliases:

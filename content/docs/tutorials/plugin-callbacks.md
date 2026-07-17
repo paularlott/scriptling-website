@@ -1,6 +1,7 @@
 ---
 title: Plugin Streaming Callbacks
 description: Pass a Scriptling callback into a Go plugin and stream events back while the function runs.
+tags: [tutorials, plugins, go]
 linkTitle: Plugin Callbacks
 weight: 35
 ---

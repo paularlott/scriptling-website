@@ -1,6 +1,7 @@
 ---
 title: subprocess
 description: Spawn and manage subprocesses, similar to Python's subprocess module.
+tags: [libraries, subprocess]
 weight: 1
 aliases:
   - /reference/libraries/extlib/subprocess/

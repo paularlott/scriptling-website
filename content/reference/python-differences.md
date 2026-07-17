@@ -1,6 +1,7 @@
 ---
 title: Python Differences
 description: What's NOT supported and key differences between Scriptling and Python.
+tags: [reference, python]
 weight: 11
 ---
 

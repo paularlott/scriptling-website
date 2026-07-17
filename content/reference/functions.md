@@ -1,6 +1,7 @@
 ---
 title: Functions
 description: Function definition, parameters, *args, **kwargs, lambdas, and closures in Scriptling.
+tags: [reference, functions]
 weight: 5
 ---
 

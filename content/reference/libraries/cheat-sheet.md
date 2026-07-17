@@ -1,6 +1,7 @@
 ---
 title: Library Cheat Sheet
 description: Quick reference for common Scriptling library patterns.
+tags: [libraries]
 weight: 1
 aliases:
   - /reference/libraries/cheat-sheet/

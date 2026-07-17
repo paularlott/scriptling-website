@@ -2,6 +2,7 @@
 title: scriptling.runtime.plugin
 linkTitle: runtime.plugin
 description: Declare a Scriptling script as a first-class plugin server exposing functions, constants, and classes to remote clients.
+tags: [libraries, runtime, plugins]
 weight: 4
 ---
 

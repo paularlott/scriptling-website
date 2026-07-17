@@ -1,6 +1,7 @@
 ---
 title: Time & System
 description: Time access, I/O streams, and platform information.
+tags: [libraries, time]
 weight: 6
 ---
 

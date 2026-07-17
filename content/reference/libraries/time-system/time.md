@@ -1,6 +1,7 @@
 ---
 title: time
 description: Time access and conversions, including timestamps, time tuples, formatting, and sleeping.
+tags: [libraries, time]
 weight: 1
 
 aliases:

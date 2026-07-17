@@ -2,6 +2,7 @@
 title: scriptling.provision.file
 linkTitle: provision.file
 description: Create, update, and remove files and directories idempotently, including marker-delimited managed blocks.
+tags: [libraries, provisioning, filesystem]
 weight: 5
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Plugin Manager
 description: Enable plugins in Go applications embedding Scriptling.
+tags: [plugins, go, embedding]
 weight: 2
 ---
 

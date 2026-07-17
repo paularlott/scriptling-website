@@ -1,6 +1,7 @@
 ---
 title: Math & Numbers
 description: Mathematical functions, hashing, and random number generation.
+tags: [libraries, math]
 weight: 4
 ---
 

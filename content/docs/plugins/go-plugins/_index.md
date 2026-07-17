@@ -1,6 +1,7 @@
 ---
 title: Go Plugins
 description: Register functions and classes in a Go plugin executable.
+tags: [plugins, go]
 weight: 3
 ---
 

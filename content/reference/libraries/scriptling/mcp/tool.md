@@ -1,6 +1,8 @@
 ---
 title: scriptling.mcp.tool
 linkTitle: mcp.tool
+description: MCP tool helper for authoring MCP tools, with parameter access and result handling.
+tags: [libraries, mcp]
 weight: 2
 ---
 

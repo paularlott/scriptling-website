@@ -1,6 +1,7 @@
 ---
 title: Language Guide
 description: Reference for the Scriptling language - syntax, data types, operators, control flow, functions, classes, and built-in functions.
+tags: [reference]
 weight: 4
 ---
 

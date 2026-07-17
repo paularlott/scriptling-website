@@ -2,6 +2,7 @@
 title: scriptling.runtime.kv
 linkTitle: runtime.kv
 description: Thread-safe key-value store for sharing state across requests and background tasks.
+tags: [libraries, runtime]
 weight: 1
 ---
 

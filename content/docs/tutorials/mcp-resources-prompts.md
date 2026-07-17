@@ -1,6 +1,8 @@
 ---
 title: Building an MCP Resources & Prompts Server
+linkTitle: Resources & Prompts Server
 description: Create MCP resources and prompts as files, alongside tools.
+tags: [tutorials, mcp, ai]
 weight: 4
 ---
 

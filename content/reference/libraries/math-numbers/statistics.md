@@ -1,6 +1,7 @@
 ---
 title: statistics
 description: Functions for calculating mathematical statistics of numeric data.
+tags: [libraries, math]
 weight: 1
 
 aliases:

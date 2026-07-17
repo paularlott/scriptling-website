@@ -2,6 +2,7 @@
 title: CLI Getting Started
 linkTitle: CLI
 description: Install and start using the Scriptling CLI.
+tags: [quick-start, cli, installation]
 weight: 1
 stream: cli
 ---

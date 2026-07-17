@@ -1,6 +1,7 @@
 ---
 title: MCP Protocol
 description: MCP (Model Context Protocol) client and tool authoring libraries.
+tags: [libraries, mcp]
 weight: 2
 ---
 

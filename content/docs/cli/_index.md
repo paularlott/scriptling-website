@@ -1,6 +1,7 @@
 ---
 title: CLI Reference
 description: Command-line interface for Scriptling.
+tags: [cli]
 weight: 2
 stream: cli
 ---

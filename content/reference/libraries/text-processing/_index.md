@@ -1,6 +1,7 @@
 ---
 title: Text Processing
 description: Libraries for working with text, strings, and markup.
+tags: [libraries, text]
 weight: 3
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Script Extensions
 description: Extend Scriptling using Scriptling code itself.
+tags: [go-integration, embedding]
 weight: 11
 ---
 

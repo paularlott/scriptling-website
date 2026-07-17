@@ -1,6 +1,7 @@
 ---
 title: GC Release Hooks
 description: Best-effort cleanup hooks for Go-owned Scriptling objects.
+tags: [go-integration, embedding, go]
 weight: 12
 ---
 

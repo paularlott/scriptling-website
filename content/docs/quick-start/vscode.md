@@ -1,6 +1,7 @@
 ---
 title: VSCode Extension
 description: Get syntax highlighting and language support for Scriptling in Visual Studio Code.
+tags: [quick-start, vscode]
 weight: 3
 ---
 

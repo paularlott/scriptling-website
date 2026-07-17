@@ -1,6 +1,8 @@
 ---
 title: scriptling.mcp
 linkTitle: mcp
+description: MCP client library for connecting to MCP servers and invoking the tools they expose.
+tags: [libraries, mcp]
 weight: 1
 ---
 

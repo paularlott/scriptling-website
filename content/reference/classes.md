@@ -1,6 +1,7 @@
 ---
 title: Classes
 description: Class definition, inheritance, super(), dunder methods, __init__, __del__, and property decorators in Scriptling.
+tags: [reference, classes]
 weight: 7
 ---
 

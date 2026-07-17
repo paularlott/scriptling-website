@@ -1,6 +1,7 @@
 ---
 title: MCP Server Mode
 description: Running Scriptling as a Model Context Protocol (MCP) server for AI integration.
+tags: [cli, mcp, ai]
 weight: 3
 ---
 

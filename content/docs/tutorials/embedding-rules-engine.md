@@ -1,6 +1,7 @@
 ---
 title: Embedding a Rules Engine
 description: Embed Scriptling in a Go application to evaluate business rules at runtime.
+tags: [tutorials, embedding, go]
 weight: 2
 ---
 

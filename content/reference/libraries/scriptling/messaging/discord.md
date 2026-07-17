@@ -1,6 +1,8 @@
 ---
 title: scriptling.messaging.discord
 linkTitle: discord
+description: Discord Bot API client using a WebSocket Gateway connection for real-time events.
+tags: [libraries, messaging]
 weight: 2
 ---
 

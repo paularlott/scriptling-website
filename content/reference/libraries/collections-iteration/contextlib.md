@@ -1,6 +1,7 @@
 ---
 title: contextlib
 description: Utilities for common tasks involving the with statement.
+tags: [libraries, collections]
 weight: 2
 
 aliases:

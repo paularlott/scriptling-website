@@ -1,6 +1,7 @@
 ---
 title: Syntax Rules
 description: Indentation, comments, case sensitivity, and multiline syntax in Scriptling.
+tags: [reference, syntax]
 weight: 1
 ---
 

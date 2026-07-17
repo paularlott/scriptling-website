@@ -1,6 +1,7 @@
 ---
 title: Writing a Go Plugin
 description: Build an executable plugin that exposes functions and classes under plugin.*.
+tags: [tutorials, plugins, go]
 weight: 25
 ---
 

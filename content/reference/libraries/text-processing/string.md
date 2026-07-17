@@ -1,6 +1,7 @@
 ---
 title: string
 description: String constants for character classification, matching Python's string module.
+tags: [libraries, text]
 weight: 1
 
 aliases:

@@ -1,6 +1,7 @@
 ---
 title: Basic Usage
 description: Running scripts, interactive mode, and command line options.
+tags: [cli]
 weight: 1
 ---
 

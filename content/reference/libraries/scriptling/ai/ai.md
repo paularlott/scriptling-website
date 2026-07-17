@@ -1,6 +1,8 @@
 ---
 title: scriptling.ai
 linkTitle: ai
+description: "AI and LLM functions for OpenAI-compatible APIs: clients, completions, embeddings, and tool-calling helpers."
+tags: [libraries, ai]
 weight: 1
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Documenting Extensions
 description: Add help text to functions, libraries, and classes for discoverability.
+tags: [go-integration, embedding, go]
 weight: 13
 ---
 

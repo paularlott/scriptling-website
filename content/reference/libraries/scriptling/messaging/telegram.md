@@ -1,6 +1,8 @@
 ---
 title: scriptling.messaging.telegram
 linkTitle: telegram
+description: Telegram Bot API client for building bots on the Telegram platform.
+tags: [libraries, messaging]
 weight: 1
 ---
 

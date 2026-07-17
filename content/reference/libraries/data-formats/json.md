@@ -1,6 +1,7 @@
 ---
 title: json
 description: Parse and generate JSON data.
+tags: [libraries, data-formats]
 weight: 1
 
 aliases:

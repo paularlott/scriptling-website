@@ -1,6 +1,7 @@
 ---
 title: Collections & Iteration
 description: Container datatypes, iterators, and functional programming tools.
+tags: [libraries, collections]
 weight: 5
 ---
 

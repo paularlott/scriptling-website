@@ -2,6 +2,7 @@
 title: scriptling.similarity
 linkTitle: similarity
 description: Text similarity utilities for fuzzy matching, tokenization, and MinHash signatures.
+tags: [libraries, utilities, text]
 weight: 1
 ---
 

@@ -2,6 +2,7 @@
 title: scriptling.secret
 linkTitle: secret
 description: Resolve secrets through host-configured provider aliases without exposing provider credentials to scripts.
+tags: [libraries, utilities, security]
 weight: 1
 ---
 

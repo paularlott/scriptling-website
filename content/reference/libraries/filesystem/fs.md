@@ -1,6 +1,7 @@
 ---
 title: fs
 description: Binary I/O for reading, writing, and unpacking binary file formats.
+tags: [libraries, filesystem]
 weight: 1
 aliases:
   - /reference/libraries/extlib/fs/

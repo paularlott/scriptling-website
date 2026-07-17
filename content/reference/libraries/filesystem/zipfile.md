@@ -1,6 +1,7 @@
 ---
 title: zipfile
 description: Read and write ZIP archives.
+tags: [libraries, filesystem]
 weight: 8
 ---
 

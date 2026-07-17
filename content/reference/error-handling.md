@@ -1,6 +1,7 @@
 ---
 title: Error Handling
 description: try/except/else/finally, raise, assert, and exception types in Scriptling.
+tags: [reference, error-handling]
 weight: 6
 ---
 

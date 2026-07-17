@@ -1,6 +1,7 @@
 ---
 title: Writing a C Plugin
 description: Build a multi-threaded C plugin with functions, classes, properties, callbacks, and logging.
+tags: [tutorials, plugins, c]
 weight: 27
 ---
 

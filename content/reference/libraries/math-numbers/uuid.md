@@ -1,6 +1,7 @@
 ---
 title: uuid
 description: UUID generation, matching Python's uuid module.
+tags: [libraries, math]
 weight: 1
 
 aliases:

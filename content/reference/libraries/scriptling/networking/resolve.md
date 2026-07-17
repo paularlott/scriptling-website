@@ -1,6 +1,8 @@
 ---
 title: scriptling.net.resolve
 linkTitle: resolve
+description: "DNS resolution for hostname lookup, SRV records, and srv+http(s):// URLs."
+tags: [libraries, networking]
 weight: 3
 ---
 

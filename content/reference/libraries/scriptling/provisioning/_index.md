@@ -2,6 +2,7 @@
 title: Provisioning Libraries
 linkTitle: Provisioning
 description: File and directory provisioning libraries for Scriptling.
+tags: [libraries, provisioning]
 weight: 1
 ---
 

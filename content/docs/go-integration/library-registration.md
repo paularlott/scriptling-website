@@ -1,6 +1,7 @@
 ---
 title: Library Registration
 description: How to register built-in libraries when embedding Scriptling in Go.
+tags: [go-integration, embedding, go]
 weight: 14
 ---
 

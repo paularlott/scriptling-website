@@ -1,6 +1,7 @@
 ---
 title: platform
 description: Read-only access to the underlying operating system, architecture, and hostname information.
+tags: [libraries, time]
 weight: 1
 
 aliases:

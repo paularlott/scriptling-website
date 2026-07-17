@@ -1,6 +1,7 @@
 ---
 title: Native Classes
 description: Create custom classes with full control over methods and inheritance.
+tags: [go-integration, embedding, go]
 weight: 4
 aliases:
   - /docs/go-integration/native/classes/

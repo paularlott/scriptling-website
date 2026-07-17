@@ -1,6 +1,7 @@
 ---
 title: tempfile
 description: Temporary file and directory creation with security restrictions.
+tags: [libraries, filesystem]
 weight: 6
 ---
 

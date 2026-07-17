@@ -1,7 +1,8 @@
 ---
 title: scriptling.runtime
 linkTitle: runtime
-description: Background tasks and concurrency for scripts and HTTP servers, plus the runtime namespace grouping HTTP, JSON-RPC, KV, sync, sandbox, and plugin sub-libraries.
+description: Background tasks and concurrency, plus the runtime namespace grouping HTTP, JSON-RPC, KV, sync, sandbox, and plugin sub-libraries.
+tags: [libraries, runtime]
 weight: 1
 ---
 

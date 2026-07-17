@@ -1,6 +1,7 @@
 ---
 title: C Plugins
 description: Build Scriptling plugins in C using the single-header SDK.
+tags: [plugins, c, json-rpc]
 weight: 8
 ---
 

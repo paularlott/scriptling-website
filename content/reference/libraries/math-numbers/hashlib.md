@@ -1,6 +1,7 @@
 ---
 title: hashlib
 description: Cryptographic hash functions.
+tags: [libraries, math, security]
 weight: 1
 
 aliases:

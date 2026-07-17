@@ -1,6 +1,7 @@
 ---
 title: math
 description: Mathematical functions and constants.
+tags: [libraries, math]
 weight: 1
 
 aliases:

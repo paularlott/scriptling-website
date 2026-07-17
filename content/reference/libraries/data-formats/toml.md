@@ -1,6 +1,7 @@
 ---
 title: toml
 description: Parse and generate TOML (Tom's Obvious Minimal Language) data.
+tags: [libraries, data-formats]
 weight: 1
 
 aliases:

@@ -1,11 +1,59 @@
 ---
 title: Changelog
-description: Scriptling release history and changes.
+description: Scriptling release history.
+tags: [docs, changelog]
 layout: changelog
 nav-skip: true
 ---
 
 ## July 2026
+
+{{< version "v0.17.6" >}}
+
+{{< changelog-item "fixed" >}}
+**`sorted()`, `sum()`, `min()`, `max()`, and `str.join()` now accept any iterable.**
+
+These builtins previously accepted only lists and tuples (`sum`/`min`/`max` additionally took flat numeric arrays); anything else raised `type error: expected LIST or TUPLE`. They now iterate any iterable — dict views (`dict_keys`/`dict_values`/`dict_items`), sets, strings, dicts, and iterators — matching Python's semantics. `str.join` likewise accepts any iterable of strings, not just lists and tuples.
+
+```python
+d = {"a": 3, "c": 1, "b": 2}
+
+sorted(d.items(), key=lambda x: x[1])   # [(c, 1), (b, 2), (a, 3)]
+sum(d.values())                         # 6
+min(d.keys())                           # "a"
+max(set([5, 2, 8]))                     # 8
+sorted("cab")                           # [a, b, c]
+"-".join(("x", "y", "z"))               # "x-y-z"
+```
+
+The numeric `FloatArray` fast paths are preserved, and `sorted()` does not mutate its input.
+
+**Set algebra operators `&`, `|`, `-`, `^` on sets.**
+
+Sets already supported set algebra via methods (`.intersection()`, `.union()`, `.difference()`, `.symmetric_difference()`); they now support the operator syntax too, matching Python. Both operands must be sets — use the methods for arbitrary iterables.
+
+```python
+a = set([1, 2, 3])
+b = set([2, 3, 4])
+
+a & b   # {2, 3}   intersection
+a | b   # {1, 2, 3, 4}   union
+a - b   # {1}   difference
+a ^ b   # {1, 4}   symmetric difference
+```
+
+Integer bitwise operations are unchanged — the new behaviour only applies when the left operand is a set. The augmented-assignment forms (`&=`, `|=`, `-=`, `^=`) work on sets too, rebinding the name to the resulting set.
+
+**Set value equality (`==` / `!=`) now compares contents.**
+
+Two sets with the same elements previously compared equal only if they were the same object; distinct sets always reported as unequal. `==` and `!=` now compare contents order-independently, so `set([1, 2, 3]) == set([3, 2, 1])` is `true`. Cross-type equality (`set == list`) returns `false` rather than erroring.
+
+**Empty tuples, sets, and dict views are now falsy.**
+
+Truthiness checks (`if`, `and`, `or`, `bool()`) previously treated any value without an explicit rule as truthy, so empty `()`, `set()`, `dict_keys()`, `dict_values()`, and `dict_items()` were all truthy — unlike Python, where empty containers are falsy. They now follow Python's rule (empty → falsy, non-empty → truthy), so `set() and f()` short-circuits and `if my_set:` works as expected. Lists, dicts, strings, and numbers were already correct.
+{{< /changelog-item >}}
+
+---
 
 {{< version "v0.17.5" >}}
 

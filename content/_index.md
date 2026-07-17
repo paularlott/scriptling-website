@@ -2,6 +2,7 @@
 title: Scriptling
 layout: index
 description: A minimal, sandboxed Python-like scripting language for Go applications and LLM agents.
+tags: [home]
 ---
 
 {{< big-title

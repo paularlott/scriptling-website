@@ -1,6 +1,7 @@
 ---
 title: HTTP Server Mode
 description: Running Scriptling as an HTTP server with custom routes.
+tags: [cli, http]
 weight: 2
 ---
 

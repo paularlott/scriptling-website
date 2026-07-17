@@ -1,6 +1,7 @@
 ---
 title: shlex
 description: Shell-style lexical analysis — quoting, splitting, and joining command-line tokens.
+tags: [libraries, text]
 weight: 7
 ---
 

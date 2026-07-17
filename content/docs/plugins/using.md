@@ -1,6 +1,7 @@
 ---
 title: Using Plugins
 description: Load plugin directories and use plugin libraries from Scriptling code.
+tags: [plugins]
 weight: 1
 ---
 

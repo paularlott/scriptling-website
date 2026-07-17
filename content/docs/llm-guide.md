@@ -1,6 +1,7 @@
 ---
 title: LLM Script Generation Guide
 description: One-page guidance for generating accurate, Python-like Scriptling code.
+tags: [docs, llm, ai]
 weight: 9
 aliases:
   - /docs/llm-guide/

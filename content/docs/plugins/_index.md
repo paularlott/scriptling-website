@@ -1,6 +1,7 @@
 ---
 title: Plugins
 description: Extend Scriptling with executable plugins over JSON-RPC.
+tags: [plugins]
 weight: 8
 ---
 

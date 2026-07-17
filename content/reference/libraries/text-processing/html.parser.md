@@ -1,6 +1,7 @@
 ---
 title: html.parser
 description: An HTML/XHTML parser compatible with Python's html.parser module.
+tags: [libraries, text]
 weight: 1
 
 aliases:

@@ -1,6 +1,7 @@
 ---
 title: Getting Started
 description: Get up and running with Scriptling.
+tags: [quick-start]
 weight: 1
 ---
 

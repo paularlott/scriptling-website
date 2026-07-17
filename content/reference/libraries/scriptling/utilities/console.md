@@ -2,6 +2,7 @@
 title: scriptling.console
 linkTitle: console
 description: TUI (terminal UI) console for building interactive chat-style applications.
+tags: [libraries, utilities]
 weight: 1
 ---
 

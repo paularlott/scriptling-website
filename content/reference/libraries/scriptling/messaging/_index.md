@@ -1,6 +1,7 @@
 ---
 title: Messaging
 description: Platform-agnostic bot framework for Telegram, Discord, Slack, and Console.
+tags: [libraries, messaging]
 weight: 3
 ---
 

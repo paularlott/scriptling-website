@@ -1,6 +1,7 @@
 ---
 title: Native Functions
 description: Register individual Go functions with direct control.
+tags: [go-integration, embedding, go]
 weight: 3
 aliases:
   - /docs/go-integration/native/functions/

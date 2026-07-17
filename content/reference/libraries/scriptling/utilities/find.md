@@ -2,6 +2,7 @@
 title: scriptling.find
 linkTitle: find
 description: Find files and directories by name, type, modification time, and size.
+tags: [libraries, utilities, filesystem]
 weight: 1
 ---
 

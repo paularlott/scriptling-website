@@ -2,6 +2,7 @@
 title: scriptling.provision.fetch
 linkTitle: provision.fetch
 description: Download files over HTTP/HTTPS and optionally unpack zip archives, idempotently.
+tags: [libraries, provisioning, http]
 weight: 6
 ---
 

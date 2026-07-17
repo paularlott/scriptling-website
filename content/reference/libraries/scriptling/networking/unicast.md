@@ -1,6 +1,8 @@
 ---
 title: scriptling.net.unicast
 linkTitle: unicast
+description: UDP and TCP point-to-point messaging for direct host-to-host communication.
+tags: [libraries, networking]
 weight: 3
 ---
 

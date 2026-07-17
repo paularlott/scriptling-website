@@ -1,6 +1,7 @@
 ---
 title: Documentation MCP Server
 description: Generate Scriptling's documentation as OKF bundles and serve them to AI agents through an MCP server.
+tags: [quick-start, mcp, ai]
 weight: 4
 ---
 

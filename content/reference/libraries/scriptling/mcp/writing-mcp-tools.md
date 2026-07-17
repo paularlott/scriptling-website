@@ -1,6 +1,7 @@
 ---
 title: Writing MCP Tools
 description: Creating custom MCP tools with metadata and script files.
+tags: [libraries, mcp]
 weight: 4
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Indexing & Slicing
 description: Single index access, slice notation, and the slice() builtin in Scriptling.
+tags: [reference, syntax]
 weight: 9
 ---
 

@@ -1,6 +1,10 @@
 baseURL = 'https://scriptling.dev/'
 title = 'Scriptling'
 
+# `tags` frontmatter is kept as OKF-style metadata only; do not generate
+# taxonomy/term list pages for it.
+disableKinds = ['taxonomy', 'term']
+
 [outputs]
   home = ['HTML', 'JSON']
 

@@ -1,6 +1,7 @@
 ---
 title: Builder Instantiation
 description: Create library templates with instance-specific configuration.
+tags: [go-integration, embedding, go]
 weight: 10
 aliases:
   - /docs/go-integration/builder/instantiation/

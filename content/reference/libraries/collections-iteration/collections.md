@@ -1,6 +1,7 @@
 ---
 title: collections
 description: Specialized container datatypes, counters, double-ended queues, named tuples, and chained dicts.
+tags: [libraries, collections]
 weight: 1
 
 aliases:

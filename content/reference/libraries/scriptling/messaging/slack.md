@@ -1,6 +1,8 @@
 ---
 title: scriptling.messaging.slack
 linkTitle: slack
+description: Slack Bot API client using Socket Mode for real-time events.
+tags: [libraries, messaging]
 weight: 3
 ---
 

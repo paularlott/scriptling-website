@@ -1,6 +1,8 @@
 ---
 title: scriptling.net.multicast
 linkTitle: multicast
+description: UDP multicast group messaging for one-to-many communication on local networks.
+tags: [libraries, networking]
 weight: 2
 ---
 

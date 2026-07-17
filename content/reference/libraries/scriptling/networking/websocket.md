@@ -1,6 +1,8 @@
 ---
 title: scriptling.net.websocket
 linkTitle: websocket
+description: WebSocket client for sending and receiving text or binary messages.
+tags: [libraries, networking]
 weight: 5
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Embedding
 description: Embed Scriptling in a Go application.
+tags: [quick-start, embedding, go]
 weight: 2
 stream: embedding
 ---

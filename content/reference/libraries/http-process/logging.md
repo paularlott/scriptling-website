@@ -1,6 +1,7 @@
 ---
 title: logging
 description: Python-style logging, backed by structured slog-based loggers.
+tags: [libraries, logging]
 weight: 1
 aliases:
   - /reference/libraries/extlib/logging/

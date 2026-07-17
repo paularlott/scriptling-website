@@ -1,6 +1,7 @@
 ---
 title: Native Libraries
 description: Create libraries with functions, constants, and sub-libraries.
+tags: [go-integration, embedding, go]
 weight: 5
 aliases:
   - /docs/go-integration/native/libraries/

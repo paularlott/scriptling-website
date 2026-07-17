@@ -1,6 +1,7 @@
 ---
 title: Documentation
 description: Complete documentation for Scriptling - a minimal, sandboxed Python-like scripting language for Go applications.
+tags: [docs]
 weight: 1
 ---
 

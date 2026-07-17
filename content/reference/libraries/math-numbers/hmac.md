@@ -1,6 +1,7 @@
 ---
 title: hmac
 description: Keyed-hashing for message authentication (HMAC).
+tags: [libraries, math, security]
 weight: 2
 
 aliases:

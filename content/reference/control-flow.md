@@ -1,6 +1,7 @@
 ---
 title: Control Flow
 description: Conditionals, loops, match statements, break, continue, and pass in Scriptling.
+tags: [reference, control-flow]
 weight: 4
 ---
 

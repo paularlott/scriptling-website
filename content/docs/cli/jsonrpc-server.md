@@ -1,6 +1,7 @@
 ---
 title: JSON-RPC Server Mode
 description: Running Scriptling as a concurrent JSON-RPC 2.0 server over stdio or HTTP.
+tags: [cli, json-rpc]
 weight: 3
 ---
 

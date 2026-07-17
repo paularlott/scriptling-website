@@ -1,6 +1,7 @@
 ---
 title: functools
 description: Higher-order functions that act on or return other functions.
+tags: [libraries, collections]
 weight: 1
 
 aliases:

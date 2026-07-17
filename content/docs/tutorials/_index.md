@@ -1,6 +1,7 @@
 ---
 title: Tutorials
 description: Step-by-step guides for building with Scriptling.
+tags: [tutorials]
 weight: 8
 ---
 

@@ -1,6 +1,8 @@
 ---
 title: scriptling.net.gossip
 linkTitle: gossip
+description: Gossip protocol cluster membership and messaging with failure detection and routing.
+tags: [libraries, networking]
 weight: 1
 ---
 

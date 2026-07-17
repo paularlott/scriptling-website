@@ -1,6 +1,7 @@
 ---
 title: os
 description: Operating system interfaces for file system operations and environment variables.
+tags: [libraries, filesystem]
 weight: 1
 aliases:
   - /reference/libraries/extlib/os/
