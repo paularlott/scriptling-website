@@ -8,6 +8,30 @@ nav-skip: true
 
 ## July 2026
 
+{{< version "v0.17.7" >}}
+
+{{< changelog-item "added" >}}
+**`scriptling.find.entries`: matching files and directories with size, mtime, and type.**
+
+`find.path` returns matching paths as a list of strings — convenient for most uses, but callers that need to compare trees (differential sync, change detection, build artefact caching) previously had to stat every match themselves. The new `find.entries` function applies the same filters as `find.path` and returns a `list[dict]` with `path`, `size`, `mtime`, and `is_dir` per entry, stat'ing each match inside the existing worker pool so the metadata arrives in a single pass.
+
+```python
+import scriptling.find as find
+
+# Build a {path: mtime} index for differential sync
+mtimes = {e["path"]: e["mtime"]
+          for e in find.entries("/site", type="file")}
+
+# Walk the matches with their size readily available
+for e in find.entries("/logs", name="*.log", size_min=10 * 1024 * 1024):
+    print(e["path"], e["size"])
+```
+
+`find.path` is unchanged; use it when only the strings are needed, since it skips the per-entry `stat` in the no-filter common case. The Go API gains a matching `extlibs.FindEntries` returning `[]extlibs.FindEntry`.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.17.6" >}}
 
 {{< changelog-item "fixed" >}}

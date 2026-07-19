@@ -10,11 +10,14 @@ The `scriptling.find` library finds files and directories under a path by name, 
 
 When searching recursively, entries are stat'd and filtered concurrently using the same bounded worker-pool model as [`scriptling.grep`](./grep/), so large trees are scanned in parallel.
 
+The library exposes two functions: `path()` returns matching paths as a list of strings, and `entries()` returns the same matches as a list of dicts carrying `size`, `mtime`, and `is_dir` per entry. Use `entries()` when you need the metadata (e.g. comparing two trees without re-reading bytes); use `path()` when only the strings are needed, since it skips the per-entry `stat` in the no-filter common case.
+
 ## Available Functions
 
 | Function | Description |
 |----------|-------------|
-| `path(path, **kwargs)` | Find files/directories matching the given filters. |
+| `path(path, **kwargs)` | Find files/directories matching the given filters; returns `list[str]`. |
+| `entries(path, **kwargs)` | Same filters as `path()`, but returns `list[dict]` with `path`, `size`, `mtime`, and `is_dir` per match. |
 
 ## Functions
 
@@ -62,6 +65,40 @@ dirs = find.path("/project", type="dir", name="node_modules",
 
 # Only immediate children, no descent
 top = find.path("/data", recursive=False)
+```
+
+### `entries(path, *, recursive=True, type="any", name="", mtime_min=None, mtime_max=None, size_min=None, size_max=None, include_hidden=False, follow_links=False, max_depth=None)`
+
+Like `path()` — same filters, same semantics — but returns a `list[dict]` with one dict per match, so the caller can compare trees without re-reading bytes. Every matching entry is stat'd; use `path()` instead when only the strings are needed.
+
+Each entry dict has the keys:
+
+| Key | Type | Description |
+|------|------|-------------|
+| `path` | `str` | The matching entry's path. |
+| `size` | `int` | Size in bytes. `0` for directories. |
+| `mtime` | `float` | Modification time as epoch seconds (matches the unit used by `mtime_min`/`mtime_max`). |
+| `is_dir` | `bool` | `True` when the entry is a directory. |
+
+**Parameters:** identical to [`path()`](#path). The root itself is never included in the result, and entries are returned in arbitrary order.
+
+**Returns:** `list[dict]`: one dict per match.
+
+**Raises:** `Error`: if `path` is outside the allowed paths.
+
+```python
+import scriptling.find as find
+
+# Sync-relevant metadata: every markdown file with its size and mtime
+for e in find.entries("/docs", name="*.md", type="file"):
+    print(e["path"], e["size"], e["mtime"])
+
+# Build a {path: mtime} index for differential sync
+mtimes = {e["path"]: e["mtime"] for e in find.entries("/site", type="file")}
+
+# Directories only — is_dir is always True here, but size and mtime are
+# still populated for the directory itself.
+dirs = find.entries("/project", type="dir", name="node_modules")
 ```
 
 ## Security Considerations
