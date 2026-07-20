@@ -8,6 +8,48 @@ nav-skip: true
 
 ## July 2026
 
+{{< version "v0.17.8" >}}
+
+{{< changelog-item "added" >}}
+**`os.symlink` and `os.path.islink`: create and detect symbolic links.**
+
+`os.symlink(src, dst)` creates a symbolic link at `dst` pointing to `src`. `os.path.islink(path)` returns `True` if the path is a symbolic link (using `Lstat` so the link itself is checked, not the target). Both respect the allowed-paths security configuration.
+
+```python
+import os
+import os.path
+
+os.symlink("../target.js", "node_modules/.bin/tool")
+os.path.islink("node_modules/.bin/tool")  # True
+```
+
+**`find.entries`: new `include_symlinks` option and `link_target` field.**
+
+When `include_symlinks=True` is passed to `find.entries`, symlink entries are yielded as-is (not followed) with their target in the `link_target` field. Use this to mirror symlink trees without resolving them.
+
+```python
+import scriptling.find as find
+
+for e in find.entries("/site", include_symlinks=True):
+    if e["link_target"]:
+        print(e["path"], "->", e["link_target"])
+```
+
+**`find.entries`: new `include_hash` option and `hash` field.**
+
+When `include_hash=True` is passed to `find.entries`, each file entry's content is crc64-hashed and the result is returned in the `hash` field. Use this for definitive change detection — two files with the same hash have identical bytes.
+
+```python
+import scriptling.find as find
+
+for e in find.entries("/site", include_hash=True, type="file"):
+    print(e["path"], e["hash"])
+```
+
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.17.7" >}}
 
 {{< changelog-item "added" >}}

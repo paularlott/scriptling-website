@@ -17,7 +17,7 @@ The library exposes two functions: `path()` returns matching paths as a list of 
 | Function | Description |
 |----------|-------------|
 | `path(path, **kwargs)` | Find files/directories matching the given filters; returns `list[str]`. |
-| `entries(path, **kwargs)` | Same filters as `path()`, but returns `list[dict]` with `path`, `size`, `mtime`, and `is_dir` per match. |
+| `entries(path, **kwargs)` | Same filters as `path()`, but returns `list[dict]` with `path`, `size`, `mtime`, and `is_dir` per match; opt-in hash, link_target, metadata fields. |
 
 ## Functions
 
@@ -67,9 +67,17 @@ dirs = find.path("/project", type="dir", name="node_modules",
 top = find.path("/data", recursive=False)
 ```
 
-### `entries(path, *, recursive=True, type="any", name="", mtime_min=None, mtime_max=None, size_min=None, size_max=None, include_hidden=False, follow_links=False, max_depth=None)`
+### `entries(path, *, recursive=True, type="any", name="", mtime_min=None, mtime_max=None, size_min=None, size_max=None, include_hidden=False, follow_links=False, max_depth=None, include_metadata=False, include_hash=False, include_symlinks=False)`
 
 Like `path()` — same filters, same semantics — but returns a `list[dict]` with one dict per match, so the caller can compare trees without re-reading bytes. Every matching entry is stat'd; use `path()` instead when only the strings are needed.
+
+**Additional parameters** (beyond those shared with `path()`):
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `include_metadata` | `bool` | When `True`, `file_perm` is populated (extracted from the entry stat, no extra syscall). |
+| `include_hash` | `bool` | When `True`, each file is crc64-hashed and the hex checksum is returned in `hash`. Use for definitive change detection — two entries with matching `hash` have identical bytes. |
+| `include_symlinks` | `bool` | When `True`, symbolic link entries are yielded with their `link_target` set to the symlink target string, instead of following the link. |
 
 Each entry dict has the keys:
 
@@ -79,8 +87,11 @@ Each entry dict has the keys:
 | `size` | `int` | Size in bytes. `0` for directories. |
 | `mtime` | `float` | Modification time as epoch seconds (matches the unit used by `mtime_min`/`mtime_max`). |
 | `is_dir` | `bool` | `True` when the entry is a directory. |
+| `file_perm` | `int` or `None` | File permission bits. `None` unless `include_metadata=True`. |
+| `hash` | `str` or `None` | Hex-encoded crc64 checksum of file content. `None` unless `include_hash=True`. |
+| `link_target` | `str` or `None` | Symlink target path. `None` unless `include_symlinks=True`. |
 
-**Parameters:** identical to [`path()`](#path). The root itself is never included in the result, and entries are returned in arbitrary order.
+**Parameters:** identical to [`path()`](#path), plus the three above. The root itself is never included in the result, and entries are returned in arbitrary order.
 
 **Returns:** `list[dict]`: one dict per match.
 
@@ -88,6 +99,7 @@ Each entry dict has the keys:
 
 ```python
 import scriptling.find as find
+import time
 
 # Sync-relevant metadata: every markdown file with its size and mtime
 for e in find.entries("/docs", name="*.md", type="file"):
@@ -99,6 +111,15 @@ mtimes = {e["path"]: e["mtime"] for e in find.entries("/site", type="file")}
 # Directories only — is_dir is always True here, but size and mtime are
 # still populated for the directory itself.
 dirs = find.entries("/project", type="dir", name="node_modules")
+
+# Hash-based change detection — only upload when bytes differ
+for e in find.entries("/site", include_hash=True, type="file"):
+    print(e["path"], e["hash"])
+
+# Detect symbolic links without following them
+for e in find.entries("/project", include_symlinks=True):
+    if e["link_target"]:
+        print(e["path"], "->", e["link_target"])
 ```
 
 ## Security Considerations

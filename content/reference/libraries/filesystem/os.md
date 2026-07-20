@@ -27,6 +27,7 @@ The `os` library provides operating system interfaces for file system operations
 | `rmdir(path)` | Remove an empty directory. |
 | `removedirs(name)` | Remove an empty directory and its empty parents. |
 | `rename(old, new)` | Rename a file or directory. |
+| `symlink(src, dst)` | Create a symbolic link named `dst` pointing to `src`. |
 
 ## Constants
 
@@ -297,6 +298,23 @@ import os
 os.rename("/tmp/old.txt", "/tmp/new.txt")
 ```
 
+### `symlink(src, dst)`
+
+Create a symbolic link named `dst` that points to `src`. If `dst` already exists, an error is raised. The destination must be within the allowed paths configured at registration.
+
+**Parameters:**
+- `src` (`str`): The target the symlink points to (may be relative or absolute).
+- `dst` (`str`): The path where the symlink is created.
+
+**Returns:** `None`
+
+```python
+import os
+
+# Create a symlink like node_modules/.bin entries
+os.symlink("../eslint/bin/eslint.js", "node_modules/.bin/eslint")
+```
+
 ## Special Variables
 
 ### `__file__`
@@ -337,6 +355,7 @@ This library implements a subset of Python's `os` module:
 | `removedirs` | Yes |
 | `remove` | Yes |
 | `rename` | Yes |
+| `symlink` | Yes |
 | `read_file` | Yes (Scriptling-specific) |
 | `write_file` | Yes (Scriptling-specific) |
 | `append_file` | Yes (Scriptling-specific) |

@@ -28,6 +28,7 @@ The `os.path` library provides common pathname manipulations: joining, splitting
 | `isabs(path)` | Check if a path is absolute. |
 | `getsize(path)` | Get a file's size in bytes. |
 | `getmtime(path)` | Get a file's last modification time. |
+| `islink(path)` | Check if a path is a symbolic link. |
 
 ## Functions
 
@@ -278,6 +279,23 @@ mtime = os.path.getmtime("/tmp/data.txt")
 print(f"Last modified: {mtime}")
 ```
 
+### `islink(path)`
+
+Check if a path is a symbolic link. Unlike `os.path.isfile` and `os.path.isdir` (which follow symlinks), this function uses `Lstat` under the hood, so it reports whether the path itself is a symlink — regardless of what the target is.
+
+**Parameters:**
+- `path` (`str`): Path to check.
+
+**Returns:** `bool`: `True` if the path is a symbolic link, `False` otherwise.
+
+```python
+import os.path
+
+# symlink check doesn't follow links: returns True for the link itself
+if os.path.islink("node_modules/.bin/eslint"):
+    print("It's a symlink")
+```
+
 ## Security Considerations
 
 This is an extended library, requiring registration in Go (registered together with the `os` library by `RegisterOSLibrary`, see [Library Registration](/docs/go-integration/library-registration/#filesystem-libraries)).
@@ -306,7 +324,7 @@ This library implements a subset of Python's `os.path` module:
 | `getmtime` | Yes |
 | `getatime` | No |
 | `getctime` | No |
-| `islink` | No |
+| `islink` | Yes |
 | `ismount` | No |
 | `samefile` | No |
 
