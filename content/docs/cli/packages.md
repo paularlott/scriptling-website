@@ -291,6 +291,97 @@ result = utils.process("data")
 helpers.format(result)
 ```
 
+## App Bundles
+
+A package whose manifest declares `serve` becomes an **app bundle** — a complete
+application shipped as one artifact. The manifest owns all path and registration
+config; the CLI only picks the transport.
+
+### Manifest
+
+```toml
+name = "myapp"
+version = "1.0.0"
+main = "setup.py"           # .py file (runs top-level) or "module.function"
+libs = ["lib", "vendor"]    # module search dirs (default ["lib"])
+serve = ["http", "mcp"]     # "http", "mcp", "json-rpc"
+```
+
+| Field | Description |
+|-------|-------------|
+| `main` | Entry point: a `.py` file path (runs top-level) or `module.function`. If absent, no setup script runs. |
+| `libs` | Module search dirs inside the package, searched in order. Default `["lib"]`. |
+| `serve` | Protocols to enable. Presence of `serve` makes the package an app bundle. |
+
+### Convention Dirs
+
+These top-level dirs are auto-discovered when present:
+
+| Dir | Protocol | Contents |
+|-----|----------|----------|
+| `tools/` | mcp | `.py` + `.toml` pairs (MCP tools) |
+| `resources/` | mcp | Resource tree (static files and `{var}` templates) |
+| `prompts/` | mcp | `.toml` + `.py` pairs or `.md`/`.txt` (MCP prompts) |
+| `webroot/` | http | Static assets served at the HTTP root |
+| `docs/` | — | Documentation viewer |
+
+### Running
+
+```bash
+# Development — run from a folder (hot-reloadable)
+scriptling --server :8000 --package ./myapp          # HTTP + MCP
+scriptling --package ./myapp                           # MCP over stdio
+scriptling --package ./myapp                           # JSON-RPC over stdio (if serve=["json-rpc"])
+
+# Production — run from a zip
+scriptling pack ./myapp myapp.zip
+scriptling --server :8000 --package myapp.zip
+scriptling --server :8000 --package https://host/myapp.zip#sha256=...
+```
+
+In app-bundle mode the CLI rejects path/registration flags (`-L`, `--script`,
+`--mcp-tools`, `--mcp-resources`, `--mcp-prompts`, `--web-root`, `--code`,
+`--interactive`) because the manifest owns them. Deployment flags (`--server`,
+`--tls-*`, `--bearer-token`, secrets) remain valid.
+
+### main Resolution
+
+`main` accepts two forms, resolved at boot by lookup order:
+
+1. Ends in `.py` **and the file exists** → run the file top-level (the bundle
+   analogue of `--script`).
+2. Otherwise → `module.function` (eval `import mod` + `mod.fn()`).
+3. Neither resolves → boot error.
+
+So `main = "setup.py"` runs the file; `main = "demo.run"` calls the function.
+`main = "foo.py"` with no such file falls back to module `foo`, function `py`.
+
+### Library Packs (without serve)
+
+A package without `serve` is a **library pack** — it provides importable modules
+only, exactly as before. The `--package` flag accepts multiple library packs
+alongside one app bundle:
+
+```bash
+scriptling --server :8000 --package ./myapp --package ./vendor-deps.zip
+```
+
+### Build Inclusion
+
+`pack build` includes exactly: `manifest.toml`, every `libs` dir, the `main`
+script file, and the convention dirs when present. Dotfiles are excluded
+silently; anything else at the top level produces a warning. Missing declared
+`libs` dirs or `main` scripts are build errors.
+
+### Examples
+
+- `examples/app-bundle/` — reference HTTP + MCP app with routes, tools and
+  webroot.
+- `examples/jsonrpc-package/` — JSON-RPC server shipped as a package (stdio +
+  HTTP).
+- `examples/sample-package/` — classic library pack (no `serve`, proves
+  backward compatibility).
+
 ## Distribution
 
 Share packages via any HTTP server:

@@ -8,6 +8,51 @@ nav-skip: true
 
 ## July 2026
 
+{{< version "v0.18.0" >}}
+
+{{< changelog-item "added" >}}
+**App bundles** — ship MCP tools, HTTP routes, JSON-RPC methods and static assets in a single package (folder or zip). A `manifest.toml` with a `serve` field declares the app's protocols; the CLI provides only the transport. Dev folders and production zips run the same code path.
+
+```toml
+name    = "myapp"
+version = "1.0.0"
+main    = "setup.py"
+libs    = ["lib", "vendor"]
+serve   = ["http", "mcp"]
+```
+
+```bash
+scriptling --server :8000 --package ./myapp       # dev (folder)
+scriptling --server :8000 --package myapp.zip     # prod (zip)
+```
+
+See `examples/app-bundle/` for a complete working example.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Decorator-based MCP tool registration** — define tools with `@mcp.tool()` in a single `.py` file, no `.toml` sidecar needed. Parameters, types and descriptions live alongside the implementation. Multiple tools per file are supported.
+
+```python
+import scriptling.runtime.mcp as mcp
+
+@mcp.tool("Calculate an expression", params={"expr": "Math expression"})
+def calc(expr):
+    return f"{expr} = {eval(expr)}"
+```
+
+The legacy `.toml` + `.py` format continues to work; both formats can coexist in the same `tools/` folder.
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**`pack build` is manifest-driven** — inclusion follows the manifest (libs dirs, main script, convention dirs). Unknown top-level entries produce warnings; missing declared entries are build errors.
+
+**Tool scripts no longer get implicit sibling imports** — pass `-L ./tools` if sibling imports are needed.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**HTTP ServeMux conflict** between `/mcp` and `GET /` routes resolved by registering MCP/JSON-RPC endpoints with explicit methods.
+{{< /changelog-item >}}
+
 {{< version "v0.17.8" >}}
 
 {{< changelog-item "added" >}}
