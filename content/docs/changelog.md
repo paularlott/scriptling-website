@@ -11,6 +11,24 @@ nav-skip: true
 {{< version "v0.18.0" >}}
 
 {{< changelog-item "added" >}}
+**Decorator-based HTTP and JSON-RPC handler registration** — attach routes directly to handler functions with `@http.get("/path")`, `@http.post(...)`, `@http.route(...)`, `@http.websocket(...)`, `@http.middleware`, `@http.not_found`, and `@jsonrpc.method("name")`, `@jsonrpc.notification("name")`. No separate setup-script registration block needed; the route lives right above the function.
+
+```python
+import scriptling.runtime.http as http
+
+@http.get("/health")
+def health(request):
+    return http.json(200, {"status": "ok"})
+
+@http.post("/api/users")
+def create_user(request):
+    return http.json(201, {"name": request.json()["name"]})
+```
+
+The module name is auto-resolved from `__name__` (falling back to `__file__` for the setup script). The imperative API (`runtime.http.get("/path", "lib.func")`) continues to work; both forms coexist.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
 **App bundles** — ship MCP tools, HTTP routes, JSON-RPC methods and static assets in a single package (folder or zip). A `manifest.toml` with a `serve` field declares the app's protocols; the CLI provides only the transport. Dev folders and production zips run the same code path.
 
 ```toml
@@ -51,6 +69,18 @@ The legacy `.toml` + `.py` format continues to work; both formats can coexist in
 
 {{< changelog-item "fixed" >}}
 **HTTP ServeMux conflict** between `/mcp` and `GET /` routes resolved by registering MCP/JSON-RPC endpoints with explicit methods.
+
+**Data race on `reloadMCP`** — signal-triggered reload and file-watcher debounce reload are now serialized with a mutex, preventing concurrent mutation of MCP registration maps and entry-tracking slices.
+
+**Setup script panic recovery** — the setup script goroutine now recovers panics, converting them to a clean startup error instead of blocking `NewServer` forever or crashing the process.
+
+**HTTP handler request cancellation** — `runHandler` now passes `r.Context()` to the script evaluator so client disconnects cancel in-flight handler scripts.
+
+**MCP handler socket consistency** — MCP tool/resource/prompt handlers now respect `--docker-host` / `--podman-host` overrides (previously hardcoded to default socket paths).
+
+**Wasted KV store allocation** — `ResetRuntime` no longer opens a throwaway in-memory KV store that `InitKVStore` immediately replaces.
+
+**`pack build` zip close error** — file close failures during `pack build` are now propagated instead of silently swallowed.
 {{< /changelog-item >}}
 
 {{< version "v0.17.8" >}}

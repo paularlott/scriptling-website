@@ -92,6 +92,42 @@ def on_progress(params):
 See the [scriptling.runtime.jsonrpc reference](../../../reference/libraries/scriptling/runtime/jsonrpc/)
 for the full API.
 
+### Decorator Syntax
+
+Instead of registering methods and notifications separately in a setup script,
+attach them directly to handler functions with decorators:
+
+```python
+# handlers.py
+import scriptling.runtime.jsonrpc as jsonrpc
+
+@jsonrpc.method("echo")
+def echo(params):
+    return params
+
+@jsonrpc.method("divide")
+def divide(params):
+    if params["b"] == 0:
+        return jsonrpc.error(-32602, "division by zero")
+    return params["a"] / params["b"]
+
+@jsonrpc.notification("progress")
+def on_progress(params):
+    pass
+```
+
+The setup script imports the handler library, which fires the decorators:
+
+```python
+# setup.py
+import handlers  # decorators fire, methods are registered
+```
+
+When the file is imported, the decorators register each handler with the
+correct `"module.function"` reference. The imperative API
+(`runtime.jsonrpc.method("echo", "handlers.echo")`) continues to work
+unchanged. Both forms can coexist in the same project.
+
 ## Talking to the Stdio Server
 
 ```bash
