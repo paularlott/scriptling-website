@@ -11,7 +11,7 @@ nav-skip: true
 {{< version "v0.18.0" >}}
 
 {{< changelog-item "added" >}}
-**Decorator-based HTTP and JSON-RPC handler registration** — attach routes directly to handler functions with `@http.get("/path")`, `@http.post(...)`, `@http.route(...)`, `@http.websocket(...)`, `@http.middleware`, `@http.not_found`, and `@jsonrpc.method("name")`, `@jsonrpc.notification("name")`. No separate setup-script registration block needed; the route lives right above the function.
+**Decorator-based HTTP and JSON-RPC handler registration** — attach routes directly to handler functions with `@http.get("/path")`, `@http.post(...)`, `@http.route(...)`, `@http.websocket(...)`, `@http.middleware`, `@http.not_found`, and `@jsonrpc.method("name")`, `@jsonrpc.notification("name")`, plus `@plugin.register_function` and `@plugin.register_class` for plugin servers. No separate setup-script registration block needed; the route lives right above the function.
 
 ```python
 import scriptling.runtime.http as http
