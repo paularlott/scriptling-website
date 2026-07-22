@@ -150,6 +150,22 @@ input_file = sys.argv[1]
 print(f"Processing {input_file}")
 ```
 
+In server modes (`--server`, `--json-rpc`, `--mcp-tools`, `--package`), `sys.argv` is available in every evaluator — the setup script, MCP tool handlers, HTTP route handlers, and JSON-RPC method handlers. Positional arguments after `--` on the CLI are included, so app bundles can accept their own flags:
+
+```sh
+# --bundles is not a scriptling flag; it passes through to sys.argv
+scriptling --package ./myapp -- --bundles /data
+```
+
+```python
+# Inside a tool or handler — each call resolves sys.argv fresh
+import sys
+bundles = "/data"
+for i in range(len(sys.argv) - 1):
+    if sys.argv[i] == "--bundles":
+        bundles = sys.argv[i + 1]
+```
+
 ## Security Considerations
 
 This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).

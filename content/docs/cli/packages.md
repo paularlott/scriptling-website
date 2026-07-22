@@ -304,7 +304,7 @@ name = "myapp"
 version = "1.0.0"
 main = "setup.py"           # .py file (runs top-level) or "module.function"
 libs = ["lib", "vendor"]    # module search dirs (default ["lib"])
-serve = ["http", "mcp"]     # "http", "mcp", "json-rpc"
+serve = ["http", "mcp"]     # "http", "mcp", "json-rpc" — any combination
 ```
 
 | Field | Description |
@@ -312,6 +312,18 @@ serve = ["http", "mcp"]     # "http", "mcp", "json-rpc"
 | `main` | Entry point: a `.py` file path (runs top-level) or `module.function`. If absent, no setup script runs. |
 | `libs` | Module search dirs inside the package, searched in order. Default `["lib"]`. |
 | `serve` | Protocols to enable. Presence of `serve` makes the package an app bundle. |
+
+### Transport
+
+The `serve` list declares **what** the app provides, not how it's reached.
+The CLI flags decide the transport:
+
+| CLI flags | What happens |
+|-----------|-------------|
+| `--package .` (no `--server`) | MCP or JSON-RPC over **stdio** (whichever is in `serve`) |
+| `--server :8000 --package .` | All declared protocols over **HTTP**: MCP at `/mcp`, JSON-RPC at `/json-rpc`, HTTP routes at their registered paths |
+
+So `serve = ["mcp"]` works for both `scriptling --package .` (stdio) and `scriptling --server :8000 --package .` (HTTP at `/mcp`).
 
 ### Convention Dirs
 
@@ -329,9 +341,8 @@ These top-level dirs are auto-discovered when present:
 
 ```bash
 # Development — run from a folder (hot-reloadable)
-scriptling --server :8000 --package ./myapp          # HTTP + MCP
-scriptling --package ./myapp                           # MCP over stdio
-scriptling --package ./myapp                           # JSON-RPC over stdio (if serve=["json-rpc"])
+scriptling --server :8000 --package ./myapp          # HTTP (all serve protocols)
+scriptling --package ./myapp                           # stdio (MCP or JSON-RPC)
 
 # Production — run from a zip
 scriptling pack ./myapp myapp.zip
