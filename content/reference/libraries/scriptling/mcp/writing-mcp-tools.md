@@ -7,7 +7,7 @@ weight: 4
 
 Custom MCP tools allow you to expose Scriptling functionality to AI assistants.
 
-{{< callout type="tip" >}}
+{{< callout type="info" >}}
 **Recommended:** Use the [decorator-based format](/reference/libraries/scriptling/runtime/mcp/) (`@mcp.tool`) for new tools. It keeps metadata and implementation in a single file, eliminates drift between `.toml` and `.py`, and supports multiple tools per file.
 {{< /callout >}}
 

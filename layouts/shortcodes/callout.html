@@ -27,7 +27,7 @@
         </svg>
       {{ end }}
     </div>
-    <div class="ml-4 {{ $textColor }} text-sm">
+    <div class="ml-4 py-2 {{ $textColor }} text-sm">
       {{ $content := .Inner | markdownify }}
       {{ if findRE "^<" $content }}
         {{ $content }}
