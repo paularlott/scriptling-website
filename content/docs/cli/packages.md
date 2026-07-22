@@ -355,6 +355,12 @@ In app-bundle mode the CLI rejects path/registration flags (`-L`, `--script`,
 `--interactive`) because the manifest owns them. Deployment flags (`--server`,
 `--tls-*`, `--bearer-token`, secrets) remain valid.
 
+Extra positional arguments after `--` are available to tools and handlers
+via `sys.argv` — useful for conditional tool registration (e.g. gating
+write tools behind `-- --allow-write`). See
+[Conditional Tool Registration](../mcp-server/#conditional-tool-registration)
+for details.
+
 ### main Resolution
 
 `main` accepts two forms, resolved at boot by lookup order:
