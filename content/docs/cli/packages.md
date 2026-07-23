@@ -293,25 +293,33 @@ helpers.format(result)
 
 ## App Bundles
 
-A package whose manifest declares `serve` becomes an **app bundle** — a complete
-application shipped as one artifact. The manifest owns all path and registration
-config; the CLI only picks the transport.
+A package with a `manifest.toml` is a self-contained unit — code, data, and
+metadata shipped as one folder or zip. Three types exist:
+
+- **App bundle** (`serve` declared): starts an HTTP, MCP, or JSON-RPC server.
+- **Script package** (`main` declared, no `serve`): runs the entry-point script
+  and exits — a standalone tool packaged with its libraries and data.
+- **Library pack** (no `main`, no `serve`): provides importable modules only.
 
 ### Manifest
 
 ```toml
-name = "myapp"
-version = "1.0.0"
-main = "setup.py"           # .py file (runs top-level) or "module.function"
-libs = ["lib", "vendor"]    # module search dirs (default ["lib"])
-serve = ["http", "mcp"]     # "http", "mcp", "json-rpc" — any combination
+name = "myapp"                             # REQUIRED — unique across loaded packages
+version = "1.0.0"                          # REQUIRED
+main = "setup.py"                          # optional: .py file or "module.function"
+libs = ["lib", "vendor"]                   # optional: module search dirs (default ["lib"])
+serve = ["http", "mcp"]                    # optional: protocols to serve
+additional_files = ["data/", "LICENSE"]    # optional: extra dirs/files to include
 ```
 
-| Field | Description |
-|-------|-------------|
-| `main` | Entry point: a `.py` file path (runs top-level) or `module.function`. If absent, no setup script runs. |
-| `libs` | Module search dirs inside the package, searched in order. Default `["lib"]`. |
-| `serve` | Protocols to enable. Presence of `serve` makes the package an app bundle. |
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | yes | Package name. Used by `scriptling.package` for file access. Must be unique across loaded packages. |
+| `version` | yes | Version string (e.g., `"1.0.0"`). |
+| `main` | no | Entry point: a `.py` file path (runs top-level) or `module.function`. Without `serve`, the script runs and exits. |
+| `libs` | no | Module search dirs inside the package, searched in order. Default `["lib"]`. |
+| `serve` | no | Protocols to serve (e.g. `["http", "mcp"]`). When present, the package starts a server instead of running and exiting. |
+| `additional_files` | no | Extra files or directories to include. A trailing `/` includes the entire directory tree; a bare path includes a single file. |
 
 ### Transport
 
@@ -336,6 +344,46 @@ These top-level dirs are auto-discovered when present:
 | `prompts/` | mcp | `.toml` + `.py` pairs or `.md`/`.txt` (MCP prompts) |
 | `webroot/` | http | Static assets served at the HTTP root |
 | `docs/` | — | Documentation viewer |
+
+### Additional Files
+
+Declare extra files or directories in the manifest to ship data, specs,
+or configuration alongside your code:
+
+```toml
+additional_files = ["data/", "LICENSE", "templates/"]
+```
+
+A trailing `/` includes the entire directory tree; a bare path includes
+a single file. These are packed into the zip alongside the `libs` and
+convention dirs.
+
+At runtime, files inside a package — including those from `additional_files`
+— are accessible via the `scriptling.package` library. This works identically
+in directory mode and zip mode:
+
+```python
+import scriptling.package as package
+
+# Read a file shipped via additional_files
+spec = package.read_file("myapp", "data/spec.md")
+
+# List all loaded packages
+for name in package.names():
+    print(name)
+
+# Glob for files
+for f in package.glob("myapp", "**/*.md"):
+    print(f)
+```
+
+Every function takes the package name (from the manifest's `name` field) as
+its first argument, so there's no ambiguity when multiple packages are loaded.
+Use `package.exists("name")` to check if a package is loaded, and
+`package.file_exists("name", "path")` to check for a specific file.
+
+Note: `os.read_file` reads from the real filesystem only — it cannot read
+files inside a zip package. Use `scriptling.package` for that.
 
 ### Running
 
