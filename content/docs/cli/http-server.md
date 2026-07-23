@@ -171,6 +171,65 @@ runtime.http.patch("/path", "handlers.patch")
 runtime.http.delete("/path", "handlers.delete")
 ```
 
+### Decorator Syntax
+
+Instead of registering routes separately in a setup script, attach them
+directly to handler functions with decorators. Import the HTTP sub-library
+and use `@http.get`, `@http.post`, `@http.put`, `@http.delete`,
+`@http.route`, `@http.websocket`, `@http.middleware`, or `@http.not_found`:
+
+```python
+# handlers.py
+import scriptling.runtime.http as http
+
+@http.get("/health")
+def health_check(request):
+    return http.json(200, {"status": "ok"})
+
+@http.post("/api/users")
+def create_user(request):
+    data = request.json()
+    return http.json(201, {"name": data["name"]})
+
+@http.route("/api/items", methods=["GET", "POST"])
+def items(request):
+    return http.json(200, [])
+
+@http.websocket("/ws")
+def ws_handler(client):
+    client.send("Welcome!")
+
+@http.middleware
+def auth(request):
+    if request.header("Authorization") == "":
+        return http.json(401, {"error": "unauthorized"})
+    return None  # continue to handler
+
+@http.not_found
+def handle_404(request):
+    return http.html(404, "<h1>Not Found</h1>")
+```
+
+The setup script still triggers registration — it imports the handler library,
+which fires the decorators:
+
+```python
+# setup.py
+import handlers  # decorators fire, routes are registered
+```
+
+When the file is imported, the decorators register each route with the correct
+`"module.function"` reference. The module name is derived from `__name__`
+(or `__file__` when `__name__` is `"__main__"`), so decorators also work
+directly in the setup/main script itself.
+
+At request time, the server re-imports the library on a fresh evaluator and
+calls the handler function. Re-import is idempotent — duplicate route
+registrations are detected and skipped silently.
+
+The imperative API (`runtime.http.get("/path", "lib.func")`) continues to
+work unchanged. Both forms can coexist in the same project.
+
 ### Request Object
 
 The request object passed to handlers provides:

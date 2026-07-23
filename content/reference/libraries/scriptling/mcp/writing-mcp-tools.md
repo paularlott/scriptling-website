@@ -5,7 +5,13 @@ tags: [libraries, mcp]
 weight: 4
 ---
 
-Custom MCP tools allow you to expose Scriptling functionality to AI assistants. Each tool consists of a metadata file (`.toml`) and a script file (`.py`).
+Custom MCP tools allow you to expose Scriptling functionality to AI assistants.
+
+{{< callout type="info" >}}
+**Recommended:** Use the [decorator-based format](/reference/libraries/scriptling/runtime/mcp/) (`@mcp.tool`) for new tools. It keeps metadata and implementation in a single file, eliminates drift between `.toml` and `.py`, and supports multiple tools per file.
+{{< /callout >}}
+
+This page documents the **legacy format** where each tool consists of a metadata file (`.toml`) and a script file (`.py`). Both formats are fully supported and can coexist in the same tools folder.
 
 ## Tool Structure
 

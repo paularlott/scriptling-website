@@ -225,6 +225,52 @@ scriptling --server :8000 --mcp-tools ./tools setup.py
 
 For details on creating custom tools, see [Writing MCP Tools](../../../reference/libraries/scriptling/mcp/writing-mcp-tools/).
 
+### Conditional Tool Registration
+
+The MCP scanner *evaluates* each `.py` file to find `@mcp.tool` decorators —
+it doesn't just parse the AST. This means decorators inside a conditional
+only fire when the condition is true, so you can gate tools behind CLI flags
+or environment checks.
+
+`sys.argv` is available in tool evaluators and contains extra args passed
+after `--` on the command line:
+
+```python
+# tools/files.py
+import scriptling.runtime.mcp as mcp
+import sys
+
+@mcp.tool("Read a file", params={"path": "File path"})
+def read_file(path):
+    return "contents"
+
+if "--allow-write" in getattr(sys, "argv", []):
+    @mcp.tool("Write a file", params={"path": "File path", "content": "Content"})
+    def write_file(path, content):
+        return "wrote " + path
+
+    @mcp.tool("Delete a file", params={"path": "File path"})
+    def delete_file(path):
+        return "deleted " + path
+```
+
+```sh
+# Read-only — only read_file is visible
+scriptling --mcp-tools tools
+
+# Read + write — all three tools are visible
+scriptling --mcp-tools tools -- --allow-write
+```
+
+The same pattern works in app bundles:
+
+```sh
+scriptling --package . -- --allow-write
+```
+
+`sys.argv` is set once at startup and is the same at scan time and request
+time, so the condition is consistent across all tool invocations.
+
 ## MCP Endpoints
 
 When running as an MCP server, the following endpoints are available:

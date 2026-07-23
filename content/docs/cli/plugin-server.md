@@ -90,6 +90,53 @@ import plugin.calculator
 print(plugin.calculator.add(3, 4))
 ```
 
+## Decorator Syntax
+
+Instead of registering functions and classes separately in the setup script,
+attach them directly with decorators:
+
+```python
+# handlers.py
+import scriptling.runtime.plugin as plugin
+
+@plugin.register_function("add")
+def add(a, b):
+    return a + b
+
+# Bare form uses the function name as the plugin function name
+@plugin.register_function
+def multiply(a, b):
+    return a * b
+
+@plugin.register_class
+class Config:
+    def __init__(self, prefix):
+        self.prefix = prefix
+
+    def greeting(self, name):
+        return self.prefix + name
+```
+
+The setup script imports the handler library, which fires the decorators:
+
+```python
+# setup.py
+import scriptling.runtime.plugin as plugin_srv
+import scriptling.runtime as runtime
+
+plugin_srv.serve("calculator", "1.0", "Basic arithmetic")
+plugin_srv.register_constant("VERSION", "1.0.0")
+
+import handlers  # decorators fire, functions and classes registered
+
+runtime.start_server()
+```
+
+The imperative API (`register_function("add", "handlers.add")`,
+`register_class("handlers.Config")`) continues to work unchanged. Constants
+remain imperative — they aren't functions or classes and don't support
+decorators.
+
 ## API
 
 ### `runtime.plugin.serve(name, version="", description="")`
@@ -105,14 +152,20 @@ Declare this script as a Scriptling plugin server.
 Must be called before `runtime.start_server()`. A warning is printed to stderr
 if called after the server has started.
 
-### `runtime.plugin.register_function(name, handler)`
+### `runtime.plugin.register_function(name, handler=None)`
 
-Register a function for the plugin server.
+Register a function for the plugin server. Supports three forms:
+
+| Form | Syntax | Description |
+|------|--------|-------------|
+| Named decorator | `@plugin.register_function("add")` | Uses the given name |
+| Bare decorator | `@plugin.register_function` | Uses the function's own name |
+| Imperative | `register_function("add", "handlers.add")` | String reference |
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `name` | str | Function name exposed to plugin clients. |
-| `handler` | str | Handler as `"library.function"` string. |
+| `handler` | str | Handler as `"library.function"` string (imperative only). |
 
 The handler receives individual positional arguments decoded from the plugin
 transport: not a raw params blob like `runtime.jsonrpc` handlers do. Each call
@@ -163,11 +216,16 @@ Must be called before `runtime.start_server()`.
 
 ### `runtime.plugin.register_class(handler)`
 
-Register a class exported by the plugin server.
+Register a class exported by the plugin server. Supports two forms:
+
+| Form | Syntax | Description |
+|------|--------|-------------|
+| Bare decorator | `@plugin.register_class` | Uses the class name |
+| Imperative | `register_class("handlers.Config")` | String reference |
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `handler` | str | Class as `"library.ClassName"` string. |
+| `handler` | str | Class as `"library.ClassName"` string (imperative only). |
 
 The exposed class name is taken from the last segment of `handler`
 (e.g. `"mymodule.Config"` → `"Config"`). The server handles the complete

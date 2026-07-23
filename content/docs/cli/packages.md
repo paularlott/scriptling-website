@@ -291,6 +291,162 @@ result = utils.process("data")
 helpers.format(result)
 ```
 
+## App Bundles
+
+A package with a `manifest.toml` is a self-contained unit — code, data, and
+metadata shipped as one folder or zip. Three types exist:
+
+- **App bundle** (`serve` declared): starts an HTTP, MCP, or JSON-RPC server.
+- **Script package** (`main` declared, no `serve`): runs the entry-point script
+  and exits — a standalone tool packaged with its libraries and data.
+- **Library pack** (no `main`, no `serve`): provides importable modules only.
+
+### Manifest
+
+```toml
+name = "myapp"                             # REQUIRED — unique across loaded packages
+version = "1.0.0"                          # REQUIRED
+main = "setup.py"                          # optional: .py file or "module.function"
+libs = ["lib", "vendor"]                   # optional: module search dirs (default ["lib"])
+serve = ["http", "mcp"]                    # optional: protocols to serve
+additional_files = ["data/", "LICENSE"]    # optional: extra dirs/files to include
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | yes | Package name. Used by `scriptling.package` for file access. Must be unique across loaded packages. |
+| `version` | yes | Version string (e.g., `"1.0.0"`). |
+| `main` | no | Entry point: a `.py` file path (runs top-level) or `module.function`. Without `serve`, the script runs and exits. |
+| `libs` | no | Module search dirs inside the package, searched in order. Default `["lib"]`. |
+| `serve` | no | Protocols to serve (e.g. `["http", "mcp"]`). When present, the package starts a server instead of running and exiting. |
+| `additional_files` | no | Extra files or directories to include. A trailing `/` includes the entire directory tree; a bare path includes a single file. |
+
+### Transport
+
+The `serve` list declares **what** the app provides, not how it's reached.
+The CLI flags decide the transport:
+
+| CLI flags | What happens |
+|-----------|-------------|
+| `--package .` (no `--server`) | MCP or JSON-RPC over **stdio** (whichever is in `serve`) |
+| `--server :8000 --package .` | All declared protocols over **HTTP**: MCP at `/mcp`, JSON-RPC at `/json-rpc`, HTTP routes at their registered paths |
+
+So `serve = ["mcp"]` works for both `scriptling --package .` (stdio) and `scriptling --server :8000 --package .` (HTTP at `/mcp`).
+
+### Convention Dirs
+
+These top-level dirs are auto-discovered when present:
+
+| Dir | Protocol | Contents |
+|-----|----------|----------|
+| `tools/` | mcp | `.py` + `.toml` pairs (MCP tools) |
+| `resources/` | mcp | Resource tree (static files and `{var}` templates) |
+| `prompts/` | mcp | `.toml` + `.py` pairs or `.md`/`.txt` (MCP prompts) |
+| `webroot/` | http | Static assets served at the HTTP root |
+| `docs/` | — | Documentation viewer |
+
+### Additional Files
+
+Declare extra files or directories in the manifest to ship data, specs,
+or configuration alongside your code:
+
+```toml
+additional_files = ["data/", "LICENSE", "templates/"]
+```
+
+A trailing `/` includes the entire directory tree; a bare path includes
+a single file. These are packed into the zip alongside the `libs` and
+convention dirs.
+
+At runtime, files inside a package — including those from `additional_files`
+— are accessible via the `scriptling.package` library. This works identically
+in directory mode and zip mode:
+
+```python
+import scriptling.package as package
+
+# Read a file shipped via additional_files
+spec = package.read_file("myapp", "data/spec.md")
+
+# List all loaded packages
+for name in package.names():
+    print(name)
+
+# Glob for files
+for f in package.glob("myapp", "**/*.md"):
+    print(f)
+```
+
+Every function takes the package name (from the manifest's `name` field) as
+its first argument, so there's no ambiguity when multiple packages are loaded.
+Use `package.exists("name")` to check if a package is loaded, and
+`package.file_exists("name", "path")` to check for a specific file.
+
+Note: `os.read_file` reads from the real filesystem only — it cannot read
+files inside a zip package. Use `scriptling.package` for that.
+
+### Running
+
+```bash
+# Development — run from a folder (hot-reloadable)
+scriptling --server :8000 --package ./myapp          # HTTP (all serve protocols)
+scriptling --package ./myapp                           # stdio (MCP or JSON-RPC)
+
+# Production — run from a zip
+scriptling pack ./myapp myapp.zip
+scriptling --server :8000 --package myapp.zip
+scriptling --server :8000 --package https://host/myapp.zip#sha256=...
+```
+
+In app-bundle mode the CLI rejects path/registration flags (`-L`, `--script`,
+`--mcp-tools`, `--mcp-resources`, `--mcp-prompts`, `--web-root`, `--code`,
+`--interactive`) because the manifest owns them. Deployment flags (`--server`,
+`--tls-*`, `--bearer-token`, secrets) remain valid.
+
+Extra positional arguments after `--` are available to tools and handlers
+via `sys.argv` — useful for conditional tool registration (e.g. gating
+write tools behind `-- --allow-write`). See
+[Conditional Tool Registration](../mcp-server/#conditional-tool-registration)
+for details.
+
+### main Resolution
+
+`main` accepts two forms, resolved at boot by lookup order:
+
+1. Ends in `.py` **and the file exists** → run the file top-level (the bundle
+   analogue of `--script`).
+2. Otherwise → `module.function` (eval `import mod` + `mod.fn()`).
+3. Neither resolves → boot error.
+
+So `main = "setup.py"` runs the file; `main = "demo.run"` calls the function.
+`main = "foo.py"` with no such file falls back to module `foo`, function `py`.
+
+### Library Packs (without serve)
+
+A package without `serve` is a **library pack** — it provides importable modules
+only, exactly as before. The `--package` flag accepts multiple library packs
+alongside one app bundle:
+
+```bash
+scriptling --server :8000 --package ./myapp --package ./vendor-deps.zip
+```
+
+### Build Inclusion
+
+`pack build` includes exactly: `manifest.toml`, every `libs` dir, the `main`
+script file, and the convention dirs when present. Dotfiles are excluded
+silently; anything else at the top level produces a warning. Missing declared
+`libs` dirs or `main` scripts are build errors.
+
+### Examples
+
+- `examples/app-bundle/` — reference HTTP + MCP app with routes, tools and
+  webroot.
+- `examples/jsonrpc-package/` — JSON-RPC server shipped as a package (stdio +
+  HTTP).
+- `examples/sample-package/` — classic library pack (no `serve`, proves
+  backward compatibility).
+
 ## Distribution
 
 Share packages via any HTTP server:
