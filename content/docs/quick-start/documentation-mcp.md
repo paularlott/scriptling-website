@@ -1,72 +1,107 @@
 ---
 title: Documentation MCP Server
-description: Generate Scriptling's documentation as OKF bundles and serve them to AI agents through an MCP server.
+description: Serve Scriptling's documentation as OKF bundles to AI agents through the OKF MCP server.
 tags: [quick-start, mcp, ai]
 weight: 4
 ---
 
-Scriptling's documentation can be published as [OKF](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) knowledge bundles and exposed to AI agents through a MCP server. An LLM can then browse and search the docs, list bundles and folders, read individual pages, and run semantic or keyword search without scraping the website.
+Scriptling's documentation can be published as [OKF](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) knowledge bundles and exposed to AI agents through an MCP server. An LLM can then browse and search the docs, list bundles and folders, read individual pages, and run semantic or keyword search without scraping the website.
+
+The MCP server is a separate, generic project — [okf-server](https://github.com/paularlott/okf-server) — that works with any OKF bundles. Scriptling ships prebuilt bundles, so there is no need to clone or build anything.
 
 ## Prerequisites
 
-- **Scriptling 0.17.4 or later** installed and on your `PATH` (`scriptling --version`). See [CLI Getting Started](./cli/) to install.
+- **Scriptling 0.18.0 or later** installed and on your `PATH` (`scriptling --version`). See [CLI Getting Started](./cli/) to install.
 
-## 1. Generate the bundles
+## 1. Download the bundles
 
-Clone the website repository and generate the bundles and MCP tools:
+Grab the latest OKF bundles archive and unzip it into a `bundles/` folder:
 
 ```bash
-git clone https://github.com/paularlott/scriptling-website
-cd scriptling-website
-
-scriptling scripts/okf.py     # or, if you have make installed: make okf
+curl -L -o okf-bundles.zip \
+  https://github.com/paularlott/scriptling-website/releases/latest/download/scriptling-okf-bundles.zip
+unzip okf-bundles.zip -d bundles && rm okf-bundles.zip
 ```
 
-This produces, under `mcp/`:
+This gives three bundles under `bundles/`:
 
-| Path | Contents |
-|------|----------|
-| `mcp/okf/scriptling-docs/`, `mcp/okf/scriptling-reference/`, `mcp/okf/scriptling-libraries/` | The three OKF knowledge bundles. |
-| `mcp/tools/` | The `skb_*` MCP tools. |
-| `mcp/okf/<bundle>/.vector.json` | Per-bundle vector index powering `skb_search`, generated automatically on first search (not shipped with the bundles). |
+| Bundle | Contents |
+|--------|----------|
+| `bundles/scriptling-docs/` | Guides and tutorials. |
+| `bundles/scriptling-reference/` | CLI and language reference. |
+| `bundles/scriptling-libraries/` | Standard library API reference. |
+
+The `latest/download` URL always fetches the newest release. To pin a specific version, replace it with `releases/download/v0.18.0/scriptling-okf-bundles.zip`.
+
+Per-bundle search indexes (`.vectors.json`, `.tags.json`, `.types.json`) are built automatically by the server on first use, so they are not shipped with the bundles.
 
 ## 2. Start the MCP server
 
-The tools locate the bundles through the `OKF_ROOT` environment variable. From the repository root it defaults to `mcp/okf`, so the commands below work as-is.
+Run the [okf-server](https://github.com/paularlott/okf-server) package with `scriptling`, pointing `--bundles` at the downloaded bundles:
 
 **Over HTTP** (for HTTP-based MCP clients):
 
 ```bash
-OKF_ROOT=mcp/okf scriptling --server :8765 --mcp-tools mcp/tools
+scriptling --server :8765 \
+  --package https://github.com/paularlott/okf-server/releases/latest/download/okf-server.zip \
+  -- --bundles ./bundles
 # → http://127.0.0.1:8765/mcp
-# shortcut: make mcp-server
 ```
 
 **Over stdio** (for MCP hosts such as Claude Desktop, which launch the server as a subprocess):
 
 ```bash
-OKF_ROOT=mcp/okf scriptling --mcp-tools mcp/tools
+scriptling \
+  --package https://github.com/paularlott/okf-server/releases/latest/download/okf-server.zip \
+  -- --bundles ./bundles
 ```
 
-Or configure a host directly using absolute paths:
+As with the bundles, the `latest/download` URL always fetches the newest okf-server release. To pin a specific version instead, use `releases/download/v0.1.0/okf-server.zip`.
+
+For a host such as Claude Desktop, configure it to spawn `scriptling`. Download and unzip the [okf-server package](https://github.com/paularlott/okf-server/releases/latest) once, then reference it by absolute path. Most hosts support an `env` block:
 
 ```json
 {
   "mcpServers": {
-    "scriptling-kb": {
+    "okf": {
       "command": "scriptling",
-      "args": ["--mcp-tools", "/abs/path/to/scriptling-website/mcp/tools"],
-      "env": { "OKF_ROOT": "/abs/path/to/scriptling-website/mcp/okf" }
+      "args": ["--package", "/abs/path/to/okf-server"],
+      "env": { "OKF_BUNDLES": "/abs/path/to/bundles" }
     }
   }
 }
+```
+
+If your client doesn't support `env`, pass `--bundles` as an argument after `--` instead:
+
+```json
+{
+  "mcpServers": {
+    "okf": {
+      "command": "scriptling",
+      "args": ["--package", "/abs/path/to/okf-server", "--", "--bundles", "/abs/path/to/bundles"]
+    }
+  }
+}
+```
+
+## Write mode
+
+By default the server is read-only. Add `--allow-write` (after `--`) to let agents create or delete concepts — useful when maintaining the bundles:
+
+```bash
+scriptling --server :8765 \
+  --package https://github.com/paularlott/okf-server/releases/latest/download/okf-server.zip \
+  -- --bundles ./bundles --allow-write
 ```
 
 ## Tools
 
 | Tool | Purpose |
 |------|---------|
-| `skb_list` | List a folder's contents, a file's metadata, or the bundles (empty path). |
-| `skb_get` | Read a concept file; synthesizes a listing when given a folder. |
-| `skb_search` | Semantic search ranked by natural-language query. |
-| `skb_grep` | Exact, fast keyword search. |
+| `okf_get` | Read a concept; synthesizes a listing when given a folder (empty path lists the bundles). |
+| `okf_search` | Semantic search ranked by natural-language query. |
+| `okf_grep` | Exact, fast keyword search. |
+| `okf_facets` | List the tags and types present, with concept counts. |
+
+See the [okf-server README](https://github.com/paularlott/okf-server) for the full tool list, faceted filtering, and the `okf_concept_write` / `okf_concept_delete` write tools.
