@@ -9,7 +9,7 @@ aliases:
   - /reference/libraries/hashlib/
 ---
 
-The `hashlib` library provides cryptographic hash functions (MD5, SHA-1, SHA-256). Its constructors return **hash objects** rather than raw strings: call `.hexdigest()` (lowercase hex) or `.digest()` (raw bytes as a string) on the returned object to get the result. Scriptling has no dedicated `bytes` type, so strings are used as byte buffers throughout.
+The `hashlib` library provides cryptographic hash functions (MD5, SHA-1, SHA-256). Its constructors return **hash objects** rather than raw strings: call `.hexdigest()` (lowercase hex) or `.digest()` (raw binary as a [`bytes`](../../data-formats/bytes/) value) on the returned object to get the result.
 
 ## Available Functions
 
@@ -26,7 +26,7 @@ The `hashlib` library provides cryptographic hash functions (MD5, SHA-1, SHA-256
 Creates a SHA-256 hash object, optionally seeded with `data`.
 
 **Parameters:**
-- `data` (`str` or `list`, optional): Initial data to hash: a string (treated as bytes) or a list of byte values (as returned by `str.encode()`).
+- `data` (`str`, `bytes`, or `list`, optional): Initial data to hash: a string (encoded as UTF-8), a `bytes` value, or a list of byte values (as returned by `str.encode()`).
 
 **Returns:** `Hash`: an instance supporting `.update()`, `.hexdigest()`, `.digest()`, and `.copy()` (see Hash Object Methods below).
 
@@ -77,7 +77,7 @@ Objects returned by `md5()`, `sha1()`, and `sha256()` support:
 |----------------|-------------|
 | `.update(data)` | Feed more data into the hash. Returns `None`. |
 | `.hexdigest()` | Return the digest as a lowercase hex string. |
-| `.digest()` | Return the digest as a raw byte string. |
+| `.digest()` | Return the digest as a [`bytes`](../../data-formats/bytes/) value. |
 | `.copy()` | Return an independent copy of the hash object. |
 | `.name` | Algorithm name, e.g. `"sha256"`. |
 | `.digest_size` | Digest size in bytes (`md5` 16, `sha1` 20, `sha256` 32). |
@@ -103,3 +103,4 @@ assert h.hexdigest() == hashlib.sha256("foobarbaz").hexdigest()
 
 - [hmac](../hmac/): message authentication codes, often paired with `hashlib` constructors.
 - [base64](../base64/): Base64 encoding and decoding.
+- [bytes](../../data-formats/bytes/): the binary type returned by `.digest()`.

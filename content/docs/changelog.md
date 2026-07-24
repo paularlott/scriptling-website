@@ -8,6 +8,44 @@ nav-skip: true
 
 ## July 2026
 
+{{< version "v0.19.0" >}}
+
+{{< changelog-item "added" >}}
+**`bytes` type** — Scriptling now has a dedicated binary data type, `bytes`, mirroring Python's `bytes`. It is an immutable sequence of byte values (0–255) with full operator support: `len()`, indexing (returns `int`), slicing (returns `bytes`), `+`/`*`, comparison, `in` (int or subsequence), iteration (yields ints), and truthiness. Mixing `bytes` with `str` in concatenation or comparison raises a `TypeError`, matching Python's strict semantics — call `.decode()` to convert.
+
+`bytes` is a global builtin (no import needed) with the Python-compatible constructor signature `bytes(source, encoding="utf-8")`, plus `bytes.fromhex()` and `bytes.frombase64()` static constructors. Methods on `bytes` values: `.decode()`, `.hex()`, `.base64()`, `.length()`.
+
+```python
+b = bytes("hi")          # b'hi'
+b = bytes([104, 105])    # b'hi'
+assert b.decode() == "hi"
+assert b.hex() == "6869"
+assert b + bytes("!") == bytes("hi!")
+```
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**`msgpack` library** — MessagePack binary serialisation, the compact counterpart to `json`. Mirrors Python's `msgpack` module: `packb(obj)` returns `bytes`, `unpackb(packed)` accepts `bytes`, with `pack`/`unpack` aliases. `bytes` values round-trip as msgpack `bin`; `str` round-trips as msgpack `str`. Streaming `Packer`/`Unpacker` classes and `ext` types are intentionally omitted.
+
+```python
+import msgpack
+
+payload = msgpack.packb({"user": "alice", "id": 42})
+data = msgpack.unpackb(payload)
+print(data["user"])  # "alice"
+```
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**`hashlib.digest()`, `hmac.digest()`, and `base64.b64decode()` now return `bytes`** instead of `str`. The previous behaviour stuffed raw binary through a UTF-8 string, silently corrupting any non-ASCII byte — anyone relying on the old return value was already in broken territory. Migration:
+
+- `base64.b64decode(s)` → `bytes` — call `.decode()` on the result to obtain a string.
+- `hashlib.<algo>(...).digest()` → `bytes` — unchanged for `.hexdigest()`.
+- `hmac.new(...).digest()` and `hmac.digest(...)` → `bytes` — unchanged for `.hexdigest()`.
+
+`hexdigest()`, `compare_digest()`, `b64encode()`, and the constructors for `hashlib`/`hmac` objects are unchanged. `b64encode`, `hashlib`, and `hmac` now also accept `bytes` as input alongside strings.
+{{< /changelog-item >}}
+
 {{< version "v0.18.0" >}}
 
 {{< changelog-item "added" >}}

@@ -9,14 +9,14 @@ aliases:
   - /reference/libraries/hmac/
 ---
 
-The `hmac` library computes and verifies message authentication codes, most commonly to verify webhook signatures. Scriptling has no dedicated `bytes` type, so strings are used as byte buffers; a list of byte values (as returned by `str.encode()`) is also accepted anywhere a byte buffer is expected.
+The `hmac` library computes and verifies message authentication codes, most commonly to verify webhook signatures. Keys and messages may be passed as strings (UTF-8 encoded), [`bytes`](../../data-formats/bytes/) values, or lists of byte values (as returned by `str.encode()`).
 
 ## Available Functions
 
 | Function | Description |
 |----------|-------------|
 | `new(key, msg=None, digestmod=None)` | Create an HMAC object. |
-| `digest(key, msg, digestmod)` | One-shot HMAC, returning the raw digest as a byte string. |
+| `digest(key, msg, digestmod)` | One-shot HMAC, returning the raw digest as a [`bytes`](../../data-formats/bytes/) value. |
 | `compare_digest(a, b)` | Constant-time string comparison (timing-safe). |
 
 ## Functions
@@ -26,8 +26,8 @@ The `hmac` library computes and verifies message authentication codes, most comm
 Creates an HMAC object.
 
 **Parameters:**
-- `key` (`str` or `list`): Secret key (string treated as bytes, or a list of byte values).
-- `msg` (`str` or `list`, optional): Initial message data. Default: `None`.
+- `key` (`str`, `bytes`, or `list`): Secret key (string encoded as UTF-8, a `bytes` value, or a list of byte values).
+- `msg` (`str`, `bytes`, or `list`, optional): Initial message data. Default: `None`.
 - `digestmod` (`str` or callable, optional): `"sha256"` (default), `"sha1"`, `"md5"`, or a `hashlib` constructor such as `hashlib.sha256`.
 
 **Returns:** `HMAC`: an instance supporting `.update()`, `.hexdigest()`, `.digest()`, and `.copy()` (see HMAC Object Methods below).
@@ -44,11 +44,11 @@ print(sig)
 One-shot HMAC, computing the digest directly without creating a reusable object.
 
 **Parameters:**
-- `key` (`str` or `list`): Secret key.
-- `msg` (`str` or `list`): Message data.
+- `key` (`str`, `bytes`, or `list`): Secret key.
+- `msg` (`str`, `bytes`, or `list`): Message data.
 - `digestmod` (`str` or callable): `"sha256"`, `"sha1"`, `"md5"`, or a `hashlib` constructor.
 
-**Returns:** `str`: the raw digest as a byte string.
+**Returns:** [`bytes`](../../data-formats/bytes/): the raw digest.
 
 ```python
 import hmac
@@ -80,7 +80,7 @@ Objects returned by `new()` support:
 |----------------|-------------|
 | `.update(data)` | Feed more data into the message. Returns `None`. |
 | `.hexdigest()` | Return the MAC as a lowercase hex string. |
-| `.digest()` | Return the MAC as a raw byte string. |
+| `.digest()` | Return the MAC as a [`bytes`](../../data-formats/bytes/) value. |
 | `.copy()` | Return an independent copy of the HMAC object. |
 | `.name` | Algorithm name, e.g. `"hmac-sha256"`. |
 | `.digest_size` | Digest size in bytes. |
@@ -117,3 +117,4 @@ print(verify(body, "sha256=tampered", secret))  # False
 - [hashlib](../hashlib/): cryptographic hash functions, including the constructors accepted as `digestmod`.
 - [secrets](../../http-process/secrets/): `token_hex()` for generating a new random secret key.
 - [base64](../base64/): Base64 encoding and decoding.
+- [bytes](../../data-formats/bytes/): the binary type returned by `.digest()` and `digest()`.
