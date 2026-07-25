@@ -21,7 +21,6 @@ The `msgpack` library serialises Scriptling values to [MessagePack](https://msgp
 | `unpackb(packed)` | Parse MessagePack `bytes` into a Scriptling value. |
 | `pack(obj)` | Alias for `packb()`. |
 | `unpack(packed)` | Alias for `unpackb()`. |
-| `codec_name()` | Return the name of the backing codec (e.g. `"vmihailenco-msgpack"`). Useful when interoperating with gossip. |
 
 ## Functions
 
@@ -133,8 +132,6 @@ The default package-level library is `stdlib.MsgpackLibrary` and defaults to gos
 stdlib.MsgpackLibrary = stdlib.NewMsgpackLibrary(myCodec)
 stdlib.RegisterAll(p)
 ```
-
-Scripts can introspect the active codec at runtime via `msgpack.codec_name()` — useful for logging or for branching when interoperating with gossip.
 
 ## See Also
 

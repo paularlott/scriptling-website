@@ -27,7 +27,7 @@ assert b + bytes("!") == bytes("hi!")
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
-**`msgpack` library** — MessagePack binary serialisation, the compact counterpart to `json`. Mirrors Python's `msgpack` module: `packb(obj)` returns `bytes`, `unpackb(packed)` accepts `bytes`, with `pack`/`unpack` aliases and `codec_name()` for runtime introspection. `bytes` round-trips as msgpack `bin`; `str` as msgpack `str`. The default codec is `shamaton-msgpack`, also used by `gossip.DefaultConfig()`, so a fresh instance and cluster agree on the wire format without explicit wiring.
+**`msgpack` library** — MessagePack binary serialisation, the compact counterpart to `json`. Mirrors Python's `msgpack` module: `packb(obj)` returns `bytes`, `unpackb(packed)` accepts `bytes`, with `pack`/`unpack` aliases. `bytes` round-trips as msgpack `bin`; `str` as msgpack `str`. The default codec is `shamaton-msgpack`, also used by `gossip.DefaultConfig()`, so a fresh instance and cluster agree on the wire format without explicit wiring.
 
 ```python
 import msgpack
