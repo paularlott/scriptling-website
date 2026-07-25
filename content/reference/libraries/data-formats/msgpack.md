@@ -117,17 +117,17 @@ import (
 )
 
 // One codec instance, used by both gossip and Scriptling.
-shared := codec.NewVmihailencoMsgpackCodec() // or Shamaton, Hashicorp, etc.
+shared := codec.NewShamatonMsgpackCodec() // or Vmihailenco, Hashicorp, etc.
 
 // Hand it to gossip:
-cfg := gossip.DefaultConfig() // already defaults to vmihailenco
+cfg := gossip.DefaultConfig() // already defaults to shamaton
 cfg.MsgCodec = shared
 
 // And to Scriptling — register a library built from the shared codec:
 p.RegisterLibrary(stdlib.NewMsgpackLibrary(shared))
 ```
 
-The default package-level library is `stdlib.MsgpackLibrary` (uses `stdlib.VmihailencoMsgpackCodec{}`), which is what `stdlib.RegisterAll` registers. Embedders who want to override that globally can reassign the var before calling `RegisterAll`:
+The default package-level library is `stdlib.MsgpackLibrary` and defaults to gossip's `codec.NewShamatonMsgpackCodec()` (matching `gossip.DefaultConfig`), which is what `stdlib.RegisterAll` registers. Embedders who want to override that globally can reassign the var before calling `RegisterAll`:
 
 ```go
 stdlib.MsgpackLibrary = stdlib.NewMsgpackLibrary(myCodec)

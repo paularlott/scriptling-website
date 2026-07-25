@@ -1,6 +1,7 @@
 <div class="mb-4">
   <div class="inline-block px-3 py-1 text-base font-medium rounded mb-2
-    {{- if eq (.Get 0) "changed" }} bg-blue-500 text-gray-100 dark:bg-blue-600
+    {{- if eq (.Get 0) "breaking" }} bg-red-700 text-gray-100 dark:bg-red-700
+    {{- else if eq (.Get 0) "changed" }} bg-blue-500 text-gray-100 dark:bg-blue-600
     {{- else if eq (.Get 0) "removed" }} bg-red-500 text-gray-100 dark:bg-red-600
     {{- else if eq (.Get 0) "added" }} bg-green-500 text-gray-100 dark:bg-green-600
     {{- else if eq (.Get 0) "fixed" }} bg-teal-500 text-gray-100 dark:bg-teal-600

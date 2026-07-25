@@ -217,7 +217,7 @@ p.write_text("Hello, World!")
 
 Read the contents of the file as bytes.
 
-**Returns:** `str`: the file's raw bytes.
+**Returns:** [`bytes`](../../data-formats/bytes/): the file's raw bytes.
 
 **Raises:** `Error`: if the path is outside the allowed paths, or the file cannot be read.
 
@@ -231,7 +231,7 @@ data = p.read_bytes()
 Write bytes to the file, creating or overwriting it.
 
 **Parameters:**
-- `data` (`str`): Raw bytes to write.
+- `data` ([`bytes`](../../data-formats/bytes/) or `str`): Raw bytes to write. Strings are UTF-8 encoded.
 
 **Returns:** `None`
 

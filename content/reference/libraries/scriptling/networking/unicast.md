@@ -115,7 +115,7 @@ Receives a message.
 **Parameters:**
 - `timeout` (`number`, optional): Timeout in seconds. Default: `30`.
 
-**Returns:** `dict`: a dict with `"data"` and `"source"` keys, or `None` on timeout.
+**Returns:** `dict`: a dict with `"data"` ([`bytes`](../../../data-formats/bytes/) — call `.decode()` for text) and `"source"` (`str`) keys, or `None` on timeout.
 
 ```python
 msg = conn.receive(timeout=5)
@@ -188,7 +188,7 @@ Receives a message from any sender.
 **Parameters:**
 - `timeout` (`number`, optional): Timeout in seconds. Default: `30`.
 
-**Returns:** `dict`: a dict with `"data"` and `"source"` keys, or `None` on timeout.
+**Returns:** `dict`: a dict with `"data"` ([`bytes`](../../../data-formats/bytes/) — call `.decode()` for text) and `"source"` (`str`) keys, or `None` on timeout.
 
 ```python
 msg = udp_server.receive(timeout=5)
