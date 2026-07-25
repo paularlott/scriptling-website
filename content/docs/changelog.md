@@ -8,6 +8,57 @@ nav-skip: true
 
 ## July 2026
 
+{{< version "v0.19.0" >}}
+
+{{< changelog-item "breaking" >}}
+**`scriptling.net.unicast` and `scriptling.net.multicast` `receive()` now return `data` as `bytes`** (was `str`). It matches Python's `socket.recv()` semantics and fixes silent corruption of binary data sent over UDP/TCP. Existing text-only scripts need `msg["data"].decode()` where they previously used `msg["data"]` directly in string operations.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**`bytes` type** — a dedicated binary data type mirroring Python's `bytes`: an immutable sequence of byte values (0–255) with the usual operator support (`len()`, indexing, slicing, `+`/`*`, comparison, `in`, iteration, truthiness). Mixing `bytes` with `str` in concatenation or comparison raises a `TypeError` — call `.decode()` to convert. It is a global builtin with the Python-compatible constructor `bytes(source, encoding="utf-8")`, plus `bytes.fromhex()` and `bytes.frombase64()` static constructors. Methods on values: `.decode()`, `.hex()`, `.base64()`, `.length()`.
+
+```python
+b = bytes("hi")          # b'hi'
+b = bytes([104, 105])    # b'hi'
+assert b.decode() == "hi"
+assert b.hex() == "6869"
+assert b + bytes("!") == bytes("hi!")
+```
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**`msgpack` library** — MessagePack binary serialisation, the compact counterpart to `json`. Mirrors Python's `msgpack` module: `packb(obj)` returns `bytes`, `unpackb(packed)` accepts `bytes`, with `pack`/`unpack` aliases. `bytes` round-trips as msgpack `bin`; `str` as msgpack `str`. The default codec is `shamaton-msgpack`, also used by `gossip.DefaultConfig()`, so a fresh instance and cluster agree on the wire format without explicit wiring.
+
+```python
+import msgpack
+
+payload = msgpack.packb({"user": "alice", "id": 42})
+data = msgpack.unpackb(payload)
+print(data["user"])  # "alice"
+```
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**`hashlib.digest()`, `hmac.digest()`, and `base64.b64decode()` now return `bytes`** instead of `str`. The previous behaviour stuffed raw binary through a UTF-8 string, silently corrupting any non-ASCII byte. Call `.decode()` on the result for a string; `hexdigest()`, `compare_digest()`, `b64encode()`, and the `hashlib`/`hmac` constructors are unchanged. `b64encode`, `hashlib`, and `hmac` now also accept `bytes` as input. `pathlib.Path.read_bytes()` and `pathlib.Path.write_bytes()` had the same bug and are fixed in the same way.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Binary interop across file I/O, HTTP, and sockets** — `bytes` is now a first-class participant in every I/O surface, mirroring Python 3's split between `str` and `bytes`:
+
+- **Files** — new `os.read_bytes(path)` returns `bytes`; `os.read_lines(path)` iterates lines lazily for large files; `os.write_file` and `os.append_file` accept `bytes`.
+- **HTTP** — responses gain a `.content` field (`bytes`), matching Python's `requests`; the request `data=` accepts `bytes` for binary bodies. `.text` and `.body` remain `str`.
+- **Sockets** — `scriptling.net.unicast` and `scriptling.net.multicast` `send()` accepts `bytes`; `receive()` returns `data` as `bytes` (see breaking change above).
+- **Packages** — new `scriptling.package.read_bytes(name, path)`.
+
+```python
+import os, msgpack
+
+# Pack to bytes, persist, read back, unpack — zero corruption.
+os.write_file("/tmp/data.msgpack", msgpack.packb({"k": "v"}))
+data = msgpack.unpackb(os.read_bytes("/tmp/data.msgpack"))
+```
+{{< /changelog-item >}}
+
 {{< version "v0.18.0" >}}
 
 {{< changelog-item "added" >}}

@@ -51,7 +51,7 @@ Send an HTTP POST request to the specified URL with the given data.
 
 **Parameters:**
 - `url` (`str`): URL to request.
-- `data` (`str`, optional): Request body. Default: `None`.
+- `data` (`str` or [`bytes`](../../data-formats/bytes/), optional): Request body. Use `bytes` for binary payloads (msgpack, etc.). Default: `None`.
 - `**kwargs` (optional):
   - `timeout` (`int`): Request timeout in seconds. Default: `5`.
   - `headers` (`dict`): HTTP headers to send.
@@ -79,7 +79,7 @@ Send an HTTP PUT request to the specified URL with the given data.
 
 **Parameters:**
 - `url` (`str`): URL to request.
-- `data` (`str`, optional): Request body. Default: `None`.
+- `data` (`str` or [`bytes`](../../data-formats/bytes/), optional): Request body. Use `bytes` for binary payloads (msgpack, etc.). Default: `None`.
 - `**kwargs` (optional):
   - `timeout` (`int`): Request timeout in seconds. Default: `5`.
   - `headers` (`dict`): HTTP headers to send.
@@ -121,7 +121,7 @@ Send an HTTP PATCH request to the specified URL with the given data.
 
 **Parameters:**
 - `url` (`str`): URL to request.
-- `data` (`str`, optional): Request body. Default: `None`.
+- `data` (`str` or [`bytes`](../../data-formats/bytes/), optional): Request body. Use `bytes` for binary payloads (msgpack, etc.). Default: `None`.
 - `**kwargs` (optional):
   - `timeout` (`int`): Request timeout in seconds. Default: `5`.
   - `headers` (`dict`): HTTP headers to send.
@@ -145,7 +145,7 @@ Execute multiple HTTP requests concurrently with a configurable concurrency limi
 - `requests` (`list`): List of request specification dicts, each containing:
   - `method` (`str`): HTTP method: `"GET"`, `"POST"`, `"PUT"`, `"DELETE"`, or `"PATCH"`. Default: `"GET"`.
   - `url` (`str`): The URL to request. Required.
-  - `data` (`str`, optional): Request body as a string.
+  - `data` (`str` or `bytes`, optional): Request body (string or binary).
   - `json` (`dict`/`list`, optional): Data to JSON-encode as the request body (sets `Content-Type`).
   - `headers` (`dict`, optional): HTTP headers.
   - `params` (`dict`, optional): Query parameters to append to the URL.
@@ -175,8 +175,9 @@ for resp in results:
 All HTTP functions return a `Response` object with the following attributes, accessible either as properties or by indexing:
 
 - `status_code` / `["status_code"]` (`int`): HTTP status code.
-- `text` / `["text"]` (`str`): Response body.
-- `body` / `["body"]` (`str`): Response body (alias for `text`).
+- `text` / `["text"]` (`str`): Response body decoded as a string.
+- `content` / `["content"]` ([`bytes`](../../data-formats/bytes/)): Raw response body. Use this instead of `.text` for binary content (images, msgpack, etc.).
+- `body` / `["body"]` (`str`): Deprecated alias for `text`.
 - `headers` / `["headers"]` (`dict`): Response headers.
 - `url` / `["url"]` (`str`): The URL of the response.
 

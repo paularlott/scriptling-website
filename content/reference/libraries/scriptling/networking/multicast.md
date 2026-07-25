@@ -81,7 +81,7 @@ Receives a message from the multicast group.
 **Parameters:**
 - `timeout` (`number`, optional): Timeout in seconds. Default: `30`.
 
-**Returns:** `dict`: a dict with `"data"` and `"source"` keys, or `None` on timeout.
+**Returns:** `dict`: a dict with `"data"` ([`bytes`](../../../data-formats/bytes/) — call `.decode()` for text) and `"source"` (`str`) keys, or `None` on timeout.
 
 ```python
 msg = group.receive(timeout=5)

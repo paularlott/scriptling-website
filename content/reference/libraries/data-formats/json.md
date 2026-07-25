@@ -111,6 +111,8 @@ except Exception as e:
 
 ## See Also
 
+- [msgpack](../msgpack/): binary serialisation — more compact, not human-readable.
+- [bytes](../bytes/): Scriptling's binary data type.
 - [toml](../toml/): parse and generate TOML configuration data.
 - [yaml](../yaml/): parse and generate YAML data.
 - [scriptling.csv](../../scriptling/utilities/csv/): parse and generate CSV data.

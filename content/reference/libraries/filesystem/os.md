@@ -17,9 +17,11 @@ The `os` library provides operating system interfaces for file system operations
 | `getenv(key, default=None)` | Get an environment variable. |
 | `getcwd()` | Get the current working directory. |
 | `listdir(path=".")` | List directory contents. |
-| `read_file(path)` | Read entire file contents as a string. |
-| `write_file(path, content, mode=0o644)` | Write content to a file (creates/overwrites). |
-| `append_file(path, content)` | Append content to a file. |
+| `read_file(path)` | Read entire file contents as a string. Use [read_bytes](#read_bytes) for binary files. |
+| `read_bytes(path)` | Read entire file contents as a [`bytes`](../../data-formats/bytes/) value. |
+| `read_lines(path)` | Iterate over lines in a file lazily (memory-efficient for large files). |
+| `write_file(path, content, mode=0o644)` | Write `str` or `bytes` content to a file (creates/overwrites). |
+| `append_file(path, content)` | Append `str` or `bytes` content to a file. |
 | `remove(path)` | Remove a file. |
 | `chmod(path, mode)` | Change file or directory permissions. |
 | `mkdir(path, mode=0o777)` | Create a directory. |
@@ -121,7 +123,9 @@ entries = os.listdir("/tmp")
 
 ### `read_file(path)`
 
-Read entire file contents as a string.
+Read entire file contents as a string. Use [`read_bytes()`](#read_bytes) for
+binary files (msgpack, images, hashes) — `read_file` will corrupt non-UTF-8
+data.
 
 **Parameters:**
 - `path` (`str`): Path to the file.
@@ -137,13 +141,65 @@ content = os.read_file("/tmp/data.txt")
 print(content)
 ```
 
-### `write_file(path, content, mode=0o644)`
+### `read_bytes(path)`
 
-Write content to a file, creating or overwriting it.
+Read entire file contents as a [`bytes`](../../data-formats/bytes/) value,
+preserving binary data byte-for-byte. Use this for msgpack/protobuf payloads,
+images, hashes, and any other non-text data.
 
 **Parameters:**
 - `path` (`str`): Path to the file.
-- `content` (`str`): Content to write.
+
+**Returns:** `bytes`: the file's raw contents.
+
+**Raises:** `Error`: if `path` is outside the allowed paths, or the file cannot be read.
+
+```python
+import os, msgpack
+
+data = msgpack.unpackb(os.read_bytes("/tmp/payload.msgpack"))
+```
+
+### `read_lines(path)`
+
+Iterate over lines in a file lazily, yielding one `str` per line (without the
+trailing newline). The file is read on-demand, so memory usage is proportional
+to the longest line, not the file size. Use this for large files where
+`read_file().splitlines()` would load everything into memory.
+
+The file handle is closed when the iterator reaches EOF. If the loop exits
+early (e.g. via `break`), the handle is closed when the iterator is
+garbage-collected — the same behaviour as Python's bare `open()` without
+`with`.
+
+**Parameters:**
+- `path` (`str`): Path to the file.
+
+**Returns:** An iterator yielding `str`, one per line.
+
+**Raises:** `Error`: if `path` is outside the allowed paths, or the file cannot be opened.
+
+```python
+import os
+
+# Process a large log file without loading it all into memory
+for line in os.read_lines("/var/log/app.log"):
+    if "ERROR" in line:
+        print(line)
+
+# Equivalent one-liner for small files (loads everything):
+# for line in os.read_file(path).splitlines():
+#     ...
+```
+
+### `write_file(path, content, mode=0o644)`
+
+Write content to a file, creating or overwriting it. Accepts a `str` (UTF-8
+encoded) or [`bytes`](../../data-formats/bytes/) (raw binary).
+
+**Parameters:**
+- `path` (`str`): Path to the file.
+- `content` (`str` or `bytes`): Content to write.
 - `mode` (`int`, optional): Permission bits used when creating a new file. Default: `0o644`.
 
 **Returns:** `None`
@@ -154,15 +210,19 @@ Write content to a file, creating or overwriting it.
 import os
 
 os.write_file("/tmp/output.txt", "Hello, World!", mode=0o600)
+
+# Binary — round-trips cleanly with read_bytes()
+os.write_file("/tmp/data.msgpack", msgpack.packb({"k": 1}))
 ```
 
 ### `append_file(path, content)`
 
-Append content to a file, creating it if it does not exist.
+Append content to a file, creating it if it does not exist. Accepts a `str`
+or [`bytes`](../../data-formats/bytes/).
 
 **Parameters:**
 - `path` (`str`): Path to the file.
-- `content` (`str`): Content to append.
+- `content` (`str` or `bytes`): Content to append.
 
 **Returns:** `None`
 
