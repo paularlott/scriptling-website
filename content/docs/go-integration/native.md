@@ -32,6 +32,8 @@ func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Ob
 - `args`: Positional arguments as Scriptling objects
 - Returns: A Scriptling object result
 
+`args` is **borrowed for the call only**: the interpreter reuses its backing array across calls, so do not retain `args` (or a sub-slice like `args[1:]`) past the return — don't store it in a field/map/global, capture it in a goroutine or a returned closure, or hand it to a `*object.List{Elements: args}`. Read elements, iterate, or spread `args...` into a synchronous call freely; if you need to keep it, copy first (`make([]object.Object, len(args)); copy(...)`). This matches CPython's `tp_call` convention.
+
 ## Blocking operations and the interpreter lock
 
 Each environment has an interpreter lock (GIL) that serializes script execution. Your native function runs **holding this lock**: that's what makes shared-state threads (`runtime.background(shared=True)`) and concurrent handlers safe. If your function does blocking work (HTTP, file or database I/O, network reads, subprocess), release the lock for the duration of the blocking call with `object.RunBlocking` so other goroutines can run script while yours is blocked:
