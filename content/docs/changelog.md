@@ -8,6 +8,50 @@ nav-skip: true
 
 ## July 2026
 
+{{< version "v0.20.0" >}}
+
+{{< changelog-item "fixed" >}}
+**`ZeroDivisionError` is now catchable.** Division by zero raised an error that no `except` clause could name, only a bare `except Exception` caught it, even though `ZeroDivisionError` already existed as a builtin. `/`, `//`, and `%` now raise a `ZeroDivisionError` that `except ZeroDivisionError:` matches, for both integer and float operands. Uncaught behaviour is unchanged (same message, file, and line), and `except Exception` still catches it, so existing scripts are unaffected.
+```python
+try:
+    x = 1 / 0
+except ZeroDivisionError as e:
+    print("caught:", e)
+```
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`math.fmod(x, 0)` now raises a catchable `ValueError`.** It had the same problem: an error no `except` clause could name. CPython reports a zero divisor here as `ValueError` ("math domain error") rather than `ZeroDivisionError`, and `math.fmod` now matches. The message is unchanged and `except Exception` still catches it.
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**Substantially faster evaluation, with far fewer allocations.** Four changes to the evaluator, all measured against v0.19.0:
+
+- **Integer arithmetic is no longer boxed per operator.** An expression such as `total + i * 2 - 1` allocated an integer object for every operator, even though only the final value is ever observed. Side-effect-free integer arithmetic and comparisons now evaluate without boxing intermediates.
+- **Attribute reads no longer allocate.** `obj.attr` is indexing by a string literal internally, so every field read was allocating its own copy of the field name. String literals now reuse one immutable value.
+- **Builtin calls no longer allocate a context.** Each call built a throwaway context to carry the environment; it is now derived once per evaluation.
+- **`a + b + c` chains no longer allocate scratch slices.** The chain path collected its operands into two slices before discovering whether they were strings, so numeric and list chains paid for a string path they never used. Operands are now folded as they are evaluated.
+
+| Workload                          | Time | Allocations |
+| --------------------------------- | ---- | ----------- |
+| Integer `+` chains                | −75% | −90%        |
+| Integer loops                     | −41% | −54%        |
+| String `+` chains                 | −40% | −50%        |
+| Mixed-type `+` chains             | −38% | −64%        |
+| `if`/`while`/`try` control flow   | −28% | —           |
+| List and dict manipulation        | −19% | −36%        |
+| Recursive calls                   | −12% | —           |
+| String building                   | −12% | −28%        |
+| Method calls and attribute access | −11% | −58%        |
+| Comprehensions                    | −8%  | −14%        |
+
+Across the interpreter benchmark suite that is a 32% reduction in run time, 48% fewer allocations, and 64% less memory allocated. Scripts dominated by integer arithmetic, attribute access, or string building benefit most; parse and compile times are unchanged.
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**`is` on a repeated string literal.** Because a string literal now yields one shared value, evaluating the same literal twice returns the same object — so `f() is f()`, where `f` returns a string literal longer than 20 characters, is now `true` where it was `false`. This matches CPython, which interns literal constants. Strings of 20 characters or fewer were already compared by value and are unaffected. Use `==` rather than `is` to compare string contents.
+{{< /changelog-item >}}
+
 {{< version "v0.19.0" >}}
 
 {{< changelog-item "breaking" >}}
