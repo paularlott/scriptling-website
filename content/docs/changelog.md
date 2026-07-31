@@ -24,6 +24,15 @@ except ZeroDivisionError as e:
 **`math.fmod(x, 0)` now raises a catchable `ValueError`.** It had the same problem: an error no `except` clause could name. CPython reports a zero divisor here as `ValueError` ("math domain error") rather than `ZeroDivisionError`, and `math.fmod` now matches. The message is unchanged and `except Exception` still catches it.
 {{< /changelog-item >}}
 
+{{< changelog-item "fixed" >}}
+**Iterating a dict directly now yields its keys, matching Python.** `for k in d`, comprehensions (`[k for k in d]`, `{k for k in d}`), and `*d` unpacking all raised `type error: expected iterable, got DICT`; they now iterate the keys like CPython. `list(d)` and `tuple(d)` already worked. The view methods `d.keys()` / `d.values()` / `d.items()` are unchanged, and `dict_keys` still has no `.sort()` (use `sorted(d.keys())`), also matching CPython.
+```python
+d = {"b": 2, "a": 1}
+for k in d:          # "b", then "a"
+    print(k, d[k])
+```
+{{< /changelog-item >}}
+
 {{< changelog-item "changed" >}}
 **Substantially faster evaluation, with far fewer allocations.** Four changes to the evaluator, all measured against v0.19.0:
 
