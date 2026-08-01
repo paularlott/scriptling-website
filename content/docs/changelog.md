@@ -41,20 +41,20 @@ for k in d:          # "b", then "a"
 - **Builtin calls no longer allocate a context.** Each call built a throwaway context to carry the environment; it is now derived once per evaluation.
 - **`a + b + c` chains no longer allocate scratch slices.** The chain path collected its operands into two slices before discovering whether they were strings, so numeric and list chains paid for a string path they never used. Operands are now folded as they are evaluated.
 
-| Workload                          | Time | Allocations |
-| --------------------------------- | ---- | ----------- |
-| Integer `+` chains                | −75% | −90%        |
-| Integer loops                     | −41% | −54%        |
-| String `+` chains                 | −40% | −50%        |
-| Mixed-type `+` chains             | −38% | −64%        |
-| `if`/`while`/`try` control flow   | −28% | —           |
-| List and dict manipulation        | −19% | −36%        |
-| Recursive calls                   | −12% | —           |
-| String building                   | −12% | −28%        |
-| Method calls and attribute access | −11% | −58%        |
-| Comprehensions                    | −8%  | −14%        |
+| Workload                          | Time  | Allocations |
+| --------------------------------- | ----- | ----------- |
+| Integer `+` chains                | −75%  | −100%       |
+| Integer loops                     | −35%  | −50%        |
+| String `+` chains                 | −25%  | −50%        |
+| Mixed-type `+` chains             | −45%  | −44%        |
+| `if`/`while`/`try` control flow   | −28%  | —           |
+| List and dict manipulation        | −24%  | −44%        |
+| Recursive calls                   | −9%   | —           |
+| String building                   | −17%  | −36%        |
+| Method calls and attribute access | −21%  | −70%        |
+| Comprehensions                    | —     | —           |
 
-Across the interpreter benchmark suite that is a 32% reduction in run time, 48% fewer allocations, and 64% less memory allocated. Scripts dominated by integer arithmetic, attribute access, or string building benefit most; parse and compile times are unchanged.
+Measured on operation-dense workloads (loops doing real work inside a single evaluation), these average roughly a 30% reduction in run time, with per-operation allocations down 40–100% — integer chains and loops, which previously boxed every operator, now allocate almost nothing. The gains are largest for scripts that loop over arithmetic, attribute access, or string/list building. Short one-shot `Eval` calls see smaller gains because the per-call interpreter setup dominates them; parse and compile times are unchanged.
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
