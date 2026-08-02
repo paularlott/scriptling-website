@@ -118,23 +118,29 @@ else:
 
 ### Iterating Dictionaries
 
+Iterating a dict directly yields its keys, just like Python:
+
 ```python
 person = {"name": "Alice", "age": 30}
 
-# Iterate over keys
-for key in keys(person):
+# Iterate over keys (the default)
+for key in person:
     print(key, person[key])
 
 # Iterate over key-value pairs
-for item in items(person):
-    key = item[0]
-    value = item[1]
-    print(key, value)
-
-# Using tuple unpacking
-for item in items(person):
-    key, value = item
+for key, value in items(person):
     print(f"{key}: {value}")
+```
+
+`keys()`, `values()`, and `items()` return iterable view objects, and `*person` unpacks the keys:
+
+```python
+for key in keys(person):       # same as: for key in person
+    print(key)
+
+def keys_only(*ks):
+    return ks
+keys_only(*person)             # ("name", "age")
 ```
 
 ## Loop Control
