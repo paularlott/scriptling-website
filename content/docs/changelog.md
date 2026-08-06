@@ -6,6 +6,16 @@ layout: changelog
 nav-skip: true
 ---
 
+## August 2026
+
+{{< version "v0.20.1" >}}
+
+{{< changelog-item "fixed" >}}
+**bug fixes**
+{{< /changelog-item >}}
+
+---
+
 ## July 2026
 
 {{< version "v0.20.0" >}}
