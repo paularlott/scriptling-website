@@ -112,6 +112,6 @@ os.write_file("output.csv", csv.format_dict(rows, columns=["name", "age"]))
 
 ## See Also
 
-- [json](../../data-formats/json/): JSON parsing and formatting
-- [yaml](../../data-formats/yaml/): YAML parsing
-- [toml](../../data-formats/toml/): TOML parsing
+- [json](../../../data-formats/json/): JSON parsing and formatting
+- [yaml](../../../data-formats/yaml/): YAML parsing
+- [toml](../../../data-formats/toml/): TOML parsing

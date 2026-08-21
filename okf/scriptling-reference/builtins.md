@@ -1,0 +1,618 @@
+---
+description: Type conversions, math, string, list, and dictionary built-in functions in Scriptling.
+generated:
+    by: scriptling-website/okf.py
+resource: https://scriptling.dev/reference/builtins/
+sources:
+    - resource: https://scriptling.dev/reference/builtins/
+status: stable
+tags:
+    - reference
+    - builtins
+title: Built-in Functions
+type: Reference
+---
+# Built-in Functions
+
+Scriptling provides many built-in functions that are always available without importing.
+
+## Type Conversions
+
+### str()
+
+Convert any value to a string:
+
+```python
+str(42)       # "42"
+str(3.14)     # "3.14"
+str(True)     # "True"
+str([1, 2])   # "[1, 2]"
+str({"a": 1}) # '{"a": 1}'
+```
+
+### int()
+
+Convert to integer:
+
+```python
+int("42")        # 42
+int(3.14)        # 3 (truncates toward zero)
+int(-3.9)        # -3 (truncates toward zero)
+int(42)          # 42 (no change)
+```
+
+Optional `base` argument (2 to 36) for base conversion from a string:
+
+```python
+int("ff", 16)    # 255
+int("0xff", 16)  # 255 (0x prefix stripped automatically)
+int("1010", 2)   # 10
+int("0b1010", 2) # 10 (0b prefix stripped automatically)
+int("77", 8)     # 63
+int("z", 36)     # 35
+```
+
+### float()
+
+Convert to float:
+
+```python
+float("3.14") # 3.14
+float(42)     # 42.0
+float("42")   # 42.0
+```
+
+### bool()
+
+Convert to boolean:
+
+```python
+bool(0)        # False
+bool(1)        # True
+bool("")       # False
+bool("hello")  # True
+bool([])       # False
+bool([1])      # True
+bool({})       # False
+bool(None)     # False
+```
+
+### list()
+
+Convert to list:
+
+```python
+list("abc")       # ["a", "b", "c"]
+list((1, 2, 3))   # [1, 2, 3]
+list({1, 2, 3})   # [1, 2, 3] (order not guaranteed)
+list(range(3))    # [0, 1, 2]
+```
+
+### tuple()
+
+Convert to tuple:
+
+```python
+tuple([1, 2, 3])  # (1, 2, 3)
+tuple("ab")       # ('a', 'b')
+tuple(range(3))   # (0, 1, 2)
+```
+
+### set()
+
+Create a set from an iterable:
+
+```python
+set([1, 2, 2, 3])  # {1, 2, 3}
+set("hello")       # {'h', 'e', 'l', 'o'}
+set()              # Empty set
+```
+
+### dict()
+
+Create a dictionary:
+
+```python
+dict()  # {}
+```
+
+## Type Checking
+
+### type()
+
+Get the type name as a string:
+
+```python
+type(42)        # "INTEGER"
+type(3.14)      # "FLOAT"
+type("hello")   # "STRING"
+type([1, 2])    # "LIST"
+type({"a": 1})  # "DICT"
+type(True)      # "BOOLEAN"
+type(None)      # "NULL"
+type((1, 2))    # "TUPLE"
+```
+
+### .type() Method
+
+All objects support the `.type()` method:
+
+```python
+x = 42
+x.type()  # "INTEGER"
+
+y = "hello"
+y.type()  # "STRING"
+```
+
+### isinstance()
+
+Check if a value is of a specific type:
+
+```python
+isinstance(42, "int")         # True
+isinstance(3.14, "float")     # True
+isinstance("hello", "str")    # True
+isinstance([1, 2], "list")    # True
+isinstance({"a": 1}, "dict")  # True
+isinstance(True, "bool")      # True
+isinstance(None, "NoneType")  # True
+isinstance((1, 2), "tuple")   # True
+```
+
+### issubclass()
+
+Check if a class is a subclass of another:
+
+```python
+class Animal:
+    pass
+
+class Dog(Animal):
+    pass
+
+issubclass(Dog, Animal)    # True
+issubclass(Animal, Animal) # True (a class is a subclass of itself)
+issubclass(Animal, Dog)    # False
+```
+
+### callable()
+
+Check if a value can be called as a function:
+
+```python
+callable(len)             # True
+callable(lambda x: x)     # True
+callable(42)              # False
+callable("hello")         # False
+```
+
+## Math Functions
+
+```python
+abs(-5)                   # 5
+min(3, 1, 2)              # 1
+max(3, 1, 2)              # 3
+round(3.7)                # 4
+round(3.14159, 2)         # 3.14
+pow(2, 10)                # 1024
+pow(2, 10, 1000)          # 24 (modular: 2^10 % 1000)
+divmod(17, 5)             # (3, 2) - returns (quotient, remainder)
+sum([1, 2, 3, 4, 5])      # 15
+sum([1.5, 2.5, 3.0])      # 7.0
+```
+
+## Number Formatting
+
+```python
+hex(255)                  # "0xff"
+hex(-255)                 # "-0xff"
+bin(10)                   # "0b1010"
+bin(-10)                  # "-0b1010"
+oct(8)                    # "0o10"
+oct(-8)                   # "-0o10"
+```
+
+## Character Conversion
+
+```python
+chr(65)                   # "A"
+chr(97)                   # "a"
+ord("A")                  # 65
+ord("a")                  # 97
+```
+
+## String Functions
+
+```python
+len("hello")                        # 5
+```
+
+String transformation is done with methods on the `str` type, not free functions. See [string](../scriptling-libraries/text-processing/string.md) for the full list:
+
+```python
+"hello".upper()                          # "HELLO"
+"HELLO".lower()                          # "hello"
+"hello world".capitalize()               # "Hello world"
+"hello world".title()                    # "Hello World"
+"a,b,c".split(",")                       # ["a", "b", "c"]
+"-".join(["a", "b", "c"])                # "a-b-c"
+"hello world".replace("world", "python") # "hello python"
+"  hello  ".strip()                      # "hello"
+"??hello??".strip("?")                   # "hello"
+"  hello  ".lstrip()                     # "hello  "
+"  hello  ".rstrip()                     # "  hello"
+"hello".startswith("he")                 # True
+"hello".endswith("lo")                   # True
+```
+
+## String Methods
+
+```python
+s = "hello world"
+s.find("world")                    # 6 (index of substring, -1 if not found)
+s.index("world")                   # 6 (like find, raises error if not found)
+s.count("o")                       # 2 (count occurrences)
+
+# String formatting
+"Hello, {}!".format("World")       # "Hello, World!"
+"{} + {} = {}".format(1, 2, 3)     # "1 + 2 = 3"
+
+# Character type checks
+"123".isdigit()                    # True
+"abc".isalpha()                    # True
+"abc123".isalnum()                 # True
+"   ".isspace()                    # True
+"HELLO".isupper()                  # True
+"hello".islower()                  # True
+
+# Case conversion
+"Hello World".swapcase()           # "hELLO wORLD"
+
+# Splitting and partitioning
+"hello\nworld".splitlines()        # ["hello", "world"]
+"hello-world".partition("-")       # ("hello", "-", "world")
+"a-b-c".rpartition("-")            # ("a-b", "-", "c")
+
+# Prefix/suffix removal
+"TestCase".removeprefix("Test")    # "Case"
+"file.py".removesuffix(".py")      # "file"
+
+# Encoding
+"ABC".encode()                     # [65, 66, 67] (byte values)
+
+# Padding and alignment
+"42".zfill(5)                      # "00042"
+"-42".zfill(5)                     # "-0042"
+"hi".center(6)                     # "  hi  "
+"hi".center(7, "*")                # "**hi***"
+"hi".ljust(5)                      # "hi   "
+"hi".rjust(5)                      # "   hi"
+```
+
+## List Functions
+
+```python
+len([1, 2, 3])                     # 3
+
+# append modifies list in-place
+my_list = [1, 2]
+my_list.append(3)                  # my_list is now [1, 2, 3]
+
+# extend modifies list in-place
+list_a = [1, 2]
+list_b = [3, 4]
+list_a.extend(list_b)              # list_a is now [1, 2, 3, 4]
+
+# sorted returns a new sorted list
+sorted([3, 1, 4, 1, 5])            # [1, 1, 3, 4, 5]
+sorted(["banana", "apple"])        # ["apple", "banana"]
+sorted([3, 1, 2], reverse=True)    # [3, 2, 1]
+sorted([(2, "b"), (1, "a")])       # [(1, "a"), (2, "b")]  (tuples/lists compare element-by-element)
+
+# sorted with key function
+sorted(["ccc", "a", "bb"], key=lambda s: len(s))  # ["a", "bb", "ccc"]
+sorted([1, 2, 3], key=lambda x: -x)               # [3, 2, 1]
+```
+
+## List Methods
+
+```python
+lst = [10, 20, 30, 20, 40]
+lst.index(20)                      # 1 (first index of value)
+lst.count(20)                      # 2 (count occurrences)
+
+lst = [1, 2, 3, 4, 5]
+lst.pop()                          # 5 (removes and returns last element)
+lst.pop(0)                         # 1 (removes and returns element at index)
+
+lst = [1, 2, 4, 5]
+lst.insert(2, 3)                   # lst is now [1, 2, 3, 4, 5]
+
+lst = [1, 2, 3, 2, 4]
+lst.remove(2)                      # lst is now [1, 3, 2, 4] (removes first occurrence)
+
+lst = [1, 2, 3]
+lst.clear()                        # lst is now []
+
+original = [1, 2, 3]
+copied = original.copy()           # shallow copy
+
+lst = [1, 2, 3, 4, 5]
+lst.reverse()                      # lst is now [5, 4, 3, 2, 1]
+```
+
+## Set Methods
+
+```python
+s = set([1, 2])
+s.add(3)            # s is now {1, 2, 3}
+s.remove(2)         # s is now {1, 3}
+s.discard(99)       # No error if element not found
+s.pop()             # Removes and returns arbitrary element
+s.clear()           # Removes all elements
+s.copy()            # Returns a shallow copy
+
+# Set operations
+s1 = set([1, 2])
+s2 = set([2, 3])
+s1.union(s2)                # {1, 2, 3}
+s1.intersection(s2)         # {2}
+s1.difference(s2)           # {1}
+s1.symmetric_difference(s2) # {1, 3}
+s1.issubset(s2)             # False
+s1.issuperset(s2)           # False
+```
+
+## Dictionary Functions
+
+```python
+person = {"name": "Alice", "age": 30}
+
+len(person)                        # 2
+keys(person)                       # dict_keys(["name", "age"])  (a view object)
+values(person)                     # dict_values(["Alice", 30])  (a view object)
+items(person)                      # dict_items([["name", "Alice"], ["age", 30]])  (a view object)
+
+# Iterate over dictionary (views are iterable)
+for item in items(person):
+    key = item[0]
+    value = item[1]
+    print(key, value)
+
+# Materialize a view into a list when needed
+list(keys(person))                 # ["name", "age"]
+```
+
+`keys()`, `values()`, and `items()` may also be called as methods: `person.keys()`, `person.values()`, `person.items()`.
+
+## Dict Methods
+
+```python
+d = {"a": 1, "b": 2, "c": 3}
+d.get("a")                         # 1
+d.get("x")                         # None
+d.get("x", "default")              # "default"
+
+d = {"a": 1, "b": 2, "c": 3}
+d.pop("b")                         # 2 (removes and returns value)
+d.pop("x", "not found")            # "not found" (with default)
+
+d1 = {"a": 1, "b": 2}
+d2 = {"b": 20, "c": 3}
+d1.update(d2)                      # d1 is now {"a": 1, "b": 20, "c": 3}
+
+d = {"a": 1, "b": 2}
+d.clear()                          # d is now {}
+
+original = {"a": 1, "b": 2}
+copied = original.copy()           # shallow copy
+
+d = {"a": 1}
+d.setdefault("a", 100)             # 1 (returns existing value)
+d.setdefault("b", 200)             # 200 (sets and returns new value)
+```
+
+## Iteration Utilities
+
+```python
+# These return iterators (lazy evaluation)
+enumerate(["a", "b"])              # Iterator: (0, "a"), (1, "b")
+zip([1, 2], ["a", "b"])            # Iterator: (1, "a"), (2, "b")
+reversed([1, 2, 3])                # Iterator: 3, 2, 1
+map(lambda x: x*2, [1, 2, 3])      # Iterator: 2, 4, 6
+filter(lambda x: x > 1, [1, 2, 3]) # Iterator: 2, 3
+
+# Convert to list if needed
+list(enumerate(["a", "b"]))       # [[0, "a"], [1, "b"]]
+list(zip([1, 2], ["a", "b"]))     # [[1, "a"], [2, "b"]]
+
+# Boolean tests (work with any iterable)
+any([False, True, False])         # True
+all([True, True, True])           # True
+all([True, False, True])          # False
+```
+
+## Iterator Protocol
+
+`iter()` and `next()` expose the iterator protocol directly, enabling manual iteration and working with custom iterable classes.
+
+```python
+# iter(): create an iterator from any iterable
+it = iter([10, 20, 30])
+next(it)   # 10
+next(it)   # 20
+next(it)   # 30
+
+# next() with a default: no exception on exhaustion
+next(it, "done")   # "done"
+
+# next() without default raises StopIteration when exhausted
+try:
+    next(it)
+except StopIteration:
+    print("exhausted")
+
+# iter() works on lists, tuples, strings, sets, dicts, and
+# instances with __iter__ or __next__
+it = iter("abc")
+next(it)   # "a"
+
+# Manual iteration pattern
+data = [1, 2, 3]
+it = iter(data)
+while True:
+    val = next(it, None)
+    if val is None:
+        break
+    print(val)
+
+# Custom iterable class
+class Counter:
+    def __init__(self, n):
+        self.n = n
+        self.i = 0
+    def __iter__(self):
+        return self
+    def __next__(self):
+        if self.i >= self.n:
+            raise StopIteration()
+        v = self.i
+        self.i = self.i + 1
+        return v
+
+for x in Counter(3):   # works in for loops too
+    print(x)           # 0, 1, 2
+
+it = iter(Counter(2))
+next(it)   # 0
+next(it)   # 1
+```
+
+## Range Function
+
+```python
+# range() returns an iterator (lazy evaluation)
+range(5)                           # Iterator: 0, 1, 2, 3, 4
+range(2, 7)                        # Iterator: 2, 3, 4, 5, 6
+range(0, 10, 2)                    # Iterator: 0, 2, 4, 6, 8
+range(10, 0, -2)                   # Iterator: 10, 8, 6, 4, 2
+
+# Convert to list if needed
+list(range(5))                     # [0, 1, 2, 3, 4]
+
+# Use in for loops (iterators work directly)
+for i in range(5):
+    print(i)
+```
+
+## I/O Functions
+
+```python
+print(value)                       # Print to stdout
+print("Hello", name)               # Multiple arguments
+print("Hello", "World", sep="-")   # Custom separator: Hello-World
+
+input("Prompt: ")                  # Read user input (returns string)
+```
+
+`input()` is not a core builtin: it is only available when the `sys` library is registered with a stdin reader (for example, by the `scriptling` CLI in interactive or server stdin mode). It is absent in a bare embedded interpreter unless the embedder provides it.
+
+## Introspection
+
+### dir()
+
+Returns a sorted list of names for an object:
+
+```python
+# No argument: all builtin names
+names = dir()          # ["abs", "all", "any", ...]
+
+# Instance: fields + methods (including inherited)
+class Dog:
+    def __init__(self, name):
+        self.name = name
+    def bark(self):
+        return "woof"
+
+d = Dog("Rex")
+dir(d)   # ["bark", "name", ...]
+
+# Class: method names
+dir(Dog)   # ["bark", "__init__"]
+
+# Dict: key names
+dir({"x": 1, "y": 2})   # ["x", "y"]
+```
+
+## Copying
+
+### copy()
+
+Returns a shallow copy of an object. Nested objects are not copied: use `copy.deepcopy()` from the `copy` library for that. For native-backed instances, hidden Go-only state is not copied.
+
+```python
+# List copy: mutations don't affect the original
+original = [1, 2, 3]
+c = copy(original)
+c.append(4)
+len(original)   # 3
+len(c)          # 4
+
+# Dict copy
+d = {"a": 1}
+dc = copy(d)
+dc["b"] = 2
+len(d)    # 1
+len(dc)   # 2
+
+# Set copy
+s = set([1, 2, 3])
+sc = copy(s)
+sc.add(4)
+len(s)    # 3
+len(sc)   # 4
+
+# Instance copy: fields are copied, class is shared
+class Box:
+    def __init__(self, v):
+        self.v = v
+
+b = Box(10)
+c = copy(b)
+c.v = 99
+b.v   # 10 (unchanged)
+c.v   # 99
+
+# Tuples and scalars are returned as-is (immutable)
+copy((1, 2, 3))   # (1, 2, 3)
+copy(42)          # 42
+```
+
+## Concurrency
+
+### yield_now()
+
+Briefly release the interpreter lock and yield the thread, letting other goroutines run before continuing. Use it inside a long, purely CPU-bound loop that never hits a naturally-blocking call, so shared-environment threads ([`runtime.background(..., shared=True)`](../scriptling-libraries/scriptling/runtime.md)) and registered handlers can make progress.
+
+Blocking builtins: `time.sleep`, `input()`, file reads/writes, socket send/receive/accept, WebSocket send/receive, subprocess, HTTP requests, AI completions/streaming, all container daemon calls, plugin calls, file provisioning, `wait_for` polling, `grep`/`sed` scans, messaging sends/downloads, `Queue` operations, `WaitGroup.wait()`, `Promise.wait()`/`get()`, `gossip send_request()`: already release the lock while they block, so you only need `yield_now()` for tight compute loops.
+
+```python
+import scriptling.runtime as runtime
+
+def cruncher():
+    # ... CPU-bound work ...
+    pass
+
+runtime.background("cruncher", "cruncher", shared=True)
+
+while working:
+    do_a_chunk_of_work()
+    yield_now()   # let the shared thread run
+```
+
+## See Also
+
+- [Data Types](types.md) - Available data types
+- [Slicing](slicing.md) - Indexing and slicing operations
+- [String Library](../scriptling-libraries/text-processing/string.md) - String constants

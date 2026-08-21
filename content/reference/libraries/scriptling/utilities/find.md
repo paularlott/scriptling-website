@@ -8,7 +8,7 @@ weight: 1
 
 The `scriptling.find` library finds files and directories under a path by name, type, modification time, and size — similar in spirit to the Unix `find` command. It fills the gap between `glob` (which matches names but cannot filter on metadata) and a hand-rolled `os.walk` loop.
 
-When searching recursively, entries are stat'd and filtered concurrently using the same bounded worker-pool model as [`scriptling.grep`](./grep/), so large trees are scanned in parallel.
+When searching recursively, entries are stat'd and filtered concurrently using the same bounded worker-pool model as [`scriptling.grep`](../grep/), so large trees are scanned in parallel.
 
 The library exposes two functions: `path()` returns matching paths as a list of strings, and `entries()` returns the same matches as a list of dicts carrying `size`, `mtime`, and `is_dir` per entry. Use `entries()` when you need the metadata (e.g. comparing two trees without re-reading bytes); use `path()` when only the strings are needed, since it skips the per-entry `stat` in the no-filter common case.
 
@@ -130,6 +130,6 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## See Also
 
-- [glob](../../filesystem/glob/): Shell-style wildcard matching by name
-- [pathlib](../../filesystem/pathlib/): Object-oriented filesystem paths
-- [scriptling.grep](./grep/): File content search, using the same parallel worker model
+- [glob](../../../filesystem/glob/): Shell-style wildcard matching by name
+- [pathlib](../../../filesystem/pathlib/): Object-oriented filesystem paths
+- [scriptling.grep](../grep/): File content search, using the same parallel worker model

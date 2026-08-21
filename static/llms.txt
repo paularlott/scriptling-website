@@ -1,0 +1,22 @@
+# Scriptling
+
+> Scriptling is a sandbox-safe, Python-like scripting language for Go applications: embed the interpreter, register only the libraries your host allows, and generate normal Python 3 style code.
+
+Docs: https://scriptling.dev/docs/
+
+## OKF bundles
+
+Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
+
+- [scriptling-libraries](https://scriptling.dev/okf/scriptling-libraries/index.md): API reference for every standard, Scriptling, and extended library
+- [scriptling-reference](https://scriptling.dev/okf/scriptling-reference/index.md): Language reference — syntax, types, operators, control flow, functions, classes, error handling
+- [scriptling-docs](https://scriptling.dev/okf/scriptling-docs/index.md): Guides — quick start, CLI usage, Go integration, security, tutorials
+- [OKF catalog](https://scriptling.dev/okf/index.md): Markdown index of all bundles
+
+## Essential
+
+- [LLM Script Generation Guide](https://scriptling.dev/docs/llm-guide/): Guidance for generating Scriptling code — includes a copyable AGENTS.md block
+- [Quick Start](https://scriptling.dev/docs/quick-start/): Install the CLI or embed in Go
+- [Command Line Options](https://scriptling.dev/docs/cli/command-line-options/): Every flag, environment variable, and config file setting
+- [Security Guide](https://scriptling.dev/docs/security/): Sandboxing, filesystem restrictions, and network policies
+- [Documentation MCP Server](https://scriptling.dev/docs/quick-start/documentation-mcp/): Serve the docs to agents over MCP with search

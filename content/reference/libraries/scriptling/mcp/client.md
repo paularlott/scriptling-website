@@ -397,7 +397,7 @@ client = mcp.Client("npx",
 
 Scriptling can itself run as a stdio MCP server (`scriptling --mcp-exec-script`
 or `--mcp-tools <dir>`, without `--server`) — see
-[MCP Server Mode](../../../../docs/cli/mcp-server/).
+[MCP Server Mode](../../../../../docs/cli/mcp-server/).
 
 ## Authentication
 

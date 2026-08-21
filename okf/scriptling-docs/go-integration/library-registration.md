@@ -1,0 +1,402 @@
+---
+description: How to register built-in libraries when embedding Scriptling in Go.
+generated:
+    by: scriptling-website/okf.py
+resource: https://scriptling.dev/docs/go-integration/library-registration/
+sources:
+    - resource: https://scriptling.dev/docs/go-integration/library-registration/
+status: stable
+tags:
+    - go-integration
+    - embedding
+    - go
+title: Library Registration
+type: Guide
+---
+# Library Registration
+
+When embedding Scriptling in a Go application, you control which libraries are available to scripts. Libraries are not loaded unless you explicitly register them.
+
+## Standard Libraries
+
+23 built-in libraries available without any configuration.
+
+### Register All at Once
+
+```go
+import "github.com/paularlott/scriptling/stdlib"
+
+stdlib.RegisterAll(p)
+```
+
+### Register Individually
+
+```go
+p.RegisterLibrary(stdlib.JSONLibrary)
+p.RegisterLibrary(stdlib.MathLibrary)
+p.RegisterLibrary(stdlib.ReLibrary)
+p.RegisterLibrary(stdlib.TimeLibrary)
+```
+
+| Namespace | Constant |
+|-----------|----------|
+| `base64` | `Base64Library` |
+| `collections` | `CollectionsLibrary` |
+| `contextlib` | `ContextlibLibrary` |
+| `datetime` | `DatetimeLibrary` |
+| `difflib` | `DifflibLibrary` |
+| `functools` | `FunctoolsLibrary` |
+| `hashlib` | `HashlibLibrary` |
+| `hmac` | `HmacLibrary` |
+| `html` | `HTMLLibrary` |
+| `io` | `IOLibrary` |
+| `itertools` | `ItertoolsLibrary` |
+| `json` | `JSONLibrary` |
+| `math` | `MathLibrary` |
+| `platform` | `PlatformLibrary` |
+| `random` | `RandomLibrary` |
+| `re` | `ReLibrary` |
+| `statistics` | `StatisticsLibrary` |
+| `string` | `StringLibrary` |
+| `textwrap` | `TextwrapLibrary` |
+| `time` | `TimeLibrary` |
+| `urllib` | `URLLibLibrary` |
+| `urllib.parse` | `URLParseLibrary` |
+| `uuid` | `UUIDLibrary` |
+
+## Extended Libraries
+
+These are in the root `extlibs` package and provide Python-compatible functionality.
+
+### Simple Registration
+
+```go
+import "github.com/paularlott/scriptling/extlibs"
+
+extlibs.RegisterRequestsLibrary(p)
+extlibs.RegisterYAMLLibrary(p)
+extlibs.RegisterTOMLLibrary(p)
+extlibs.RegisterSecretsLibrary(p)
+extlibs.RegisterSubprocessLibrary(p)
+extlibs.RegisterHTMLParserLibrary(p)
+extlibs.RegisterShlexLibrary(p)
+```
+
+| Namespace | Function |
+|-----------|----------|
+| `requests` | `RegisterRequestsLibrary(p)` |
+| `yaml` | `RegisterYAMLLibrary(p)` |
+| `toml` | `RegisterTOMLLibrary(p)` |
+| `secrets` | `RegisterSecretsLibrary(p)` |
+| `subprocess` | `RegisterSubprocessLibrary(p)` |
+| `html.parser` | `RegisterHTMLParserLibrary(p)` |
+| `shlex` | `RegisterShlexLibrary(p)` |
+| `scriptling.csv` | `RegisterCsvLibrary(p)` |
+| `scriptling.xml` | `RegisterXmlLibrary(p)` |
+
+### Filesystem Libraries
+
+These accept `allowedPaths` to restrict filesystem access. Pass `nil` for unrestricted access.
+
+```go
+extlibs.RegisterOSLibrary(p, []string{"/tmp", "/data"})
+extlibs.RegisterPathlibLibrary(p, []string{"/tmp", "/data"})
+extlibs.RegisterFSLibrary(p, []string{"/tmp", "/data"})
+extlibs.RegisterGlobLibrary(p, []string{"/tmp", "/data"})
+extlibs.RegisterTempfileLibrary(p, []string{"/tmp"})
+extlibs.RegisterShutilLibrary(p, []string{"/tmp", "/data"})
+extlibs.RegisterZipfileLibrary(p, []string{"/tmp", "/data"})
+extlibs.RegisterTarfileLibrary(p, []string{"/tmp", "/data"})
+extlibs.RegisterGrepLibrary(p, []string{"/tmp"})
+extlibs.RegisterFindLibrary(p, []string{"/tmp"})
+extlibs.RegisterSedLibrary(p, []string{"/tmp"})
+```
+
+| Namespace | Function |
+|-----------|----------|
+| `os` + `os.path` | `RegisterOSLibrary(p, allowedPaths)` |
+| `pathlib` | `RegisterPathlibLibrary(p, allowedPaths)` |
+| `fs` | `RegisterFSLibrary(p, allowedPaths)` |
+| `glob` | `RegisterGlobLibrary(p, allowedPaths)` |
+| `tempfile` | `RegisterTempfileLibrary(p, allowedPaths)` |
+| `shutil` | `RegisterShutilLibrary(p, allowedPaths)` |
+| `zipfile` | `RegisterZipfileLibrary(p, allowedPaths)` |
+| `tarfile` | `RegisterTarfileLibrary(p, allowedPaths)` |
+| `scriptling.grep` | `RegisterGrepLibrary(p, allowedPaths)` |
+| `scriptling.find` | `RegisterFindLibrary(p, allowedPaths)` |
+| `scriptling.sed` | `RegisterSedLibrary(p, allowedPaths)` |
+
+### Custom Configuration
+
+```go
+// sys: requires argv and stdin
+extlibs.RegisterSysLibrary(p, []string{"script.py"}, os.Stdin)
+
+// logging: requires a logger instance (or use default)
+extlibs.RegisterLoggingLibraryDefault(p)
+// or with custom logger:
+// extlibs.RegisterLoggingLibrary(p, myLogger)
+
+// secrets provider: requires a secret registry
+extlibs.RegisterSecretLibrary(p, registry)
+
+// wait_for, websocket, templates
+extlibs.RegisterWaitForLibrary(p)
+extlibs.RegisterWebSocketLibrary(p)
+extlibs.RegisterTemplateHTMLLibrary(p)
+extlibs.RegisterTemplateTextLibrary(p)
+```
+
+| Namespace | Function |
+|-----------|----------|
+| `sys` | `RegisterSysLibrary(p, argv []string, stdin io.Reader)` |
+| `logging` | `RegisterLoggingLibrary(p, logger)` or `RegisterLoggingLibraryDefault(p)` |
+| `scriptling.secret` | `RegisterSecretLibrary(p, registry *secretprovider.Registry)` |
+| `scriptling.wait_for` | `RegisterWaitForLibrary(p)` |
+| `scriptling.net.websocket` | `RegisterWebSocketLibrary(p)` |
+| `scriptling.template.html` | `RegisterTemplateHTMLLibrary(p)` |
+| `scriptling.template.text` | `RegisterTemplateTextLibrary(p)` |
+
+## Runtime Libraries
+
+Background tasks, HTTP routing, JSON-RPC, key-value store, concurrency, and sandboxing.
+
+```go
+// Register http, kv, sync, sandbox, and jsonrpc at once (not plugin, see below)
+extlibs.RegisterRuntimeLibraryAll(p, []string{"/tmp"})
+
+// Or register individually
+extlibs.RegisterRuntimeLibrary(p)          // scriptling.runtime (background tasks)
+extlibs.RegisterRuntimeHTTPLibrary(p)      // scriptling.runtime.http
+extlibs.RegisterRuntimeJSONRPCLibrary(p)   // scriptling.runtime.jsonrpc
+extlibs.RegisterRuntimeKVLibrary(p)        // scriptling.runtime.kv
+extlibs.RegisterRuntimeSyncLibrary(p)      // scriptling.runtime.sync
+extlibs.RegisterRuntimeSandboxLibrary(p, []string{"/tmp"})  // scriptling.runtime.sandbox
+```
+
+| Namespace | Function |
+|-----------|----------|
+| `scriptling.runtime` | `RegisterRuntimeLibrary(p)` |
+| `scriptling.runtime.http`, `.kv`, `.sync`, `.sandbox`, `.jsonrpc` | `RegisterRuntimeLibraryAll(p, allowedPaths)` |
+| `scriptling.runtime.http` | `RegisterRuntimeHTTPLibrary(p)` |
+| `scriptling.runtime.jsonrpc` | `RegisterRuntimeJSONRPCLibrary(p)` |
+| `scriptling.runtime.kv` | `RegisterRuntimeKVLibrary(p)` or `RegisterRuntimeKVLibraryWithSecurity(p, allowedPaths)` |
+| `scriptling.runtime.sync` | `RegisterRuntimeSyncLibrary(p)` |
+| `scriptling.runtime.sandbox` | `RegisterRuntimeSandboxLibrary(p, allowedPaths)` |
+
+`scriptling.runtime.plugin` is registered separately, it is not included in `RegisterRuntimeLibraryAll` and is only meaningful in the **agent variant** of Scriptling, alongside `scriptling.ai.agent`:
+
+```go
+extlibs.RegisterRuntimePluginLibrary(p)  // scriptling.runtime.plugin
+```
+
+| Namespace | Function |
+|-----------|----------|
+| `scriptling.runtime.plugin` | `RegisterRuntimePluginLibrary(p)` |
+
+## Scriptling-Specific Libraries
+
+These live in subpackages under `extlibs/` and each expose a `Register` function.
+
+### AI & Agent
+
+```go
+import (
+    "github.com/paularlott/scriptling/extlibs/ai"
+    "github.com/paularlott/scriptling/extlibs/agent"
+    aimemory "github.com/paularlott/scriptling/extlibs/ai/memory"
+    aitools "github.com/paularlott/scriptling/extlibs/ai/tools"
+)
+
+ai.Register(p)                  // scriptling.ai
+agent.Register(p)               // scriptling.ai.agent (returns error)
+agent.RegisterInteract(p)       // scriptling.ai.agent.interact (returns error)
+aimemory.Register(p)            // scriptling.ai.memory
+aitools.Register(p)             // scriptling.ai.tools
+```
+
+| Namespace | Import Path | Call |
+|-----------|-------------|------|
+| `scriptling.ai` | `extlibs/ai` | `ai.Register(p)` |
+| `scriptling.ai.agent` | `extlibs/agent` | `agent.Register(p)` |
+| `scriptling.ai.agent.interact` | `extlibs/agent` | `agent.RegisterInteract(p)` |
+| `scriptling.ai.memory` | `extlibs/ai/memory` | `memory.Register(p)` |
+| `scriptling.ai.tools` | `extlibs/ai/tools` | `tools.Register(p)` |
+
+### MCP Protocol & TOON
+
+```go
+import "github.com/paularlott/scriptling/extlibs/mcp"
+
+mcp.Register(p)             // scriptling.mcp
+mcp.RegisterToolHelpers(p)  // scriptling.mcp.tool
+mcp.RegisterToon(p)         // scriptling.toon
+```
+
+| Namespace | Call |
+|-----------|------|
+| `scriptling.mcp` | `mcp.Register(p)` |
+| `scriptling.mcp.tool` | `mcp.RegisterToolHelpers(p)` |
+| `scriptling.toon` | `mcp.RegisterToon(p)` |
+
+### Networking
+
+```go
+import (
+    "github.com/paularlott/scriptling/extlibs/net/resolve"
+    "github.com/paularlott/scriptling/extlibs/net/multicast"
+    "github.com/paularlott/scriptling/extlibs/net/unicast"
+    "github.com/paularlott/scriptling/extlibs/net/gossip"
+)
+
+resolve.Register(p, myResolver) // scriptling.net.resolve (requires a Resolver implementation)
+multicast.Register(p)       // scriptling.net.multicast
+unicast.Register(p)         // scriptling.net.unicast
+gossip.Register(p, nil)     // scriptling.net.gossip (nil = null logger)
+```
+
+| Namespace | Import Path | Call |
+|-----------|-------------|------|
+| `scriptling.net.resolve` | `extlibs/net/resolve` | `resolve.Register(p, resolver)` |
+| `scriptling.net.multicast` | `extlibs/net/multicast` | `multicast.Register(p)` |
+| `scriptling.net.unicast` | `extlibs/net/unicast` | `unicast.Register(p)` |
+| `scriptling.net.gossip` | `extlibs/net/gossip` | `gossip.Register(p, logger)` |
+
+### Network Policy
+
+The outbound networking libraries — `requests`, `scriptling.wait_for`, and `scriptling.net.websocket` — accept an optional `*netsecurity.Config` that restricts where scripts may connect. Pass `nil` (or omit the argument) for no restrictions; a non-nil policy blocks loopback, link-local (cloud metadata), private, unspecified, and multicast addresses, and IP-literal URLs, by default.
+
+```go
+import "github.com/paularlott/scriptling/extlibs/netsecurity"
+
+policy := &netsecurity.Config{
+    RequireHTTPS: true,
+    AllowHosts:   []string{"api.example.com"},
+}
+
+extlibs.RegisterRequestsLibrary(p, policy)
+extlibs.RegisterWaitForLibrary(p, policy)
+extlibs.RegisterWebSocketLibrary(p, policy)
+
+// Or load the same TOML file the CLI's --network-policy flag uses
+policy, err := netsecurity.LoadConfig("policy.toml")
+if err != nil {
+    return err // invalid policies are an error, never an open policy
+}
+```
+
+`Config` options (all optional — the zero value plus a non-nil pointer is a safe default policy):
+
+| Option | Type | Default | Meaning |
+|---|---|---|---|
+| `RequireHTTPS` | `bool` | `false` | Reject plain `http://` and `ws://` URLs |
+| `AllowIPLiterals` | `bool` | `false` | Permit URLs that name an IP directly; granted addresses still face the address rules |
+| `AllowLoopback` | `bool` | `false` | Permit `127.0.0.0/8` and `::1` |
+| `AllowPrivateIPs` | `bool` | `false` | Permit RFC1918 and IPv6 unique-local ranges |
+| `AllowHosts` | `[]string` | `nil` | Host allowlist; when set, only these hosts may be contacted. Listed hosts are trusted — they may resolve to internal addresses. Exact names match themselves; a leading dot (`.corp.example.com`) matches the domain and all subdomains |
+| `DenyHosts` | `[]string` | `nil` | Host denylist; always wins, even over `AllowHosts`. Same syntax |
+| `AllowedCIDRs` | `[]string` | `nil` | Address ranges permitted explicitly, overriding the built-in blocks (how you grant one slice of a LAN) |
+| `DeniedCIDRs` | `[]string` | `nil` | Address ranges blocked explicitly; wins over everything, including `AllowedCIDRs` |
+| `DNSServers` | `[]string` | `nil` | Resolve through these servers (`"1.1.1.1"` or `"8.8.8.8:53"`, plain DNS) instead of the host resolver; the same resolver then serves `scriptling.net.resolve` too |
+| `AllowAll` | `bool` | `false` | Host-use only (not settable from policy files): disable every address and host check, leaving only the shared DNS resolver — the way to configure nameservers without imposing a policy |
+
+An invalid config (bad CIDR, malformed DNS server) fails `netsecurity.NewGuard` / `LoadConfig` with an error — treat it as a startup failure. `netsecurity.FailClosed(err)` returns a guard that rejects every request if you need to keep serving after a config error.
+
+### Messaging
+
+```go
+import (
+    "github.com/paularlott/scriptling/extlibs/messaging/console"
+    "github.com/paularlott/scriptling/extlibs/messaging/telegram"
+    "github.com/paularlott/scriptling/extlibs/messaging/discord"
+    "github.com/paularlott/scriptling/extlibs/messaging/slack"
+)
+
+console.Register(p)          // scriptling.messaging.console
+telegram.Register(p, nil)   // scriptling.messaging.telegram
+discord.Register(p, nil)    // scriptling.messaging.discord
+slack.Register(p, nil)      // scriptling.messaging.slack
+```
+
+| Namespace | Import Path | Call |
+|-----------|-------------|------|
+| `scriptling.messaging.console` | `extlibs/messaging/console` | `console.Register(p)` |
+| `scriptling.messaging.telegram` | `extlibs/messaging/telegram` | `telegram.Register(p, logger)` |
+| `scriptling.messaging.discord` | `extlibs/messaging/discord` | `discord.Register(p, logger)` |
+| `scriptling.messaging.slack` | `extlibs/messaging/slack` | `slack.Register(p, logger)` |
+
+### Utilities
+
+```go
+import (
+    "github.com/paularlott/scriptling/extlibs/console"
+    "github.com/paularlott/scriptling/extlibs/container"
+    "github.com/paularlott/scriptling/extlibs/nomad"
+    "github.com/paularlott/scriptling/extlibs/similarity"
+    "github.com/paularlott/scriptling/extlibs/provision/fetch"
+    "github.com/paularlott/scriptling/extlibs/provision/file"
+)
+
+console.Register(p)                        // scriptling.console
+container.Register(p, "", "")              // scriptling.container (empty = default sockets)
+nomad.Register(p)                          // scriptling.nomad
+similarity.Register(p)                     // scriptling.similarity
+file.Register(p)                           // scriptling.provision.file
+fetch.Register(p)                          // scriptling.provision.fetch
+extlibs.RegisterMarkdownLibrary(p)         // scriptling.markdown
+```
+
+| Namespace | Import Path | Call |
+|-----------|-------------|------|
+| `scriptling.console` | `extlibs/console` | `console.Register(p)` |
+| `scriptling.container` | `extlibs/container` | `container.Register(p, dockerSock, podmanSock)` |
+| `scriptling.nomad` | `extlibs/nomad` | `nomad.Register(p)` |
+| `scriptling.similarity` | `extlibs/similarity` | `similarity.Register(p)` |
+| `scriptling.provision.file` | `extlibs/provision/file` | `file.Register(p)` |
+| `scriptling.provision.fetch` | `extlibs/provision/fetch` | `fetch.Register(p)` |
+| `scriptling.markdown` | root `extlibs` | `extlibs.RegisterMarkdownLibrary(p)` |
+
+### Executable Plugins
+
+`scriptling.plugin` (the control library for executable plugins, listing/calling/loading them at runtime) lives in the root `plugin` package, not `extlibs`, and needs a `*plugin.Manager` rather than just the interpreter:
+
+```go
+import (
+    "github.com/paularlott/scriptling/plugin"
+)
+
+manager := plugin.NewManager(myLogger, func(name string, err error) {
+    myLogger.Error("plugin process exited", "plugin", name, "error", err)
+})
+manager.AddDir("./plugins")
+if err := manager.Load(ctx); err != nil {
+    // handle error
+}
+
+plugin.RegisterLibraries(p, manager)  // scriptling.plugin, plus plugin.<name> for each loaded executable
+```
+
+| Namespace | Import Path | Call |
+|-----------|-------------|------|
+| `scriptling.plugin` | `plugin` | `plugin.RegisterLibraries(p, manager)` |
+
+See [Plugins](plugins.md) for the full plugin embedding guide.
+
+## Security Considerations
+
+When embedding Scriptling, you have full control over what scripts can access. See the [Security Guide](../security.md) for best practices.
+
+**Never register these libraries when running untrusted code:**
+
+- `subprocess`: allows arbitrary command execution
+- `sys`: provides access to environment variables and system internals
+- `scriptling.container`: controls Docker/Podman containers on the host
+- `scriptling.nomad`: grants full control over a Nomad cluster (CSI volumes, jobs)
+- `scriptling.runtime.sandbox`: can execute arbitrary code
+- `scriptling.ai.agent`: can execute AI-generated code with tools
+
+## See Also
+
+- [Basics](basics.md): creating interpreters and exchanging variables
+- [Security Guide](../security.md): security best practices for embedding
+- [Libraries](../../scriptling-libraries/scriptling-libraries.md): usage reference for all libraries

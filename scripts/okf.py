@@ -1,12 +1,20 @@
-# OKF bundle generator — walks content/ and emits raw OKF markdown to static/okf/
+# OKF bundle generator — walks content/ and emits OKF 0.2 markdown to okf/.
 # Run:  scriptling scripts/okf.py   (or:  make okf)
+#
+# Output is committed: the site is hosted on Cloudflare, which runs Hugo but
+# not scripts, so okf/ is mounted into the site (see hugo.toml module.mounts)
+# and published at /okf/. The zip for GitHub releases packs the three bundle
+# directories only — okf/index.md is a site-only catalog outside the bundles.
 import os
 import os.path
 import shutil
 import yaml
 import re
 
-OUT = "mcp/okf"
+OUT = "okf"
+OKF_VERSION = "0.2"
+GENERATED_BY = "scriptling-website/okf.py"
+BASE_URL = "https://scriptling.dev"
 
 # (name, source_dir, default_type, excluded_subdirs)
 BUNDLES = [
@@ -14,6 +22,12 @@ BUNDLES = [
     ("scriptling-reference", "content/reference", "Reference", ["libraries"]),
     ("scriptling-libraries", "content/reference/libraries", "API Reference", []),
 ]
+
+BUNDLE_DESCRIPTIONS = {
+    "scriptling-docs": "Guides: quick start, CLI usage, Go integration, plugins, security, and tutorials.",
+    "scriptling-reference": "Language reference: syntax, types, operators, control flow, functions, classes, and error handling.",
+    "scriptling-libraries": "API reference for every standard, Scriptling, and extended library.",
+}
 
 
 # --- source -> bundle mapping ------------------------------------------------
@@ -44,7 +58,13 @@ def src_rel(path):
 
 
 def out_rel_md(path):  # default mirrored output path for a source .md
-    return OUT + "/" + bundle_of(path) + "/" + src_rel(path)
+    r = src_rel(path)
+    if r.endswith("/index.md"):
+        # leaf page bundle (a dir named after the page) emits its concept
+        # beside the directory, so index.md never carries concept frontmatter
+        d = os.path.dirname(r)
+        return out_dir_for(bundle_of(path), os.path.dirname(d)) + "/" + os.path.basename(d) + ".md"
+    return OUT + "/" + bundle_of(path) + "/" + r
 
 
 def out_base(path):  # output dir for a source file or directory
@@ -65,6 +85,18 @@ def overview_out_path(cand):
     return out_dir_for(b, os.path.dirname(rel)) + "/" + os.path.basename(rel) + ".md"
 
 
+def page_url(src_file):
+    # Canonical hosted URL of the source page, used for provenance.
+    rel = src_file[len("content/"):]
+    if rel.endswith("/_index.md"):
+        rel = rel[: -len("_index.md")]
+    elif rel.endswith("/index.md"):
+        rel = rel[: -len("index.md")]
+    else:
+        rel = rel[:-3] + "/"
+    return BASE_URL + "/" + rel
+
+
 # --- frontmatter -------------------------------------------------------------
 
 FM_RE = re.compile(r"^---\n(.*?)\n---\n?(.*)$", re.S)
@@ -77,11 +109,24 @@ def parse(raw):
     return yaml.safe_load(m.group(1)) or {}, m.group(2)
 
 
-def build_frontmatter(fm, default_type, title):
+def build_frontmatter(fm, default_type, title, url):
     out = {"type": fm.get("type") or default_type, "title": title}
-    for k in ["description", "tags", "timestamp", "resource"]:
+    for k in ["description", "tags", "resource"]:
         if k in fm and fm[k] not in ("", None):
             out[k] = fm[k]
+    # OKF 0.2 provenance and lifecycle fields. `generated.at` uses the page's
+    # own lastmod/date when set so output stays deterministic across
+    # regenerations; absent is conformant (only generated.by is required).
+    generated = {"by": GENERATED_BY}
+    for k in ["lastmod", "date"]:
+        if fm.get(k):
+            generated["at"] = fm[k]
+            break
+    out["generated"] = generated
+    out["status"] = fm.get("okf_status") or "stable"
+    out["sources"] = [{"resource": url}]
+    if "resource" not in out:
+        out["resource"] = url
     return "---\n" + yaml.safe_dump(out).rstrip() + "\n---\n"
 
 
@@ -168,7 +213,7 @@ def resolve_target(src_file, out_file, url):
             # A directory link maps to its overview concept when it has one
             # (mirrors the website, where a dir URL serves the _index overview),
             # otherwise to the directory itself.
-            if os.path.isfile(cand + "/_index.md"):
+            if os.path.isfile(cand + "/_index.md") or os.path.isfile(cand + "/index.md"):
                 return os.path.relpath(overview_out_path(cand), out_dir) + anchor
             return os.path.relpath(out_base(cand), out_dir) + "/" + anchor
     return None
@@ -193,7 +238,7 @@ def process_file(src_file, default_type, out_file):
     title = fm.get("title") or os.path.splitext(os.path.basename(src_file))[0]
     body = prepend_title(title, body)
     os.makedirs(os.path.dirname(out_file), exist_ok=True)
-    os.write_file(out_file, build_frontmatter(fm, default_type, title) + body.rstrip() + "\n")
+    os.write_file(out_file, build_frontmatter(fm, default_type, title, page_url(src_file)) + body.rstrip() + "\n")
 
 
 def list_dir(src_dir, exclude):
@@ -201,6 +246,44 @@ def list_dir(src_dir, exclude):
         return sorted(os.listdir(src_dir))
     except Exception:
         return []
+
+
+def concept_title(out_file):
+    # Title of an already-emitted concept, read back from its frontmatter.
+    try:
+        fm, _ = parse(os.read_file(out_file))
+        return fm.get("title") or os.path.splitext(os.path.basename(out_file))[0]
+    except Exception:
+        return os.path.splitext(os.path.basename(out_file))[0]
+
+
+def emit_bundle_index(name, src):
+    # OKF 0.2 bundle-root index.md: the only index allowed frontmatter, and
+    # only for the okf_version key. Body is level-by-level navigation.
+    entries = []
+    seen = set()  # concepts already listed via their directory
+    overview = OUT + "/" + name + "/" + name + ".md"
+    if os.path.isfile(overview):
+        entries.append("- [" + concept_title(overview) + "](" + name + ".md)")
+        seen.add(name + ".md")
+    for entry in list_dir(OUT + "/" + name, []):
+        if entry in (".", "..", "index.md"):
+            continue
+        full = OUT + "/" + name + "/" + entry
+        if entry.endswith(".md"):
+            if entry in seen:
+                continue
+            entries.append("- [" + concept_title(full) + "](" + entry + ")")
+        elif os.path.isdir(full):
+            concept = full + ".md"
+            if os.path.isfile(concept):
+                entries.append("- [" + concept_title(concept) + "](" + entry + ".md)")
+                seen.add(entry + ".md")
+            else:
+                entries.append("- " + entry)
+    body = "# " + name + "\n\n" + BUNDLE_DESCRIPTIONS[name] + "\n\n## Concepts\n\n" + "\n".join(entries) + "\n"
+    os.write_file(OUT + "/" + name + "/index.md",
+                  "---\nokf_version: \"" + OKF_VERSION + "\"\n---\n" + body)
 
 
 def emit_bundle(name, src, default_type, exclude):
@@ -222,11 +305,44 @@ def emit_bundle(name, src, default_type, exclude):
                         parent_rel = os.path.dirname(rel)
                         out_file = out_dir_for(name, parent_rel) + "/" + os.path.basename(rel) + ".md"
                 elif entry == "index.md":
-                    out_file = out_dir_for(name, rel) + "/index.md"  # leaf concept
+                    # leaf page bundle -> concept beside its directory, named
+                    # after it: OKF reserves index.md for navigation (no
+                    # concept frontmatter outside a bundle root)
+                    parent_rel = os.path.dirname(rel)
+                    out_file = out_dir_for(name, parent_rel) + "/" + os.path.basename(rel) + ".md"
                 else:
                     out_file = out_dir_for(name, rel) + "/" + entry  # mirrored concept
                 process_file(full, default_type, out_file)
     emit("")
+    emit_bundle_index(name, src)
+
+
+def emit_site_catalog():
+    # Site-only catalog at okf/index.md. It sits beside the bundles, not
+    # inside any of them, so it is outside OKF's index rules entirely; it is
+    # never packed into the release zip.
+    entries = []
+    for name, _, _, _ in BUNDLES:
+        entries.append("- [" + name + "](" + name + "/index.md) — " + BUNDLE_DESCRIPTIONS[name])
+    body = ("# Scriptling OKF Bundles\n\n"
+            "OKF " + OKF_VERSION + " knowledge bundles generated from the [Scriptling documentation]("
+            + BASE_URL + "/docs/). Fetch these URLs directly; every document is plain markdown with "
+            "YAML frontmatter and relative links.\n\n## Bundles\n\n" + "\n".join(entries) + "\n")
+    os.write_file(OUT + "/index.md", body)
+
+    # HTML twin: static hosts serve /okf/ from index.html, not index.md
+    rows = []
+    for name, _, _, _ in BUNDLES:
+        rows.append('<li><a href="' + name + '/index.md">' + name + "</a> — " + BUNDLE_DESCRIPTIONS[name] + "</li>")
+    html = ("<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n"
+            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
+            "<title>Scriptling OKF Bundles</title>\n"
+            "<style>body{font-family:system-ui,sans-serif;max-width:44rem;margin:3rem auto;padding:0 1rem;line-height:1.6}code{background:#f1f5f9;padding:.1rem .3rem;border-radius:.25rem}@media(prefers-color-scheme:dark){body{background:#0f172a;color:#e2e8f0}code{background:#1e293b}}</style>\n"
+            "</head>\n<body>\n<h1>Scriptling OKF Bundles</h1>\n"
+            "<p>OKF " + OKF_VERSION + " knowledge bundles generated from the <a href=\"" + BASE_URL + "/docs/\">Scriptling documentation</a>. "
+            "Every document is plain markdown with YAML frontmatter and relative links — fetch these URLs directly, or start from <a href=\"index.md\">index.md</a>.</p>\n"
+            "<ul>\n" + "\n".join(rows) + "\n</ul>\n</body>\n</html>\n")
+    os.write_file(OUT + "/index.html", html)
 
 
 def main():
@@ -235,7 +351,8 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     for name, src, default_type, exclude in BUNDLES:
         emit_bundle(name, src, default_type, exclude)
-    print("OKF bundles generated at " + OUT + "/")
+    emit_site_catalog()
+    print("OKF " + OKF_VERSION + " bundles generated at " + OUT + "/")
 
 
 main()

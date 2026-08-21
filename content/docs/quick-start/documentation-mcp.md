@@ -9,9 +9,11 @@ Scriptling's documentation can be published as [OKF](https://github.com/GoogleCl
 
 The MCP server is a separate, generic project — [okf-server](https://github.com/paularlott/okf-server) — that works with any OKF bundles. Scriptling ships prebuilt bundles, so there is no need to clone or build anything.
 
+The same bundles are also hosted as plain markdown at [scriptling.dev/okf/](https://scriptling.dev/okf/) — if your agent can fetch URLs it can read the docs directly (each bundle's `index.md` lists its concepts), and the MCP server is only needed for search and write access.
+
 ## Prerequisites
 
-- **Scriptling 0.18.0 or later** installed and on your `PATH` (`scriptling --version`). See [CLI Getting Started](./cli/) to install.
+- **Scriptling 0.18.0 or later** installed and on your `PATH` (`scriptling --version`). See [CLI Getting Started](../cli/) to install.
 
 ## 1. Download the bundles
 

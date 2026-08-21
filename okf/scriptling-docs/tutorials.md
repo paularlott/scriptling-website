@@ -1,0 +1,52 @@
+---
+description: Step-by-step guides for building with Scriptling.
+generated:
+    by: scriptling-website/okf.py
+resource: https://scriptling.dev/docs/tutorials/
+sources:
+    - resource: https://scriptling.dev/docs/tutorials/
+status: stable
+tags:
+    - tutorials
+title: Tutorials
+type: Guide
+---
+# Tutorials
+
+Hands-on tutorials that walk through real-world scenarios from start to finish.
+
+## CLI Tutorials
+
+### [Fetching and Processing API Data](tutorials/api-data-fetching.md)
+
+Write a CLI script that fetches data from a public API, processes it with JSON, and outputs formatted results. Covers GET/POST/PUT/DELETE requests, the `requests` library, error handling, and working with lists and dictionaries.
+
+## Plugin Tutorials
+
+### [Writing a Go Plugin](tutorials/go-plugin.md)
+
+Build a Go executable plugin that exposes functions and classes under `plugin.*`.
+
+### [Writing a Bash Plugin](tutorials/bash-plugin.md)
+
+Implement the plugin JSON-RPC protocol directly from a shell script.
+
+### [Writing a C Plugin](tutorials/c-plugin.md)
+
+Build a multi-threaded C plugin with functions, classes, properties, callbacks, and logging using the single-header SDK.
+
+### [Plugin Streaming Callbacks](tutorials/plugin-callbacks.md)
+
+Pass a Scriptling function into a Go plugin and stream events back while the plugin function is running. Covers `plugin.Callback`, callback lifetime, and structured callback payloads.
+
+## Go Integration Tutorials
+
+### [Embedding a Rules Engine](tutorials/embedding-rules-engine.md)
+
+Embed Scriptling in a Go application to evaluate business rules at runtime. Covers interpreter setup, variable exchange, custom function registration, and library loading.
+
+## AI Integration Tutorials
+
+### [Building an MCP Tool Server](tutorials/mcp-tool-server.md)
+
+Create a Model Context Protocol server with custom tools that AI assistants can call. Covers tool definition, script implementation, and server startup.
