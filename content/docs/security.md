@@ -176,6 +176,27 @@ stdlib.RegisterAll(p)
 extlibs.RegisterRequestsLibrary(p)
 ```
 
+### Network Policies
+
+For scripts that *should* reach the internet but must never reach your private network, register a network policy. A policy governs the `requests`, `scriptling.wait_for`, and `scriptling.net.websocket` libraries and is enforced at connect time: the hostname is resolved through the configured DNS servers, every resolved address is checked against the policy, and the connection is made to the validated address directly. That closes the usual bypasses — DNS rebinding (the answer changing between check and connect), redirects to internal hosts, and IP-notation tricks.
+
+With a policy active, loopback, link-local (including cloud metadata endpoints like `169.254.169.254`), private, unspecified, and multicast addresses are all blocked by default, as are URLs that name an IP directly. Host allow/deny lists, CIDR exceptions, https-only, and custom DNS servers grant exactly the access you intend — allowlisted hosts are trusted to resolve internally, and deny rules always win.
+
+- **CLI**: `--network-policy=policy.toml` — the full policy file reference is in the [network policy guide](/docs/cli/network-policy/). Combine with `--no-subprocess` so scripts can't bypass the policy by shelling out to `curl`.
+- **Embedding**: pass a `*netsecurity.Config` (or load the same TOML file with `netsecurity.LoadConfig`) when registering the governed libraries — the `Config` options are documented in the [library registration guide](/docs/go-integration/library-registration/#network-policy). No policy means no restrictions.
+
+```go
+policy, err := netsecurity.LoadConfig("policy.toml")
+if err != nil {
+    return err // an invalid policy must never degrade into an open one
+}
+extlibs.RegisterRequestsLibrary(p, policy)
+extlibs.RegisterWaitForLibrary(p, policy)
+extlibs.RegisterWebSocketLibrary(p, policy)
+```
+
+The policy governs the three libraries above. `scriptling.ai`, `scriptling.mcp`, and `scriptling.provision.fetch` make network calls too, but to endpoints configured by the host rather than chosen by the script; if scripts can configure those endpoints in your integration, keep them unregistered in untrusted environments.
+
 ## Secret Provider Security
 
 Use `scriptling.secret` when scripts need secrets but should not receive provider URLs, tokens, or other private configuration.

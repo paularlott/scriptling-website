@@ -2,7 +2,7 @@
 title: HTTP Server Mode
 description: Running Scriptling as an HTTP server with custom routes.
 tags: [cli, http]
-weight: 2
+weight: 5
 ---
 
 Scriptling can run as an HTTP server, allowing you to build REST APIs and web services.
@@ -344,6 +344,7 @@ curl -X POST http://localhost:8000/api/users \
 
 ## See Also
 
-- [Basic Usage](../basic-usage/) - Installation and command line options
+- [Basic Usage](../basic-usage/) - Running scripts, interactive mode, and lint mode
+- [Command Line Options](../command-line-options/) - Every flag and configuration file setting
 - [MCP Server Mode](../mcp-server/) - Model Context Protocol integration
 - [Runtime HTTP Library](../../../reference/libraries/scriptling/runtime/http/) - HTTP server API reference

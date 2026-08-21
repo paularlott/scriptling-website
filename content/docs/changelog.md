@@ -8,6 +8,42 @@ nav-skip: true
 
 ## August 2026
 
+{{< version "v0.21.0" >}}
+
+{{< changelog-item "added" >}}
+**Script network policies.** Hosts can keep scripts off the private LAN and away from cloud metadata endpoints. Registering `requests`, `wait_for`, or `websocket` with a policy blocks loopback, link-local, private, and IP-literal addresses by default, with allow/deny host lists, CIDRs, https-only, and custom DNS servers for the exceptions you grant. Checks run at connect time, so DNS-rebinding and redirect tricks don't get through. The CLI takes a TOML policy file — `--network-policy=policy.toml`, format in the CLI guide — and `--no-subprocess` leaves the subprocess library out entirely. No policy configured means no restrictions.
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**One resolver for all script DNS.** A policy's `dns_servers` — or a resolver injected by the host — now serves every script network path, `scriptling.net.resolve` included, so lookups and connections always see the same answers. Without either, the host's system resolver is used as before.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**`sys.stdout` and `sys.stderr`.** Scripts had no way to write to stderr, so warnings and errors shared stdout with the report. Both streams are now available with `write()`, `writelines()`, `flush()`, `isatty()`, and `with` support, and `print(..., file=...)` now accepts any object with a `write` method — `sys.stderr`, `sys.stdout`, or your own class. The streams follow output capture, host writers, and sandbox discarding just like `print()` does, and Go hosts get a matching `SetErrorWriter(io.Writer)`.
+
+```python
+import sys
+
+sys.stderr.write("warning: retrying (attempt 2)\n")
+print("fatal: disk full", file=sys.stderr)
+print('{"status": "ok"}')   # stdout stays report-only
+```
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**Booleans now display as `True`/`False`, matching Python 3.** `print(True)`, `str()`, `repr()`, and f-strings used to render lowercase; the literals themselves were always `True`/`False`. Machine-facing output is unchanged — `json.dumps`, query parameters, and tool responses still use lowercase. Scripts that compare boolean text (for example `str(flag) == "true"`) need updating, and Go hosts stringifying booleans for the wire should use the new `object.CoerceWireString`.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`toon.decode` accepts block lists and rejects malformed input.** Lists written as `- item` lines under a key (`tags:` / `- python`) were silently decoded as an empty object; they now decode as lists. Invalid lines that were silently dropped now raise an error in strict mode (the default).
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**`create_leader_election` now takes `min_cluster_size`.** A leader can only be elected while at least that many nodes are visible, so a split cluster can no longer elect two leaders. This replaces `quorum_percentage` — set `min_cluster_size` to the majority of your smallest cluster (`2` for three nodes, `1` for single-node) and leave it alone as the cluster grows. Upgrading gossip also brings adaptive quorum sizing and automatic retirement of dead nodes' votes.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.20.1" >}}
 
 {{< changelog-item "fixed" >}}

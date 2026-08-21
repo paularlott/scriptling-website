@@ -8,7 +8,7 @@ weight: 1
 
 The `scriptling.container` library provides container lifecycle management for Docker, Podman, and Apple Containers through a single unified interface. All operations go through a `ContainerClient` obtained from `Client()`.
 
-Docker and Podman endpoints are configured via the `--docker-host` / `--podman-host` CLI flags or the `DOCKER_HOST` / `CONTAINER_HOST` environment variables: see [CLI Basic Usage](/docs/cli/basic-usage/#container-endpoints) for details.
+Docker and Podman endpoints are configured via the `--docker-host` / `--podman-host` CLI flags or the `DOCKER_HOST` / `CONTAINER_HOST` environment variables: see [Command Line Options](/docs/cli/command-line-options/#container-endpoints) for details.
 
 ## Available Functions
 

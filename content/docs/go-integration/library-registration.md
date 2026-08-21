@@ -252,6 +252,46 @@ gossip.Register(p, nil)     // scriptling.net.gossip (nil = null logger)
 | `scriptling.net.unicast` | `extlibs/net/unicast` | `unicast.Register(p)` |
 | `scriptling.net.gossip` | `extlibs/net/gossip` | `gossip.Register(p, logger)` |
 
+### Network Policy
+
+The outbound networking libraries — `requests`, `scriptling.wait_for`, and `scriptling.net.websocket` — accept an optional `*netsecurity.Config` that restricts where scripts may connect. Pass `nil` (or omit the argument) for no restrictions; a non-nil policy blocks loopback, link-local (cloud metadata), private, unspecified, and multicast addresses, and IP-literal URLs, by default.
+
+```go
+import "github.com/paularlott/scriptling/extlibs/netsecurity"
+
+policy := &netsecurity.Config{
+    RequireHTTPS: true,
+    AllowHosts:   []string{"api.example.com"},
+}
+
+extlibs.RegisterRequestsLibrary(p, policy)
+extlibs.RegisterWaitForLibrary(p, policy)
+extlibs.RegisterWebSocketLibrary(p, policy)
+
+// Or load the same TOML file the CLI's --network-policy flag uses
+policy, err := netsecurity.LoadConfig("policy.toml")
+if err != nil {
+    return err // invalid policies are an error, never an open policy
+}
+```
+
+`Config` options (all optional — the zero value plus a non-nil pointer is a safe default policy):
+
+| Option | Type | Default | Meaning |
+|---|---|---|---|
+| `RequireHTTPS` | `bool` | `false` | Reject plain `http://` and `ws://` URLs |
+| `AllowIPLiterals` | `bool` | `false` | Permit URLs that name an IP directly; granted addresses still face the address rules |
+| `AllowLoopback` | `bool` | `false` | Permit `127.0.0.0/8` and `::1` |
+| `AllowPrivateIPs` | `bool` | `false` | Permit RFC1918 and IPv6 unique-local ranges |
+| `AllowHosts` | `[]string` | `nil` | Host allowlist; when set, only these hosts may be contacted. Listed hosts are trusted — they may resolve to internal addresses. Exact names match themselves; a leading dot (`.corp.example.com`) matches the domain and all subdomains |
+| `DenyHosts` | `[]string` | `nil` | Host denylist; always wins, even over `AllowHosts`. Same syntax |
+| `AllowedCIDRs` | `[]string` | `nil` | Address ranges permitted explicitly, overriding the built-in blocks (how you grant one slice of a LAN) |
+| `DeniedCIDRs` | `[]string` | `nil` | Address ranges blocked explicitly; wins over everything, including `AllowedCIDRs` |
+| `DNSServers` | `[]string` | `nil` | Resolve through these servers (`"1.1.1.1"` or `"8.8.8.8:53"`, plain DNS) instead of the host resolver; the same resolver then serves `scriptling.net.resolve` too |
+| `AllowAll` | `bool` | `false` | Host-use only (not settable from policy files): disable every address and host check, leaving only the shared DNS resolver — the way to configure nameservers without imposing a policy |
+
+An invalid config (bad CIDR, malformed DNS server) fails `netsecurity.NewGuard` / `LoadConfig` with an error — treat it as a startup failure. `netsecurity.FailClosed(err)` returns a guard that rejects every request if you need to keep serving after a config error.
+
 ### Messaging
 
 ```go

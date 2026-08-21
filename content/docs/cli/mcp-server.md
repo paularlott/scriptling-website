@@ -2,7 +2,7 @@
 title: MCP Server Mode
 description: Running Scriptling as a Model Context Protocol (MCP) server for AI integration.
 tags: [cli, mcp, ai]
-weight: 3
+weight: 7
 ---
 
 Scriptling can run as an MCP (Model Context Protocol) server, enabling AI assistants to use your tools and execute scripts.
@@ -433,7 +433,8 @@ This configuration:
 
 ## See Also
 
-- [Basic Usage](../basic-usage/) - Installation and command line options
+- [Basic Usage](../basic-usage/) - Running scripts, interactive mode, and lint mode
+- [Command Line Options](../command-line-options/) - Every flag and configuration file setting
 - [HTTP Server Mode](../http-server/) - HTTP server without MCP
 - [Writing MCP Tools](../../../reference/libraries/scriptling/mcp/writing-mcp-tools/) - Creating custom MCP tools
 - [MCP Library](../../../reference/libraries/scriptling/mcp/) - MCP library reference

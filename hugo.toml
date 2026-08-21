@@ -38,6 +38,21 @@ disableKinds = ['taxonomy', 'term']
     source = '(postcss|tailwind)\.config\.js'
     target = 'css'
 
+[security]
+  # The CSS pipeline shells out to tailwindcss (a Node script), so those
+  # executables must be allowed. The first four entries are Hugo's own
+  # defaults, restated so this list stays complete.
+  [security.exec]
+    allow = [
+      '^(dart-)?sass(-embedded)?$',
+      '^go$',
+      '^npx$',
+      '^postcss$',
+      '^tailwindcss$',
+      '^node$',
+      '^npm$',
+    ]
+
 [module]
   [module.hugoVersion]
     extended = true

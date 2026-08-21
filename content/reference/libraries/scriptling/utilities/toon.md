@@ -76,7 +76,7 @@ tags:
 data = toon.decode(text)
 print(data.name)    # "Alice"
 print(data.age)     # 30
-print(data.active)  # true
+print(data.active)  # True
 print(data.tags[0]) # "python"
 ```
 

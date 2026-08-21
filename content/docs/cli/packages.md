@@ -2,7 +2,7 @@
 title: Packages
 description: Create, distribute, and load Scriptling packages.
 tags: [cli]
-weight: 4
+weight: 8
 ---
 
 Packages are ZIP archives containing Scriptling libraries that can be loaded from local files or URLs. They enable easy distribution and reuse of code.

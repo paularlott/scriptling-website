@@ -105,6 +105,23 @@ h5, h6 {
   display: none;
 }
 
+/* Wide tables (the CLI flag reference, Config option tables) must not blow
+   out the content column. Long code tokens inside cells (env var names,
+   flags) may wrap; below tablet width a table becomes its own horizontal
+   scroll container. */
+td code,
+th code {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 767px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* Custom table styles */
 table {
   width: 100%;

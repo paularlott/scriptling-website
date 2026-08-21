@@ -10,7 +10,7 @@ DNS resolution library for hostname lookup, SRV record resolution, and `srv+http
 
 ## Overview
 
-The `scriptling.net.resolve` library provides DNS resolution utilities. It uses the system resolver by default, or custom nameservers when configured by the host application (e.g. [knot](https://github.com/paularlott/knot)).
+The `scriptling.net.resolve` library provides DNS resolution utilities. It uses the system resolver by default, or custom nameservers when configured by the host application (e.g. [knot](https://github.com/paularlott/knot)). In the CLI, a [network policy](/docs/cli/network-policy/)'s `dns_servers` configure this resolver too — every script network path resolves through the same servers.
 
 ## Available Functions
 
@@ -88,7 +88,7 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## Host Application Integration
 
-Host applications can inject a custom resolver by passing it to `resolve.Register(env, resolver)`. This allows applications like [knot](https://github.com/paularlott/knot) to configure custom nameservers, caching, and domain-specific routing. The `resolver` argument is required; `Register` panics if it is `nil`.
+Host applications can inject a custom resolver by passing it to `resolve.Register(env, resolver)`. This allows applications like [knot](https://github.com/paularlott/knot) to configure custom nameservers, caching, and domain-specific routing. The `resolver` argument is required; `Register` panics if it is `nil`. When the host also registers a network policy, pass the policy's resolver (the `netsecurity` guard's `Resolver()`) so lookups and connections share one resolver — see the [library registration guide](/docs/go-integration/library-registration/#network-policy).
 
 ## See Also
 

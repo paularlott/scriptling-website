@@ -34,7 +34,19 @@ scriptling --server :8000 --json-rpc setup.py
 
 ### [Basic Usage](./basic-usage/)
 
-Installation, running scripts, interactive mode, lint mode, command line options, environment configuration, and library loading.
+Running scripts, interactive mode, lint mode, and environment configuration.
+
+### [Command Line Options](./command-line-options/)
+
+Every CLI flag, environment variable, and configuration file setting, plus container endpoints.
+
+### [Network Policy](./network-policy/)
+
+Restricting script outbound network access with a policy file.
+
+### [Libraries](./libraries/)
+
+Loading, disabling, and controlling library and filesystem access.
 
 ### [HTTP Server Mode](./http-server/)
 
