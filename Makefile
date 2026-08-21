@@ -21,21 +21,26 @@ bundle-pack: okf
 	cd okf && zip -qr ../dist/scriptling-okf-bundles.zip scriptling-docs scriptling-reference scriptling-libraries
 	@echo "Built dist/scriptling-okf-bundles.zip"
 
-## Regenerate OKF bundles; commit and push them if anything changed
+## Regenerate OKF bundles; commit them if anything changed (no push)
 okf-sync: okf
 	@if ! git diff --quiet -- okf/; then \
-		echo "OKF bundles changed; committing and pushing"; \
-		git add okf/ && git commit -m "Regenerate OKF bundles" && git push; \
+		echo "OKF bundles changed; committing"; \
+		git add okf/ && git commit -m "Regenerate OKF bundles"; \
 	else \
 		echo "OKF bundles up to date"; \
 	fi
 
 ## Tag and publish a GitHub release with the OKF bundles archive.
-## The bundles are regenerated and pushed first so the release always matches
-## the committed docs.
-release: okf-sync bundle-pack
+## Ordering matters: regenerate + commit the bundles, then push — the push
+## either no-ops or pushes the code and triggers the Cloudflare site build —
+## and only then pack the zips, upload, and tag, so the hosted bundles and
+## the release archive can never diverge from the committed docs.
+release:
+	@$(MAKE) okf-sync
 	@test -d ../scriptling || { echo "scriptling repo not found at ../scriptling"; exit 1; }
 	@command -v gh >/dev/null 2>&1 || { echo "gh CLI not installed"; exit 1; }
+	@git push
+	@$(MAKE) bundle-pack
 	@V=$$(cd ../scriptling && go run ./tools/getversion); \
 	echo "Releasing scriptling-okf-bundles v$$V"; \
 	if git tag -l v$$V | grep -q v$$V; then \
