@@ -206,6 +206,7 @@ print(duration)  # 95400.0
 # Use with datetime arithmetic
 now = datetime.datetime.now()
 tomorrow = now + datetime.timedelta(days=1)
+yesterday = now - datetime.timedelta(days=1)
 next_week = now + datetime.timedelta(weeks=1)
 
 # Use with date arithmetic
@@ -505,7 +506,7 @@ print(new_d)  # "2025-06-15"
 
 `datetime` and `date` instances support comparison operators (`<`, `>`, `<=`, `>=`, `==`, `!=`) against instances of the same type, and arithmetic with numbers or `timedelta()` values.
 
-For `datetime`, subtraction of two instances returns the difference in seconds as a `float`, and addition takes a number of seconds (`int` or `float`):
+For `datetime`, subtraction of two instances returns the difference in seconds as a `float`, while addition and subtraction with a number of seconds (`int` or `float`) returns a new `datetime`:
 
 ```python
 import datetime
@@ -525,13 +526,19 @@ print(diff)  # 86400.0 (one day in seconds)
 dt3 = dt1 + 3600  # One hour later
 print(dt3)  # "2024-01-15 11:30:45"
 
+# Subtraction (subtract seconds)
+dt0 = dt1 - 3600  # One hour earlier
+print(dt0)  # "2024-01-15 09:30:45"
+
 # Using timedelta
 one_day = datetime.timedelta(days=1)
 tomorrow = dt1 + one_day
 print(tomorrow)  # "2024-01-16 10:30:45"
+yesterday = dt1 - one_day
+print(yesterday)  # "2024-01-14 10:30:45"
 ```
 
-For `date`, subtraction of two instances returns the difference in whole days as an `int`, and addition takes a number of days (`int`) or a `timedelta()` value (`float` seconds, converted to whole days):
+For `date`, subtraction of two instances returns the difference in whole days as an `int`, while addition and subtraction take a number of days (`int`) or a `timedelta()` value (`float` seconds, converted to whole days):
 
 ```python
 import datetime
@@ -550,10 +557,16 @@ print(diff)  # 5 (days)
 next_week = d1 + 7
 print(next_week)  # "2024-01-22"
 
+# Subtraction (subtract days)
+last_week = d2 - 7
+print(last_week)  # "2024-01-13"
+
 # Using timedelta
 one_week = datetime.timedelta(weeks=1)
 next_week = d1 + one_week
 print(next_week)  # "2024-01-22"
+prev_week = d1 - one_week
+print(prev_week)  # "2024-01-08"
 ```
 
 ## Format Codes

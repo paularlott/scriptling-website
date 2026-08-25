@@ -8,6 +8,14 @@ nav-skip: true
 
 ## August 2026
 
+{{< version "v0.21.1" >}}
+
+{{< changelog-item "fixed" >}}
+**Subtracting durations from `datetime` and `date`.** `dt + 3600` worked but `dt - 3600` raised a type error — subtraction only accepted another instance. Both sides of `+` and `-` now behave the same: `datetime - <seconds>` and `date - <days>` return a new instance, and `timedelta()` values work everywhere a number does, so `now - timedelta(minutes=30)` no longer needs the `+ timedelta(minutes=-30)` workaround. Compound assignment (`+=`, `-=`) follows automatically.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.21.0" >}}
 
 {{< changelog-item "added" >}}
