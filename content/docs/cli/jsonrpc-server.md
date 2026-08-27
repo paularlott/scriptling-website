@@ -57,6 +57,12 @@ scriptling --server :8000 --json-rpc --mcp-tools ./tools setup.py
 `--json-rpc` selects one transport. Without `--server` it uses stdio; with
 `--server` it mounts HTTP JSON-RPC at `/json-rpc`.
 
+Over HTTP, the script middleware registered with
+`runtime.http.middleware(...)` guards `/json-rpc` the same as HTTP routes —
+use it for token or per-user key authentication (see
+[Per-User Keys](../http-server/#per-user-keys)). Without a middleware, a
+`--bearer-token` guards the endpoint instead.
+
 ## Registering Handlers
 
 Handlers are referenced by string (`"library.function"`), the same model used by

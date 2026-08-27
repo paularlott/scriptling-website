@@ -397,7 +397,9 @@ kill -HUP $(pidof scriptling)
 The `--mcp-exec-script` flag allows AI assistants to execute arbitrary code. Consider:
 
 - Use `--allowed-paths` to restrict filesystem access
-- Use `--bearer-token` to require authentication
+- Use `--bearer-token` to require authentication, or register a script
+  middleware for per-user keys — it guards `/mcp` the same as HTTP routes
+  (see [Per-User Keys](../http-server/#per-user-keys))
 - Run in a sandboxed environment for untrusted AI systems
 
 ```bash
