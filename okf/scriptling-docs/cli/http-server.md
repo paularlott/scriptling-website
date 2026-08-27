@@ -132,6 +132,40 @@ Clients must include the token in the `Authorization` header:
 curl -H "Authorization: Bearer my-secret-token" http://localhost:8000/api/hello
 ```
 
+### Per-User Keys
+
+For more than one key, skip the static token and register a script middleware
+that checks the `Authorization` header itself — a dict lookup, the KV store,
+or an API call all work. The middleware guards every HTTP route and, when
+enabled, the `/mcp` and `/json-rpc` endpoints too, so one handler
+authenticates API clients, MCP clients, and JSON-RPC callers alike:
+
+```python
+# auth.py
+KEYS = {
+    "Bearer alice-key": "alice",
+    "Bearer bob-key": "bob",
+}
+
+def check(request):
+    auth = request.header("authorization", "")
+    if auth in KEYS:
+        return None
+    return {"status": 401, "body": "unauthorized"}
+```
+
+```python
+# setup.py
+import auth
+import scriptling.runtime as runtime
+
+runtime.http.middleware("auth.check")
+```
+
+When a middleware is registered it replaces static `--bearer-token` checking
+on the protocol endpoints; without one, the static token guards everything
+as before.
+
 ## Filesystem Restrictions
 
 Restrict which paths scripts can access:
