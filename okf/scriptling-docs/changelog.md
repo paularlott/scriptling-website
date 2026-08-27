@@ -16,6 +16,23 @@ type: Guide
 
 ## August 2026
 
+### v0.21.4
+
+
+
+**Background tasks no longer die when the script ends.** A `runtime.background()` task you didn't await was killed the moment the main script finished — the CLI exited mid-task, so everything it did, `logging.info()` and `logging.error()` included, vanished without an error, while the same calls from the main script worked fine. The CLI now waits for outstanding background tasks before exiting, so fire-and-forget tasks run to completion and their log messages appear.
+
+
+
+**`daemon=True` for tasks that must not hold the process open.** The CLI waits for background tasks at exit so their work isn't lost, but a long-running loop shouldn't keep a finished script alive forever. Pass `daemon=True` and the task is left behind when the process exits. It's a control flag, not an argument: handlers never see it, and it works with `shared=True` too.
+
+
+
+**Background tasks in embedded scriptlings.** A program embedding scriptling directly, without the CLI's factory setup, got the silent version of the same bug: `runtime.background()` returned `null` and the task never started at all. Such tasks now run immediately in an environment derived from the calling script — sibling functions only, still isolated from its data — with `print` output and `logging` going to the host's destinations, and imports inside the task resolved by the host's own library setup.
+
+
+---
+
 ### v0.21.3
 
 
