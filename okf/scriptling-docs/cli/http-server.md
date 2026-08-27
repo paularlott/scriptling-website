@@ -155,6 +155,10 @@ runtime.http.post("/api/echo", "handlers.echo")
 runtime.http.get("/api/users/{id}", "handlers.get_user")
 ```
 
+Handler modules can live in subdirectories: `routes/me.py` is imported as
+`import routes.me` and its functions are referenced as `"routes.me.get_user"`.
+The module part of a handler reference may be any dotted module path.
+
 ```python
 # handlers.py
 import scriptling.runtime as runtime
@@ -262,6 +266,12 @@ directly in the setup/main script itself.
 At request time, the server re-imports the library on a fresh evaluator and
 calls the handler function. Re-import is idempotent — duplicate route
 registrations are detected and skipped silently.
+
+Route decorators must sit on module-level functions. A decorated method
+inside a class registers a reference the server cannot dispatch (the function
+is not at the top level of the module) — the route fails with a logged
+"function not found" error on first request. Decorate a module-level function
+that delegates to the class instead.
 
 The imperative API (`runtime.http.get("/path", "lib.func")`) continues to
 work unchanged. Both forms can coexist in the same project.
