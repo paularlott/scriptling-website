@@ -16,6 +16,23 @@ type: Guide
 
 ## August 2026
 
+### v0.21.5
+
+
+
+**Logging inside background tasks no longer looks like a hang.** A module-level variable (like a `getLogger()` result) used inside a `runtime.background()` task raised `identifier not found`, and the failure died with the task — no log, no error, nothing after the call. Module-level constants are now visible to tasks, a failing task prints `background task "<name>" failed: <error>` to stderr instead of dying silently, and module-level objects like loggers should be created inside the handler.
+
+
+
+**A background task name identifies one task.** `runtime.background()` with a name that is already queued or running starts nothing and returns the running task's promise; the name is reusable once the task ends. Previously a module registering both a route handler and a task respawned the task on every request, since handler modules are re-imported per request.
+
+
+
+**`runtime.background()` in a server setup script returns a promise** instead of `null`, resolving once the queued task runs — so `promise.get()` works there like anywhere else.
+
+
+---
+
 ### v0.21.4
 
 
