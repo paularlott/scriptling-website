@@ -60,7 +60,8 @@ scriptling --server :8000 --json-rpc --mcp-tools ./tools setup.py
 ## Registering Handlers
 
 Handlers are referenced by string (`"library.function"`), the same model used by
-`runtime.http`. Each request runs on a fresh, isolated evaluator, so handlers
+`runtime.http`; the module part may be a dotted path into a subdirectory
+(`"routes.me.echo"`). Each request runs on a fresh, isolated evaluator, so handlers
 are fully concurrent and a slow handler never blocks the next request.
 
 ```python

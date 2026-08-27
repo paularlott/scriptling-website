@@ -30,7 +30,7 @@ The `scriptling.runtime.http` library lets a setup script register routes, middl
 | `redirect(location, status=302)` | Create a redirect response |
 | `parse_query(query_string)` | Parse a URL query string |
 
-Route paths support wildcards: `{name}` matches one path segment and `{name...}` matches the rest of the path. Values are read in the handler with `request.path_param(name)` — see [Request Object](#request-object) below.
+Route paths support wildcards: `{name}` matches one path segment and `{name...}` matches the rest of the path. Values are read in the handler with `request.path_param(name)` — see [Request Object](#request-object) below. Handler references may use dotted module paths: a handler in `routes/me.py` is referenced as `"routes.me.get_user"` — the module part is everything before the last dot.
 
 ## Functions
 

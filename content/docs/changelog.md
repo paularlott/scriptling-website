@@ -8,6 +8,26 @@ nav-skip: true
 
 ## August 2026
 
+{{< version "v0.21.3" >}}
+
+{{< changelog-item "fixed" >}}
+**Route handlers in subdirectories.** A handler module in a folder — `routes/me.py`, imported as `import routes.me` — registered its routes fine at startup, but the first request to any of them failed with `unknown library: routes` and a 500. Looking the handler up at request time now follows the full module path, so handlers organised into folders dispatch like any other — HTTP routes, middleware, `not_found`, WebSocket handlers, JSON-RPC methods, and plugin functions and classes alike. Background tasks were never affected: they hold the function itself rather than looking it up by name.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**Two wildcard routes covering the same requests no longer crash the server.** Registering `/items/{name}/detail` in one module and `/items/{slug}/detail` in another — the same requests, just different parameter names — used to kill the server before it served anything, with a raw Go stack trace. The conflicting route is now skipped with an error in the log, and everything else keeps serving. Within a single module, defining the same function name twice still follows Python's rule: the later definition wins, and both routes dispatch to it.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**Replacing a server no longer crashes while the old one winds down.** A host that stops one scriptling server and starts another while the first's setup script is still finishing could crash the process with `close of nil channel`. Leftover work from the old server now notices it has been superseded and steps aside, leaving the new server to start cleanly.
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**Clearer error for hyphenated module names.** `import status-other` used to fail with `unknown library: status` — a name you never typed — and never mention the actual mistake, the hyphen. Hyphenated module names have never been valid, same as Python; the difference is you're now told that, on the exact line, before anything runs. Spell it `status_other.py`.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.21.2" >}}
 
 {{< changelog-item "fixed" >}}
