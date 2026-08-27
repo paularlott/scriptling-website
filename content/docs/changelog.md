@@ -8,6 +8,14 @@ nav-skip: true
 
 ## August 2026
 
+{{< version "v0.22.0" >}}
+
+{{< changelog-item "fixed" >}}
+**Failed KV disk writes are no longer silent.** With a persistent store (`--kv-storage` or `SCRIPTLING_KV_STORAGE`, and stores opened with `kv.open()`), a snapshot write that failed — disk full, directory deleted, permissions — left no trace: the script reported success and the data was simply gone on the next run. Save failures are now logged with the store path and the cause, and `store.close()` raises the error to the script instead of returning quietly.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.21.5" >}}
 
 {{< changelog-item "fixed" >}}
