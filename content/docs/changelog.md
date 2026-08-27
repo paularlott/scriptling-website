@@ -8,6 +8,18 @@ nav-skip: true
 
 ## August 2026
 
+{{< version "v0.21.2" >}}
+
+{{< changelog-item "fixed" >}}
+**Path parameters in HTTP routes.** A route like `runtime.http.get("/api/users/{id}", ...)` registered — and appeared in the server log — but a request to `/api/users/42` fell through to a plain 404 without the handler ever running: the server looked handlers up by the literal request path, which can never match a `{id}` pattern key. The server now asks Go's `ServeMux` (which already did the matching) for the pattern that won, so wildcard routes dispatch, `{name...}` captures the rest of the path, literal routes still beat wildcards at the same position (`/api/users/me` wins over `/api/users/{id}`), HEAD dispatches to GET handlers, and captured values arrive percent-decoded.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**The documented Request accessors.** The request object now actually has the methods the docs promised: `path_param(name, default=None)`, `query_param(name, default=None)`, and case-insensitive `header(name, default=None)`, plus `path_params` and `remote_addr` fields. `runtime.http.patch()` is real too, and the request `body` stays a string field (`request.body`), not a method.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.21.1" >}}
 
 {{< changelog-item "fixed" >}}

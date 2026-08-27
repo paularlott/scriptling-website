@@ -66,7 +66,7 @@ def not_found(request):
 ```
 
 Priority order for incoming requests:
-1. Registered script routes (exact match)
+1. Registered script routes (literal or `{param}` wildcard match)
 2. Registered static routes (`runtime.http.static()`)
 3. Web root directory (`--web-root`)
 4. `not_found` handler (if registered)
@@ -171,11 +171,38 @@ runtime.http.patch("/path", "handlers.patch")
 runtime.http.delete("/path", "handlers.delete")
 ```
 
+### Path Parameters
+
+Route patterns capture path segments with `{name}` for a single segment and `{name...}` for the rest of the path. Values are read in the handler with `request.path_param(name)` and arrive percent-decoded:
+
+```python
+# setup.py
+import scriptling.runtime as runtime
+
+runtime.http.get("/api/users/{id}", "handlers.get_user")
+runtime.http.get("/files/{path...}", "handlers.get_file")
+```
+
+```python
+# handlers.py
+import scriptling.runtime as runtime
+
+def get_user(request):
+    user_id = request.path_param("id")          # "/api/users/42"  -> "42"
+    return runtime.http.json(200, {"user_id": user_id})
+
+def get_file(request):
+    path = request.path_param("path")           # "/files/a/b.txt" -> "a/b.txt"
+    return runtime.http.json(200, {"path": path})
+```
+
+Matching follows Go's `ServeMux` rules: a literal route wins over a wildcard at the same position, so `/api/users/me` hits its own handler while `/api/users/42` matches `/api/users/{id}`. HEAD requests are dispatched to GET handlers, and values keep encoded slashes within one segment (`/api/users/a%2Fb` captures `a/b`).
+
 ### Decorator Syntax
 
 Instead of registering routes separately in a setup script, attach them
 directly to handler functions with decorators. Import the HTTP sub-library
-and use `@http.get`, `@http.post`, `@http.put`, `@http.delete`,
+and use `@http.get`, `@http.post`, `@http.put`, `@http.patch`, `@http.delete`,
 `@http.route`, `@http.websocket`, `@http.middleware`, or `@http.not_found`:
 
 ```python
@@ -248,8 +275,8 @@ def handler(request):
     # Headers
     content_type = request.header("Content-Type")
 
-    # Request body
-    body = request.body()
+    # Request body (a string field)
+    body = request.body
 
     # JSON body (parsed)
     data = request.json()

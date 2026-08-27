@@ -26,6 +26,7 @@ The `scriptling.runtime.http` library lets a setup script register routes, middl
 | `get(path, handler)` | Register a GET route |
 | `post(path, handler)` | Register a POST route |
 | `put(path, handler)` | Register a PUT route |
+| `patch(path, handler)` | Register a PATCH route |
 | `delete(path, handler)` | Register a DELETE route |
 | `route(path, handler, methods=["GET", "POST", "PUT", "DELETE"])` | Register a route for multiple methods |
 | `middleware(handler)` | Register global middleware |
@@ -38,6 +39,8 @@ The `scriptling.runtime.http` library lets a setup script register routes, middl
 | `redirect(location, status=302)` | Create a redirect response |
 | `parse_query(query_string)` | Parse a URL query string |
 
+Route paths support wildcards: `{name}` matches one path segment and `{name...}` matches the rest of the path. Values are read in the handler with `request.path_param(name)` — see [Request Object](#request-object) below.
+
 ## Functions
 
 ### `get(path, handler)`
@@ -45,7 +48,7 @@ The `scriptling.runtime.http` library lets a setup script register routes, middl
 Registers a GET route.
 
 **Parameters:**
-- `path` (`str`): URL path (e.g. `"/api/users"`).
+- `path` (`str`): URL path (e.g. `"/api/users"`). Supports `{name}` and `{name...}` wildcards.
 - `handler` (`str`): Handler function as `"library.function"`.
 
 **Returns:** `None`
@@ -54,6 +57,7 @@ Registers a GET route.
 import scriptling.runtime as runtime
 
 runtime.http.get("/users", "handlers.list_users")
+runtime.http.get("/users/{id}", "handlers.get_user")
 ```
 
 ### `post(path, handler)`
@@ -85,7 +89,23 @@ Registers a PUT route.
 ```python
 import scriptling.runtime as runtime
 
-runtime.http.put("/users/:id", "handlers.update_user")
+runtime.http.put("/users/{id}", "handlers.update_user")
+```
+
+### `patch(path, handler)`
+
+Registers a PATCH route.
+
+**Parameters:**
+- `path` (`str`): URL path.
+- `handler` (`str`): Handler function as `"library.function"`.
+
+**Returns:** `None`
+
+```python
+import scriptling.runtime as runtime
+
+runtime.http.patch("/users/{id}", "handlers.patch_user")
 ```
 
 ### `delete(path, handler)`
@@ -101,7 +121,7 @@ Registers a DELETE route.
 ```python
 import scriptling.runtime as runtime
 
-runtime.http.delete("/users/:id", "handlers.delete_user")
+runtime.http.delete("/users/{id}", "handlers.delete_user")
 ```
 
 ### `route(path, handler, methods=["GET", "POST", "PUT", "DELETE"])`
@@ -118,7 +138,7 @@ Registers a route for multiple HTTP methods.
 ```python
 import scriptling.runtime as runtime
 
-runtime.http.route("/users/:id", "handlers.user_resource", methods=["GET", "PUT", "DELETE"])
+runtime.http.route("/users/{id}", "handlers.user_resource", methods=["GET", "PUT", "DELETE"])
 ```
 
 ### `middleware(handler)`
@@ -305,10 +325,24 @@ Handlers receive a Request object with these fields:
 - `body` (`str`): Request body.
 - `headers` (`dict`): Request headers (lowercase keys).
 - `query` (`dict`): Query parameters.
+- `path_params` (`dict`): Path parameters captured from route wildcards.
+- `remote_addr` (`str`): Remote address of the client.
 
 **Methods:**
 
+- `path_param(name, default=None)`: get a path parameter captured from a route wildcard (`"/api/users/{id}"` captures `id`), percent-decoded.
+- `query_param(name, default=None)`: get the first value of a query parameter.
+- `header(name, default=None)`: get a request header; names are case-insensitive.
 - `json()`: parse the body as JSON.
+
+```python
+def get_user(request):
+    user_id = request.path_param("id")            # from "/api/users/{id}"
+    page = request.query_param("page", "1")
+    token = request.header("Authorization")
+    data = request.json()
+    return runtime.http.json(200, {"user_id": user_id})
+```
 
 ## Examples
 
