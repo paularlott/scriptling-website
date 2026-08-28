@@ -113,6 +113,48 @@ def calc(expr):
     return f"{expr} = {result}"
 ```
 
+## Request-Scoped Registration
+
+The `register_request_*` functions expose MCP entries **for the life of a single request**. Call them from [middleware](/reference/libraries/scriptling/runtime/http/#middlewarehandler): every MCP message over HTTP is its own request and runs the middleware, so the entries each caller sees — and can call — are exactly the ones that caller's middleware registered. That makes per-user tool sets possible, with authorization re-evaluated on every message rather than only at listing time. Static entries always win on a name collision; a malformed registration fails the request with a 500.
+
+Over the stdio transport middleware never runs — gate on `mcp.transport()` and register statically there instead.
+
+### `mcp.register_request_tool(name, handler, ...)`
+
+```python
+import scriptling.runtime.mcp as mcp
+
+def auth(request):
+    user = identify(request)
+    if user == "admin":
+        mcp.register_request_tool("restart_service",
+            handler="admintools.restart",
+            description="Restart a service",
+            params={"service": {"type": "string", "description": "Service to restart", "required": True}},
+        )
+    return None
+```
+
+`handler` is a `"module.function"` reference invoked per call with the tool arguments as keyword parameters — the same conventions as any other handler reference. Inside the handler, `mcp.tool.get_string()` reads the arguments and `mcp.tool.request_context()` reads the middleware's context (who is calling). `params` uses the same metadata vocabulary as `@mcp.tool`: a string per parameter (its description) or a dict with `type`, `description` and `required`. `keywords` and `discoverable` feed tool search.
+
+### `mcp.register_request_resource(uri, handler, name, ...)`
+
+Exposes a resource (or, with `template=True`, a URI template like `"user://docs/{path}"`). `resources/list` and `resources/templates/list` show it; `resources/read` runs the handler with the template variables as keyword parameters (and `__uri` holding the full URI). A string return is the content; a dict or list is JSON encoded. `mime_type` defaults to `text/plain`, or `application/json` for structured results.
+
+### `mcp.register_request_prompt(name, handler, ...)`
+
+Exposes a prompt. `prompts/get` runs the handler with the prompt arguments as keyword parameters: a string return is a single user message, a dict with a `"messages"` list of `{"role": "user"|"assistant", "content": "..."}` builds a multi-message prompt. `arguments` is a list of metadata dicts with `name`, `description` and `required`.
+
+### `mcp.transport()`
+
+Returns `"http"` when serving over HTTP (also from middleware and handlers mid-request), `"stdio"` for the MCP stdio server, and `None` when the script is not being served at all — so one setup script can work in every mode:
+
+```python
+if mcp.transport() == "stdio":
+    # No middleware over stdio: expose the extra tools to everyone.
+    ...
+```
+
 ## Multiple Tools per File
 
 A single `.py` file can define multiple tools:

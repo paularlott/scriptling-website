@@ -35,6 +35,7 @@ HTTP JSON-RPC is served at `POST /json-rpc` and can run alongside normal `runtim
 | `error(code, message, data=None)` | Build a structured JSON-RPC error response |
 | `get_request()` | Get the HTTP request this call arrived on, or `None` over stdio |
 | `request_context()` | Get the context dict set by the middleware (empty dict if none) |
+| `transport()` | How the server is being served: `"http"`, `"stdio"` or `None` |
 
 ## Functions
 
@@ -137,6 +138,20 @@ import scriptling.runtime as runtime
 def who(params):
     user = runtime.jsonrpc.request_context().get("user", "anonymous")
     return {"user": user}
+```
+
+### `transport()`
+
+Returns `"http"` when serving at `POST /json-rpc` (also from method handlers mid-request), `"stdio"` for the `--json-rpc` stdio server, and `None` when the script is not being served at all — so one setup script can work in every mode, since middleware never runs over stdio.
+
+**Returns:** `str` or `None`
+
+```python
+import scriptling.runtime as runtime
+
+if runtime.jsonrpc.transport() == "stdio":
+    # No middleware over stdio: treat every caller alike.
+    ...
 ```
 
 ## Concurrency Model

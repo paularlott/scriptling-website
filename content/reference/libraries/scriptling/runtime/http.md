@@ -136,7 +136,7 @@ runtime.http.route("/users/{id}", "handlers.user_resource", methods=["GET", "PUT
 
 Registers global middleware that runs before every route handler — and, when the protocol endpoints are enabled, before the `/mcp`, `/json-rpc` and WebSocket handlers too. The middleware receives the request and should return `None` to continue to the handler, or a response dict to short-circuit the request.
 
-The middleware can pass data to the handler by writing to `request.context`, a dict that starts empty on every request. HTTP route handlers read it straight off their request object; MCP tools and JSON-RPC methods read it with `request_context()` / `get_request()` (see the [MCP tool](/reference/libraries/scriptling/mcp/tool/) and [JSON-RPC](/reference/libraries/scriptling/runtime/jsonrpc/) pages).
+The middleware can pass data to the handler by writing to `request.context`, a dict that starts empty on every request. HTTP route handlers read it straight off their request object; MCP tools and JSON-RPC methods read it with `request_context()` / `get_request()` (see the [MCP tool](/reference/libraries/scriptling/mcp/tool/) and [JSON-RPC](/reference/libraries/scriptling/runtime/jsonrpc/) pages). It can also register MCP entries for the life of the request — per-user tools, resources and prompts — with the [request-scoped registration](/reference/libraries/scriptling/runtime/mcp/#request-scoped-registration) functions.
 
 **Parameters:**
 - `handler` (`str`): Middleware function as `"library.function"`.

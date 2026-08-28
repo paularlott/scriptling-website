@@ -11,6 +11,14 @@ nav-skip: true
 {{< version "v0.23.0" >}}
 
 {{< changelog-item "added" >}}
+**Per-user MCP tools, resources and prompts.** Middleware can now register MCP entries that exist for the life of a single request: `mcp.register_request_tool("restart", handler="admintools.restart", ...)` — plus `register_request_resource` and `register_request_prompt`. Every MCP message over HTTP runs the middleware, so each caller's `tools/list` shows exactly what their middleware registered and `tools/call` re-checks it — hand an admin their restart tool without anyone else ever seeing it. Static entries always win on a name collision, and inside a request-registered handler `mcp.tool.request_context()` still tells you who is calling.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Scripts can ask how they are being served.** `mcp.transport()` and `runtime.jsonrpc.transport()` return `"http"`, `"stdio"` or `None`, so one setup script works in every mode — over stdio the middleware never runs, and the registrations it would gate per user can be made unconditionally instead.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
 **Middleware can pass data to handlers.** The middleware now gets `request.context`, a dict that starts empty on every request: authenticate, write `request.context["user"] = name`, return `None` — and the handler reads it back. HTTP route handlers read `request.context` off their request; MCP tools and JSON-RPC methods, which only receive their parameters, call `tool.request_context()` or `runtime.jsonrpc.request_context()` (always a dict, empty when the middleware sets nothing). `tool.get_request()` / `runtime.jsonrpc.get_request()` go further and return the whole HTTP request — headers, remote address and all — or `None` over stdio.
 {{< /changelog-item >}}
 
