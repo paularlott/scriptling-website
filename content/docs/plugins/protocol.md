@@ -409,13 +409,14 @@ they arrive.
 
 ## Peer Environment
 
-Executables spawned as stdio peers receive `SCRIPTLING_PLUGIN_PEER=1` in their
+Executables spawned as stdio peers receive `SCRIPTLING_PLUGIN_PEER=<version>`
 environment, on top of the host's environment. Multi-role executables check it
 to divert a bare invocation into plugin mode — an executable that is also a
 general CLI can serve the protocol when scriptling spawns it with no
-arguments, without dedicating a subcommand to it. The variable is reserved:
-only scriptling sets it, and a peer that spawns children should unset it so
-the trigger does not propagate.
+arguments, without dedicating a subcommand to it. The value is the scriptling
+version (e.g. `0.23.0`), so a peer can check compatibility and refuse to
+serve a version it does not support. Only scriptling sets it, and a peer
+that spawns children should unset it so the trigger does not propagate.
 
 ## Skipping the handshake
 
