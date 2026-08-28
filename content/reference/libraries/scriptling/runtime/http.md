@@ -134,7 +134,9 @@ runtime.http.route("/users/{id}", "handlers.user_resource", methods=["GET", "PUT
 
 ### `middleware(handler)`
 
-Registers global middleware that runs before every route handler. The middleware receives the request and should return `None` to continue to the handler, or a response dict to short-circuit the request.
+Registers global middleware that runs before every route handler — and, when the protocol endpoints are enabled, before the `/mcp`, `/json-rpc` and WebSocket handlers too. The middleware receives the request and should return `None` to continue to the handler, or a response dict to short-circuit the request.
+
+The middleware can pass data to the handler by writing to `request.context`, a dict that starts empty on every request. HTTP route handlers read it straight off their request object; MCP tools and JSON-RPC methods read it with `request_context()` / `get_request()` (see the [MCP tool](/reference/libraries/scriptling/mcp/tool/) and [JSON-RPC](/reference/libraries/scriptling/runtime/jsonrpc/) pages).
 
 **Parameters:**
 - `handler` (`str`): Middleware function as `"library.function"`.
@@ -147,6 +149,7 @@ import scriptling.runtime as runtime
 def auth(request):
     if "authorization" not in request.headers:
         return runtime.http.json(401, {"error": "Unauthorized"})
+    request.context["user"] = "alice"  # Readable by the handler
     return None  # Continue to handler
 
 runtime.http.middleware("handlers.auth")
@@ -318,6 +321,7 @@ Handlers receive a Request object with these fields:
 - `query` (`dict`): Query parameters.
 - `path_params` (`dict`): Path parameters captured from route wildcards.
 - `remote_addr` (`str`): Remote address of the client.
+- `context` (`dict`): Starts empty on every request; middleware can write to it (e.g. `request.context["user"] = name` after authenticating) and the handler reads it back. Per-request only — not related to the persistent KV store.
 
 **Methods:**
 

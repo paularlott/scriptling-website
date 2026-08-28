@@ -8,6 +8,18 @@ nav-skip: true
 
 ## August 2026
 
+{{< version "v0.23.0" >}}
+
+{{< changelog-item "added" >}}
+**Middleware can pass data to handlers.** The middleware now gets `request.context`, a dict that starts empty on every request: authenticate, write `request.context["user"] = name`, return `None` — and the handler reads it back. HTTP route handlers read `request.context` off their request; MCP tools and JSON-RPC methods, which only receive their parameters, call `tool.request_context()` or `runtime.jsonrpc.request_context()` (always a dict, empty when the middleware sets nothing). `tool.get_request()` / `runtime.jsonrpc.get_request()` go further and return the whole HTTP request — headers, remote address and all — or `None` over stdio.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**WebSocket routes were not guarded.** A script middleware protected HTTP routes and the `/mcp` and `/json-rpc` endpoints, but a WebSocket upgrade slipped past it — `websocket("/ws", ...)` was reachable without the token the middleware demanded everywhere else. Upgrades now run through the middleware (and the static `--bearer-token` when no middleware is registered) like every other endpoint, and the handler can read `request.context` from the upgrade request.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.22.0" >}}
 
 {{< changelog-item "added" >}}

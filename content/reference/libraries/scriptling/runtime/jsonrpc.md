@@ -33,6 +33,8 @@ HTTP JSON-RPC is served at `POST /json-rpc` and can run alongside normal `runtim
 | `method(name, handler)` | Register a JSON-RPC method handler |
 | `notification(name, handler)` | Register a notification handler (no response) |
 | `error(code, message, data=None)` | Build a structured JSON-RPC error response |
+| `get_request()` | Get the HTTP request this call arrived on, or `None` over stdio |
+| `request_context()` | Get the context dict set by the middleware (empty dict if none) |
 
 ## Functions
 
@@ -105,6 +107,36 @@ def divide(params):
     if params["b"] == 0:
         return runtime.jsonrpc.error(-32602, "division by zero", {"field": "b"})
     return params["a"] / params["b"]
+```
+
+### `get_request()`
+
+Returns the HTTP request this call is being served for, when the JSON-RPC server is mounted over HTTP (`POST /json-rpc`): the same [Request object](/reference/libraries/scriptling/runtime/http/#request-object) the middleware saw, with `method`, `path`, `headers`, `query`, `remote_addr` and `context`. Over the stdio transport there is no HTTP request, so it returns `None`.
+
+**Returns:** `Request` or `None`
+
+```python
+import scriptling.runtime as runtime
+
+def who(params):
+    req = runtime.jsonrpc.get_request()
+    if req != None:
+        return {"ip": req.remote_addr}
+    return {"ip": "stdio"}
+```
+
+### `request_context()`
+
+Returns the context dict the [middleware](/reference/libraries/scriptling/runtime/http/#middlewarehandler) populated for this request — e.g. `request.context["user"] = name` after authenticating. It is always a dict: empty when no middleware ran or it set nothing, so `.get(name, default)` is always safe. Each call gets its own copy, so writes from the handler are local — with a batch dispatching concurrently, one element's writes are never visible to the others.
+
+**Returns:** `dict`
+
+```python
+import scriptling.runtime as runtime
+
+def who(params):
+    user = runtime.jsonrpc.request_context().get("user", "anonymous")
+    return {"user": user}
 ```
 
 ## Concurrency Model
