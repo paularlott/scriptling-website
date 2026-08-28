@@ -198,6 +198,43 @@ sl_wrapper(srv, "greet",
 
 See [Client Wrappers](../go-plugins/client-wrappers/) for details on wrapper source conventions.
 
+## Fetchers
+
+Serve `scheme://` package and script sources on demand. Register a scheme
+with a read handler and a list handler before `sl_server_run()`:
+
+```c
+static sl_fetch_result *my_read(const char *source, const char *path, void *ctx) {
+    /* path == "" means the source itself is a single script file. */
+    return sl_fetch_data("# content\n", 10);  /* copies the bytes; host does not cache */
+}
+
+static sl_fetch_entry *my_list(const char *source, const char *path,
+                               size_t *count, void *ctx) {
+    /* names must stay valid until the handler returns; the SDK frees only
+       the array itself. */
+    static sl_fetch_entry entries[] = { { "manifest.toml", false }, { "lib", true } };
+    sl_fetch_entry *out = malloc(sizeof(entries));
+    memcpy(out, entries, sizeof(entries));
+    *count = 2;
+    return out;
+}
+
+sl_register_fetcher(srv, "mylib", my_read, my_list);
+```
+
+Read handler results:
+
+- `sl_fetch_data(ptr, len)` — the file's content (the bytes are copied).
+- `sl_fetch_not_found()` — a miss, reported to the host as JSON-RPC code
+  `-32001` so a failed module probe is not an error.
+
+The host asks for `manifest.toml` first and then for individual files as
+imports resolve. It keeps none of them, so every read reaches your `Read`
+handler; cache inside the handler if your backend needs it. The `hello-c`
+example implements a complete `cdemo://` fetcher. See
+[Plugin Fetchers](/docs/plugins/fetchers/) for the host-side behavior.
+
 ## Compilation
 
 ```bash

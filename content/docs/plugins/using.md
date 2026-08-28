@@ -7,14 +7,33 @@ weight: 1
 
 ## CLI Loading
 
-Use `--plugin-dir` to load executable plugins from a directory:
+Use `--plugin-dir` to load executable plugins from a directory, or `--plugin`
+to load a single executable directly:
 
 ```bash
 scriptling --plugin-dir ./plugins script.py
 scriptling --plugin-dir ./plugins --plugin-dir ./more-plugins -c 'import plugin.hello; print(plugin.hello.greet("Ada"))'
+scriptling --plugin ./plugins/hello script.py
 ```
 
-The flag can be repeated. Scriptling scans executable files directly inside each directory. Subdirectories are ignored.
+Both flags can be repeated. Scriptling scans executable files directly inside each `--plugin-dir` directory; subdirectories are ignored. A `--plugin` value is an executable path, used literally, so paths containing spaces need nothing special. Arguments come from `--plugin-arg`:
+
+```bash
+scriptling --plugin /usr/local/bin/knot \
+           --plugin-arg scriptling-server --plugin-arg=--alias=testing \
+           script.py
+```
+
+Values that begin with `-` need the `--plugin-arg=value` form. With one
+`--plugin`, every `--plugin-arg` belongs to it; with several, qualify each as
+`<plugin>=<arg>`. See
+[loading plugins](/docs/cli/command-line-options/#loading-plugins) for the full
+rules.
+
+Explicit `--plugin` entries load before `--plugin-dir` scans, and the same
+executable discovered in a directory loses to the explicit entry and its
+arguments. Plugins register under the library name they declare in their
+handshake however they are loaded.
 
 Configuration options:
 
@@ -23,8 +42,18 @@ Configuration options:
 | CLI | `--plugin-dir ./plugins` |
 | Environment | `SCRIPTLING_PLUGIN_DIR=./plugins` |
 | Config file | `plugins.dirs = ["./plugins"]` |
+| CLI | `--plugin ./plugins/hello` |
+| Environment | `SCRIPTLING_PLUGIN=./plugins/hello` |
+| Config file | `plugins.paths = ["./plugins/hello"]` |
+| CLI | `--plugin-arg scriptling-server` |
+| Environment | `SCRIPTLING_PLUGIN_ARG=scriptling-server` |
+| Config file | `plugins.args = ["scriptling-server"]` |
 
-Plugin loading is eager. Startup failures are reported as warnings. A loaded plugin that fails while a script is running produces an execution error.
+Plugin loading is eager. Startup failures are reported as warnings. A loaded plugin that fails while a script is running produces an execution error. Commands that never evaluate a script — `--lint`, `--list-libs`, and the `pack`, `unpack` and `cache` subcommands — skip plugin loading entirely.
+
+Plugins that serve [fetcher](/docs/plugins/fetchers/) schemes are loaded the
+same way; their sources then work as packages and scripts (`--package
+knot://libs`).
 
 ## Importing Plugin Libraries
 

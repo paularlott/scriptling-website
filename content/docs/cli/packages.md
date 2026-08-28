@@ -85,6 +85,27 @@ scriptling --package mylib.zip#sha256=abc123... script.py
 scriptling --package https://example.com/lib.zip#sha256=abc123... script.py
 ```
 
+### Plugin Fetcher Schemes
+
+A fetcher plugin serves its library itself: loading the
+plugin attaches it automatically, so no `--package` is involved. `--package`
+takes only ordinary packages — a `.zip`, a directory, or a URL — and rejects a
+plugin `scheme://` source.
+
+A scheme source does work as the script itself, fetched from the plugin and
+refetched on every run:
+
+```bash
+scriptling --plugin /usr/local/bin/knot --plugin-arg scriptling-server \
+           knot://scripts/hello
+```
+
+If no loaded plugin serves the scheme, the error names the scheme and points at
+`--plugin`, rather than reporting a missing file. See
+[Plugin Fetchers](/docs/plugins/fetchers/) for the full picture.
+
+See [Plugin Fetchers](/docs/plugins/fetchers/) for details.
+
 **How it works:**
 - Append `#sha256=<hash>` to the package path or URL
 - Scriptling computes the SHA256 hash after fetching

@@ -9,6 +9,25 @@ nav-skip: true
 ## August 2026
 
 {{< version "v0.23.0" >}}
+{{< changelog-item "added" >}}
+**Peers are told they were spawned by scriptling.** Every executable spawned as a plugin peer now receives `SCRIPTLING_PLUGIN_PEER=1` in its environment, so a multi-role executable can divert a bare invocation into plugin mode — `scriptling --plugin knot knot://myscript` works without knot dedicating a subcommand to being a plugin. The variable is additive and reserved; peers that don't know it ignore it.
+{{< /changelog-item >}}
+
+
+{{< changelog-item "added" >}}
+**Plugins can serve library and script sources as fetchers.** The whole contract is one registration call — `RegisterFetcher("knot", fetcher)` — and the host knows the rest: `knot://` sources route to the plugin, the plugin's library attaches automatically when it loads (one plugin, one scheme, modules under the hardcoded `lib/` layout, no manifest to serve), and files are asked for only when an import actually resolves, so nothing is transferred that nothing imports. `scriptling --plugin knot -c 'import mylib'` needs no `--package` (which stays what it always was — a `.zip`, directory, or URL, never a plugin scheme), and `scriptling knot://scripts/hello` runs a script served by the plugin; scheme sources work as setup scripts in the server modes too (`--json-rpc knot://scripts/setup`). The host caches none of what it fetches — the plugin owns any persistence, where the backend's freshness rules live — and content travels base64-encoded so binary assets arrive intact. Not-found and cannot-reach are kept distinct: a missing module is a quiet miss, but a plugin whose backend errors fails the import loudly with the source named. Go plugins implement the `Fetcher` interface with `RegisterFetcher`; the C SDK gains `sl_register_fetcher` with the same contract, and even the bash example serves a `bsh://` library. See the new Plugin Fetchers page for details. {{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Load a single plugin with `--plugin` and `--plugin-arg`.** Point at one executable instead of a directory: `--plugin /usr/local/bin/knot --plugin-arg scriptling-server --plugin-arg=--alias=testing`. The path is used literally, so paths containing spaces need no quoting, and arguments are separate values rather than a string to be re-split. Both flags can be repeated; with several plugins loaded, qualify each argument as `<plugin>=<arg>`. Explicit entries load before `--plugin-dir` scans, and the explicit entry (with its arguments) wins when the same executable is also discovered in a directory. Plugins register under the name they declare in their handshake however they are loaded, and commands that never evaluate a script — `--lint`, `--list-libs`, `pack`, `unpack`, `cache` — no longer start plugin processes at all.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Embedding hosts can use fetcher plugins.** `pluginpack.New(...)` bridges a plugin manager into a package scheme registry, so a Go application embedding Scriptling resolves `knot://libs` and `knot://scripts/hello` exactly as the CLI does. The bridge takes a context, so cancelling it aborts in-flight fetches, and `Close()` releases the schemes it claimed — which is what makes reloading plugins at runtime possible. Hosts needing independent routing tables pass their own `pack.NewSchemeRegistry()`. Server hosts hand a fetched setup script straight to `ServerConfig.ScriptSource` instead of a path, so nothing is written to a temporary file. A runnable host lives at `examples/embed-fetcher-plugin`.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**A source with an unknown scheme reported a missing file.** `scriptling knot://scripts/hello` without the knot plugin loaded fell through to the local-file path and complained about `no such file or directory`. It now names the scheme and says which flag loads a plugin, and lists the schemes that are available. Fetch not-found errors also no longer repeat themselves (`fetch source not found: fetch source not found: …`), and directory listings from a fetcher are refreshed periodically so a long-running server notices files appearing in a served directory.
+{{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
 **Per-user MCP tools, resources and prompts.** Middleware can now register MCP entries that exist for the life of a single request: `mcp.register_request_tool("restart", handler="admintools.restart", ...)` — plus `register_request_resource` and `register_request_prompt`. Every MCP message over HTTP runs the middleware, so each caller's `tools/list` shows exactly what their middleware registered and `tools/call` re-checks it — hand an admin their restart tool without anyone else ever seeing it. Static entries always win on a name collision, and inside a request-registered handler `mcp.tool.request_context()` still tells you who is calling.
@@ -24,6 +43,14 @@ nav-skip: true
 
 {{< changelog-item "fixed" >}}
 **WebSocket routes were not guarded.** A script middleware protected HTTP routes and the `/mcp` and `/json-rpc` endpoints, but a WebSocket upgrade slipped past it — `websocket("/ws", ...)` was reachable without the token the middleware demanded everywhere else. Upgrades now run through the middleware (and the static `--bearer-token` when no middleware is registered) like every other endpoint, and the handler can read `request.context` from the upgrade request.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**Subcommands now honor the flags they read.** `--cache-dir`, `--package`, `--allowed-paths`, `--network-policy`, `--docker-host` and `--podman-host` were not marked global, so `cache clear` rejected `--cache-dir` outright (and always cleared the default directory), and `help` silently ignored the packages and security flags it was built to accept. All six are global now and work in any position, and `help` gained its own `-k/--insecure` like the pack commands.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**The `plugins.dirs` config key works.** `--plugin-dir` looked its config path up as the alternative top-level keys `plugins` or `dirs`, so the documented nested `[plugins] dirs = [...]` never took effect. It now reads the nested key, matching the documentation, and `--plugin` reads `plugins.paths` alongside it.
 {{< /changelog-item >}}
 
 ---

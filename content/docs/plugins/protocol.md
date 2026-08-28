@@ -144,7 +144,14 @@ Remote objects are passed by reference:
 | `transport` | string | Must be `"json"` |
 | `library` | object | `name`, `version`, `description` |
 | `capabilities` | [string] | Plugin capabilities |
+| `scheme` | string | The source scheme this plugin's fetcher serves (with the `fetch` capability); one scheme per plugin |
 | `schema` | object | Functions, classes, and constants |
+
+Known capabilities: `remote_objects` (remote object references in results)
+and `fetch` (the plugin serves sources under its one `scheme`; see
+[Plugin Fetchers](/docs/plugins/fetchers/)). Unknown capabilities are
+ignored, so newer plugins still load on older hosts; the host only calls
+fetch methods on plugins that advertised `fetch` and a scheme.
 
 The `schema` object:
 
@@ -338,6 +345,58 @@ Class properties also use `object.call_method`. A getter call sends the property
 
 The plugin removes the instance and calls `__del__` if defined. Destroy is idempotent: destroying an already-destroyed ID succeeds silently.
 
+### `fetch.read`
+
+**Direction:** Host → Plugin
+**When:** The host needs one file from a `scheme://` source this plugin's fetcher serves. Sources arrive as `--package` values or the script argument; only files an import actually touches are read.
+
+**Request params:**
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `source` | string | No | Full source string, e.g. `knot://libs` |
+| `path` | string | Yes | Slash path within the source; empty means the source itself is a single script file |
+
+**Response result:**
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `data` | string | Yes | File content, base64-encoded |
+
+A missing source or path is reported as error code `-32001`. The host treats
+that as a plain not-found (a failed module probe), not a fatal error. Any
+other error aborts package loading with the source named — hosts deliberately
+distinguish "module is not there" from "plugin could not be asked". The host
+caches nothing it fetches, so every read reaches the plugin and returns content;
+there is no conditional-read form. `data` is base64-encoded, which is what lets
+binary assets travel intact.
+
+```json
+→ {"jsonrpc":"2.0","id":7,"method":"fetch.read","params":{"source":"knot://libs","path":"lib/greet.py"}}
+← {"jsonrpc":"2.0","id":7,"result":{"data":"ZGVmIGdyZWV0aW5nKG5hbWUpOg=="}}
+```
+
+### `fetch.list`
+
+**Direction:** Host → Plugin
+**When:** The host enumerates a directory of a source (globbing, listings, `scriptling.package` list functions).
+
+**Request params:**
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `source` | string | No | Full source string |
+| `path` | string | Yes | Directory to list; empty or `.` for the root |
+
+**Response result:**
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `entries` | [{name, is_dir}] | No | One level of directory entries |
+
+A missing directory is reported as error code `-32001`. The host memoizes
+listings for the lifetime of a package.
+
 ## Lifecycle
 
 1. Host starts the plugin executable.
@@ -348,6 +407,16 @@ The plugin removes the instance and calls `__del__` if defined. Destroy is idemp
 `environment.open` and `environment.close` are reserved for future use. The
 host does not currently send them, but plugins must accept them as no-ops if
 they arrive.
+
+## Peer Environment
+
+Executables spawned as stdio peers receive `SCRIPTLING_PLUGIN_PEER=1` in their
+environment, on top of the host's environment. Multi-role executables check it
+to divert a bare invocation into plugin mode — an executable that is also a
+general CLI can serve the protocol when scriptling spawns it with no
+arguments, without dedicating a subcommand to it. The variable is reserved:
+only scriptling sets it, and a peer that spawns children should unset it so
+the trigger does not propagate.
 
 ## Skipping the handshake
 
