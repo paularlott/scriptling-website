@@ -23,7 +23,8 @@ speaks the fetch protocol.
 1. The plugin registers its one fetcher and scheme at startup, before
    `Run()` / serving, like every other plugin registration. A second
    registration is an error.
-2. The plugin's handshake advertises the `fetch` capability and the scheme.
+2. The plugin's handshake advertises the scheme — its presence is the whole
+   advertisement.
 3. The host routes `scheme://...` sources to that plugin and issues
    `fetch.read` / `fetch.list` JSON-RPC requests for individual files and
    directory listings. The library bundle the host attaches is synthesized
@@ -137,13 +138,13 @@ if err := server.Run(); err != nil { panic(err) }
 ```go
 type myFetcher struct{}
 
-func (myFetcher) Read(ctx context.Context, source, path string) (plugin.FetchResult, error) {
+func (myFetcher) Read(ctx context.Context, source, path string) ([]byte, error) {
     // path == "" means the source itself is a single script file.
     content, ok := lookup(source, path)
     if !ok {
-        return plugin.FetchResult{}, fmt.Errorf("%w: %s", plugin.ErrFetchNotFound, path)
+        return nil, fmt.Errorf("%w: %s", plugin.ErrFetchNotFound, path)
     }
-    return plugin.FetchResult{Data: []byte(content)}, nil
+    return []byte(content), nil
 }
 
 func (myFetcher) List(ctx context.Context, source, path string) ([]plugin.FetchEntry, error) {
@@ -156,6 +157,10 @@ for a miss. Data travels base64-encoded inside the JSON-RPC result, so binary
 assets arrive intact. There are no validators to deal with: the host does not
 cache, so every read reaches your handler. Cache inside `Read` if your backend
 needs it.
+
+There is no stat round trip either: `Open` and `Stat` read the file (a
+directory is simply a path whose listing succeeds), so a plugin only ever
+answers "here are the bytes" or "not found".
 
 A complete example lives at `examples/plugins/fetcher-go` in the repository.
 

@@ -213,7 +213,7 @@ static sl_fetch_entry *my_list(const char *source, const char *path,
                                size_t *count, void *ctx) {
     /* names must stay valid until the handler returns; the SDK frees only
        the array itself. */
-    static sl_fetch_entry entries[] = { { "manifest.toml", false }, { "lib", true } };
+    static sl_fetch_entry entries[] = { { "lib", true } };
     sl_fetch_entry *out = malloc(sizeof(entries));
     memcpy(out, entries, sizeof(entries));
     *count = 2;
@@ -229,10 +229,11 @@ Read handler results:
 - `sl_fetch_not_found()` — a miss, reported to the host as JSON-RPC code
   `-32001` so a failed module probe is not an error.
 
-The host asks for `manifest.toml` first and then for individual files as
-imports resolve. It keeps none of them, so every read reaches your `Read`
-handler; cache inside the handler if your backend needs it. The `hello-c`
-example implements a complete `cdemo://` fetcher. See
+The host attaches the plugin's library automatically (the standard `lib/`
+layout is synthesized host-side) and asks for individual files as imports
+resolve — there is no manifest to serve. It keeps none of them, so every read
+reaches your `Read` handler; cache inside the handler if your backend needs
+it. The `hello-c` example implements a complete `cdemo://` fetcher. See
 [Plugin Fetchers](/docs/plugins/fetchers/) for the host-side behavior.
 
 ## Compilation

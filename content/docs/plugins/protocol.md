@@ -147,11 +147,10 @@ Remote objects are passed by reference:
 | `scheme` | string | The source scheme this plugin's fetcher serves (with the `fetch` capability); one scheme per plugin |
 | `schema` | object | Functions, classes, and constants |
 
-Known capabilities: `remote_objects` (remote object references in results)
-and `fetch` (the plugin serves sources under its one `scheme`; see
-[Plugin Fetchers](/docs/plugins/fetchers/)). Unknown capabilities are
-ignored, so newer plugins still load on older hosts; the host only calls
-fetch methods on plugins that advertised `fetch` and a scheme.
+Known capabilities: `remote_objects` (remote object references in results).
+A plugin with a fetcher is identified by its `scheme`, whose presence is the
+whole advertisement — see [Plugin Fetchers](/docs/plugins/fetchers/). Unknown
+capabilities are ignored, so newer plugins still load on older hosts.
 
 The `schema` object:
 
