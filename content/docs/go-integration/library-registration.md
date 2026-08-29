@@ -390,3 +390,22 @@ When embedding Scriptling, you have full control over what scripts can access. S
 - [Basics](../basics/): creating interpreters and exchanging variables
 - [Security Guide](../../security/): security best practices for embedding
 - [Libraries](../../../reference/libraries/): usage reference for all libraries
+
+## Database Drivers in Embedded Hosts
+
+Scriptling is the library; your application is the host, and the database drivers are optional at every level — you may compile them in, load them as external plugin binaries, or have neither. One call covers all three cases:
+
+```go
+import scriptlingplugin "github.com/paularlott/scriptling/plugin"
+
+// On every interpreter your host spins up — main instances, HTTP request
+// environments, MCP sessions, sandbox/background factories:
+scriptlingplugin.RegisterLibraries(p, pluginManager, scriptlingplugin.PolicyFromSecurity(netPolicy, allowedPaths))
+```
+
+- **Compiled in** (build tags `plugin_sqlite` / `plugin_sql` / `plugin_valkey` / `plugin_badgerdb`, or import the plugin packages and call `sqlite.RegisterInProcess(p, policy)`): registers regardless of the manager — a nil `pluginManager` is fine.
+- **External plugin binaries**: pass your `*plugin.Manager` (see [Plugin Manager](../../plugins/host-integration/)) and the proxy libraries register per instance.
+- **Neither**: nothing registers; scripts importing `scriptling.sqlite` fail with a named `unknown library` error.
+
+The CLI is exactly this pattern — its `--plugin-dir` handling, exe-relative discovery and per-mode wiring are host choices, not library behaviour. Inside handler scripts, open a connection per run and let the environment's teardown collect it (`Connection` closes itself when instances are collected; explicit `conn.close()` is still good manners).
+

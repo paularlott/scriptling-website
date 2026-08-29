@@ -10,47 +10,64 @@ nav-skip: true
 
 {{< version "v0.23.0" >}}
 {{< changelog-item "added" >}}
-**Peers are told they were spawned by scriptling.** Every executable spawned as a plugin peer now receives `SCRIPTLING_PLUGIN_PEER=1` in its environment, so a multi-role executable can divert a bare invocation into plugin mode — `scriptling --plugin knot knot://myscript` works without knot dedicating a subcommand to being a plugin. The variable is additive and reserved; peers that don't know it ignore it.
+**Database support.** New first-party plugins bring SQLite, MySQL/MariaDB, PostgreSQL, Valkey/Redis and BadgerDB to scripts. The relational libraries `scriptling.sqlite` and `scriptling.sql` share a `connect()` → `Connection.query/execute/close` API with rows as dicts; the key/value libraries `scriptling.valkey` and `scriptling.badgerdb` share `get/set/delete/expire/ttl/incr` plus hashes, so code moves between a shared cache and local storage unchanged. The valkey client adds clusters and sentinels (`connect(url, mode=...)`), flushes (`flushdb`/`flushall`), sets, queues and database selection. All pure Go, compiled in or as external plugin binaries. See the new [Database Libraries](/reference/libraries/scriptling/databases/) reference and the runnable [examples](https://github.com/paularlott/scriptling/tree/main/examples/databases).
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**`get_orm()`.** Relational connections gain an ORM: kwargs helpers for dict-shaped rows (`insert`, `update`, `delete`, `count`), a query builder that composes conditions with chained `.where(...)` calls and `.order_by(...)`, and `orm.table()` model gateways that map rows onto your objects. One implementation serves all four relational backends.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Namespaced plugin names.** A plugin that declares a name containing a dot is imported verbatim — `myplugin.hello` imports as `myplugin.hello` — so the database plugins can declare `scriptling.sqlite` and match compiled-in builds. A name that would shadow a registered library is refused.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Plugins receive the security policy.** The handshake now carries the `--allowed-paths` filesystem roots and the network policy, and first-party plugins enforce both: file-based plugins check database paths, network plugins dial through the same guards as `requests`. Older plugins ignore the new field.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Plugin peers know who spawned them.** Every executable spawned as a plugin peer gets `SCRIPTLING_PLUGIN_PEER=1`, so a multi-role executable can divert a bare invocation into plugin mode.
 {{< /changelog-item >}}
 
 
 {{< changelog-item "added" >}}
-**Plugins can serve library and script sources as fetchers.** The whole contract is one registration call — `RegisterFetcher("knot", fetcher)` — and the host knows the rest: `knot://` sources route to the plugin, the plugin's library attaches automatically when it loads (one plugin, one scheme, modules under the hardcoded `lib/` layout, no manifest to serve), and files are asked for only when an import actually resolves, so nothing is transferred that nothing imports. `scriptling --plugin knot -c 'import mylib'` needs no `--package` (which stays what it always was — a `.zip`, directory, or URL, never a plugin scheme), and `scriptling knot://scripts/hello` runs a script served by the plugin; scheme sources work as setup scripts in the server modes too (`--json-rpc knot://scripts/setup`). The host caches none of what it fetches — the plugin owns any persistence, where the backend's freshness rules live — and content travels base64-encoded so binary assets arrive intact. Not-found and cannot-reach are kept distinct: a missing module is a quiet miss, but a plugin whose backend errors fails the import loudly with the source named. Go plugins implement the `Fetcher` interface with `RegisterFetcher`; the C SDK gains `sl_register_fetcher` with the same contract, and even the bash example serves a `bsh://` library. See the new Plugin Fetchers page for details. {{< /changelog-item >}}
-
-{{< changelog-item "added" >}}
-**Load a single plugin with `--plugin` and `--plugin-arg`.** Point at one executable instead of a directory: `--plugin /usr/local/bin/knot --plugin-arg scriptling-server --plugin-arg=--alias=testing`. The path is used literally, so paths containing spaces need no quoting, and arguments are separate values rather than a string to be re-split. Both flags can be repeated; with several plugins loaded, qualify each argument as `<plugin>=<arg>`. Explicit entries load before `--plugin-dir` scans, and the explicit entry (with its arguments) wins when the same executable is also discovered in a directory. Plugins register under the name they declare in their handshake however they are loaded, and commands that never evaluate a script — `--lint`, `--list-libs`, `pack`, `unpack`, `cache` — no longer start plugin processes at all.
+**Fetcher plugins.** Plugins can serve libraries and scripts over custom schemes with a single registration call (`RegisterFetcher("knot", fetcher)`). `knot://scripts/hello` runs a plugin-served script, `knot://libs` libraries attach on import, and files are fetched only when something actually imports them. Go plugins use the `Fetcher` interface; the C SDK gains `sl_register_fetcher` with the same contract. See the Plugin Fetchers page.
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
-**Embedding hosts can use fetcher plugins.** `pluginpack.New(...)` bridges a plugin manager into a package scheme registry, so a Go application embedding Scriptling resolves `knot://libs` and `knot://scripts/hello` exactly as the CLI does. The bridge takes a context, so cancelling it aborts in-flight fetches, and `Close()` releases the schemes it claimed — which is what makes reloading plugins at runtime possible. Hosts needing independent routing tables pass their own `pack.NewSchemeRegistry()`. Server hosts hand a fetched setup script straight to `ServerConfig.ScriptSource` instead of a path, so nothing is written to a temporary file. A runnable host lives at `examples/embed-fetcher-plugin`.
+**`--plugin` loads a single plugin.** Point `--plugin` at one executable instead of scanning a directory, with per-plugin `--plugin-arg` values. Both flags repeat; explicit entries load before `--plugin-dir` scans and win on a clash.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Fetcher plugins for embedders.** `pluginpack.New(...)` brings the same `knot://` resolution to Go hosting applications, with context-based cancellation of in-flight fetches and reloadable schemes. Server hosts hand a fetched setup script straight to `ServerConfig.ScriptSource`. See `examples/embed-fetcher-plugin`.
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
-**A source with an unknown scheme reported a missing file.** `scriptling knot://scripts/hello` without the knot plugin loaded fell through to the local-file path and complained about `no such file or directory`. It now names the scheme and says which flag loads a plugin, and lists the schemes that are available. Fetch not-found errors also no longer repeat themselves (`fetch source not found: fetch source not found: …`), and directory listings from a fetcher are refreshed periodically so a long-running server notices files appearing in a served directory.
+**Unknown schemes are now named.** `scriptling knot://...` without the knot plugin loaded reported `no such file or directory`; it now names the scheme, the flag that loads a plugin for it, and the schemes that are available. Fetcher not-found errors also stopped repeating themselves.
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
-**Per-user MCP tools, resources and prompts.** Middleware can now register MCP entries that exist for the life of a single request: `mcp.register_request_tool("restart", handler="admintools.restart", ...)` — plus `register_request_resource` and `register_request_prompt`. Every MCP message over HTTP runs the middleware, so each caller's `tools/list` shows exactly what their middleware registered and `tools/call` re-checks it — hand an admin their restart tool without anyone else ever seeing it. Static entries always win on a name collision, and inside a request-registered handler `mcp.tool.request_context()` still tells you who is calling.
+**Per-user MCP tools, resources and prompts.** Middleware can register entries that exist for the life of a single request (e.g. `mcp.register_request_tool("restart", ...)`), so each caller's `tools/list` shows exactly what their middleware registered — hand an admin their `restart` tool without anyone else ever seeing it.
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
-**Scripts can ask how they are being served.** `mcp.transport()` and `runtime.jsonrpc.transport()` return `"http"`, `"stdio"` or `None`, so one setup script works in every mode — over stdio the middleware never runs, and the registrations it would gate per user can be made unconditionally instead.
+**Scripts can ask how they are served.** `mcp.transport()` and `runtime.jsonrpc.transport()` return `"http"`, `"stdio"` or `None`, so one setup script works in every mode.
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
-**Middleware can pass data to handlers.** The middleware now gets `request.context`, a dict that starts empty on every request: authenticate, write `request.context["user"] = name`, return `None` — and the handler reads it back. HTTP route handlers read `request.context` off their request; MCP tools and JSON-RPC methods, which only receive their parameters, call `tool.request_context()` or `runtime.jsonrpc.request_context()` (always a dict, empty when the middleware sets nothing). `tool.get_request()` / `runtime.jsonrpc.get_request()` go further and return the whole HTTP request — headers, remote address and all — or `None` over stdio.
+**Middleware can pass data to handlers.** The middleware gets `request.context`, a fresh dict on every request: authenticate, write `request.context["user"] = name`, and the handler reads it back — via `request.context` on HTTP routes, or `tool.request_context()` / `runtime.jsonrpc.request_context()` in MCP tools and JSON-RPC methods. `get_request()` goes further and returns the whole HTTP request, or `None` over stdio.
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
-**WebSocket routes were not guarded.** A script middleware protected HTTP routes and the `/mcp` and `/json-rpc` endpoints, but a WebSocket upgrade slipped past it — `websocket("/ws", ...)` was reachable without the token the middleware demanded everywhere else. Upgrades now run through the middleware (and the static `--bearer-token` when no middleware is registered) like every other endpoint, and the handler can read `request.context` from the upgrade request.
+**WebSocket routes are now guarded.** WebSocket upgrades now run through the middleware (and the static `--bearer-token` when no middleware is registered) like every other endpoint, so a `websocket("/ws", ...)` handler can't be reached without the token.
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
-**Subcommands now honor the flags they read.** `--cache-dir`, `--package`, `--allowed-paths`, `--network-policy`, `--docker-host` and `--podman-host` were not marked global, so `cache clear` rejected `--cache-dir` outright (and always cleared the default directory), and `help` silently ignored the packages and security flags it was built to accept. All six are global now and work in any position, and `help` gained its own `-k/--insecure` like the pack commands.
+**Subcommands honor their flags.** `--cache-dir`, `--package`, `--allowed-paths`, `--network-policy`, `--docker-host` and `--podman-host` are now global flags, so `cache clear` and `help` accept them in any position instead of ignoring or rejecting them.
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
-**The `plugins.dirs` config key works.** `--plugin-dir` looked its config path up as the alternative top-level keys `plugins` or `dirs`, so the documented nested `[plugins] dirs = [...]` never took effect. It now reads the nested key, matching the documentation, and `--plugin` reads `plugins.paths` alongside it.
+**`plugins.dirs` config key works.** `--plugin-dir` now reads the documented nested `[plugins] dirs = [...]` config key instead of the wrong alternative keys, and `--plugin` reads `plugins.paths` alongside it.
 {{< /changelog-item >}}
 
 ---
@@ -58,11 +75,11 @@ nav-skip: true
 {{< version "v0.22.0" >}}
 
 {{< changelog-item "added" >}}
-**Per-user keys for MCP and JSON-RPC.** The middleware registered with `runtime.http.middleware(...)` now guards the `/mcp` and `/json-rpc` endpoints as well as HTTP routes, so one handler can authenticate API clients, MCP clients, and JSON-RPC callers against whatever it likes — a dict of keys, the KV store, an API. Registering a middleware replaces static `--bearer-token` checking on the protocol endpoints; without one, the static token guards everything as before.
+**Per-user keys for MCP and JSON-RPC.** The middleware registered with `runtime.http.middleware(...)` now guards the `/mcp` and `/json-rpc` endpoints as well as HTTP routes, so one handler can authenticate API clients, MCP clients, and JSON-RPC callers against whatever it likes, a dict of keys, the KV store, an API. Registering a middleware replaces static `--bearer-token` checking on the protocol endpoints; without one, the static token guards everything as before.
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
-**Failed KV disk writes are no longer silent.** With a persistent store (`--kv-storage` or `SCRIPTLING_KV_STORAGE`, and stores opened with `kv.open()`), a snapshot write that failed — disk full, directory deleted, permissions — left no trace: the script reported success and the data was simply gone on the next run. Save failures are now logged with the store path and the cause, and `store.close()` raises the error to the script instead of returning quietly.
+**Failed KV disk writes are no longer silent.** With a persistent store (`--kv-storage` or `SCRIPTLING_KV_STORAGE`, and stores opened with `kv.open()`), a snapshot write that failed, disk full, directory deleted, permissions, left no trace: the script reported success and the data was simply gone on the next run. Save failures are now logged with the store path and the cause, and `store.close()` raises the error to the script instead of returning quietly.
 {{< /changelog-item >}}
 
 ---
@@ -70,7 +87,7 @@ nav-skip: true
 {{< version "v0.21.5" >}}
 
 {{< changelog-item "fixed" >}}
-**Logging inside background tasks no longer looks like a hang.** A module-level variable (like a `getLogger()` result) used inside a `runtime.background()` task raised `identifier not found`, and the failure died with the task — no log, no error, nothing after the call. Module-level constants are now visible to tasks, a failing task prints `background task "<name>" failed: <error>` to stderr instead of dying silently, and module-level objects like loggers should be created inside the handler.
+**Logging inside background tasks no longer looks like a hang.** A module-level variable (like a `getLogger()` result) used inside a `runtime.background()` task raised `identifier not found`, and the failure died with the task, no log, no error, nothing after the call. Module-level constants are now visible to tasks, a failing task prints `background task "<name>" failed: <error>` to stderr instead of dying silently, and module-level objects like loggers should be created inside the handler.
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
@@ -78,7 +95,7 @@ nav-skip: true
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
-**`runtime.background()` in a server setup script returns a promise** instead of `null`, resolving once the queued task runs — so `promise.get()` works there like anywhere else.
+**`runtime.background()` in a server setup script returns a promise** instead of `null`, resolving once the queued task runs, so `promise.get()` works there like anywhere else.
 {{< /changelog-item >}}
 
 ---
@@ -86,7 +103,7 @@ nav-skip: true
 {{< version "v0.21.4" >}}
 
 {{< changelog-item "fixed" >}}
-**Background tasks no longer die when the script ends.** A `runtime.background()` task you didn't await was killed the moment the main script finished — the CLI exited mid-task, so everything it did, `logging.info()` and `logging.error()` included, vanished without an error, while the same calls from the main script worked fine. The CLI now waits for outstanding background tasks before exiting, so fire-and-forget tasks run to completion and their log messages appear.
+**Background tasks no longer die when the script ends.** A `runtime.background()` task you didn't await was killed the moment the main script finished, the CLI exited mid-task, so everything it did, `logging.info()` and `logging.error()` included, vanished without an error, while the same calls from the main script worked fine. The CLI now waits for outstanding background tasks before exiting, so fire-and-forget tasks run to completion and their log messages appear.
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
@@ -94,7 +111,7 @@ nav-skip: true
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
-**Background tasks in embedded scriptlings.** A program embedding scriptling directly, without the CLI's factory setup, got the silent version of the same bug: `runtime.background()` returned `null` and the task never started at all. Such tasks now run immediately in an environment derived from the calling script — sibling functions only, still isolated from its data — with `print` output and `logging` going to the host's destinations, and imports inside the task resolved by the host's own library setup.
+**Background tasks in embedded scriptlings.** A program embedding scriptling directly, without the CLI's factory setup, got the silent version of the same bug: `runtime.background()` returned `null` and the task never started at all. Such tasks now run immediately in an environment derived from the calling script, sibling functions only, still isolated from its data, with `print` output and `logging` going to the host's destinations, and imports inside the task resolved by the host's own library setup.
 {{< /changelog-item >}}
 
 ---
@@ -102,11 +119,11 @@ nav-skip: true
 {{< version "v0.21.3" >}}
 
 {{< changelog-item "fixed" >}}
-**Route handlers in subdirectories.** A handler module in a folder — `routes/me.py`, imported as `import routes.me` — registered its routes fine at startup, but the first request to any of them failed with `unknown library: routes` and a 500. Looking the handler up at request time now follows the full module path, so handlers organised into folders dispatch like any other — HTTP routes, middleware, `not_found`, WebSocket handlers, JSON-RPC methods, and plugin functions and classes alike. Background tasks were never affected: they hold the function itself rather than looking it up by name.
+**Route handlers in subdirectories.** A handler module in a folder, `routes/me.py`, imported as `import routes.me`, registered its routes fine at startup, but the first request to any of them failed with `unknown library: routes` and a 500. Looking the handler up at request time now follows the full module path, so handlers organised into folders dispatch like any other, HTTP routes, middleware, `not_found`, WebSocket handlers, JSON-RPC methods, and plugin functions and classes alike. Background tasks were never affected: they hold the function itself rather than looking it up by name.
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
-**Two wildcard routes covering the same requests no longer crash the server.** Registering `/items/{name}/detail` in one module and `/items/{slug}/detail` in another — the same requests, just different parameter names — used to kill the server before it served anything, with a raw Go stack trace. The conflicting route is now skipped with an error in the log, and everything else keeps serving. Within a single module, defining the same function name twice still follows Python's rule: the later definition wins, and both routes dispatch to it.
+**Two wildcard routes covering the same requests no longer crash the server.** Registering `/items/{name}/detail` in one module and `/items/{slug}/detail` in another, the same requests, just different parameter names, used to kill the server before it served anything, with a raw Go stack trace. The conflicting route is now skipped with an error in the log, and everything else keeps serving. Within a single module, defining the same function name twice still follows Python's rule: the later definition wins, and both routes dispatch to it.
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
@@ -114,7 +131,7 @@ nav-skip: true
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
-**Clearer error for hyphenated module names.** `import status-other` used to fail with `unknown library: status` — a name you never typed — and never mention the actual mistake, the hyphen. Hyphenated module names have never been valid, same as Python; the difference is you're now told that, on the exact line, before anything runs. Spell it `status_other.py`.
+**Clearer error for hyphenated module names.** `import status-other` used to fail with `unknown library: status`, a name you never typed, and never mention the actual mistake, the hyphen. Hyphenated module names have never been valid, same as Python; the difference is you're now told that, on the exact line, before anything runs. Spell it `status_other.py`.
 {{< /changelog-item >}}
 
 ---
@@ -122,7 +139,7 @@ nav-skip: true
 {{< version "v0.21.2" >}}
 
 {{< changelog-item "fixed" >}}
-**Path parameters in HTTP routes.** A route like `runtime.http.get("/api/users/{id}", ...)` registered — and appeared in the server log — but a request to `/api/users/42` fell through to a plain 404 without the handler ever running: the server looked handlers up by the literal request path, which can never match a `{id}` pattern key. The server now asks Go's `ServeMux` (which already did the matching) for the pattern that won, so wildcard routes dispatch, `{name...}` captures the rest of the path, literal routes still beat wildcards at the same position (`/api/users/me` wins over `/api/users/{id}`), HEAD dispatches to GET handlers, and captured values arrive percent-decoded.
+**Path parameters in HTTP routes.** A route like `runtime.http.get("/api/users/{id}", ...)` registered, and appeared in the server log, but a request to `/api/users/42` fell through to a plain 404 without the handler ever running: the server looked handlers up by the literal request path, which can never match a `{id}` pattern key. The server now asks Go's `ServeMux` (which already did the matching) for the pattern that won, so wildcard routes dispatch, `{name...}` captures the rest of the path, literal routes still beat wildcards at the same position (`/api/users/me` wins over `/api/users/{id}`), HEAD dispatches to GET handlers, and captured values arrive percent-decoded.
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
@@ -134,7 +151,7 @@ nav-skip: true
 {{< version "v0.21.1" >}}
 
 {{< changelog-item "fixed" >}}
-**Subtracting durations from `datetime` and `date`.** `dt + 3600` worked but `dt - 3600` raised a type error — subtraction only accepted another instance. Both sides of `+` and `-` now behave the same: `datetime - <seconds>` and `date - <days>` return a new instance, and `timedelta()` values work everywhere a number does, so `now - timedelta(minutes=30)` no longer needs the `+ timedelta(minutes=-30)` workaround. Compound assignment (`+=`, `-=`) follows automatically.
+**Subtracting durations from `datetime` and `date`.** `dt + 3600` worked but `dt - 3600` raised a type error, subtraction only accepted another instance. Both sides of `+` and `-` now behave the same: `datetime - <seconds>` and `date - <days>` return a new instance, and `timedelta()` values work everywhere a number does, so `now - timedelta(minutes=30)` no longer needs the `+ timedelta(minutes=-30)` workaround. Compound assignment (`+=`, `-=`) follows automatically.
 {{< /changelog-item >}}
 
 ---
@@ -142,15 +159,15 @@ nav-skip: true
 {{< version "v0.21.0" >}}
 
 {{< changelog-item "added" >}}
-**Script network policies.** Hosts can keep scripts off the private LAN and away from cloud metadata endpoints. Registering `requests`, `wait_for`, or `websocket` with a policy blocks loopback, link-local, private, and IP-literal addresses by default, with allow/deny host lists, CIDRs, https-only, and custom DNS servers for the exceptions you grant. Checks run at connect time, so DNS-rebinding and redirect tricks don't get through. The CLI takes a TOML policy file — `--network-policy=policy.toml`, format in the CLI guide — and `--no-subprocess` leaves the subprocess library out entirely. No policy configured means no restrictions.
+**Script network policies.** Hosts can keep scripts off the private LAN and away from cloud metadata endpoints. Registering `requests`, `wait_for`, or `websocket` with a policy blocks loopback, link-local, private, and IP-literal addresses by default, with allow/deny host lists, CIDRs, https-only, and custom DNS servers for the exceptions you grant. Checks run at connect time, so DNS-rebinding and redirect tricks don't get through. The CLI takes a TOML policy file, `--network-policy=policy.toml`, format in the CLI guide, and `--no-subprocess` leaves the subprocess library out entirely. No policy configured means no restrictions.
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
-**One resolver for all script DNS.** A policy's `dns_servers` — or a resolver injected by the host — now serves every script network path, `scriptling.net.resolve` included, so lookups and connections always see the same answers. Without either, the host's system resolver is used as before.
+**One resolver for all script DNS.** A policy's `dns_servers`, or a resolver injected by the host, now serves every script network path, `scriptling.net.resolve` included, so lookups and connections always see the same answers. Without either, the host's system resolver is used as before.
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
-**`sys.stdout` and `sys.stderr`.** Scripts had no way to write to stderr, so warnings and errors shared stdout with the report. Both streams are now available with `write()`, `writelines()`, `flush()`, `isatty()`, and `with` support, and `print(..., file=...)` now accepts any object with a `write` method — `sys.stderr`, `sys.stdout`, or your own class. The streams follow output capture, host writers, and sandbox discarding just like `print()` does, and Go hosts get a matching `SetErrorWriter(io.Writer)`.
+**`sys.stdout` and `sys.stderr`.** Scripts had no way to write to stderr, so warnings and errors shared stdout with the report. Both streams are now available with `write()`, `writelines()`, `flush()`, `isatty()`, and `with` support, and `print(..., file=...)` now accepts any object with a `write` method, `sys.stderr`, `sys.stdout`, or your own class. The streams follow output capture, host writers, and sandbox discarding just like `print()` does, and Go hosts get a matching `SetErrorWriter(io.Writer)`.
 
 ```python
 import sys
@@ -162,7 +179,7 @@ print('{"status": "ok"}')   # stdout stays report-only
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
-**Booleans now display as `True`/`False`, matching Python 3.** `print(True)`, `str()`, `repr()`, and f-strings used to render lowercase; the literals themselves were always `True`/`False`. Machine-facing output is unchanged — `json.dumps`, query parameters, and tool responses still use lowercase. Scripts that compare boolean text (for example `str(flag) == "true"`) need updating, and Go hosts stringifying booleans for the wire should use the new `object.CoerceWireString`.
+**Booleans now display as `True`/`False`, matching Python 3.** `print(True)`, `str()`, `repr()`, and f-strings used to render lowercase; the literals themselves were always `True`/`False`. Machine-facing output is unchanged, `json.dumps`, query parameters, and tool responses still use lowercase. Scripts that compare boolean text (for example `str(flag) == "true"`) need updating, and Go hosts stringifying booleans for the wire should use the new `object.CoerceWireString`.
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
@@ -170,7 +187,7 @@ print('{"status": "ok"}')   # stdout stays report-only
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
-**`create_leader_election` now takes `min_cluster_size`.** A leader can only be elected while at least that many nodes are visible, so a split cluster can no longer elect two leaders. This replaces `quorum_percentage` — set `min_cluster_size` to the majority of your smallest cluster (`2` for three nodes, `1` for single-node) and leave it alone as the cluster grows. Upgrading gossip also brings adaptive quorum sizing and automatic retirement of dead nodes' votes.
+**`create_leader_election` now takes `min_cluster_size`.** A leader can only be elected while at least that many nodes are visible, so a split cluster can no longer elect two leaders. This replaces `quorum_percentage`, set `min_cluster_size` to the majority of your smallest cluster (`2` for three nodes, `1` for single-node) and leave it alone as the cluster grows. Upgrading gossip also brings adaptive quorum sizing and automatic retirement of dead nodes' votes.
 {{< /changelog-item >}}
 
 ---

@@ -135,6 +135,7 @@ Remote objects are passed by reference:
 | `host_version` | string | Host version string |
 | `transports` | [string] | Always `["json"]` |
 | `capabilities` | [string] | Host capabilities |
+| `policy` | object | Optional host security context, see below |
 
 **Response result:**
 
@@ -147,9 +148,18 @@ Remote objects are passed by reference:
 | `scheme` | string | The source scheme this plugin's fetcher serves (with the `fetch` capability); one scheme per plugin |
 | `schema` | object | Functions, classes, and constants |
 
-Known capabilities: `remote_objects` (remote object references in results).
+Known capabilities: `remote_objects` (remote object references in results) and `policy` (the plugin reads and enforces the handshake policy).
+
+The optional `policy` object is the host's security context for this plugin
+session, so trusted plugins can enforce it themselves. `allowed_paths`
+restricts filesystem locations (database files, storage directories) and
+`network` carries the outbound network policy (host allow/deny lists, CIDR
+rules, category flags). Omitted or nil means the host imposes no
+restrictions. Plugins that predate the field ignore it; plugins that enforce
+it advertise the `policy` capability. The first-party database plugins are
+the reference implementation.
 A plugin with a fetcher is identified by its `scheme`, whose presence is the
-whole advertisement — see [Plugin Fetchers](/docs/plugins/fetchers/). Unknown
+whole advertisement (see [Plugin Fetchers](/docs/plugins/fetchers/)). Unknown
 capabilities are ignored, so newer plugins still load on older hosts.
 
 The `schema` object:
@@ -183,7 +193,7 @@ The `schema` object:
 
 If the plugin returns any other protocol version, the host refuses to load it and records a manager warning. Breaking protocol changes require a new protocol version and older hosts will reject the plugin during handshake.
 
-When `source` is empty or absent the host auto-generates an RPC proxy. When `source` is provided the host uses it directly: either as a wrapper around RPC calls or as pure host-side Scriptling code.
+When `source` is empty or absent the host auto-generates an RPC proxy: every call is a JSON-RPC round trip. When `source` is provided the host compiles and runs that Scriptling code itself, so it executes entirely host-side; it becomes a wrapper around RPC calls (using `scriptling.plugin.call_method` / `call_function` to reach the plugin) or pure host-side logic. If any entry carries a source the whole module registers as script: entries without sources get their auto-generated shims emitted alongside. See [Host-Side Scripting](../go-plugins/host-side-scripting/) for the authoring side.
 
 Class `properties` are auto-generated as Scriptling @property descriptors. `settable: true` means the host also generates a setter. Getter-only properties are read-only from Scriptling.
 
@@ -364,8 +374,8 @@ The plugin removes the instance and calls `__del__` if defined. Destroy is idemp
 
 A missing source or path is reported as error code `-32001`. The host treats
 that as a plain not-found (a failed module probe), not a fatal error. Any
-other error aborts package loading with the source named — hosts deliberately
-distinguish "module is not there" from "plugin could not be asked". The host
+other error aborts package loading with the source named, because hosts
+deliberately distinguish "module is not there" from "plugin could not be asked". The host
 caches nothing it fetches, so every read reaches the plugin and returns content;
 there is no conditional-read form. `data` is base64-encoded, which is what lets
 binary assets travel intact.
@@ -411,7 +421,7 @@ they arrive.
 
 Executables spawned as stdio peers receive `SCRIPTLING_PLUGIN_PEER=<version>`
 environment, on top of the host's environment. Multi-role executables check it
-to divert a bare invocation into plugin mode — an executable that is also a
+to divert a bare invocation into plugin mode: an executable that is also a
 general CLI can serve the protocol when scriptling spawns it with no
 arguments, without dedicating a subcommand to it. The value is the scriptling
 version (e.g. `0.23.0`), so a peer can check compatibility and refuse to

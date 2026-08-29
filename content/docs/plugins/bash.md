@@ -9,7 +9,7 @@ A plugin can be any executable that speaks Scriptling's line-delimited JSON-RPC 
 
 A bash plugin can even act as a [fetcher](/docs/plugins/fetchers/): advertise
 its scheme in the handshake, and answer
-`fetch.read` / `fetch.list` with `base64`-encoded content — the example in the
+`fetch.read` / `fetch.list` with `base64`-encoded content; the example in the
 repository (`examples/plugins/bash/hello-plugin.sh`) serves a whole `bsh://`
 package and script source from shell heredocs.
 

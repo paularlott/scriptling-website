@@ -17,6 +17,18 @@ Get up and running with the Scriptling command-line interface.
 brew install paularlott/tap/scriptling
 ```
 
+Database support is optional. The plugin binaries live in their own formula:
+
+```bash
+brew install paularlott/tap/scriptling-plugins
+export SCRIPTLING_PLUGIN_DIR="$(brew --prefix)/opt/scriptling-plugins/libexec/plugins"
+```
+
+Or use `scriptling-full` — the same CLI with all database plugins compiled
+in (mutually exclusive with `scriptling`): `brew install paularlott/tap/scriptling-full`.
+
+See [Plugins](../plugins/) for how plugins load and the [database reference](../../reference/libraries/scriptling/databases/) for the APIs.
+
 ### GitHub Releases
 
 Download pre-built binaries from [GitHub Releases](https://github.com/paularlott/scriptling/releases):

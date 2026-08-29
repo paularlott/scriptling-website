@@ -31,6 +31,12 @@ Scriptling-specific libraries that provide functionality not available in Python
 - [Resolve](networking/resolve/): DNS resolution for IP, SRV, and srv+http URLs
 - [Websocket](networking/websocket/): WebSocket client for connecting to WebSocket servers
 
+#### Databases
+- [SQLite](databases/sqlite/): Embedded relational database (pure Go)
+- [SQL](databases/sql/): MySQL, MariaDB and PostgreSQL client
+- [Valkey](databases/valkey/): Valkey and Redis key/value client
+- [BadgerDB](databases/badgerdb/): Embedded key/value store mirroring the valkey API
+
 #### Provisioning
 - [Provisioning](provisioning/): File/directory provisioning and HTTP/HTTPS fetch provisioning
 

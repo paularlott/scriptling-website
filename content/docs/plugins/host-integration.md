@@ -220,7 +220,7 @@ construct a manager and call `plugin.RegisterLibraries` on each environment.
 
 ## Fetcher Plugins
 
-Plugins that own a URI scheme — see [plugin fetchers](/docs/plugins/fetchers/) —
+Plugins that own a URI scheme (see [plugin fetchers](/docs/plugins/fetchers/))
 serve scripts and libraries on demand. A host opts in by bridging its manager
 into a package scheme registry with `pluginpack`. After that, `knot://libs`
 resolves like any other package source and `knot://scripts/hello` can be
@@ -266,8 +266,8 @@ p.EvalWithContext(ctx, "import mylib")
 ```
 
 `Register` must run before any scheme source is opened, because it is what
-makes the scheme resolvable. A partial failure — two plugins claiming one
-scheme — rolls back, so the bridge is left owning nothing.
+makes the scheme resolvable. A partial failure (two plugins claiming one
+scheme) rolls back, so the bridge is left owning nothing.
 
 A source whose scheme no loaded plugin serves fails with an error wrapping
 `pack.ErrUnknownScheme`, so a host can tell "the plugin was never loaded" apart
@@ -340,7 +340,7 @@ Two tenants can then each own a `knot` scheme pointing at different plugins.
 
 ### Caching and Freshness
 
-Plugin-served content is not cached — not on disk, and not in memory between
+Plugin-served content is not cached, not on disk and not in memory between
 reads. See [caching](/docs/plugins/fetchers/#caching): the compile is already
 cached upstream by source text, and the plugin is the only side that knows its
 backend's freshness rules, so any persistence belongs behind its own `Read`.

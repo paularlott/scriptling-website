@@ -49,7 +49,7 @@ Configuration options:
 | Environment | `SCRIPTLING_PLUGIN_ARG=scriptling-server` |
 | Config file | `plugins.args = ["scriptling-server"]` |
 
-Plugin loading is eager. Startup failures are reported as warnings. A loaded plugin that fails while a script is running produces an execution error. Commands that never evaluate a script — `--lint`, `--list-libs`, and the `pack`, `unpack` and `cache` subcommands — skip plugin loading entirely.
+Plugin loading is eager. Startup failures are reported as warnings. A loaded plugin that fails while a script is running produces an execution error. Commands that never evaluate a script (`--lint`, `--list-libs`, and the `pack`, `unpack` and `cache` subcommands) skip plugin loading entirely.
 
 Plugins that serve [fetcher](/docs/plugins/fetchers/) schemes are loaded the
 same way; their sources then work as packages and scripts (`--package
@@ -57,13 +57,33 @@ knot://libs`).
 
 ## Importing Plugin Libraries
 
-A plugin declares a short name, for example `hello`, and Scriptling exposes it as `plugin.hello`:
+A plugin declares a name in its handshake, and the name decides where the
+library lands:
+
+- A **bare name** registers in the plugin namespace. A plugin declaring
+  `hello` becomes `plugin.hello`; one declaring `knot` becomes `plugin.knot`.
+  Every function and class is a member of that module: `plugin.hello.greet()`,
+  `plugin.hello.Config(...)`.
+- A **name containing a dot** is the author's namespace and is used verbatim.
+  A plugin declaring `myplugin.hello` imports as `myplugin.hello`, and the first-party
+  database plugins declare `scriptling.sqlite`, `scriptling.sql`,
+  `scriptling.valkey` and `scriptling.badgerdb` so their imports match
+  compiled-in builds exactly.
 
 ```python
 import plugin.hello
-
 print(plugin.hello.greet("Ada"))
+
+import scriptling.sqlite as sqlite
+conn = sqlite.connect()
 ```
+
+Because verbatim names can collide, registration guards them: a plugin whose
+dotted name matches a library the host already has (a built-in, a stdlib
+library, or a compiled-in driver) is skipped with a warning at load instead
+of shadowing it. A plugin can never take over `json`, `scriptling.runtime`,
+or a compiled-in driver's name. Bare names cannot collide with built-ins by
+construction, since built-in names are single words.
 
 ## Inspecting Plugins
 
@@ -94,7 +114,7 @@ print(cfg.get("name"))
 scriptling.plugin.release(cfg)
 ```
 
-Prefer explicit `release()` for deterministic cleanup. Embedded Go applications can call `plugin.ReleaseWithContext(ctx, obj)` when release should follow a request context. The contextless `plugin.Release(obj)` and GC finalizer fallback use `plugin.DefaultReleaseTimeout`. All class instances with `__del__` get a GC finalizer installed automatically: both in-process and plugin objects: as a best-effort fallback.
+Prefer explicit `release()` for deterministic cleanup. Embedded Go applications can call `plugin.ReleaseWithContext(ctx, obj)` when release should follow a request context. The contextless `plugin.Release(obj)` and GC finalizer fallback use `plugin.DefaultReleaseTimeout`. All class instances with `__del__` get a GC finalizer installed automatically, both in-process and plugin objects, as a best-effort fallback.
 
 ## Loading JSON-RPC Peers at Runtime
 
@@ -226,8 +246,11 @@ callbacks back to the client. Use stdio plugins when host callbacks or
   on the second call).
 - Loading an already-loaded path or URL under a **different** name raises an error.
 - Loading a **new** path or URL under a name already in use raises an error. The
-  name must not collide with any existing plugin library: including ones
+  name must not collide with any existing plugin library, including ones
   discovered via `--plugin-dir`.
+- A dotted (verbatim) name that matches a library already registered on the
+  interpreter is refused at registration with a warning, so plugins cannot
+  shadow built-in or compiled-in libraries.
 - `unload(name)` sends a best-effort shutdown, closes the process, removes the
   client, and removes any dynamic `plugin.*` proxy registered for that peer.
   The same name+path can be `load()`-ed again afterwards.

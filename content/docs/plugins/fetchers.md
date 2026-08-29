@@ -6,7 +6,7 @@ weight: 4
 ---
 
 A fetcher is a plugin that owns a URI scheme. The whole contract is one
-registration call — `RegisterFetcher("knot", fetcher)` — and from that the
+registration call, `RegisterFetcher("knot", fetcher)`, and from that the
 host knows everything it needs: `knot://` sources route to this plugin, its
 library attaches automatically when it loads, and files are asked for only
 when an import actually resolves. Nothing is transferred that nothing
@@ -18,27 +18,31 @@ the standard layout hardcoded: modules live under `lib/`, and a bare
 credentials, the discovery logic and the source of truth; scriptling only
 speaks the fetch protocol.
 
+Fetchers are keyed by URL scheme and are orthogonal to library names: the
+scheme never passes through the plugin naming rules, and what a fetcher
+returns is file content, nothing prefixed, nothing wrapped.
+
 ## How It Works
 
 1. The plugin registers its one fetcher and scheme at startup, before
    `Run()` / serving, like every other plugin registration. A second
    registration is an error.
-2. The plugin's handshake advertises the scheme — its presence is the whole
+2. The plugin's handshake advertises the scheme; its presence is the whole
    advertisement.
 3. The host routes `scheme://...` sources to that plugin and issues
    `fetch.read` / `fetch.list` JSON-RPC requests for individual files and
    directory listings. The library bundle the host attaches is synthesized
-   from the handshake (name, version, `libs = ["lib"]`) — the plugin never
+   from the handshake (name, version, `libs = ["lib"]`); the plugin never
    serves a manifest.
 4. File content travels base64-encoded inside the JSON-RPC result, so binary
-   assets — a `webroot/` image, a font — arrive intact.
+   assets (a `webroot/` image, a font) arrive intact.
 5. The host keeps none of it. Every read is a fetch, and script sources are
    refetched on every run.
 
 A missing source or path is reported as JSON-RPC error code `-32001`, which
 the host treats as a plain not-found (a failed module probe), never as a fatal
-error. Any other failure — the plugin process died, the backend it proxies is
-unreachable — is a different matter: the host aborts the import with an error
+error. Any other failure (the plugin process died, the backend it proxies is
+unreachable) is a different matter: the host aborts the import with an error
 naming the package source, rather than silently skipping its modules. A
 configured source you cannot reach should be an incident, not a script that
 mysteriously runs without its libraries. Local files and higher-priority
@@ -68,8 +72,8 @@ scriptling --plugin /usr/local/bin/knot knot://scripts/hello
 ```
 
 A plugin's library attaches when the plugin is loaded, so nothing else is
-needed. `--package` is for ordinary packages — a `.zip`, a directory, or a
-URL — and does not take a plugin scheme source; there is no reason to name
+needed. `--package` is for ordinary packages (a `.zip`, a directory, or a
+URL) and does not take a plugin scheme source; there is no reason to name
 one, since attachment is automatic.
 
 `--plugin` takes an executable path, used literally, so paths containing
@@ -84,8 +88,8 @@ rules when several plugins are loaded at once.
 | Config file | `plugins.paths = ["/usr/local/bin/knot"]`, `plugins.args = ["scriptling-server"]` |
 
 A scheme source can also be run directly as the positional script argument.
-Plugin libraries compose with the ordinary loader chain — local files and
-explicit `--package` bundles take precedence — and registered built-in modules
+Plugin libraries compose with the ordinary loader chain (local files and
+explicit `--package` bundles take precedence) and registered built-in modules
 such as `json` and `os` are resolved before any loader, so a plugin library
 can never shadow the standard library.
 
@@ -106,7 +110,7 @@ are available.
 
 The server modes take their setup script through the plugin too. A scheme
 source as the script argument is fetched (always fresh) and handed to the
-server as source text — nothing is written to a temporary file — and the
+server as source text (nothing is written to a temporary file) and the
 plugin's library attaches in those modes just as it does for plain script
 execution:
 
@@ -125,7 +129,7 @@ printf '{"jsonrpc":"2.0","id":1,"method":"demo.add","params":{"a":2,"b":3}}\n' |
 
 ## Go Plugins
 
-Implement the `Fetcher` interface and make the one registration call — that
+Implement the `Fetcher` interface and make the one registration call; that
 is the entire contract. The library bundle the host attaches takes its name
 and version from the plugin's handshake:
 
@@ -182,7 +186,7 @@ See [C Plugins](/docs/plugins/c-plugins/) for the handler contracts and the
 ## Embedding Hosts
 
 Go applications that embed Scriptling get the same behaviour by bridging their
-plugin manager into a package scheme registry — see
+plugin manager into a package scheme registry; see
 [fetcher plugins in the plugin manager docs](/docs/plugins/host-integration/#fetcher-plugins)
 for the wiring and reloading, and
 `examples/embed-fetcher-plugin` for a runnable host.
@@ -197,5 +201,5 @@ inside handlers via `plugin.Logger(ctx)`.
 
 `List` is required by the `Fetcher` interface: path resolution consults its
 parent's listing before reading, and enumeration (globbing, tooling that walks
-a source) depends on it. Listings are treated as advisory — a file a listing
-omits is still readable — so a fetcher may keep them cheap.
+a source) depends on it. Listings are treated as advisory: a file a listing
+omits is still readable, so a fetcher may keep them cheap.

@@ -16,7 +16,20 @@ function calls, object lifecycle, generated `plugin.*` proxies, and batches,
 but the server cannot initiate callbacks back to the client. Host callbacks and
 `plugin.Logger(ctx)` require the bidirectional stdio transport.
 
-A plugin declares a short name such as `hello`. Scriptling imports it as `plugin.hello`.
+A plugin declares a name. A bare name such as `hello` registers in the plugin namespace: scripts import `plugin.hello`. A name containing a dot is the author's namespace and is used verbatim: `myplugin.hello` imports as `myplugin.hello`, and the first-party database plugins declare `scriptling.sqlite` and friends so their imports match compiled-in builds. Verbatim names that collide with a library the host already has are refused with a warning at load, so a plugin can never shadow a built-in.
+
+## First-Party Plugins
+
+The database plugins ship with Scriptling in every release form: compiled into `scriptling-full`, selectable individually with build tags, or as external plugin binaries from the release page (zips named `sqlite-linux-arm64.zip` and so on, each containing a binary named after the plugin). See the [database libraries reference](../../reference/libraries/scriptling/databases/) for the full APIs.
+
+| Plugin | Import | Description |
+|--------|--------|-------------|
+| SQLite | `scriptling.sqlite` | Embedded relational database (pure Go, no server) |
+| SQL | `scriptling.sql` | MySQL, MariaDB and PostgreSQL client with one API and `?` placeholders everywhere |
+| Valkey | `scriptling.valkey` | Valkey and Redis key/value client (strings, counters, TTLs, patterns) |
+| BadgerDB | `scriptling.badgerdb` | Embedded key/value store mirroring the valkey API |
+
+All four enforce the host security policy (allowed paths for the file-backed pair, the network policy for the network pair), and the [examples directory](https://github.com/paularlott/scriptling/tree/main/examples/databases) has runnable scripts with container commands for local test servers.
 
 ## Start Here
 

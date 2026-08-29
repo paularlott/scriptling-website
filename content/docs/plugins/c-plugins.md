@@ -225,13 +225,13 @@ sl_register_fetcher(srv, "mylib", my_read, my_list);
 
 Read handler results:
 
-- `sl_fetch_data(ptr, len)` — the file's content (the bytes are copied).
-- `sl_fetch_not_found()` — a miss, reported to the host as JSON-RPC code
+- `sl_fetch_data(ptr, len)`: the file's content (the bytes are copied).
+- `sl_fetch_not_found()`: a miss, reported to the host as JSON-RPC code
   `-32001` so a failed module probe is not an error.
 
 The host attaches the plugin's library automatically (the standard `lib/`
 layout is synthesized host-side) and asks for individual files as imports
-resolve — there is no manifest to serve. It keeps none of them, so every read
+resolve; there is no manifest to serve. It keeps none of them, so every read
 reaches your `Read` handler; cache inside the handler if your backend needs
 it. The `hello-c` example implements a complete `cdemo://` fetcher. See
 [Plugin Fetchers](/docs/plugins/fetchers/) for the host-side behavior.
