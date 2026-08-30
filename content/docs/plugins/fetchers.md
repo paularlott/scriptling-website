@@ -203,3 +203,14 @@ inside handlers via `plugin.Logger(ctx)`.
 parent's listing before reading, and enumeration (globbing, tooling that walks
 a source) depends on it. Listings are treated as advisory: a file a listing
 omits is still readable, so a fetcher may keep them cheap.
+
+Path safety has two halves, and the host owns only one of them. Before any
+RPC is issued the host validates the virtual path with `fs.ValidPath`
+semantics, so `..`, absolute paths and malformed components never reach the
+plugin. What the host cannot do is sanitize the plugin's own filesystem: a
+disk-backed fetcher maps virtual paths to real files, and a symlink inside
+the served root (or a path component that resolves through one) can point
+anywhere the plugin process can read. A fetcher serving files from disk must
+defend its own root, typically by resolving the real path
+(`filepath.EvalSymlinks`) and checking it stays inside the root before every
+read.

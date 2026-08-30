@@ -23,7 +23,7 @@ weight: 2
 | `--plugin-arg`       | `SCRIPTLING_PLUGIN_ARG`    | `plugins.args`               | Argument to pass to a `--plugin` executable (repeatable)   | (none)           |
 | `--plugin-env`       | `SCRIPTLING_PLUGIN_ENV`    | `plugins.env`                | KEY=VALUE environment entry for a `--plugin` executable (repeatable) | (none) |
 | `--plugin-header`    | `SCRIPTLING_PLUGIN_HEADER` | `plugins.headers`            | HTTP header KEY=VALUE for an http(s) `--plugin` (repeatable) | (none) |
-| `--plugin-insecure`  | `SCRIPTLING_PLUGIN_INSECURE` | `plugins.insecure`         | Skip TLS verification for https:// plugin URLs (self-signed certificates) | false |
+| `--plugin-insecure`  | `SCRIPTLING_PLUGIN_INSECURE` | `plugins.insecure`         | Mark this https:// `--plugin` URL as insecure, skipping TLS verification (repeatable) | (none) |
 | `--log-level`         | `SCRIPTLING_LOG_LEVEL`     | `log.level`                  | Log level (trace/debug/info/warn/error)              | info             |
 | `--log-format`        | `SCRIPTLING_LOG_FORMAT`    | `log.format`                 | Log format (console/json)                            | console          |
 | `-S`, `--server`      | `SCRIPTLING_SERVER`        | `server.address`             | HTTP server address (host:port)                      | (disabled)       |
@@ -108,7 +108,23 @@ since the host connects to it.
 An HTTP plugin that needs authentication takes headers with
 `--plugin-header`, binding like the other plugin flags (bare with one plugin,
 `<plugin>=` qualified with several); the value keeps its own equals sign, so
-bearer tokens pass through whole:
+bearer tokens pass through whole. The token does not belong on the command
+line, where it is visible in process listings: prefer the environment
+variable or the config file, both of which accept the same values:
+
+```bash
+export SCRIPTLING_PLUGIN_HEADER="Authorization=Bearer $PLUGIN_TOKEN"
+scriptling --plugin https://plugins.internal:8443 script.py
+```
+
+```toml
+# scriptling.toml
+[plugins]
+paths = ["https://plugins.internal:8443"]
+headers = ["Authorization=Bearer eyJ..."]
+```
+
+The flag form exists for quick tests:
 
 ```bash
 scriptling --plugin https://plugins.internal:8443 \
@@ -127,10 +143,13 @@ request line or Host header; an explicit `--plugin-header Authorization=...`
 wins over URL credentials.
 
 For https plugin URLs whose certificate is self-signed (development, internal
-networks), `--plugin-insecure` skips certificate verification for that run:
+networks), `--plugin-insecure` names the URLs to load without certificate
+verification, so one self-signed endpoint never weakens the others:
 
 ```bash
-scriptling --plugin https://plugins.internal:8443 --plugin-insecure script.py
+scriptling --plugin https://plugins.internal:8443 \
+           --plugin-insecure https://plugins.internal:8443 \
+           script.py
 ```
 
 Explicit `--plugin` entries load before `--plugin-dir` scans. Plugin identity

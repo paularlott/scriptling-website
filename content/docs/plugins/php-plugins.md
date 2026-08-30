@@ -89,8 +89,8 @@ scriptling --plugin http://127.0.0.1:8080 \
 The handshake declares the short name `hello`; Scriptling imports it as
 `plugin.hello`, exactly like an executable plugin. In production, terminate
 TLS in front of the server and load the `https://` URL; when the certificate
-is self-signed (development, internal networks), add `--plugin-insecure` to
-skip verification.
+is self-signed (development, internal networks), name the URL with
+`--plugin-insecure` to skip verification for it alone.
 
 ## Authentication
 
@@ -99,9 +99,11 @@ script side: a bearer token with `--plugin-header`, or username and password
 in the URL as Basic auth.
 
 ```bash
-scriptling --plugin https://plugins.internal:8443 \
-           --plugin-header "Authorization=Bearer $PLUGIN_TOKEN" script.py
+# the token stays out of the process listing
+export SCRIPTLING_PLUGIN_HEADER="Authorization=Bearer $PLUGIN_TOKEN"
+scriptling --plugin https://plugins.internal:8443 script.py
 
+# username and password ride the URL as Basic auth
 scriptling --plugin https://user:pass@plugins.internal:8443 script.py
 ```
 
@@ -120,8 +122,11 @@ the `--plugin-header "Authorization=Bearer seekrit"` form above loads it.
   where you start it.
 - **Request/response only.** The HTTP transport carries handshakes, function
   calls, object lifecycle and batches, but the server cannot call back into
-  the host. Host callbacks and `plugin.Logger(ctx)` require the stdio
-  transport.
+  the host. This is not negotiated at load: a plugin that registers
+  callback-bearing functions loads without warning, and the failure happens
+  at call time. Load-time refusal would be the wrong default anyway, since
+  the host often cannot reach back to the network a plugin server sits on.
+  Host callbacks and `plugin.Logger(ctx)` require the stdio transport.
 - **Errors are JSON-RPC errors.** An `error` object in a response surfaces in
   the script as an ordinary error, so unknown functions or a failing handler
   report themselves plainly.

@@ -214,6 +214,15 @@ The database plugins enforce the host security policy on every operation, in bot
 
 When no policy is configured the drivers connect without restriction, exactly like the other network libraries.
 
+The same holds for any plugin that advertises the `policy` capability, and it
+is worth being precise about what that means: the policy is **delivered to the
+plugin and enforced by it**. It is not a sandbox around a plugin process, so
+`--allowed-paths` and `--network-policy` bound what a *cooperative* plugin
+does, never what a malicious one could. Treat third-party plugin binaries
+like any other executable you choose to run. For plugins that do cooperate
+the protection is real, and the network guard in particular carries genuine
+SSRF and DNS-rebinding defences to every dial the plugin makes.
+
 ```toml
 # policy.toml — a script that may reach the database subnet
 allow_private_ips = true

@@ -13,8 +13,12 @@ they expose the Scriptling plugin protocol at a JSON-RPC endpoint.
 
 HTTP plugin transport is request/response only. It supports handshakes,
 function calls, object lifecycle, generated `plugin.*` proxies, and batches,
-but the server cannot initiate callbacks back to the client. Host callbacks and
-`plugin.Logger(ctx)` require the bidirectional stdio transport.
+but the server cannot initiate callbacks back to the client. That limit is
+not negotiated at load: a plugin registering callback-bearing functions loads
+without warning and the call fails at call time (the host may not even be
+able to reach the network the plugin server sits on, so refusing at load
+would be guessing). Host callbacks and `plugin.Logger(ctx)` require the
+bidirectional stdio transport.
 
 A plugin declares a name. A bare name such as `hello` registers in the plugin namespace: scripts import `plugin.hello`. A name containing a dot is the author's namespace and is used verbatim: `myplugin.hello` imports as `myplugin.hello`, and the first-party database plugins declare `scriptling.sqlite` and friends so their imports match compiled-in builds. Verbatim names that collide with a library the host already has are refused with a warning at load, so a plugin can never shadow a built-in.
 
