@@ -27,6 +27,8 @@ Scriptling is a minimal, sandboxed interpreter for Python-like scripting designe
 
 - [Plugins](https://scriptling.dev/okf/scriptling-docs/./plugins.md) - Extend Scriptling with Go, C, PHP or any JSON-RPC language; database drivers included
 
+- [LLM Script Generation Guide](https://scriptling.dev/okf/scriptling-docs/llm-guide.md) - Guidance for generating accurate Scriptling code with LLMs
+
 
 ## Tutorials
 

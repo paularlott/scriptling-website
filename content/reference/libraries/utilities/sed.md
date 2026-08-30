@@ -3,7 +3,7 @@ title: scriptling.sed
 linkTitle: sed
 description: In-place file content replacement and capture group extraction.
 tags: [libraries, utilities, text, filesystem]
-weight: 2
+weight: 8
 
 aliases:
   - /reference/libraries/scriptling/utilities/sed/

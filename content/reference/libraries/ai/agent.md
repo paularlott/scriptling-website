@@ -3,7 +3,7 @@ title: scriptling.ai.agent
 linkTitle: ai.agent
 description: Agentic AI loop for building AI agents with automatic tool execution.
 tags: [libraries, ai, agents]
-weight: 2
+weight: 3
 
 aliases:
   - /reference/libraries/scriptling/ai/agent/

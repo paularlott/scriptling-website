@@ -2,7 +2,7 @@
 title: Classes
 description: Class definition, inheritance, super(), dunder methods, __init__, __del__, and property decorators in Scriptling.
 tags: [reference, classes]
-weight: 7
+weight: 8
 ---
 
 Scriptling supports object-oriented programming with classes, single inheritance, the `super()` function, and a rich set of dunder (magic) methods.

@@ -2,7 +2,7 @@
 title: glob
 description: Unix shell-style wildcard matching for filenames, similar to Python's glob module.
 tags: [libraries, filesystem]
-weight: 1
+weight: 5
 aliases:
   - /reference/libraries/extlib/glob/
   - /reference/libraries/glob/

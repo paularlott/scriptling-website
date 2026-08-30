@@ -2,7 +2,7 @@
 title: json
 description: Parse and generate JSON data.
 tags: [libraries, data-formats]
-weight: 1
+weight: 2
 
 aliases:
   - /reference/libraries/stdlib/json/

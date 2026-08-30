@@ -2,7 +2,7 @@
 title: secrets
 description: Cryptographically strong random number generation for tokens, keys, and passwords.
 tags: [libraries, security]
-weight: 1
+weight: 5
 aliases:
   - /reference/libraries/extlib/secrets/
   - /reference/libraries/secrets/

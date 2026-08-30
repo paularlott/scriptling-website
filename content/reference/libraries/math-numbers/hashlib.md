@@ -2,7 +2,7 @@
 title: hashlib
 description: Cryptographic hash functions.
 tags: [libraries, math, security]
-weight: 1
+weight: 4
 
 aliases:
   - /reference/libraries/stdlib/hashlib/

@@ -11,10 +11,10 @@ tags:
     - embedding
     - go
     - plugins
-title: Plugins
+title: Embedding Plugins
 type: Guide
 ---
-# Plugins
+# Embedding Plugins
 
 Applications that embed Scriptling can use the same executable plugin system as the CLI. Create one `plugin.Manager` for the application, load plugin directories during startup, and register plugin libraries with each Scriptling environment you create.
 

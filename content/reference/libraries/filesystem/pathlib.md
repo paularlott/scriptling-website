@@ -2,7 +2,7 @@
 title: pathlib
 description: Object-oriented filesystem paths, similar to Python's pathlib module.
 tags: [libraries, filesystem]
-weight: 1
+weight: 3
 aliases:
   - /reference/libraries/extlib/pathlib/
   - /reference/libraries/pathlib/

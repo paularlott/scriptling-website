@@ -2,7 +2,7 @@
 title: Documenting Extensions
 description: Add help text to functions, libraries, and classes for discoverability.
 tags: [go-integration, embedding, go]
-weight: 13
+weight: 14
 ---
 
 Scriptling includes a built-in `help()` function that provides Python-like help for functions and libraries. This guide shows how to document your Go extensions.

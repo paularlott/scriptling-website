@@ -19,7 +19,7 @@ type: Guide
 ### v0.23.0
 
 
-**Database support.** New first-party plugins bring SQLite, MySQL/MariaDB, PostgreSQL, Valkey/Redis and BadgerDB to scripts. The relational libraries `scriptling.sqlite` and `scriptling.sql` share one API: `connect()` hands you a connection with `query()`, `execute()` and `close()`, and rows come back as dicts. The key/value libraries `scriptling.valkey` and `scriptling.badgerdb` agree on `get`, `set`, `delete`, `expire`, `ttl` and `incr`, plus hashes, so code moves between a shared cache and local storage unchanged. The valkey client also speaks to clusters and sentinels, can flush a database, and adds sets, queues and database selection. All pure Go, compiled in or shipped as external plugin binaries. See the new [Database Libraries](https://scriptling.dev/okf/scriptling-libraries/./databases.md) reference and the runnable [examples](https://github.com/paularlott/scriptling/tree/main/examples/databases).
+**Database support.** New first-party plugins bring SQLite, MySQL/MariaDB, PostgreSQL, Valkey/Redis and BadgerDB to scripts. The relational libraries `scriptling.sqlite` and `scriptling.sql` share one API: `connect()` hands you a connection with `query()`, `execute()` and `close()`, and rows come back as dicts. The key/value libraries `scriptling.valkey` and `scriptling.badgerdb` agree on `get`, `set`, `delete`, `expire`, `ttl` and `incr`, plus hashes, so code moves between a shared cache and local storage unchanged. The valkey client also speaks to clusters and sentinels, can flush a database, and adds sets, queues and database selection. All pure Go. Take it either way: `scriptling-full` is the same CLI with every driver compiled in (`brew install paularlott/tap/scriptling-full`), or the `plugins-<os>-<arch>.zip` from the releases page — installed as `brew install paularlott/tap/scriptling-plugins` — provides all four binaries to point `--plugin-dir` at. See the new [Database Libraries](https://scriptling.dev/okf/scriptling-libraries/./databases.md) reference and the runnable [examples](https://github.com/paularlott/scriptling/tree/main/examples/databases).
 
 
 
@@ -43,7 +43,7 @@ type: Guide
 
 
 
-**Plugin peers know who spawned them.** Every executable spawned as a plugin peer gets `SCRIPTLING_PLUGIN_PEER=1`, so a multi-role executable can divert a bare invocation into plugin mode.
+**Plugin peers know who spawned them.** Every executable spawned as a plugin peer gets `SCRIPTLING_PLUGIN_PEER` set to the host's version, so a multi-role executable can divert a bare invocation into plugin mode.
 
 
 
@@ -72,6 +72,10 @@ type: Guide
 
 
 **WebSocket routes are now guarded.** WebSocket upgrades now run through the middleware (and the static `--bearer-token` when no middleware is registered) like every other endpoint, so a `websocket("/ws", ...)` handler can't be reached without the token.
+
+
+
+**`runtime.background()` no longer races the caller's environment.** A spawned task read the calling script's variables from its own goroutine, racing any concurrent evaluation of the same environment — intermittent and unreproducible under concurrent handlers. Task setup now runs on the caller's goroutine before the task starts.
 
 
 

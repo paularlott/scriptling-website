@@ -3,7 +3,7 @@ title: scriptling.grep
 linkTitle: grep
 description: Fast file content search using regular expressions or literal strings.
 tags: [libraries, utilities, text, filesystem]
-weight: 1
+weight: 4
 
 aliases:
   - /reference/libraries/scriptling/utilities/grep/

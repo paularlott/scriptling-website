@@ -2,7 +2,7 @@
 title: os.path
 description: Common pathname manipulations, similar to Python's os.path module.
 tags: [libraries, filesystem]
-weight: 1
+weight: 2
 aliases:
   - /reference/libraries/extlib/os.path/
   - /reference/libraries/os.path/

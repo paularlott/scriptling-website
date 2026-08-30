@@ -50,3 +50,7 @@ Embed Scriptling in a Go application to evaluate business rules at runtime. Cove
 ### [Building an MCP Tool Server](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-tool-server.md)
 
 Create a Model Context Protocol server with custom tools that AI assistants can call. Covers tool definition, script implementation, and server startup.
+
+### [Building an MCP Resources & Prompts Server](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-resources-prompts.md)
+
+Expose MCP resources and prompts as files, alongside tools.

@@ -2,7 +2,7 @@
 title: Plugins
 description: Extend Scriptling with executable plugins over JSON-RPC.
 tags: [plugins]
-weight: 8
+weight: 7
 ---
 
 Plugins are standalone executables that Scriptling loads eagerly at startup.
@@ -46,6 +46,7 @@ All four enforce the host security policy (allowed paths for the file-backed pai
 - [Bash Plugins](bash/) - Implement the JSON-RPC protocol directly.
 - [PHP Plugins](php-plugins/) - Serve the protocol from plain PHP over HTTP.
 - [JSON-RPC Protocol](protocol/) - Wire format reference for all methods and value encoding.
+- [Plugin Fetchers](fetchers/) - Serve scheme sources such as `knot://` on demand.
 
 ## Scriptling Scripts as Plugins
 

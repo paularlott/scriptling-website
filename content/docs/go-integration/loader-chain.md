@@ -2,7 +2,7 @@
 title: Library Loader Chain
 description: Flexible library loading from multiple sources.
 tags: [go-integration, embedding, go]
-weight: 12
+weight: 13
 ---
 
 The `libloader` package provides a flexible, chainable library loading system. Load libraries from the filesystem, APIs, or custom sources with Python-style folder organization.

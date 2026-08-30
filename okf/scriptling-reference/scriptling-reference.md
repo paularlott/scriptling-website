@@ -168,6 +168,8 @@ if __name__ == "__main__":
 
 - [Error Handling](https://scriptling.dev/okf/scriptling-reference/error-handling.md) - try/except/finally, raise, assert, exception types
 
+- [Decorators](https://scriptling.dev/okf/scriptling-reference/decorators.md) - Wrapping functions and classes, factories with arguments, stacking
+
 - [Classes](https://scriptling.dev/okf/scriptling-reference/classes.md) - Class definition, inheritance, super()
 
 - [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md) - Type conversions, math, string, list, dict functions

@@ -44,7 +44,7 @@ Every CLI flag, environment variable, and configuration file setting, plus conta
 
 Restricting script outbound network access with a policy file.
 
-### [Libraries](./libraries/)
+### [CLI Libraries](./libraries/)
 
 Loading, disabling, and controlling library and filesystem access.
 

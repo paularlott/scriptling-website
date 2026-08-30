@@ -2,7 +2,7 @@
 title: textwrap
 description: Text wrapping and filling utilities, compatible with Python's textwrap module.
 tags: [libraries, text]
-weight: 1
+weight: 3
 
 aliases:
   - /reference/libraries/stdlib/textwrap/

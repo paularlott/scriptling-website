@@ -2,7 +2,7 @@
 title: html
 description: Escape and unescape HTML special characters and entities.
 tags: [libraries, text]
-weight: 1
+weight: 4
 
 aliases:
   - /reference/libraries/stdlib/html/

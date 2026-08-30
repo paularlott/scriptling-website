@@ -2,7 +2,7 @@
 title: itertools
 description: Iteration utilities for efficient looping, filtering, and combinatorics.
 tags: [libraries, collections]
-weight: 1
+weight: 2
 
 aliases:
   - /reference/libraries/stdlib/itertools/

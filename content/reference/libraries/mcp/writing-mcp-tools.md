@@ -2,7 +2,7 @@
 title: Writing MCP Tools
 description: Creating custom MCP tools with metadata and script files.
 tags: [libraries, mcp]
-weight: 4
+weight: 3
 
 aliases:
   - /reference/libraries/scriptling/mcp/writing-mcp-tools/

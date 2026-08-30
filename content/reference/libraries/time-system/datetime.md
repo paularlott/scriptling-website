@@ -2,7 +2,7 @@
 title: datetime
 description: Date and time objects with construction, formatting, arithmetic, and comparison, using a Python-compatible API.
 tags: [libraries, time]
-weight: 1
+weight: 2
 
 aliases:
   - /reference/libraries/stdlib/datetime/

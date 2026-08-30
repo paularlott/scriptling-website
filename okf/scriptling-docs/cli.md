@@ -51,7 +51,7 @@ Every CLI flag, environment variable, and configuration file setting, plus conta
 
 Restricting script outbound network access with a policy file.
 
-### [Libraries](https://scriptling.dev/okf/scriptling-docs/cli/libraries.md)
+### [CLI Libraries](https://scriptling.dev/okf/scriptling-docs/cli/libraries.md)
 
 Loading, disabling, and controlling library and filesystem access.
 

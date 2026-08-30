@@ -2,7 +2,7 @@
 title: difflib
 description: Compute deltas between sequences, including unified diffs, similarity ratios, and close-match finding.
 tags: [libraries, text]
-weight: 3
+weight: 6
 
 aliases:
   - /reference/libraries/stdlib/difflib/

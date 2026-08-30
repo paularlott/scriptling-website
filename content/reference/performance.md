@@ -2,7 +2,7 @@
 title: Performance Guide
 description: Tips and best practices for writing efficient Scriptling code.
 tags: [reference, performance]
-weight: 12
+weight: 13
 ---
 
 Tips and best practices for writing efficient Scriptling code.

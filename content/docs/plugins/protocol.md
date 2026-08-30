@@ -2,7 +2,7 @@
 title: JSON-RPC Protocol
 description: The wire protocol between Scriptling and plugin executables.
 tags: [plugins, json-rpc]
-weight: 8
+weight: 7
 ---
 
 Plugins communicate with the Scriptling host over line-delimited JSON-RPC 2.0 on stdio. Each frame is a JSON object or JSON-RPC batch array terminated by a newline. The host writes requests to the plugin's stdin and reads responses from the plugin's stdout.

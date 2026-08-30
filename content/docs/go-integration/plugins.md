@@ -1,5 +1,5 @@
 ---
-title: Plugins
+title: Embedding Plugins
 description: Enable executable plugins when embedding Scriptling in Go.
 tags: [go-integration, embedding, go, plugins]
 weight: 12

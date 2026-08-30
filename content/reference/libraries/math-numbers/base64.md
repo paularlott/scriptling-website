@@ -2,7 +2,7 @@
 title: base64
 description: Base64 encoding and decoding.
 tags: [libraries, math]
-weight: 1
+weight: 6
 
 aliases:
   - /reference/libraries/stdlib/base64/

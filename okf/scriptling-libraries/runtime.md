@@ -27,6 +27,7 @@ Libraries for runtime functionality including background task execution, HTTP se
 | [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/runtime/plugin.md) | Expose a script as a first-class plugin server (agent variant only) |
 | [scriptling.runtime.sync](https://scriptling.dev/okf/scriptling-libraries/runtime/sync.md) | Named cross-environment concurrency primitives |
 | [scriptling.runtime.sandbox](https://scriptling.dev/okf/scriptling-libraries/runtime/sandbox.md) | Isolated script execution environments |
+| [scriptling.runtime.mcp](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md) | Register MCP tools via decorators |
 
 ## Quick Start
 

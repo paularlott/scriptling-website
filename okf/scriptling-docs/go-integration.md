@@ -61,10 +61,12 @@ func main() {
 - [Builder Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-classes.md) - Type-safe class builder
 - [Builder Instantiation](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-instantiation.md) - Library templates with per-instance config
 - [Script Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md) - Extend using Scriptling code
-- [Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md) - Enable executable plugins in embedded applications
+- [Embedding Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md) - Enable executable plugins in embedded applications
 - [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md) - Flexible library loading from multiple sources
 - [Documenting Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/documentation.md) - Add help text to functions and libraries
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - Register built-in libraries when embedding
 - [Linting](https://scriptling.dev/okf/scriptling-docs/go-integration/lint.md) - Code analysis for detecting syntax errors without execution
+- [GC Release Hooks](https://scriptling.dev/okf/scriptling-docs/go-integration/gc-release-hooks.md) - Best-effort cleanup hooks for Go-owned objects
 
 ## Two Integration Approaches
 

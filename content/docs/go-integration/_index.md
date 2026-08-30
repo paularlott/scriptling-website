@@ -53,10 +53,12 @@ func main() {
 - [Builder Classes](builder-classes/) - Type-safe class builder
 - [Builder Instantiation](builder-instantiation/) - Library templates with per-instance config
 - [Script Extensions](scripts/) - Extend using Scriptling code
-- [Plugins](plugins/) - Enable executable plugins in embedded applications
+- [Embedding Plugins](plugins/) - Enable executable plugins in embedded applications
 - [Library Loader Chain](loader-chain/) - Flexible library loading from multiple sources
 - [Documenting Extensions](documentation/) - Add help text to functions and libraries
+- [Library Registration](library-registration/) - Register built-in libraries when embedding
 - [Linting](lint/) - Code analysis for detecting syntax errors without execution
+- [GC Release Hooks](gc-release-hooks/) - Best-effort cleanup hooks for Go-owned objects
 
 ## Two Integration Approaches
 

@@ -2,7 +2,7 @@
 title: yaml
 description: Parse and generate YAML (YAML Ain't Markup Language) data.
 tags: [libraries, data-formats]
-weight: 1
+weight: 4
 
 aliases:
   - /reference/libraries/extlib/yaml/

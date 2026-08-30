@@ -2,7 +2,7 @@
 title: Python Differences
 description: What's NOT supported and key differences between Scriptling and Python.
 tags: [reference, python]
-weight: 11
+weight: 12
 ---
 
 Scriptling is inspired by Python but has intentional limitations for embedded scripting. This page documents what's NOT supported and key differences.

@@ -3,7 +3,7 @@ title: scriptling.runtime.sync
 linkTitle: runtime.sync
 description: Named cross-environment concurrency primitives, atomics, shared variables, wait groups, and queues.
 tags: [libraries, runtime]
-weight: 1
+weight: 6
 
 aliases:
   - /reference/libraries/scriptling/runtime/sync/

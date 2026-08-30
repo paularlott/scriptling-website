@@ -11,7 +11,7 @@
 - [Command Line Options](https://scriptling.dev/okf/scriptling-docs/cli/command-line-options.md): Every CLI flag, environment variable, and configuration file setting.
 - [HTTP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md): Running Scriptling as an HTTP server with custom routes.
 - [JSON-RPC Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/jsonrpc-server.md): Running Scriptling as a concurrent JSON-RPC 2.0 server over stdio or HTTP.
-- [Libraries](https://scriptling.dev/okf/scriptling-docs/cli/libraries.md): Loading, disabling, and controlling library and filesystem access.
+- [CLI Libraries](https://scriptling.dev/okf/scriptling-docs/cli/libraries.md): Loading, disabling, and controlling library and filesystem access.
 - [MCP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md): Running Scriptling as a Model Context Protocol (MCP) server for AI integration.
 - [Network Policy](https://scriptling.dev/okf/scriptling-docs/cli/network-policy.md): Restricting script outbound network access with a policy file.
 - [Packages](https://scriptling.dev/okf/scriptling-docs/cli/packages.md): Create, distribute, and load Scriptling packages.
@@ -32,7 +32,7 @@
 - [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md): Register individual Go functions with direct control.
 - [Native Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md): Create libraries with functions, constants, and sub-libraries.
 - [Native API](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md): Direct control with maximum performance for extending Scriptling.
-- [Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md): Enable executable plugins when embedding Scriptling in Go.
+- [Embedding Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md): Enable executable plugins when embedding Scriptling in Go.
 - [Script Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md): Extend Scriptling using Scriptling code itself.
 - [Go Integration](https://scriptling.dev/okf/scriptling-docs/go-integration.md): Embed Scriptling in your Go application.
 - [LLM Script Generation Guide](https://scriptling.dev/okf/scriptling-docs/llm-guide.md): Guidance for generating accurate Scriptling code with LLMs — copy it into your agent's instructions or fetch the hosted docs.

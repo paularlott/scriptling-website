@@ -2,7 +2,7 @@
 title: random
 description: Random number generation, compatible with Python's random module.
 tags: [libraries, math]
-weight: 1
+weight: 2
 
 aliases:
   - /reference/libraries/stdlib/random/

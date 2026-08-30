@@ -2,7 +2,7 @@
 title: string
 description: String constants for character classification, matching Python's string module.
 tags: [libraries, text]
-weight: 1
+weight: 2
 
 aliases:
   - /reference/libraries/stdlib/string/

@@ -2,7 +2,7 @@
 title: Libraries
 description: Available libraries and APIs in Scriptling.
 tags: [libraries]
-weight: 10
+weight: 11
 
 aliases:
   - /reference/libraries/scriptling/

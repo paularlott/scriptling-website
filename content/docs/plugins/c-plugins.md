@@ -2,7 +2,7 @@
 title: C Plugins
 description: Build Scriptling plugins in C using the single-header SDK.
 tags: [plugins, c, json-rpc]
-weight: 8
+weight: 4
 ---
 
 A C plugin is a standalone executable that links against a single-header, single-source SDK and speaks Scriptling's JSON-RPC protocol over stdio. Each incoming request runs in its own thread, matching the concurrency model of the Go plugin server.

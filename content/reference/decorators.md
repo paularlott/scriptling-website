@@ -2,7 +2,7 @@
 title: Decorators
 description: Using decorators to wrap functions and classes, decorator factories with arguments, stacking, and built-in decorators in Scriptling.
 tags: [reference, decorators, functions, classes]
-weight: 6
+weight: 7
 ---
 
 Decorators modify or extend functions and classes by wrapping them with another callable. Scriptling supports the `@` syntax familiar from Python.

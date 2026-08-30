@@ -2,7 +2,7 @@
 title: Plugin Fetchers
 description: Serve scheme sources such as knot:// or demo:// from a plugin, on demand.
 tags: [plugins]
-weight: 4
+weight: 8
 ---
 
 A fetcher is a plugin that owns a URI scheme. The whole contract is one

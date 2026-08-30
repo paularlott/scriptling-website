@@ -1,5 +1,5 @@
 ---
-title: Libraries
+title: CLI Libraries
 description: Loading, disabling, and controlling library and filesystem access.
 tags: [cli]
 weight: 4

@@ -3,7 +3,7 @@ title: scriptling.ai.tools
 linkTitle: ai.tools
 description: Tool schema builder for AI agents.
 tags: [libraries, ai, agents]
-weight: 5
+weight: 6
 
 aliases:
   - /reference/libraries/scriptling/ai/tools/

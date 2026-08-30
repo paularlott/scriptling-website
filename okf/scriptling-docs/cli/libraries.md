@@ -8,10 +8,10 @@ sources:
 status: stable
 tags:
     - cli
-title: Libraries
+title: CLI Libraries
 type: Guide
 ---
-# Libraries
+# CLI Libraries
 
 ## Library Loading
 

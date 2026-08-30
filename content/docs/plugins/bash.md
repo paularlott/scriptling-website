@@ -2,7 +2,7 @@
 title: Bash Plugins
 description: Implement the plugin JSON-RPC protocol directly from a shell script.
 tags: [plugins, bash, json-rpc]
-weight: 7
+weight: 5
 ---
 
 A plugin can be any executable that speaks Scriptling's line-delimited JSON-RPC protocol on stdio. This Bash example requires `jq`.

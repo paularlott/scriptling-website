@@ -2,7 +2,7 @@
 title: Built-in Functions
 description: Type conversions, math, string, list, and dictionary built-in functions in Scriptling.
 tags: [reference, builtins]
-weight: 8
+weight: 9
 ---
 
 Scriptling provides many built-in functions that are always available without importing.

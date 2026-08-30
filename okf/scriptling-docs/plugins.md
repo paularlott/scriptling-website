@@ -54,6 +54,7 @@ All four enforce the host security policy (allowed paths for the file-backed pai
 - [Bash Plugins](https://scriptling.dev/okf/scriptling-docs/plugins/bash.md) - Implement the JSON-RPC protocol directly.
 - [PHP Plugins](https://scriptling.dev/okf/scriptling-docs/plugins/php-plugins.md) - Serve the protocol from plain PHP over HTTP.
 - [JSON-RPC Protocol](https://scriptling.dev/okf/scriptling-docs/plugins/protocol.md) - Wire format reference for all methods and value encoding.
+- [Plugin Fetchers](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md) - Serve scheme sources such as `knot://` on demand.
 
 ## Scriptling Scripts as Plugins
 

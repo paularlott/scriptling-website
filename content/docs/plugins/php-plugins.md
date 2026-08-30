@@ -2,7 +2,7 @@
 title: PHP Plugins
 description: Serve the plugin protocol from plain PHP over HTTP JSON-RPC.
 tags: [plugins, php, json-rpc, http]
-weight: 8
+weight: 6
 ---
 
 PHP serves the HTTP plugin transport: instead of stdio, the same protocol

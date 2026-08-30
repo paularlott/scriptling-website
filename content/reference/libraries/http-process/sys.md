@@ -2,7 +2,7 @@
 title: sys
 description: System-specific parameters and functions, similar to Python's sys module.
 tags: [libraries, runtime]
-weight: 1
+weight: 3
 aliases:
   - /reference/libraries/extlib/sys/
   - /reference/libraries/sys/

@@ -3,7 +3,7 @@ title: scriptling.ai.Client
 linkTitle: ai.Client
 description: Primary client interface for calling AI providers like OpenAI, Claude, and Gemini.
 tags: [libraries, ai]
-weight: 1
+weight: 2
 
 aliases:
   - /reference/libraries/scriptling/ai/client/

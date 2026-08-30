@@ -42,3 +42,7 @@ Embed Scriptling in a Go application to evaluate business rules at runtime. Cove
 ### [Building an MCP Tool Server](mcp-tool-server/)
 
 Create a Model Context Protocol server with custom tools that AI assistants can call. Covers tool definition, script implementation, and server startup.
+
+### [Building an MCP Resources & Prompts Server](mcp-resources-prompts/)
+
+Expose MCP resources and prompts as files, alongside tools.

@@ -155,6 +155,7 @@ if __name__ == "__main__":
 {{< card link="control-flow" title="Control Flow" description="Conditionals, loops, match statements, break/continue" >}}
 {{< card link="functions" title="Functions" description="Definition, parameters, *args, **kwargs, lambdas" >}}
 {{< card link="error-handling" title="Error Handling" description="try/except/finally, raise, assert, exception types" >}}
+{{< card link="decorators" title="Decorators" description="Wrapping functions and classes, factories with arguments, stacking" >}}
 {{< card link="classes" title="Classes" description="Class definition, inheritance, super()" >}}
 {{< card link="builtins" title="Built-in Functions" description="Type conversions, math, string, list, dict functions" >}}
 {{< card link="slicing" title="Indexing & Slicing" description="Single index, slice notation, slice() builtin" >}}
