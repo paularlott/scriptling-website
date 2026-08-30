@@ -76,8 +76,8 @@ needed. `--package` is for ordinary packages (a `.zip`, a directory, or a
 URL) and does not take a plugin scheme source; there is no reason to name
 one, since attachment is automatic.
 
-`--plugin` takes an executable path, used literally, so paths containing
-spaces need no special handling. Arguments come from `--plugin-arg`; see
+`--plugin` takes an executable path, used literally (paths containing spaces
+need no special handling), or the http(s) URL of a plugin server. Arguments come from `--plugin-arg`; see
 [loading plugins](/docs/cli/command-line-options/#loading-plugins) for the
 rules when several plugins are loaded at once.
 

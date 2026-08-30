@@ -16,7 +16,7 @@ scriptling --plugin-dir ./plugins --plugin-dir ./more-plugins -c 'import plugin.
 scriptling --plugin ./plugins/hello script.py
 ```
 
-Both flags can be repeated. Scriptling scans executable files directly inside each `--plugin-dir` directory; subdirectories are ignored. A `--plugin` value is an executable path, used literally, so paths containing spaces need nothing special. Arguments come from `--plugin-arg`:
+Both flags can be repeated. Scriptling scans executable files directly inside each `--plugin-dir` directory; subdirectories are ignored. A `--plugin` value is an executable path, used literally, so paths containing spaces need nothing special — or the `http://`/`https://` URL of a plugin server, which speaks the same protocol over JSON-RPC POST instead of stdio (`--plugin-insecure` accepts a self-signed certificate). Arguments come from `--plugin-arg`, and environment entries for an executable plugin from `--plugin-env KEY=VALUE`; both bind the same way, bare with one plugin or `<plugin>=` qualified with several:
 
 ```bash
 scriptling --plugin /usr/local/bin/knot \

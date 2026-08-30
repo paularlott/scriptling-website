@@ -10,6 +10,10 @@ nav-skip: true
 
 {{< version "v0.23.0" >}}
 {{< changelog-item "added" >}}
+**`--plugin` loads plugin servers; `--plugin-env` passes variables.** A `--plugin` value can be the `http://`/`https://` URL of a remote JSON-RPC plugin server instead of an executable (`--plugin-insecure` accepts self-signed certificates), and `--plugin-env KEY=VALUE` layers environment entries onto an executable plugin, binding like `--plugin-arg` (bare with one plugin, `<plugin>=` qualified with several). A [plain-PHP example server](https://github.com/paularlott/scriptling/tree/main/examples/plugins/php-server) shows the whole protocol in another language.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
 **Database support.** New first-party plugins bring SQLite, MySQL/MariaDB, PostgreSQL, Valkey/Redis and BadgerDB to scripts. The relational libraries `scriptling.sqlite` and `scriptling.sql` share a `connect()` → `Connection.query/execute/close` API with rows as dicts; the key/value libraries `scriptling.valkey` and `scriptling.badgerdb` share `get/set/delete/expire/ttl/incr` plus hashes, so code moves between a shared cache and local storage unchanged. The valkey client adds clusters and sentinels (`connect(url, mode=...)`), flushes (`flushdb`/`flushall`), sets, queues and database selection. All pure Go, compiled in or as external plugin binaries. See the new [Database Libraries](/reference/libraries/scriptling/databases/) reference and the runnable [examples](https://github.com/paularlott/scriptling/tree/main/examples/databases).
 {{< /changelog-item >}}
 

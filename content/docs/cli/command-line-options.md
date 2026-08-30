@@ -21,6 +21,8 @@ weight: 2
 | `--plugin-dir`       | `SCRIPTLING_PLUGIN_DIR`    | `plugins.dirs`               | Plugin executable directory (repeatable)             | (none)           |
 | `--plugin`           | `SCRIPTLING_PLUGIN`        | `plugins.paths`              | Plugin executable to load, path taken literally (repeatable) | (none) |
 | `--plugin-arg`       | `SCRIPTLING_PLUGIN_ARG`    | `plugins.args`               | Argument to pass to a `--plugin` executable (repeatable)   | (none)           |
+| `--plugin-env`       | `SCRIPTLING_PLUGIN_ENV`    | `plugins.env`                | KEY=VALUE environment entry for a `--plugin` executable (repeatable) | (none) |
+| `--plugin-insecure`  | `SCRIPTLING_PLUGIN_INSECURE` | `plugins.insecure`         | Skip TLS verification for https:// plugin URLs (self-signed certificates) | false |
 | `--log-level`         | `SCRIPTLING_LOG_LEVEL`     | `log.level`                  | Log level (trace/debug/info/warn/error)              | info             |
 | `--log-format`        | `SCRIPTLING_LOG_FORMAT`    | `log.format`                 | Log format (console/json)                            | console          |
 | `-S`, `--server`      | `SCRIPTLING_SERVER`        | `server.address`             | HTTP server address (host:port)                      | (disabled)       |
@@ -49,7 +51,11 @@ The [network policy](../network-policy/) flag has its own page with the policy f
 Plugins come from two places, and both can be repeated:
 
 - `--plugin-dir` scans a directory and loads every executable in it.
-- `--plugin` loads one executable by path.
+- `--plugin` loads one plugin: an executable path, or the `http://`/`https://`
+  URL of a plugin server, where the plugin protocol speaks JSON-RPC over POST
+  instead of stdio (the same plugin either way; a
+  [PHP example](https://github.com/paularlott/scriptling/tree/main/examples/plugins/php-server)
+  shows how little it takes to serve one).
 
 A `--plugin` value is used literally, so a path containing spaces needs nothing
 beyond ordinary shell quoting:
@@ -85,6 +91,25 @@ An unqualified argument with more than one plugin is an error rather than a
 guess. A value whose text before `=` matches no `--plugin` is treated as a
 plain argument, so ordinary flags like `--alias=testing` pass through
 unqualified.
+
+Environment variables reach an executable plugin with `--plugin-env`, binding
+exactly like `--plugin-arg` with `KEY=VALUE` payloads:
+
+```bash
+scriptling --plugin /usr/local/bin/knot            --plugin-env KNOT_DB=/var/lib/knot            --plugin-env LOG=debug            script.py
+```
+
+The entries layer on top of the inherited environment, so a variable already
+set is overridden and everything else passes through. They apply to executable
+plugins, which the host spawns; a plugin server owns its own environment,
+since the host connects to it.
+
+For https plugin URLs whose certificate is self-signed (development, internal
+networks), `--plugin-insecure` skips certificate verification for that run:
+
+```bash
+scriptling --plugin https://plugins.internal:8443 --plugin-insecure script.py
+```
 
 Explicit `--plugin` entries load before `--plugin-dir` scans. Plugin identity
 is the resolved executable path, so the same binary found in a scanned

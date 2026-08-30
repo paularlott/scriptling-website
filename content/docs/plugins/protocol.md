@@ -158,6 +158,15 @@ rules, category flags). Omitted or nil means the host imposes no
 restrictions. Plugins that predate the field ignore it; plugins that enforce
 it advertise the `policy` capability. The first-party database plugins are
 the reference implementation.
+
+The policy is advisory, and that is a property of the protocol, not an
+oversight: it is delivered to the plugin, and the plugin enforces it. The
+host does not sandbox the plugin process, so the policy bounds what a
+cooperative plugin does, not what a malicious one could. Treat plugins like
+any other executable you choose to run: the policy protects scripts from
+mistakes and misconfiguration inside a plugin you trust, and it is no
+substitute for trusting the plugin binary itself.
+
 A plugin with a fetcher is identified by its `scheme`, whose presence is the
 whole advertisement (see [Plugin Fetchers](/docs/plugins/fetchers/)). Unknown
 capabilities are ignored, so newer plugins still load on older hosts.
@@ -247,7 +256,7 @@ Example:
 
 ### `callback.call`
 
-**Direction:** Plugin -> Host  
+**Direction:** Plugin -> Host
 **When:** A plugin invokes a callback argument before the outer function, constructor, or method call has returned.
 
 Callback calls are ordinary JSON-RPC requests sent over the same stdio stream while another host -> plugin request is still pending. The host executes the Scriptling callback synchronously on the same environment call stack and responds before the plugin continues.
@@ -276,7 +285,7 @@ If the callback raises an error, the host returns a JSON-RPC error and the plugi
 
 ### `host.log`
 
-**Direction:** Plugin -> Host  
+**Direction:** Plugin -> Host
 **When:** A Go plugin writes through `plugin.Logger(ctx)` during an active function, constructor, or method call.
 
 **Request params:**
