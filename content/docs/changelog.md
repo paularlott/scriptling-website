@@ -10,7 +10,7 @@ nav-skip: true
 
 {{< version "v0.23.0" >}}
 {{< changelog-item "added" >}}
-**`--plugin` loads plugin servers; `--plugin-env` passes variables.** A `--plugin` value can be the `http://`/`https://` URL of a remote JSON-RPC plugin server instead of an executable (`--plugin-insecure` accepts self-signed certificates), and `--plugin-env KEY=VALUE` layers environment entries onto an executable plugin, binding like `--plugin-arg` (bare with one plugin, `<plugin>=` qualified with several). A [plain-PHP example server](https://github.com/paularlott/scriptling/tree/main/examples/plugins/php-server) shows the whole protocol in another language.
+**`--plugin` loads plugin servers; `--plugin-env` passes variables.** A `--plugin` value can be the `http://`/`https://` URL of a remote JSON-RPC plugin server instead of an executable (`--plugin-insecure` accepts self-signed certificates), and `--plugin-env KEY=VALUE` layers environment entries onto an executable plugin, binding like `--plugin-arg` (bare with one plugin, `<plugin>=` qualified with several). HTTP plugin URLs authenticate with `--plugin-header KEY=VALUE` (a bearer token, say) or `user:pass@` in the URL as Basic auth. A [plain-PHP example server](https://github.com/paularlott/scriptling/tree/main/examples/plugins/php-server) shows the whole protocol in another language (see [PHP Plugins](/docs/plugins/php-plugins/)).
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}

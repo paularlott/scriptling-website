@@ -40,6 +40,7 @@ All four enforce the host security policy (allowed paths for the file-backed pai
   - [Host-Side Scripting](go-plugins/host-side-scripting/) - Pure Scriptling functions and classes on the host.
 - [C Plugins](c-plugins/) - Build plugins in C using the single-header SDK.
 - [Bash Plugins](bash/) - Implement the JSON-RPC protocol directly.
+- [PHP Plugins](php-plugins/) - Serve the protocol from plain PHP over HTTP.
 - [JSON-RPC Protocol](protocol/) - Wire format reference for all methods and value encoding.
 
 ## Scriptling Scripts as Plugins

@@ -22,6 +22,7 @@ weight: 2
 | `--plugin`           | `SCRIPTLING_PLUGIN`        | `plugins.paths`              | Plugin executable to load, path taken literally (repeatable) | (none) |
 | `--plugin-arg`       | `SCRIPTLING_PLUGIN_ARG`    | `plugins.args`               | Argument to pass to a `--plugin` executable (repeatable)   | (none)           |
 | `--plugin-env`       | `SCRIPTLING_PLUGIN_ENV`    | `plugins.env`                | KEY=VALUE environment entry for a `--plugin` executable (repeatable) | (none) |
+| `--plugin-header`    | `SCRIPTLING_PLUGIN_HEADER` | `plugins.headers`            | HTTP header KEY=VALUE for an http(s) `--plugin` (repeatable) | (none) |
 | `--plugin-insecure`  | `SCRIPTLING_PLUGIN_INSECURE` | `plugins.insecure`         | Skip TLS verification for https:// plugin URLs (self-signed certificates) | false |
 | `--log-level`         | `SCRIPTLING_LOG_LEVEL`     | `log.level`                  | Log level (trace/debug/info/warn/error)              | info             |
 | `--log-format`        | `SCRIPTLING_LOG_FORMAT`    | `log.format`                 | Log format (console/json)                            | console          |
@@ -103,6 +104,27 @@ The entries layer on top of the inherited environment, so a variable already
 set is overridden and everything else passes through. They apply to executable
 plugins, which the host spawns; a plugin server owns its own environment,
 since the host connects to it.
+
+An HTTP plugin that needs authentication takes headers with
+`--plugin-header`, binding like the other plugin flags (bare with one plugin,
+`<plugin>=` qualified with several); the value keeps its own equals sign, so
+bearer tokens pass through whole:
+
+```bash
+scriptling --plugin https://plugins.internal:8443 \
+           --plugin-header "Authorization=Bearer $PLUGIN_TOKEN" \
+           script.py
+```
+
+Username and password can also ride the URL itself, as HTTP Basic auth:
+
+```bash
+scriptling --plugin https://user:pass@plugins.internal:8443 script.py
+```
+
+The credentials travel as the Authorization header and never appear in the
+request line or Host header; an explicit `--plugin-header Authorization=...`
+wins over URL credentials.
 
 For https plugin URLs whose certificate is self-signed (development, internal
 networks), `--plugin-insecure` skips certificate verification for that run:
