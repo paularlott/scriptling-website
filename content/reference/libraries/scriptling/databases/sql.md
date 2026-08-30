@@ -49,6 +49,7 @@ Rows are dicts keyed by column name; values are ints, floats, bools, strings or 
 | `query(sql, *params)` | Run a SELECT-style statement, returning a list of row dicts |
 | `query_iter(sql, *params)` | Same statement, streamed: a `Cursor` whose `next()` yields one row dict at a time (`None` at the end) instead of materialising the whole result |
 | `execute(sql, *params)` | Run a row-changing statement, returning `{"last_insert_id": int, "rows_affected": int}` |
+| `get_orm()` | Return the [ORM](../orm/) bound to this connection |
 | `close()` | Close the connection |
 
 PostgreSQL has no last-insert-id: `last_insert_id` is 0 there; use `insert ... returning id` with `query()` instead:

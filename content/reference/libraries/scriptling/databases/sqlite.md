@@ -48,6 +48,7 @@ Rows are dicts keyed by column name; values are ints, floats, bools, strings or 
 | `query(sql, *params)` | Run a SELECT-style statement, returning a list of row dicts |
 | `query_iter(sql, *params)` | Same statement, streamed: a `Cursor` whose `next()` yields one row dict at a time (`None` at the end) instead of materialising the whole result |
 | `execute(sql, *params)` | Run a row-changing statement (INSERT/UPDATE/DELETE/DDL), returning `{"last_insert_id": int, "rows_affected": int}` |
+| `get_orm()` | Return the [ORM](../orm/) bound to this connection |
 | `close()` | Close the connection and release the database handle |
 
 The class can also be constructed directly: `sqlite.Connection(path, timeout_ms=5000)`.
