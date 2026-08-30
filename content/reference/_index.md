@@ -173,5 +173,5 @@ if __name__ == "__main__":
 
 - [Quick Start](/docs/quick-start/) - Get started with CLI or embedding
 - [Go Integration](/docs/go-integration/) - Embedding Scriptling in Go
-- [CLI Reference](/docs/cli/) - Command-line interface documentation
+- [CLI Guide](/docs/cli/) - Command-line interface documentation
 - [Security Guide](/docs/security/) - Security best practices

@@ -191,5 +191,5 @@ if __name__ == "__main__":
 
 - [Quick Start](https://scriptling.dev/okf/scriptling-docs/./quick-start.md) - Get started with CLI or embedding
 - [Go Integration](https://scriptling.dev/okf/scriptling-docs/./go-integration.md) - Embedding Scriptling in Go
-- [CLI Reference](https://scriptling.dev/okf/scriptling-docs/./cli.md) - Command-line interface documentation
+- [CLI Guide](https://scriptling.dev/okf/scriptling-docs/./cli.md) - Command-line interface documentation
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security best practices

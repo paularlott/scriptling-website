@@ -138,7 +138,7 @@ print(calc("2+3"))             # 5
 print(_tools["calc"]["description"])  # "Calculate expression"
 ```
 
-This pattern is used by `scriptling.runtime.mcp` for [MCP tool registration](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/mcp.md).
+This pattern is used by `scriptling.runtime.mcp` for [MCP tool registration](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md).
 
 ## Accessing `fn.__name__`
 
@@ -259,4 +259,4 @@ print(Counter.increment())  # 2
 
 - [Functions](https://scriptling.dev/okf/scriptling-reference/functions.md) — Function definition, parameters, closures
 - [Classes](https://scriptling.dev/okf/scriptling-reference/classes.md#decorators) — `@property`, `@staticmethod`, `@classmethod`
-- [runtime.mcp](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/mcp.md) — MCP tool registration via decorators
+- [runtime.mcp](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md) — MCP tool registration via decorators

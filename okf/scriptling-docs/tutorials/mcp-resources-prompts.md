@@ -242,5 +242,5 @@ clients re-fetch. `SIGHUP` / `SIGUSR1` force a reload.
 
 - [Building an MCP Tool Server](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-tool-server.md) — the tool tutorial
 - [MCP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md) — running the server, flags, transports
-- [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/writing-mcp-tools.md) — tool metadata reference (the `.toml` format prompts share)
-- [MCP client library](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/client.md) — reading resources and prompts from a server
+- [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/mcp/writing-mcp-tools.md) — tool metadata reference (the `.toml` format prompts share)
+- [MCP client library](https://scriptling.dev/okf/scriptling-libraries/mcp/client.md) — reading resources and prompts from a server

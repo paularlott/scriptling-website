@@ -246,7 +246,7 @@ my-tools/
 
 ## See Also
 
-- [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/writing-mcp-tools.md) - Complete MCP tool reference
-- [MCP Client Library](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/client.md) - Connecting to MCP servers from scripts
+- [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/mcp/writing-mcp-tools.md) - Complete MCP tool reference
+- [MCP Client Library](https://scriptling.dev/okf/scriptling-libraries/mcp/client.md) - Connecting to MCP servers from scripts
 - [CLI MCP Server](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md) - CLI server mode documentation
 - [Statistics Library](https://scriptling.dev/okf/scriptling-libraries/math-numbers/statistics.md) - Stats functions used in this tutorial

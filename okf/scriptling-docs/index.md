@@ -9,7 +9,7 @@ Guides: quick start, CLI usage, Go integration, plugins, security, and tutorials
 
 - [Documentation](https://scriptling.dev/okf/scriptling-docs/scriptling-docs.md)
 - [Changelog](https://scriptling.dev/okf/scriptling-docs/changelog.md)
-- [CLI Reference](https://scriptling.dev/okf/scriptling-docs/cli.md)
+- [CLI Guide](https://scriptling.dev/okf/scriptling-docs/cli.md)
 - [Go Integration](https://scriptling.dev/okf/scriptling-docs/go-integration.md)
 - [LLM Script Generation Guide](https://scriptling.dev/okf/scriptling-docs/llm-guide.md)
 - [Plugins](https://scriptling.dev/okf/scriptling-docs/plugins.md)

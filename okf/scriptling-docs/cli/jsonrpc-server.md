@@ -31,7 +31,7 @@ handlers via `scriptling.runtime.jsonrpc`. The server then reads newline-
 delimited JSON-RPC 2.0 requests from stdin and writes one response per line to
 stdout.
 
-> **Keeping the setup script alive:** As with the HTTP server, the setup script can call [`runtime.start_server()`](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime.md) to stay alive alongside the stdio server instead of exiting after registration: useful for sharing state or running background work while serving requests.
+> **Keeping the setup script alive:** As with the HTTP server, the setup script can call [`runtime.start_server()`](https://scriptling.dev/okf/scriptling-libraries/./runtime.md) to stay alive alongside the stdio server instead of exiting after registration: useful for sharing state or running background work while serving requests.
 
 > **Logging goes to stderr.** In `--json-rpc` mode, all log output is
 > automatically redirected to **stderr** so it never corrupts the JSON-RPC
@@ -105,7 +105,7 @@ def on_progress(params):
     pass
 ```
 
-See the [scriptling.runtime.jsonrpc reference](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/jsonrpc.md)
+See the [scriptling.runtime.jsonrpc reference](https://scriptling.dev/okf/scriptling-libraries/runtime/jsonrpc.md)
 for the full API.
 
 ### Decorator Syntax
@@ -212,5 +212,5 @@ a response with a custom error code and optional structured `data`.
 
 ## See Also
 
-- [scriptling.runtime.jsonrpc reference](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/jsonrpc.md)
+- [scriptling.runtime.jsonrpc reference](https://scriptling.dev/okf/scriptling-libraries/runtime/jsonrpc.md)
 - [HTTP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md) for the equivalent HTTP concurrency model

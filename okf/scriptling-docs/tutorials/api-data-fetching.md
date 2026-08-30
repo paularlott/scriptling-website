@@ -323,4 +323,4 @@ if resp.status_code == 204:
 - [Requests Library](https://scriptling.dev/okf/scriptling-libraries/http-process/requests.md) - Full HTTP client documentation
 - [JSON Library](https://scriptling.dev/okf/scriptling-libraries/data-formats/json.md) - JSON parsing reference
 - [Reference](https://scriptling.dev/okf/scriptling-reference/scriptling-reference.md) - Complete language reference
-- [CLI Reference](https://scriptling.dev/okf/scriptling-docs/./cli.md) - Command-line options
+- [CLI Guide](https://scriptling.dev/okf/scriptling-docs/./cli.md) - Command-line options

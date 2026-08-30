@@ -27,7 +27,7 @@ export SCRIPTLING_PLUGIN_DIR="$(brew --prefix)/opt/scriptling-plugins/libexec/pl
 Or use `scriptling-full` — the same CLI with all database plugins compiled
 in (mutually exclusive with `scriptling`): `brew install paularlott/tap/scriptling-full`.
 
-See [Plugins](../plugins/) for how plugins load and the [database reference](../../reference/libraries/scriptling/databases/) for the APIs.
+See [Plugins](../../plugins/) for how plugins load and the [database reference](../../../reference/libraries/databases/) for the APIs.
 
 ### GitHub Releases
 
@@ -107,5 +107,5 @@ scriptling --server :8000 --mcp-tools ./tools setup.py
 
 - [Language Guide](../../../reference/) - Learn the complete language syntax
 - [Libraries](../../../reference/libraries/) - Explore available libraries and APIs
-- [CLI Reference](../../cli/) - Full command-line interface documentation
+- [CLI Guide](../../cli/) - Full command-line interface documentation
 - [Security Guide](../../security/) - Security best practices

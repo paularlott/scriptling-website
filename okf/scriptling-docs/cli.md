@@ -8,10 +8,10 @@ sources:
 status: stable
 tags:
     - cli
-title: CLI Reference
+title: CLI Guide
 type: Guide
 ---
-# CLI Reference
+# CLI Guide
 
 Scriptling includes a command-line interface for running scripts, interactive mode, and HTTP/MCP/JSON-RPC servers.
 

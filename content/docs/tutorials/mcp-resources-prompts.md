@@ -233,5 +233,5 @@ clients re-fetch. `SIGHUP` / `SIGUSR1` force a reload.
 
 - [Building an MCP Tool Server](../mcp-tool-server/) — the tool tutorial
 - [MCP Server Mode](../../cli/mcp-server/) — running the server, flags, transports
-- [Writing MCP Tools](../../../reference/libraries/scriptling/mcp/writing-mcp-tools/) — tool metadata reference (the `.toml` format prompts share)
-- [MCP client library](../../../reference/libraries/scriptling/mcp/client/) — reading resources and prompts from a server
+- [Writing MCP Tools](../../../reference/libraries/mcp/writing-mcp-tools/) — tool metadata reference (the `.toml` format prompts share)
+- [MCP client library](../../../reference/libraries/mcp/client/) — reading resources and prompts from a server

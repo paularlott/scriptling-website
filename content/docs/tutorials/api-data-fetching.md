@@ -314,4 +314,4 @@ if resp.status_code == 204:
 - [Requests Library](../../../reference/libraries/http-process/requests/) - Full HTTP client documentation
 - [JSON Library](../../../reference/libraries/data-formats/json/) - JSON parsing reference
 - [Reference](/reference/) - Complete language reference
-- [CLI Reference](../../cli/) - Command-line options
+- [CLI Guide](../../cli/) - Command-line options

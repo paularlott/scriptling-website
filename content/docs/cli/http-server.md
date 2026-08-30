@@ -18,7 +18,7 @@ scriptling --server :8000 setup.py
 
 The setup script is executed when the server starts and typically registers route handlers.
 
-> **Keeping the setup script alive:** By default the setup script exits after registering handlers and the server runs until shutdown. To keep the script running alongside the server: e.g. to maintain gossip state, run a polling loop, or share objects with handlers via `runtime.sync`: call [`runtime.start_server()`](../../../reference/libraries/scriptling/runtime/) instead of exiting. See the [runtime reference](../../../reference/libraries/scriptling/runtime/) for details.
+> **Keeping the setup script alive:** By default the setup script exits after registering handlers and the server runs until shutdown. To keep the script running alongside the server: e.g. to maintain gossip state, run a polling loop, or share objects with handlers via `runtime.sync`: call [`runtime.start_server()`](../../../reference/libraries/runtime/) instead of exiting. See the [runtime reference](../../../reference/libraries/runtime/) for details.
 
 ## Server Options
 
@@ -418,4 +418,4 @@ curl -X POST http://localhost:8000/api/users \
 - [Basic Usage](../basic-usage/) - Running scripts, interactive mode, and lint mode
 - [Command Line Options](../command-line-options/) - Every flag and configuration file setting
 - [MCP Server Mode](../mcp-server/) - Model Context Protocol integration
-- [Runtime HTTP Library](../../../reference/libraries/scriptling/runtime/http/) - HTTP server API reference
+- [Runtime HTTP Library](../../../reference/libraries/runtime/http/) - HTTP server API reference

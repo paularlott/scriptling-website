@@ -120,5 +120,5 @@ except Exception as e:
 - [bytes](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md): Scriptling's binary data type.
 - [toml](https://scriptling.dev/okf/scriptling-libraries/data-formats/toml.md): parse and generate TOML configuration data.
 - [yaml](https://scriptling.dev/okf/scriptling-libraries/data-formats/yaml.md): parse and generate YAML data.
-- [scriptling.csv](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/csv.md): parse and generate CSV data.
-- [scriptling.xml](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/xml.md): parse and generate XML data.
+- [scriptling.csv](https://scriptling.dev/okf/scriptling-libraries/utilities/csv.md): parse and generate CSV data.
+- [scriptling.xml](https://scriptling.dev/okf/scriptling-libraries/utilities/xml.md): parse and generate XML data.

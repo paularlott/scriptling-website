@@ -233,7 +233,7 @@ Custom tools are loaded from the directory specified by `--mcp-tools`. Each tool
 scriptling --server :8000 --mcp-tools ./tools setup.py
 ```
 
-For details on creating custom tools, see [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/writing-mcp-tools.md).
+For details on creating custom tools, see [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/mcp/writing-mcp-tools.md).
 
 ### Conditional Tool Registration
 
@@ -378,9 +378,9 @@ when `--mcp-tools` is set) and a `write_script` prompt are always available.
 
 **For a walkthrough of creating resources and prompts** — including the shared
 `.toml` format — see the [Building an MCP Resources & Prompts Server tutorial](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-resources-prompts.md).
-The [tool metadata reference](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/writing-mcp-tools.md)
+The [tool metadata reference](https://scriptling.dev/okf/scriptling-libraries/mcp/writing-mcp-tools.md)
 covers the `.toml` fields prompts share. To read resources and prompts from a
-server in a script, see the [scriptling.mcp client](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/client.md#resources-and-prompts).
+server in a script, see the [scriptling.mcp client](https://scriptling.dev/okf/scriptling-libraries/mcp/client.md#resources-and-prompts).
 
 ## Live Reload and Change Notifications
 
@@ -448,6 +448,6 @@ This configuration:
 - [Basic Usage](https://scriptling.dev/okf/scriptling-docs/cli/basic-usage.md) - Running scripts, interactive mode, and lint mode
 - [Command Line Options](https://scriptling.dev/okf/scriptling-docs/cli/command-line-options.md) - Every flag and configuration file setting
 - [HTTP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md) - HTTP server without MCP
-- [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/writing-mcp-tools.md) - Creating custom MCP tools
-- [MCP Library](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp.md) - MCP library reference
-- [MCP Tool Library](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/tool.md) - Tool implementation API
+- [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/mcp/writing-mcp-tools.md) - Creating custom MCP tools
+- [MCP Library](https://scriptling.dev/okf/scriptling-libraries/./mcp.md) - MCP library reference
+- [MCP Tool Library](https://scriptling.dev/okf/scriptling-libraries/mcp/tool.md) - Tool implementation API

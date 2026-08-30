@@ -70,5 +70,5 @@ Scriptling can be used two ways: as a standalone command-line tool, or embedded 
 
 - [Language Guide](/reference/) - Complete language reference
 - [Libraries](../../reference/libraries/) - Library usage and APIs
-- [CLI Reference](../cli/) - Full command-line documentation
+- [CLI Guide](../cli/) - Full command-line documentation
 - [Go Integration](../go-integration/) - Deep dive into embedding

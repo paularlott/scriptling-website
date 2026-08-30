@@ -1,5 +1,5 @@
 ---
-title: CLI Reference
+title: CLI Guide
 description: Command-line interface for Scriptling.
 tags: [cli]
 weight: 2

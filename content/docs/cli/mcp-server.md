@@ -223,7 +223,7 @@ Custom tools are loaded from the directory specified by `--mcp-tools`. Each tool
 scriptling --server :8000 --mcp-tools ./tools setup.py
 ```
 
-For details on creating custom tools, see [Writing MCP Tools](../../../reference/libraries/scriptling/mcp/writing-mcp-tools/).
+For details on creating custom tools, see [Writing MCP Tools](../../../reference/libraries/mcp/writing-mcp-tools/).
 
 ### Conditional Tool Registration
 
@@ -368,9 +368,9 @@ when `--mcp-tools` is set) and a `write_script` prompt are always available.
 
 **For a walkthrough of creating resources and prompts** — including the shared
 `.toml` format — see the [Building an MCP Resources & Prompts Server tutorial](../../tutorials/mcp-resources-prompts/).
-The [tool metadata reference](../../../reference/libraries/scriptling/mcp/writing-mcp-tools/)
+The [tool metadata reference](../../../reference/libraries/mcp/writing-mcp-tools/)
 covers the `.toml` fields prompts share. To read resources and prompts from a
-server in a script, see the [scriptling.mcp client](../../../reference/libraries/scriptling/mcp/client/#resources-and-prompts).
+server in a script, see the [scriptling.mcp client](../../../reference/libraries/mcp/client/#resources-and-prompts).
 
 ## Live Reload and Change Notifications
 
@@ -438,6 +438,6 @@ This configuration:
 - [Basic Usage](../basic-usage/) - Running scripts, interactive mode, and lint mode
 - [Command Line Options](../command-line-options/) - Every flag and configuration file setting
 - [HTTP Server Mode](../http-server/) - HTTP server without MCP
-- [Writing MCP Tools](../../../reference/libraries/scriptling/mcp/writing-mcp-tools/) - Creating custom MCP tools
-- [MCP Library](../../../reference/libraries/scriptling/mcp/) - MCP library reference
-- [MCP Tool Library](../../../reference/libraries/scriptling/mcp/tool/) - Tool implementation API
+- [Writing MCP Tools](../../../reference/libraries/mcp/writing-mcp-tools/) - Creating custom MCP tools
+- [MCP Library](../../../reference/libraries/mcp/) - MCP library reference
+- [MCP Tool Library](../../../reference/libraries/mcp/tool/) - Tool implementation API

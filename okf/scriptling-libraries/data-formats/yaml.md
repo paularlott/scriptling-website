@@ -174,5 +174,5 @@ print(updated_yaml)
 
 - [json](https://scriptling.dev/okf/scriptling-libraries/data-formats/json.md): parse and generate JSON data.
 - [toml](https://scriptling.dev/okf/scriptling-libraries/data-formats/toml.md): parse and generate TOML configuration data.
-- [scriptling.csv](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/csv.md): parse and generate CSV data.
-- [scriptling.xml](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/xml.md): parse and generate XML data.
+- [scriptling.csv](https://scriptling.dev/okf/scriptling-libraries/utilities/csv.md): parse and generate CSV data.
+- [scriptling.xml](https://scriptling.dev/okf/scriptling-libraries/utilities/xml.md): parse and generate XML data.

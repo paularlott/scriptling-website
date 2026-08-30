@@ -409,5 +409,5 @@ If you discover a security vulnerability in Scriptling, please report it respons
 ## Additional Resources
 
 - [Go Integration Basics](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md) - Setting up Scriptling in Go
-- [Sandbox Library](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/sandbox.md) - Runtime sandbox configuration
+- [Sandbox Library](https://scriptling.dev/okf/scriptling-libraries/runtime/sandbox.md) - Runtime sandbox configuration
 - [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - How to register libraries in Go

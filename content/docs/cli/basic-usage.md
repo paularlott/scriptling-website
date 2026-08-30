@@ -116,4 +116,4 @@ print(f"Path: {env['PATH']}")
 - [Libraries](../libraries/) - Loading, disabling, and access modes
 - [HTTP Server Mode](../http-server/) - Running Scriptling as an HTTP server
 - [MCP Server Mode](../mcp-server/) - Model Context Protocol integration
-- [Writing MCP Tools](../../../reference/libraries/scriptling/mcp/writing-mcp-tools/) - Creating custom MCP tools
+- [Writing MCP Tools](../../../reference/libraries/mcp/writing-mcp-tools/) - Creating custom MCP tools
