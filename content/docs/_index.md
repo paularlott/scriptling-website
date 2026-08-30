@@ -14,6 +14,7 @@ Scriptling is a minimal, sandboxed interpreter for Python-like scripting designe
 {{< card link="cli/" title="CLI Reference" description="Running scripts, HTTP server mode, MCP server mode, and packages" >}}
 {{< card link="go-integration/" title="Go Integration" description="Embed the interpreter, register functions, and create custom libraries" >}}
 {{< card link="security/" title="Security Guide" description="Sandbox configuration, path restrictions, and network access control" >}}
+{{< card link="plugins/" title="Plugins" description="Extend Scriptling with Go, C, PHP or any JSON-RPC language; database drivers included" >}}
 {{< /cards >}}
 
 ## Tutorials

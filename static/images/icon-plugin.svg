@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <rect width="100" height="100" rx="16" fill="#0d9488" fill-opacity="0.1"/>
+  <!-- Puzzle piece: the classic extension/plugin mark -->
+  <path d="M38 22H54C54 22 52 26 52 30C52 35 56 38 61 38C66 38 70 35 70 30C70 26 68 22 68 22H84V38C84 38 80 36 76 36C71 36 68 40 68 45C68 50 71 54 76 54C80 54 84 52 84 52V68H68C68 68 70 64 70 60C70 55 66 52 61 52C56 52 52 55 52 60C52 64 54 68 54 68H38V22Z"
+    stroke="#0d9488" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M38 22H22V38C22 38 26 36 30 36C35 36 38 40 38 45C38 50 35 54 30 54C26 54 22 52 22 52V68H38"
+    stroke="#059669" stroke-width="3.5" stroke-linejoin="round"/>
+</svg>

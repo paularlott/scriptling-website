@@ -68,6 +68,28 @@ tags: [home]
 {{< feature-grid >}}
   {{< feature-row
     reverse=true
+    img="/images/icon-database.svg"
+    alt="Database Support"
+    is4=true
+  >}}
+  ## Built-in Database Support
+  SQLite, MySQL/MariaDB, PostgreSQL, Valkey/Redis and BadgerDB plugins with a shared API and a script-side ORM: query builders, criteria and model gateways that run unchanged on every backend.
+  {{< /feature-row >}}
+
+  {{< feature-row
+    reverse=true
+    img="/images/icon-plugin.svg"
+    alt="Plugin System"
+    is4=true
+  >}}
+  ## Plugin Extensibility
+  Extend with Go, C, PHP or any language speaking JSON-RPC: libraries, remote objects and whole file sources (knot:// style) served from disk or http(s), with the host security policy delivered to every plugin.
+  {{< /feature-row >}}
+{{< /feature-grid >}}
+
+{{< feature-grid >}}
+  {{< feature-row
+    reverse=true
     img="/images/icon-library.svg"
     alt="Rich Library Ecosystem"
     is4=true
@@ -97,6 +119,7 @@ Scriptling is an open-source (MIT License) scripting language that bridges the g
 - **AI & LLM Integration** - Let AI agents execute code safely with built-in guardrails
 - **Go Embedding** - Add scripting capabilities to your Go applications
 - **REST API Automation** - Built-in HTTP client with JSON handling
+- **Database Access** - SQL, NoSQL and embedded stores through one plugin API with an ORM
 - **Sandboxed Execution** - Run untrusted code with configurable security
 - **MCP Servers** - Build Model Context Protocol servers for LLM tools
 - **Developer Tooling** - [VSCode extension](https://marketplace.visualstudio.com/items?itemName=PaulArlott.scriptling) with syntax highlighting and language support
