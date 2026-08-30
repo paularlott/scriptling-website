@@ -143,7 +143,9 @@ runtime.http.route("/users/{id}", "handlers.user_resource", methods=["GET", "PUT
 
 ### `middleware(handler)`
 
-Registers global middleware that runs before every route handler. The middleware receives the request and should return `None` to continue to the handler, or a response dict to short-circuit the request.
+Registers global middleware that runs before every route handler — and, when the protocol endpoints are enabled, before the `/mcp`, `/json-rpc` and WebSocket handlers too. The middleware receives the request and should return `None` to continue to the handler, or a response dict to short-circuit the request.
+
+The middleware can pass data to the handler by writing to `request.context`, a dict that starts empty on every request. HTTP route handlers read it straight off their request object; MCP tools and JSON-RPC methods read it with `request_context()` / `get_request()` (see the [MCP tool](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/tool.md) and [JSON-RPC](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/jsonrpc.md) pages). Keep plain data in it: `request_context()` copies dicts and lists deeply so concurrent handlers cannot race through them, but instances pass by reference (they may hold resources), so a shared instance is still shared. It can also register MCP entries for the life of the request — per-user tools, resources and prompts — with the [request-scoped registration](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/mcp.md#request-scoped-registration) functions.
 
 **Parameters:**
 - `handler` (`str`): Middleware function as `"library.function"`.
@@ -156,6 +158,7 @@ import scriptling.runtime as runtime
 def auth(request):
     if "authorization" not in request.headers:
         return runtime.http.json(401, {"error": "Unauthorized"})
+    request.context["user"] = "alice"  # Readable by the handler
     return None  # Continue to handler
 
 runtime.http.middleware("handlers.auth")
@@ -232,7 +235,7 @@ The object passed to a `websocket()` handler:
 | `close()` | Closes the connection. |
 | `remote_addr` | The client's remote address as a `str`. |
 
-This is the server-side counterpart to the client documented on the [scriptling.net.websocket](../networking/websocket.md) page: the two expose the same `connected()`/`receive()`/`send()`/`send_binary()`/`close()`/`remote_addr` surface. Use `scriptling.net.websocket.is_text()` / `is_binary()` to inspect a received message's type.
+This is the server-side counterpart to the client documented on the [scriptling.net.websocket](https://scriptling.dev/okf/scriptling-libraries/scriptling/networking/websocket.md) page: the two expose the same `connected()`/`receive()`/`send()`/`send_binary()`/`close()`/`remote_addr` surface. Use `scriptling.net.websocket.is_text()` / `is_binary()` to inspect a received message's type.
 
 ### `json(status_code, data)`
 
@@ -327,6 +330,7 @@ Handlers receive a Request object with these fields:
 - `query` (`dict`): Query parameters.
 - `path_params` (`dict`): Path parameters captured from route wildcards.
 - `remote_addr` (`str`): Remote address of the client.
+- `context` (`dict`): Starts empty on every request; middleware can write to it (e.g. `request.context["user"] = name` after authenticating) and the handler reads it back. Per-request only — not related to the persistent KV store.
 
 **Methods:**
 
@@ -378,13 +382,13 @@ Routes are registered during setup script execution. Use `--web-root <dir>` to s
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.runtime.http` does not make outbound requests: it registers routes and handlers that turn the embedding process into (or adds to) an HTTP **server**, exposing a network listener. The risk shape is therefore about what gets exposed: every registered route, middleware, and static directory becomes reachable by anyone who can reach the listening address. Review handler logic for authorization, and be deliberate about what `static()` directories you expose. For a full risk breakdown across all libraries, see the [Security Guide](../../../scriptling-docs/security.md).
+`scriptling.runtime.http` does not make outbound requests: it registers routes and handlers that turn the embedding process into (or adds to) an HTTP **server**, exposing a network listener. The risk shape is therefore about what gets exposed: every registered route, middleware, and static directory becomes reachable by anyone who can reach the listening address. Review handler logic for authorization, and be deliberate about what `static()` directories you expose. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 
 ## See Also
 
-- [scriptling.runtime](runtime.md): background tasks, `start_server()`, and the rest of the runtime namespace
-- [scriptling.runtime.jsonrpc](jsonrpc.md): JSON-RPC 2.0 server sharing the same handler model
-- [scriptling.runtime.kv](kv.md): share state across HTTP handlers
-- [Security Guide](../../../scriptling-docs/security.md)
+- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/runtime.md): background tasks, `start_server()`, and the rest of the runtime namespace
+- [scriptling.runtime.jsonrpc](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/jsonrpc.md): JSON-RPC 2.0 server sharing the same handler model
+- [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/kv.md): share state across HTTP handlers
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md)

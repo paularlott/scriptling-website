@@ -168,4 +168,4 @@ The complete documentation is published as [OKF](https://github.com/GoogleCloudP
 | `scriptling-reference` | Language reference: syntax, types, operators, control flow | `https://scriptling.dev/okf/scriptling-reference/index.md` |
 | `scriptling-docs` | Guides: CLI, Go integration, security, tutorials | `https://scriptling.dev/okf/scriptling-docs/index.md` |
 
-Each bundle's `index.md` lists its concepts; follow the relative links from there. To give an agent search as well as reads, serve the bundles through an MCP server instead — see the [Documentation MCP Server](quick-start/documentation-mcp.md) guide.
+Each bundle's `index.md` lists its concepts; follow the relative links from there. To give an agent search as well as reads, serve the bundles through an MCP server instead — see the [Documentation MCP Server](https://scriptling.dev/okf/scriptling-docs/quick-start/documentation-mcp.md) guide.

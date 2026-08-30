@@ -16,10 +16,10 @@ type: API Reference
 
 | Library | Description |
 |---------|-------------|
-| [re](text-processing/regex.md) | Regular expression operations |
-| [string](text-processing/string.md) | String constants |
-| [textwrap](text-processing/textwrap.md) | Text wrapping and filling |
-| [html](text-processing/html.md) | HTML escaping and unescaping |
-| [html.parser](text-processing/html.parser.md) | HTML/XHTML parser |
-| [difflib](text-processing/difflib.md) | Sequence comparison and diff generation |
-| [shlex](text-processing/shlex.md) | Shell-style quoting, splitting, and joining |
+| [re](https://scriptling.dev/okf/scriptling-libraries/text-processing/regex.md) | Regular expression operations |
+| [string](https://scriptling.dev/okf/scriptling-libraries/text-processing/string.md) | String constants |
+| [textwrap](https://scriptling.dev/okf/scriptling-libraries/text-processing/textwrap.md) | Text wrapping and filling |
+| [html](https://scriptling.dev/okf/scriptling-libraries/text-processing/html.md) | HTML escaping and unescaping |
+| [html.parser](https://scriptling.dev/okf/scriptling-libraries/text-processing/html.parser.md) | HTML/XHTML parser |
+| [difflib](https://scriptling.dev/okf/scriptling-libraries/text-processing/difflib.md) | Sequence comparison and diff generation |
+| [shlex](https://scriptling.dev/okf/scriptling-libraries/text-processing/shlex.md) | Shell-style quoting, splitting, and joining |

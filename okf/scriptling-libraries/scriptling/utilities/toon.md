@@ -255,4 +255,4 @@ Use TOON for hand-written config, human-in-the-loop data, comments, and tabular 
 
 ## See Also
 
-- [scriptling.similarity](similarity.md) - Fuzzy matching and tokenization, often used alongside decoded TOON records
+- [scriptling.similarity](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/similarity.md) - Fuzzy matching and tokenization, often used alongside decoded TOON records

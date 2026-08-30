@@ -15,7 +15,7 @@ type: API Reference
 ---
 # scriptling.template.text
 
-The `scriptling.template.text` library renders text templates using Go's `text/template`. No escaping is applied: use this for emails, config files, or any other non-HTML output. For browser-rendered output, use [scriptling.template.html](html.md) instead.
+The `scriptling.template.text` library renders text templates using Go's `text/template`. No escaping is applied: use this for emails, config files, or any other non-HTML output. For browser-rendered output, use [scriptling.template.html](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/template/html.md) instead.
 
 ## Available Functions
 
@@ -147,4 +147,4 @@ print(tmpl.render({"Name": "Alice", "Product": "Scriptling Pro", "ExpiryDays": 1
 
 ## See Also
 
-- [scriptling.template.html](html.md) - Auto-escaped template rendering for browser output
+- [scriptling.template.html](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/template/html.md) - Auto-escaped template rendering for browser output

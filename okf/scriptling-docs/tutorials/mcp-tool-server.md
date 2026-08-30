@@ -19,7 +19,7 @@ This tutorial walks through building an MCP (Model Context Protocol) server with
 
 ## Prerequisites
 
-- Scriptling CLI installed ([Installation](../quick-start/cli.md))
+- Scriptling CLI installed ([Installation](https://scriptling.dev/okf/scriptling-docs/quick-start/cli.md))
 - An MCP-compatible AI client (e.g., Claude Desktop)
 
 ## What You'll Build
@@ -155,7 +155,7 @@ Scriptling serves MCP over HTTP. Start the server with the tools directory:
 scriptling --server :8000 --mcp-tools ./my-tools setup.py
 ```
 
-The MCP endpoint is mounted at `http://127.0.0.1:8000/mcp`. See [MCP Server Mode](../cli/mcp-server.md) for the full set of options.
+The MCP endpoint is mounted at `http://127.0.0.1:8000/mcp`. See [MCP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md) for the full set of options.
 
 ## Step 6: Configure Claude Desktop
 
@@ -246,7 +246,7 @@ my-tools/
 
 ## See Also
 
-- [Writing MCP Tools](../../scriptling-libraries/scriptling/mcp/writing-mcp-tools.md) - Complete MCP tool reference
-- [MCP Client Library](../../scriptling-libraries/scriptling/mcp/client.md) - Connecting to MCP servers from scripts
-- [CLI MCP Server](../cli/mcp-server.md) - CLI server mode documentation
-- [Statistics Library](../../scriptling-libraries/math-numbers/statistics.md) - Stats functions used in this tutorial
+- [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/writing-mcp-tools.md) - Complete MCP tool reference
+- [MCP Client Library](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/client.md) - Connecting to MCP servers from scripts
+- [CLI MCP Server](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md) - CLI server mode documentation
+- [Statistics Library](https://scriptling.dev/okf/scriptling-libraries/math-numbers/statistics.md) - Stats functions used in this tutorial

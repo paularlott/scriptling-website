@@ -173,6 +173,6 @@ if has_significant_change(old_content, new_content):
 
 ## See Also
 
-- [string](string.md) - String constants for character classification
-- [textwrap](textwrap.md) - Text wrapping and filling utilities
-- [regex](regex.md) - Regular expressions for pattern matching
+- [string](https://scriptling.dev/okf/scriptling-libraries/text-processing/string.md) - String constants for character classification
+- [textwrap](https://scriptling.dev/okf/scriptling-libraries/text-processing/textwrap.md) - Text wrapping and filling utilities
+- [regex](https://scriptling.dev/okf/scriptling-libraries/text-processing/regex.md) - Regular expressions for pattern matching

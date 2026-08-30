@@ -99,12 +99,12 @@ The built-in CLI loader currently supports `vault` and `onepassword`. Embedded a
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.secret` grants access to credentials, but the risk is mitigated by design: scripts only ever see a provider alias and a logical path/field name, never the actual secret value's source, provider URL, or access token. The host application owns the real `secretprovider.Registry` passed to `RegisterSecretLibrary(p, registry)`, and resolution fails closed when an alias is missing or the provider errors. See [Secret Provider Security](../../../scriptling-docs/security.md#secret-provider-security) for the full model.
+`scriptling.secret` grants access to credentials, but the risk is mitigated by design: scripts only ever see a provider alias and a logical path/field name, never the actual secret value's source, provider URL, or access token. The host application owns the real `secretprovider.Registry` passed to `RegisterSecretLibrary(p, registry)`, and resolution fails closed when an alias is missing or the provider errors. See [Secret Provider Security](https://scriptling.dev/okf/scriptling-docs/security.md#secret-provider-security) for the full model.
 
 ## See Also
 
-- [CLI Reference](../../../scriptling-docs/cli.md) - Command-line flags and runtime behavior
-- [Library Registration](../../../scriptling-docs/go-integration/library-registration.md) - Registering extended libraries when embedding in Go
-- [Security Guide](../../../scriptling-docs/security.md) - Security guidance for host-provided libraries
+- [CLI Reference](https://scriptling.dev/okf/scriptling-docs/./cli.md) - Command-line flags and runtime behavior
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - Registering extended libraries when embedding in Go
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security guidance for host-provided libraries

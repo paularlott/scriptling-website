@@ -774,6 +774,6 @@ print(account.get_statement())
 
 ## See Also
 
-- [Functions](functions.md) - Function definitions
-- [Error Handling](error-handling.md) - Using raise in classes
-- [Python Differences](python-differences.md) - Class limitations
+- [Functions](https://scriptling.dev/okf/scriptling-reference/functions.md) - Function definitions
+- [Error Handling](https://scriptling.dev/okf/scriptling-reference/error-handling.md) - Using raise in classes
+- [Python Differences](https://scriptling.dev/okf/scriptling-reference/python-differences.md) - Class limitations

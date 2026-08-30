@@ -291,6 +291,6 @@ while runtime.server_running():
 
 ## See Also
 
-- [`scriptling.plugin.load()`](../plugins/using.md): Load a plugin peer.
-- [JSON-RPC Server Mode](jsonrpc-server.md): Plain JSON-RPC without the plugin handshake.
-- [Go Plugins](../plugins/go-plugins.md): Compiled plugin executables with full class and callback support.
+- [`scriptling.plugin.load()`](https://scriptling.dev/okf/scriptling-docs/plugins/using.md): Load a plugin peer.
+- [JSON-RPC Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/jsonrpc-server.md): Plain JSON-RPC without the plugin handshake.
+- [Go Plugins](https://scriptling.dev/okf/scriptling-docs/plugins/go-plugins.md): Compiled plugin executables with full class and callback support.

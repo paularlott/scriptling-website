@@ -508,5 +508,5 @@ if ex, ok := result.(*object.Exception); ok {
 
 ## See Also
 
-- [Functions](functions.md) - Function definitions
-- [Python Differences](python-differences.md) - Exception handling differences
+- [Functions](https://scriptling.dev/okf/scriptling-reference/functions.md) - Function definitions
+- [Python Differences](https://scriptling.dev/okf/scriptling-reference/python-differences.md) - Exception handling differences

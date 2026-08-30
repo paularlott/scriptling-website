@@ -93,6 +93,27 @@ scriptling --package mylib.zip#sha256=abc123... script.py
 scriptling --package https://example.com/lib.zip#sha256=abc123... script.py
 ```
 
+### Plugin Fetcher Schemes
+
+A fetcher plugin serves its library itself: loading the
+plugin attaches it automatically, so no `--package` is involved. `--package`
+takes only ordinary packages — a `.zip`, a directory, or a URL — and rejects a
+plugin `scheme://` source.
+
+A scheme source does work as the script itself, fetched from the plugin and
+refetched on every run:
+
+```bash
+scriptling --plugin /usr/local/bin/knot --plugin-arg scriptling-server \
+           knot://scripts/hello
+```
+
+If no loaded plugin serves the scheme, the error names the scheme and points at
+`--plugin`, rather than reporting a missing file. See
+[Plugin Fetchers](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md) for the full picture.
+
+See [Plugin Fetchers](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md) for details.
+
 **How it works:**
 - Append `#sha256=<hash>` to the package path or URL
 - Scriptling computes the SHA256 hash after fetching
@@ -414,7 +435,7 @@ In app-bundle mode the CLI rejects path/registration flags (`-L`, `--script`,
 Extra positional arguments after `--` are available to tools and handlers
 via `sys.argv` — useful for conditional tool registration (e.g. gating
 write tools behind `-- --allow-write`). See
-[Conditional Tool Registration](mcp-server.md#conditional-tool-registration)
+[Conditional Tool Registration](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md#conditional-tool-registration)
 for details.
 
 ### main Resolution
@@ -470,6 +491,6 @@ scriptling --package https://yourserver.com/libs/mylib.zip app.py
 
 ## See Also
 
-- [Basic Usage](basic-usage.md) - Running scripts and interactive mode
-- [HTTP Server Mode](http-server.md) - Running as an HTTP server
-- [MCP Server Mode](mcp-server.md) - Model Context Protocol integration
+- [Basic Usage](https://scriptling.dev/okf/scriptling-docs/cli/basic-usage.md) - Running scripts and interactive mode
+- [HTTP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md) - Running as an HTTP server
+- [MCP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md) - Model Context Protocol integration

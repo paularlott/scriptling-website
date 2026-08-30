@@ -19,7 +19,7 @@ This tutorial walks through building a CLI script that fetches user data from a 
 
 ## Prerequisites
 
-- Scriptling CLI installed ([Installation](../quick-start/cli.md))
+- Scriptling CLI installed ([Installation](https://scriptling.dev/okf/scriptling-docs/quick-start/cli.md))
 
 ## Step 1: Fetch Data from an API
 
@@ -209,7 +209,7 @@ with open("users_export.json", "w") as f:
 print(f"\nExported {len(summary)} users to users_export.json")
 ```
 
-> **Note:** File system access (`open()`) works in the CLI. When embedding in Go, the `os` library requires explicit registration. See [Library Registration](../go-integration/library-registration.md).
+> **Note:** File system access (`open()`) works in the CLI. When embedding in Go, the `os` library requires explicit registration. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md).
 
 ## Complete Script
 
@@ -320,7 +320,7 @@ if resp.status_code == 204:
 
 ## See Also
 
-- [Requests Library](../../scriptling-libraries/http-process/requests.md) - Full HTTP client documentation
-- [JSON Library](../../scriptling-libraries/data-formats/json.md) - JSON parsing reference
-- [Reference](../../scriptling-reference/scriptling-reference.md) - Complete language reference
-- [CLI Reference](../cli.md) - Command-line options
+- [Requests Library](https://scriptling.dev/okf/scriptling-libraries/http-process/requests.md) - Full HTTP client documentation
+- [JSON Library](https://scriptling.dev/okf/scriptling-libraries/data-formats/json.md) - JSON parsing reference
+- [Reference](https://scriptling.dev/okf/scriptling-reference/scriptling-reference.md) - Complete language reference
+- [CLI Reference](https://scriptling.dev/okf/scriptling-docs/./cli.md) - Command-line options

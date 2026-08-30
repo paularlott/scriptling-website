@@ -31,10 +31,10 @@ The messaging libraries share a common architecture:
 
 | Library | Description |
 |---------|-------------|
-| [scriptling.messaging.telegram](messaging/telegram.md) | Telegram Bot API client |
-| [scriptling.messaging.discord](messaging/discord.md) | Discord Bot API client |
-| [scriptling.messaging.slack](messaging/slack.md) | Slack Bot API client |
-| [scriptling.messaging.console](messaging/console.md) | Console-based messaging client |
+| [scriptling.messaging.telegram](https://scriptling.dev/okf/scriptling-libraries/scriptling/messaging/telegram.md) | Telegram Bot API client |
+| [scriptling.messaging.discord](https://scriptling.dev/okf/scriptling-libraries/scriptling/messaging/discord.md) | Discord Bot API client |
+| [scriptling.messaging.slack](https://scriptling.dev/okf/scriptling-libraries/scriptling/messaging/slack.md) | Slack Bot API client |
+| [scriptling.messaging.console](https://scriptling.dev/okf/scriptling-libraries/scriptling/messaging/console.md) | Console-based messaging client |
 
 ## Shared Concepts
 
@@ -202,6 +202,6 @@ Common capabilities:
 
 ## See Also
 
-- [scriptling libraries](../scriptling.md) - Parent namespace for all scriptling extended libraries
-- [scriptling.console](utilities/console.md) - Terminal console the console messaging client is built on
-- [Library Registration](../../scriptling-docs/go-integration/library-registration.md) - How to register these extended libraries in Go
+- [scriptling libraries](https://scriptling.dev/okf/scriptling-libraries/./scriptling.md) - Parent namespace for all scriptling extended libraries
+- [scriptling.console](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/console.md) - Terminal console the console messaging client is built on
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - How to register these extended libraries in Go

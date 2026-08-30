@@ -16,7 +16,7 @@ type: API Reference
 
 MCP tool helper library for authoring MCP tools in scriptling. This sub-library provides functions for parameter access and result handling when implementing tool scripts.
 
-For the MCP client library (connecting to MCP servers), see [scriptling.mcp](client.md).
+For the MCP client library (connecting to MCP servers), see [scriptling.mcp](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/client.md).
 
 ## Enabling
 
@@ -46,6 +46,8 @@ MCP tool helpers read and write environment variables set by the MCP tool execut
 | `get_int_list(name, default=None)` | Get an integer array parameter |
 | `get_float_list(name, default=None)` | Get a float array parameter |
 | `get_bool_list(name, default=None)` | Get a boolean array parameter |
+| `get_request()` | Get the HTTP request this call arrived on, or `None` |
+| `request_context()` | Get the context dict set by the middleware (empty dict if none) |
 | `return_string(text)` | Return a string result and stop execution |
 | `return_object(obj)` | Return an object as JSON and stop execution |
 | `return_toon(obj)` | Return an object as TOON and stop execution |
@@ -213,6 +215,37 @@ import scriptling.mcp.tool as tool
 
 flags = tool.get_bool_list("flags")  # [true, false, true]
 options = tool.get_bool_list("options", [False])
+```
+
+## Request Access Functions
+
+When the MCP server is served over HTTP, these give tool scripts a look at the HTTP request the call arrived on — the same one the server's [middleware](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/http.md#middlewarehandler) saw. Over the stdio transport there is no HTTP request.
+
+### `mcp.tool.get_request()`
+
+Returns the HTTP request this tool call is being served for: a [Request object](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/http.md#request-object) with `method`, `path`, `headers`, `query`, `remote_addr` and `context`. Returns `None` over stdio or anywhere else outside a served request.
+
+**Returns:** `Request` or `None`
+
+```python
+import scriptling.mcp.tool as tool
+
+req = tool.get_request()
+if req != None:
+    log(req.remote_addr + " called this tool")
+```
+
+### `mcp.tool.request_context()`
+
+Returns the context dict the middleware populated for this request — e.g. `request.context["user"] = name` after authenticating. Always a dict: empty when no middleware ran or it set nothing, so `.get(name, default)` is always safe. Each call gets its own copy, so writes from the handler are local and never visible to other handlers.
+
+**Returns:** `dict`
+
+```python
+import scriptling.mcp.tool as tool
+
+user = tool.request_context().get("user", "anonymous")
+tool.return_string("hello " + user)
 ```
 
 ## Result Functions
@@ -416,12 +449,12 @@ func RunToolScript(
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
 `scriptling.mcp.tool` itself has no implicit network, filesystem, or process access: it only reads `__mcp_params` and writes `__mcp_response`. Risk depends entirely on what the tool script you write does with those parameters.
 
 ## See Also
 
-- [scriptling.mcp](client.md): MCP client for connecting to MCP servers
-- [scriptling.ai](../ai.md): AI client and completion functions
-- [scriptling.ai.agent](../ai/agent.md): Building AI agents with automatic tool execution
+- [scriptling.mcp](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/client.md): MCP client for connecting to MCP servers
+- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai.md): AI client and completion functions
+- [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/agent.md): Building AI agents with automatic tool execution

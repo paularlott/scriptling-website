@@ -228,7 +228,7 @@ The store uses **MinHash signatures** (64 hash values, 256 bytes per memory) for
 
 ## Agent Integration
 
-The simplest way to give an agent memory is to pass `memory=` to `Agent()`. The agent wires up the tools and augments the system prompt automatically: see [scriptling.ai.agent Memory Integration](agent.md#memory-integration).
+The simplest way to give an agent memory is to pass `memory=` to `Agent()`. The agent wires up the tools and augments the system prompt automatically: see [scriptling.ai.agent Memory Integration](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/agent.md#memory-integration).
 
 ```python
 import scriptling.ai as ai
@@ -284,12 +284,12 @@ SCRIPTLING_AI_MODEL=qwen3-8b \
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.ai.memory` has no network access by itself: it stores conversation history and other memories in the KV store the embedder provides (in-memory or persistent), and only talks to an AI provider if you explicitly pass an `ai_client` for LLM-based deduplication. Risk is low; see the [Security Guide](../../../scriptling-docs/security.md#library-security) for the general model.
+`scriptling.ai.memory` has no network access by itself: it stores conversation history and other memories in the KV store the embedder provides (in-memory or persistent), and only talks to an AI provider if you explicitly pass an `ai_client` for LLM-based deduplication. Risk is low; see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#library-security) for the general model.
 
 ## See Also
 
-- [scriptling.runtime.kv](../runtime/kv.md): KV store backing the memory system
-- [scriptling.ai.agent](agent.md): Agent with automatic memory integration
+- [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/kv.md): KV store backing the memory system
+- [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/agent.md): Agent with automatic memory integration
 - [Memory MCP Tools Example](https://github.com/paularlott/scriptling/tree/main/examples/mcp-tools/memory-tools)

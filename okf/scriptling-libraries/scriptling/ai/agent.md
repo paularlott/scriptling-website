@@ -27,7 +27,7 @@ Agentic AI loop for building AI agents with automatic tool execution. The `Agent
 | `agent.get_messages()` | Get conversation history |
 | `agent.set_messages(messages)` | Set conversation history |
 
-For tool registry documentation, see [scriptling.ai](../ai.md).
+For tool registry documentation, see [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai.md).
 
 ## Quick Start
 
@@ -131,7 +131,7 @@ print(response.content)
 
 ### `agent.interact(max_iterations=25)`
 
-Runs an interactive CLI session. Requires the `scriptling.ai.agent.interact` library to be imported, which adds this method to the `Agent` class: see [scriptling.ai.agent.interact](interact.md) for the full reference.
+Runs an interactive CLI session. Requires the `scriptling.ai.agent.interact` library to be imported, which adds this method to the `Agent` class: see [scriptling.ai.agent.interact](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/interact.md) for the full reference.
 
 **Parameters:**
 
@@ -224,7 +224,7 @@ The agent appends a `## Memory` block to the system prompt explaining when and h
 
 The original `system_prompt` you pass is always preserved: the memory content is appended after it.
 
-See [scriptling.ai.memory](memory.md) for full memory store documentation.
+See [scriptling.ai.memory](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/memory.md) for full memory store documentation.
 
 ## Auto-Compaction
 
@@ -338,12 +338,12 @@ bot.interact()
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.ai.agent` makes outbound HTTP requests to the configured AI provider, and: when tools are registered: lets the model execute multi-step agentic loops by calling those tools automatically. Never register `scriptling.ai.agent` for untrusted code: a malicious script can supply a tool registry whose handlers do anything the host process allows. For a full risk breakdown, see the [Security Guide](../../../scriptling-docs/security.md#library-security) and [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#ai--agent).
+`scriptling.ai.agent` makes outbound HTTP requests to the configured AI provider, and: when tools are registered: lets the model execute multi-step agentic loops by calling those tools automatically. Never register `scriptling.ai.agent` for untrusted code: a malicious script can supply a tool registry whose handlers do anything the host process allows. For a full risk breakdown, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#library-security) and [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#ai--agent).
 
 ## See Also
 
-- [scriptling.ai](../ai.md): AI client and completion functions
-- [scriptling.ai.agent.interact](interact.md): Interactive terminal session
-- [scriptling.ai.memory](memory.md): Long-term memory store
+- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai.md): AI client and completion functions
+- [scriptling.ai.agent.interact](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/interact.md): Interactive terminal session
+- [scriptling.ai.memory](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/memory.md): Long-term memory store

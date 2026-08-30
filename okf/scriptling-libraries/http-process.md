@@ -16,8 +16,8 @@ type: API Reference
 
 | Library | Description |
 |---------|-------------|
-| [requests](http-process/requests.md) | HTTP library for sending requests |
-| [subprocess](http-process/subprocess.md) | Spawn and manage subprocesses |
-| [sys](http-process/sys.md) | System-specific parameters |
-| [logging](http-process/logging.md) | Logging functionality |
-| [secrets](http-process/secrets.md) | Cryptographically strong random numbers |
+| [requests](https://scriptling.dev/okf/scriptling-libraries/http-process/requests.md) | HTTP library for sending requests |
+| [subprocess](https://scriptling.dev/okf/scriptling-libraries/http-process/subprocess.md) | Spawn and manage subprocesses |
+| [sys](https://scriptling.dev/okf/scriptling-libraries/http-process/sys.md) | System-specific parameters |
+| [logging](https://scriptling.dev/okf/scriptling-libraries/http-process/logging.md) | Logging functionality |
+| [secrets](https://scriptling.dev/okf/scriptling-libraries/http-process/secrets.md) | Cryptographically strong random numbers |

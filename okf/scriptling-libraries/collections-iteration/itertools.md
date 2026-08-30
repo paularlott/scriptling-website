@@ -423,5 +423,5 @@ running_total = itertools.accumulate(sales)
 
 ## See Also
 
-- [functools](functools.md): `reduce()` for collapsing an iterable to a single value.
-- [collections](collections.md): `deque` and other specialized containers.
+- [functools](https://scriptling.dev/okf/scriptling-libraries/collections-iteration/functools.md): `reduce()` for collapsing an iterable to a single value.
+- [collections](https://scriptling.dev/okf/scriptling-libraries/collections-iteration/collections.md): `deque` and other specialized containers.

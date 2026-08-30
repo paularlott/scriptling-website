@@ -208,11 +208,11 @@ print("All services are healthy!")
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.wait_for` can be used to probe network reachability and timing: `port()` and `http()` make outbound TCP/HTTP connections to any host or URL the script provides, with no built-in restriction on destination. There is no allowlist parameter for this library; if network access should be restricted for untrusted scripts, control it at the network/sandbox level rather than relying on this library. For a full risk breakdown across all libraries, see the [Security Guide](../../../scriptling-docs/security.md).
+`scriptling.wait_for` can be used to probe network reachability and timing: `port()` and `http()` make outbound TCP/HTTP connections to any host or URL the script provides, with no built-in restriction on destination. There is no allowlist parameter for this library; if network access should be restricted for untrusted scripts, control it at the network/sandbox level rather than relying on this library. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 
 ## See Also
 
-- [scriptling.runtime](../runtime.md) - Background tasks and coordination primitives that often pair with wait_for
-- [Security Guide](../../../scriptling-docs/security.md) - Security guidance for host-provided libraries
+- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime.md) - Background tasks and coordination primitives that often pair with wait_for
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security guidance for host-provided libraries

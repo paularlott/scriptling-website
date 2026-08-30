@@ -428,12 +428,12 @@ for v in c.csi_volumes_list(namespace="*"):
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.nomad` grants full control over the Nomad cluster reachable at the address and ACL token passed to `Client()`, including deregistering CSI volumes and stopping or registering jobs: this is a significant risk, comparable to direct infrastructure access. There is no allowlist parameter for this library; scope the ACL token to the minimum policy needed for the task, and never register this library for untrusted code. For a full risk breakdown across all libraries, see the [Security Guide](../../../scriptling-docs/security.md).
+`scriptling.nomad` grants full control over the Nomad cluster reachable at the address and ACL token passed to `Client()`, including deregistering CSI volumes and stopping or registering jobs: this is a significant risk, comparable to direct infrastructure access. There is no allowlist parameter for this library; scope the ACL token to the minimum policy needed for the task, and never register this library for untrusted code. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 
 ## See Also
 
-- [scriptling.container](container.md) - Container lifecycle management for Docker, Podman, and Apple Containers
-- [Library Registration](../../../scriptling-docs/go-integration/library-registration.md) - Registering extended libraries when embedding in Go
-- [Security Guide](../../../scriptling-docs/security.md) - Security guidance for host-provided libraries
+- [scriptling.container](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/container.md) - Container lifecycle management for Docker, Podman, and Apple Containers
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - Registering extended libraries when embedding in Go
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security guidance for host-provided libraries

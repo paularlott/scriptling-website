@@ -21,8 +21,8 @@ tools, they are just files in folders: no Go code, no startup registration.
 
 ## Prerequisites
 
-- Scriptling CLI installed ([Installation](../quick-start/cli.md))
-- Read [Building an MCP Tool Server](mcp-tool-server.md) first — this tutorial
+- Scriptling CLI installed ([Installation](https://scriptling.dev/okf/scriptling-docs/quick-start/cli.md))
+- Read [Building an MCP Tool Server](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-tool-server.md) first — this tutorial
   mirrors its conventions
 
 ## What you'll build
@@ -183,7 +183,7 @@ message.
 
 ## Step 6: Add a tool (optional)
 
-Drop a tool in `tools/` exactly as in the [tool tutorial](mcp-tool-server.md) —
+Drop a tool in `tools/` exactly as in the [tool tutorial](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-tool-server.md) —
 `name.toml` + `name.py`. Tools, resources, and prompts all live side by side.
 
 ## Step 7: Run it
@@ -240,7 +240,7 @@ clients re-fetch. `SIGHUP` / `SIGUSR1` force a reload.
 
 ## See also
 
-- [Building an MCP Tool Server](mcp-tool-server.md) — the tool tutorial
-- [MCP Server Mode](../cli/mcp-server.md) — running the server, flags, transports
-- [Writing MCP Tools](../../scriptling-libraries/scriptling/mcp/writing-mcp-tools.md) — tool metadata reference (the `.toml` format prompts share)
-- [MCP client library](../../scriptling-libraries/scriptling/mcp/client.md) — reading resources and prompts from a server
+- [Building an MCP Tool Server](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-tool-server.md) — the tool tutorial
+- [MCP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md) — running the server, flags, transports
+- [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/writing-mcp-tools.md) — tool metadata reference (the `.toml` format prompts share)
+- [MCP client library](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/client.md) — reading resources and prompts from a server

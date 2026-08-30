@@ -388,8 +388,8 @@ print(f"Shipping: ${shipping:.2f}")
 
 ## See Also
 
-- [Go Integration Basics](../go-integration/basics.md) - Complete interpreter setup guide
-- [Native Functions](../go-integration/native-functions.md) - Direct function registration
-- [Builder Functions](../go-integration/builder-functions.md) - Type-safe builder API
-- [Library Registration](../go-integration/library-registration.md) - Registering libraries
-- [Security Guide](../security.md) - Sandboxing and security best practices
+- [Go Integration Basics](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md) - Complete interpreter setup guide
+- [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md) - Direct function registration
+- [Builder Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-functions.md) - Type-safe builder API
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - Registering libraries
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Sandboxing and security best practices

@@ -125,12 +125,12 @@ if result["status"] == fetch.UNCHANGED:
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.provision.fetch` makes outbound HTTP/HTTPS requests to arbitrary URLs and writes the downloaded bytes (or unpacked zip contents) to the local filesystem: so it combines network access with filesystem writes. Setting `insecure=True` disables HTTPS certificate verification entirely; only use it for trusted internal endpoints or bootstrap scenarios where certificate validation is genuinely impossible: passing it carelessly exposes downloads to interception and tampering. Zip extraction rejects absolute paths, `..` traversal, and non-regular entries (symlinks, device files), but the library otherwise writes wherever the host process has permission. For a full risk breakdown across all libraries, see the [Security Guide](../../../scriptling-docs/security.md).
+`scriptling.provision.fetch` makes outbound HTTP/HTTPS requests to arbitrary URLs and writes the downloaded bytes (or unpacked zip contents) to the local filesystem: so it combines network access with filesystem writes. Setting `insecure=True` disables HTTPS certificate verification entirely; only use it for trusted internal endpoints or bootstrap scenarios where certificate validation is genuinely impossible: passing it carelessly exposes downloads to interception and tampering. Zip extraction rejects absolute paths, `..` traversal, and non-regular entries (symlinks, device files), but the library otherwise writes wherever the host process has permission. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 
 ## See Also
 
-- [scriptling.provision.file](provision-file.md): provision plain files and managed blocks without fetching them remotely
-- [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries)
-- [Security Guide](../../../scriptling-docs/security.md)
+- [scriptling.provision.file](https://scriptling.dev/okf/scriptling-libraries/scriptling/provisioning/provision-file.md): provision plain files and managed blocks without fetching them remotely
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries)
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md)

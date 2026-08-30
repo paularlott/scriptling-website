@@ -18,7 +18,7 @@ DNS resolution library for hostname lookup, SRV record resolution, and `srv+http
 
 ## Overview
 
-The `scriptling.net.resolve` library provides DNS resolution utilities. It uses the system resolver by default, or custom nameservers when configured by the host application (e.g. [knot](https://github.com/paularlott/knot)). In the CLI, a [network policy](../../../scriptling-docs/cli/network-policy.md)'s `dns_servers` configure this resolver too — every script network path resolves through the same servers.
+The `scriptling.net.resolve` library provides DNS resolution utilities. It uses the system resolver by default, or custom nameservers when configured by the host application (e.g. [knot](https://github.com/paularlott/knot)). In the CLI, a [network policy](https://scriptling.dev/okf/scriptling-docs/cli/network-policy.md)'s `dns_servers` configure this resolver too — every script network path resolves through the same servers.
 
 ## Available Functions
 
@@ -90,16 +90,16 @@ print(url)  # "https://plain.example.com/path"
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.net.resolve` performs DNS lookups against the system resolver, or against custom nameservers if the embedder injects one. DNS responses are not validated against any allowlist, so a script can trigger lookups for arbitrary hostnames, which can be used for network reconnaissance or to exfiltrate data via DNS queries. Host applications can restrict or monitor this by passing a custom resolver to `resolve.Register(env, resolver)`: see [Host Application Integration](#host-application-integration) below. See [Security Considerations](../../../scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
+`scriptling.net.resolve` performs DNS lookups against the system resolver, or against custom nameservers if the embedder injects one. DNS responses are not validated against any allowlist, so a script can trigger lookups for arbitrary hostnames, which can be used for network reconnaissance or to exfiltrate data via DNS queries. Host applications can restrict or monitor this by passing a custom resolver to `resolve.Register(env, resolver)`: see [Host Application Integration](#host-application-integration) below. See [Security Considerations](https://scriptling.dev/okf/scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
 
 ## Host Application Integration
 
-Host applications can inject a custom resolver by passing it to `resolve.Register(env, resolver)`. This allows applications like [knot](https://github.com/paularlott/knot) to configure custom nameservers, caching, and domain-specific routing. The `resolver` argument is required; `Register` panics if it is `nil`. When the host also registers a network policy, pass the policy's resolver (the `netsecurity` guard's `Resolver()`) so lookups and connections share one resolver — see the [library registration guide](../../../scriptling-docs/go-integration/library-registration.md#network-policy).
+Host applications can inject a custom resolver by passing it to `resolve.Register(env, resolver)`. This allows applications like [knot](https://github.com/paularlott/knot) to configure custom nameservers, caching, and domain-specific routing. The `resolver` argument is required; `Register` panics if it is `nil`. When the host also registers a network policy, pass the policy's resolver (the `netsecurity` guard's `Resolver()`) so lookups and connections share one resolver — see the [library registration guide](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#network-policy).
 
 ## See Also
 
-- [scriptling.net.unicast](unicast.md): direct point-to-point UDP/TCP messaging
-- [scriptling.net.websocket](websocket.md): WebSocket client library
-- [Security Guide](../../../scriptling-docs/security.md): full risk breakdown across all libraries
+- [scriptling.net.unicast](https://scriptling.dev/okf/scriptling-libraries/scriptling/networking/unicast.md): direct point-to-point UDP/TCP messaging
+- [scriptling.net.websocket](https://scriptling.dev/okf/scriptling-libraries/scriptling/networking/websocket.md): WebSocket client library
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md): full risk breakdown across all libraries

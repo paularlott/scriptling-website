@@ -559,6 +559,6 @@ print(string_utils.count_vowels(text))      # 3
 
 ## See Also
 
-- [Native API](native.md) - Create extensions in Go
-- [Builder API](builder.md) - Type-safe Go builders
-- [Error Handling](../../scriptling-reference/error-handling.md) - Try/except patterns
+- [Native API](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md) - Create extensions in Go
+- [Builder API](https://scriptling.dev/okf/scriptling-docs/go-integration/builder.md) - Type-safe Go builders
+- [Error Handling](https://scriptling.dev/okf/scriptling-reference/error-handling.md) - Try/except patterns

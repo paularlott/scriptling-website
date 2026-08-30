@@ -24,7 +24,7 @@ The `os` library provides operating system interfaces for file system operations
 | `getcwd()` | Get the current working directory. |
 | `listdir(path=".")` | List directory contents. |
 | `read_file(path)` | Read entire file contents as a string. Use [read_bytes](#read_bytes) for binary files. |
-| `read_bytes(path)` | Read entire file contents as a [`bytes`](../data-formats/bytes.md) value. |
+| `read_bytes(path)` | Read entire file contents as a [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) value. |
 | `read_lines(path)` | Iterate over lines in a file lazily (memory-efficient for large files). |
 | `write_file(path, content, mode=0o644)` | Write `str` or `bytes` content to a file (creates/overwrites). |
 | `append_file(path, content)` | Append `str` or `bytes` content to a file. |
@@ -149,7 +149,7 @@ print(content)
 
 ### `read_bytes(path)`
 
-Read entire file contents as a [`bytes`](../data-formats/bytes.md) value,
+Read entire file contents as a [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) value,
 preserving binary data byte-for-byte. Use this for msgpack/protobuf payloads,
 images, hashes, and any other non-text data.
 
@@ -201,7 +201,7 @@ for line in os.read_lines("/var/log/app.log"):
 ### `write_file(path, content, mode=0o644)`
 
 Write content to a file, creating or overwriting it. Accepts a `str` (UTF-8
-encoded) or [`bytes`](../data-formats/bytes.md) (raw binary).
+encoded) or [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) (raw binary).
 
 **Parameters:**
 - `path` (`str`): Path to the file.
@@ -224,7 +224,7 @@ os.write_file("/tmp/data.msgpack", msgpack.packb({"k": 1}))
 ### `append_file(path, content)`
 
 Append content to a file, creating it if it does not exist. Accepts a `str`
-or [`bytes`](../data-formats/bytes.md).
+or [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md).
 
 **Parameters:**
 - `path` (`str`): Path to the file.
@@ -400,9 +400,9 @@ content = os.read_file(data_file)
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`os` provides read/write access to the host filesystem and to the embedder's environment variables (via `os.environ`/`os.getenv`). When embedding in Go, file access is restricted to the `allowedPaths` passed to `RegisterOSLibrary(p, allowedPaths)`: path traversal (`../`) and symlink attacks are blocked automatically. Passing `nil` removes all restrictions, which is dangerous for untrusted scripts. See [Library Registration](../../scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](../../scriptling-docs/security.md#file-system-security).
+`os` provides read/write access to the host filesystem and to the embedder's environment variables (via `os.environ`/`os.getenv`). When embedding in Go, file access is restricted to the `allowedPaths` passed to `RegisterOSLibrary(p, allowedPaths)`: path traversal (`../`) and symlink attacks are blocked automatically. Passing `nil` removes all restrictions, which is dangerous for untrusted scripts. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
 
 ## Python Compatibility
 
@@ -439,6 +439,6 @@ Caveats on the supported subset:
 
 ## See Also
 
-- [os.path](os.path.md): Path manipulation functions
-- [pathlib](pathlib.md): Object-oriented filesystem paths
-- [fs](fs.md): Binary file I/O
+- [os.path](https://scriptling.dev/okf/scriptling-libraries/filesystem/os.path.md): Path manipulation functions
+- [pathlib](https://scriptling.dev/okf/scriptling-libraries/filesystem/pathlib.md): Object-oriented filesystem paths
+- [fs](https://scriptling.dev/okf/scriptling-libraries/filesystem/fs.md): Binary file I/O

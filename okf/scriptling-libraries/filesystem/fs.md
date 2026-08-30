@@ -168,11 +168,11 @@ body = fs.slice(data, 4)         # Everything after
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`fs` provides direct read/write access to the host filesystem at the byte level. When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterFSLibrary(p, allowedPaths)`: path traversal (`../`) is blocked automatically. See [Library Registration](../../scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](../../scriptling-docs/security.md#file-system-security).
+`fs` provides direct read/write access to the host filesystem at the byte level. When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterFSLibrary(p, allowedPaths)`: path traversal (`../`) is blocked automatically. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
 
 ## See Also
 
-- [os](os.md): Operating system interfaces and simple text file I/O
-- [pathlib](pathlib.md): Object-oriented filesystem paths
+- [os](https://scriptling.dev/okf/scriptling-libraries/filesystem/os.md): Operating system interfaces and simple text file I/O
+- [pathlib](https://scriptling.dev/okf/scriptling-libraries/filesystem/pathlib.md): Object-oriented filesystem paths

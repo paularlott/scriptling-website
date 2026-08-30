@@ -50,21 +50,21 @@ func main() {
 
 ## Topics
 
-- [Basics](go-integration/basics.md) - Creating interpreters, variable exchange, calling functions
-- [Native API](go-integration/native.md) - Direct control with maximum performance
-- [Native Functions](go-integration/native-functions.md) - Register individual Go functions
-- [Native Classes](go-integration/native-classes.md) - Create custom classes with full control
-- [Native Libraries](go-integration/native-libraries.md) - Create libraries with functions and constants
-- [Builder API](go-integration/builder.md) - Type-safe, cleaner syntax
-- [Builder Functions](go-integration/builder-functions.md) - Type-safe function builder
-- [Builder Libraries](go-integration/builder-libraries.md) - Type-safe library builder
-- [Builder Classes](go-integration/builder-classes.md) - Type-safe class builder
-- [Builder Instantiation](go-integration/builder-instantiation.md) - Library templates with per-instance config
-- [Script Extensions](go-integration/scripts.md) - Extend using Scriptling code
-- [Plugins](go-integration/plugins.md) - Enable executable plugins in embedded applications
-- [Library Loader Chain](go-integration/loader-chain.md) - Flexible library loading from multiple sources
-- [Documenting Extensions](go-integration/documentation.md) - Add help text to functions and libraries
-- [Linting](go-integration/lint.md) - Code analysis for detecting syntax errors without execution
+- [Basics](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md) - Creating interpreters, variable exchange, calling functions
+- [Native API](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md) - Direct control with maximum performance
+- [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md) - Register individual Go functions
+- [Native Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes.md) - Create custom classes with full control
+- [Native Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md) - Create libraries with functions and constants
+- [Builder API](https://scriptling.dev/okf/scriptling-docs/go-integration/builder.md) - Type-safe, cleaner syntax
+- [Builder Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-functions.md) - Type-safe function builder
+- [Builder Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md) - Type-safe library builder
+- [Builder Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-classes.md) - Type-safe class builder
+- [Builder Instantiation](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-instantiation.md) - Library templates with per-instance config
+- [Script Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md) - Extend using Scriptling code
+- [Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md) - Enable executable plugins in embedded applications
+- [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md) - Flexible library loading from multiple sources
+- [Documenting Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/documentation.md) - Add help text to functions and libraries
+- [Linting](https://scriptling.dev/okf/scriptling-docs/go-integration/lint.md) - Code analysis for detecting syntax errors without execution
 
 ## Two Integration Approaches
 

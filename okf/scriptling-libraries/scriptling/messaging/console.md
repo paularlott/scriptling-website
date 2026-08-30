@@ -339,7 +339,7 @@ caps = console.capabilities(bot)
 
 ## See Also
 
-- [scriptling.messaging.telegram](telegram.md): Telegram Bot API client
-- [scriptling.messaging.discord](discord.md): Discord Bot API client
-- [scriptling.messaging.slack](slack.md): Slack Bot API client
-- [scriptling.console](../utilities/console.md): the underlying Console instance wrapped by this library
+- [scriptling.messaging.telegram](https://scriptling.dev/okf/scriptling-libraries/scriptling/messaging/telegram.md): Telegram Bot API client
+- [scriptling.messaging.discord](https://scriptling.dev/okf/scriptling-libraries/scriptling/messaging/discord.md): Discord Bot API client
+- [scriptling.messaging.slack](https://scriptling.dev/okf/scriptling-libraries/scriptling/messaging/slack.md): Slack Bot API client
+- [scriptling.console](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/console.md): the underlying Console instance wrapped by this library

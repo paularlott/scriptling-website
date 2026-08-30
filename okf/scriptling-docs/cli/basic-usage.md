@@ -119,9 +119,9 @@ print(f"Path: {env['PATH']}")
 
 ## See Also
 
-- [Command Line Options](command-line-options.md) - Every flag, environment variable, and config file setting
-- [Network Policy](network-policy.md) - Restricting script outbound network access
-- [Libraries](libraries.md) - Loading, disabling, and access modes
-- [HTTP Server Mode](http-server.md) - Running Scriptling as an HTTP server
-- [MCP Server Mode](mcp-server.md) - Model Context Protocol integration
-- [Writing MCP Tools](../../scriptling-libraries/scriptling/mcp/writing-mcp-tools.md) - Creating custom MCP tools
+- [Command Line Options](https://scriptling.dev/okf/scriptling-docs/cli/command-line-options.md) - Every flag, environment variable, and config file setting
+- [Network Policy](https://scriptling.dev/okf/scriptling-docs/cli/network-policy.md) - Restricting script outbound network access
+- [Libraries](https://scriptling.dev/okf/scriptling-docs/cli/libraries.md) - Loading, disabling, and access modes
+- [HTTP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md) - Running Scriptling as an HTTP server
+- [MCP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md) - Model Context Protocol integration
+- [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/writing-mcp-tools.md) - Creating custom MCP tools

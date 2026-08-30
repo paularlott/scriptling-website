@@ -722,6 +722,6 @@ result = c.increment()
 
 ## See Also
 
-- [Native Functions](native-functions.md) - Register individual functions
-- [Native Libraries](native-libraries.md) - Create libraries with functions and constants
-- [Builder Classes](builder-classes.md) - Type-safe class builder
+- [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md) - Register individual functions
+- [Native Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md) - Create libraries with functions and constants
+- [Builder Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-classes.md) - Type-safe class builder

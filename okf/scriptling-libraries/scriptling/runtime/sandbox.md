@@ -225,12 +225,12 @@ print(env2.get("result"))  # 600
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#runtime-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#runtime-libraries).
 
-`scriptling.runtime.sandbox` executes arbitrary Scriptling code strings: a significant risk, even though execution stays inside an isolated sub-environment within the **same OS process** (it is not a separate process or VM boundary). Filesystem access via `exec_file()` is restricted to the `allowedPaths` passed to `RegisterRuntimeSandboxLibrary(p, allowedPaths)`; by default no restrictions are applied, so an unconfigured embedder gets unrestricted file reads. Never pass untrusted or unvalidated input directly to `exec()` or `exec_file()`. See [Library Registration: Runtime Libraries](../../../scriptling-docs/go-integration/library-registration.md#runtime-libraries) and [Code Injection Prevention](../../../scriptling-docs/security.md#code-injection-prevention).
+`scriptling.runtime.sandbox` executes arbitrary Scriptling code strings: a significant risk, even though execution stays inside an isolated sub-environment within the **same OS process** (it is not a separate process or VM boundary). Filesystem access via `exec_file()` is restricted to the `allowedPaths` passed to `RegisterRuntimeSandboxLibrary(p, allowedPaths)`; by default no restrictions are applied, so an unconfigured embedder gets unrestricted file reads. Never pass untrusted or unvalidated input directly to `exec()` or `exec_file()`. See [Library Registration: Runtime Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#runtime-libraries) and [Code Injection Prevention](https://scriptling.dev/okf/scriptling-docs/security.md#code-injection-prevention).
 
 ## See Also
 
-- [scriptling.runtime](runtime.md): background tasks, which share the same sandbox factory
-- [scriptling.runtime.plugin](plugin.md): expose registered functions instead of executing arbitrary code
-- [Security Guide](../../../scriptling-docs/security.md#code-injection-prevention)
+- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/runtime.md): background tasks, which share the same sandbox factory
+- [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/plugin.md): expose registered functions instead of executing arbitrary code
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#code-injection-prevention)

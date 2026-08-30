@@ -31,7 +31,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Nested classes | Classes cannot be defined inside other classes/functions |
 | Metaclasses | Custom metaclasses are not supported |
 | Descriptors | The descriptor protocol is not implemented |
-| Regex backreferences (`\1`, `\2`) | RE2 engine used; no backreferences, lookaheads, or lookbehinds: see [regex docs](../scriptling-libraries/text-processing/regex.md) |
+| Regex backreferences (`\1`, `\2`) | RE2 engine used; no backreferences, lookaheads, or lookbehinds: see [regex docs](https://scriptling.dev/okf/scriptling-libraries/text-processing/regex.md) |
 
 ### Built-in Functions NOT Supported
 
@@ -267,7 +267,7 @@ except Exception:
 
 ## See Also
 
-- [Syntax Rules](syntax.md) - Scriptling syntax
-- [Functions](functions.md) - Function parameters
-- [Error Handling](error-handling.md) - Error vs Exception
-- [Classes](classes.md) - Class limitations
+- [Syntax Rules](https://scriptling.dev/okf/scriptling-reference/syntax.md) - Scriptling syntax
+- [Functions](https://scriptling.dev/okf/scriptling-reference/functions.md) - Function parameters
+- [Error Handling](https://scriptling.dev/okf/scriptling-reference/error-handling.md) - Error vs Exception
+- [Classes](https://scriptling.dev/okf/scriptling-reference/classes.md) - Class limitations

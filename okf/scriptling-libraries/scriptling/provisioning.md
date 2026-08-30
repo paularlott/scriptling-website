@@ -20,8 +20,8 @@ Provisioning libraries for managing files and directories within the Scriptling 
 
 | Library | Description |
 |---------|-------------|
-| [scriptling.provision.file](provisioning/provision-file.md) | File and directory provisioning: create, update, and remove with correct permissions, plus marker-delimited managed blocks for maintaining a region within a file |
-| [scriptling.provision.fetch](provisioning/provision-fetch.md) | HTTP/HTTPS file fetching with optional insecure TLS and safe zip unpacking |
+| [scriptling.provision.file](https://scriptling.dev/okf/scriptling-libraries/scriptling/provisioning/provision-file.md) | File and directory provisioning: create, update, and remove with correct permissions, plus marker-delimited managed blocks for maintaining a region within a file |
+| [scriptling.provision.fetch](https://scriptling.dev/okf/scriptling-libraries/scriptling/provisioning/provision-fetch.md) | HTTP/HTTPS file fetching with optional insecure TLS and safe zip unpacking |
 
 ## Quick Start
 
@@ -38,6 +38,6 @@ file.ensure_directory("~/.config/myapp")
 
 ## See Also
 
-- [Utilities](utilities.md) - General purpose utility libraries
-- [Libraries](../scriptling-libraries.md) - Full library reference index
-- [Security Guide](../../scriptling-docs/security.md) - Filesystem risk breakdown
+- [Utilities](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities.md) - General purpose utility libraries
+- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Full library reference index
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Filesystem risk breakdown

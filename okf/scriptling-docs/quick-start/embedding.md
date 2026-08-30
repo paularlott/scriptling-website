@@ -105,12 +105,12 @@ import "github.com/paularlott/scriptling/stdlib"
 stdlib.RegisterAll(p)
 ```
 
-Extended and `scriptling.*` libraries are registered individually. See [Library Registration](../go-integration/library-registration.md) for the complete list and signatures.
+Extended and `scriptling.*` libraries are registered individually. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) for the complete list and signatures.
 
 ## Next Steps
 
-- [Go Integration Basics](../go-integration/basics.md) - Complete guide to interpreters, variables, and functions
-- [Native API](../go-integration/native.md) - Direct control with maximum performance
-- [Builder API](../go-integration/builder.md) - Type-safe, cleaner syntax
-- [Libraries](../../scriptling-libraries/scriptling-libraries.md) - Library usage and registration reference
-- [Security Guide](../security.md) - Security best practices for embedding
+- [Go Integration Basics](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md) - Complete guide to interpreters, variables, and functions
+- [Native API](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md) - Direct control with maximum performance
+- [Builder API](https://scriptling.dev/okf/scriptling-docs/go-integration/builder.md) - Type-safe, cleaner syntax
+- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Library usage and registration reference
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security best practices for embedding

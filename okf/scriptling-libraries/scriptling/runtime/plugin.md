@@ -254,13 +254,13 @@ while runtime.server_running():
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go via `RegisterRuntimePluginLibrary` (called after `RegisterRuntimeLibraryAll`), see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#runtime-libraries).
+This is an extended library, requiring registration in Go via `RegisterRuntimePluginLibrary` (called after `RegisterRuntimeLibraryAll`), see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#runtime-libraries).
 
-`scriptling.runtime.plugin` does not execute arbitrary code strings the way `runtime.sandbox` does: `RegisterRuntimePluginLibrary` only registers a transport that decodes plugin-protocol calls and dispatches them to functions, constants, and classes the script explicitly registered. The risk shape is the same as `runtime.http` and `runtime.jsonrpc`: declaring `serve()` and registering handlers turns the process into a network-reachable (or stdio-reachable) RPC server, so every `register_function`/`register_class` call is a new entry point reachable by any connected plugin client. Registered classes additionally hand the server full object lifecycle control (construct, call methods, destroy) over server-side instances, so treat registered classes with the same care as any other exposed API surface. For a full risk breakdown across all libraries, see the [Security Guide](../../../scriptling-docs/security.md).
+`scriptling.runtime.plugin` does not execute arbitrary code strings the way `runtime.sandbox` does: `RegisterRuntimePluginLibrary` only registers a transport that decodes plugin-protocol calls and dispatches them to functions, constants, and classes the script explicitly registered. The risk shape is the same as `runtime.http` and `runtime.jsonrpc`: declaring `serve()` and registering handlers turns the process into a network-reachable (or stdio-reachable) RPC server, so every `register_function`/`register_class` call is a new entry point reachable by any connected plugin client. Registered classes additionally hand the server full object lifecycle control (construct, call methods, destroy) over server-side instances, so treat registered classes with the same care as any other exposed API surface. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 
 ## See Also
 
-- [scriptling.runtime.jsonrpc](jsonrpc.md): lower-level JSON-RPC method registration without the full plugin handshake
-- [scriptling.runtime.http](http.md): HTTP route registration sharing the same per-request evaluator model
-- [scriptling.runtime](runtime.md): `start_server()` lifecycle shared with the plugin server
-- [Security Guide](../../../scriptling-docs/security.md)
+- [scriptling.runtime.jsonrpc](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/jsonrpc.md): lower-level JSON-RPC method registration without the full plugin handshake
+- [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/http.md): HTTP route registration sharing the same per-request evaluator model
+- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/runtime.md): `start_server()` lifecycle shared with the plugin server
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md)

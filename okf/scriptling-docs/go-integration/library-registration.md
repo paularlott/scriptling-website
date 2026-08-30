@@ -380,11 +380,11 @@ plugin.RegisterLibraries(p, manager)  // scriptling.plugin, plus plugin.<name> f
 |-----------|-------------|------|
 | `scriptling.plugin` | `plugin` | `plugin.RegisterLibraries(p, manager)` |
 
-See [Plugins](plugins.md) for the full plugin embedding guide.
+See [Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md) for the full plugin embedding guide.
 
 ## Security Considerations
 
-When embedding Scriptling, you have full control over what scripts can access. See the [Security Guide](../security.md) for best practices.
+When embedding Scriptling, you have full control over what scripts can access. See the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) for best practices.
 
 **Never register these libraries when running untrusted code:**
 
@@ -397,6 +397,24 @@ When embedding Scriptling, you have full control over what scripts can access. S
 
 ## See Also
 
-- [Basics](basics.md): creating interpreters and exchanging variables
-- [Security Guide](../security.md): security best practices for embedding
-- [Libraries](../../scriptling-libraries/scriptling-libraries.md): usage reference for all libraries
+- [Basics](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md): creating interpreters and exchanging variables
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md): security best practices for embedding
+- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md): usage reference for all libraries
+
+## Database Drivers in Embedded Hosts
+
+Scriptling is the library; your application is the host, and the database drivers are optional at every level — you may compile them in, load them as external plugin binaries, or have neither. One call covers all three cases:
+
+```go
+import scriptlingplugin "github.com/paularlott/scriptling/plugin"
+
+// On every interpreter your host spins up — main instances, HTTP request
+// environments, MCP sessions, sandbox/background factories:
+scriptlingplugin.RegisterLibraries(p, pluginManager, scriptlingplugin.PolicyFromSecurity(netPolicy, allowedPaths))
+```
+
+- **Compiled in** (build tags `plugin_sqlite` / `plugin_sql` / `plugin_valkey` / `plugin_badgerdb`, or import the plugin packages and call `sqlite.RegisterInProcess(p, policy)`): registers regardless of the manager — a nil `pluginManager` is fine.
+- **External plugin binaries**: pass your `*plugin.Manager` (see [Plugin Manager](https://scriptling.dev/okf/scriptling-docs/plugins/host-integration.md)) and the proxy libraries register per instance.
+- **Neither**: nothing registers; scripts importing `scriptling.sqlite` fail with a named `unknown library` error.
+
+The CLI is exactly this pattern — its `--plugin-dir` handling, exe-relative discovery and per-mode wiring are host choices, not library behaviour. Inside handler scripts, open a connection per run and let the environment's teardown collect it (`Connection` closes itself when instances are collected; explicit `conn.close()` is still good manners).

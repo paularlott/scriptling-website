@@ -101,9 +101,9 @@ except Exception:
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`subprocess` allows arbitrary OS command execution on the host. This is a **critical risk**: there is no built-in mitigation, sandboxing, or allowlisting. Never register this library when running untrusted scripts, and be careful with user-provided command strings or the `shell` option to avoid command injection. See [Library Registration](../../scriptling-docs/go-integration/library-registration.md#security-considerations) and the [Security Guide](../../scriptling-docs/security.md).
+`subprocess` allows arbitrary OS command execution on the host. This is a **critical risk**: there is no built-in mitigation, sandboxing, or allowlisting. Never register this library when running untrusted scripts, and be careful with user-provided command strings or the `shell` option to avoid command injection. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#security-considerations) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 
 ## Platform Compatibility
 
@@ -113,5 +113,5 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## See Also
 
-- [sys](sys.md): Detect the current platform and access environment/argv
-- [requests](requests.md): Make HTTP requests without spawning a process
+- [sys](https://scriptling.dev/okf/scriptling-libraries/http-process/sys.md): Detect the current platform and access environment/argv
+- [requests](https://scriptling.dev/okf/scriptling-libraries/http-process/requests.md): Make HTTP requests without spawning a process

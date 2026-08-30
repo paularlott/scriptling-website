@@ -20,12 +20,12 @@ Libraries for interacting with AI/LLM APIs and building intelligent agents with 
 
 | Library | Description |
 |---------|-------------|
-| [scriptling.ai](ai/ai.md) | AI and LLM functions and helpers |
-| [AI Client](ai/client.md) | Client class reference (completion, embedding, Responses API) |
-| [scriptling.ai.agent](ai/agent.md) | Agentic AI loop with automatic tool execution |
-| [scriptling.ai.agent.interact](ai/interact.md) | Interactive terminal interface for AI agents |
-| [scriptling.ai.memory](ai/memory.md) | Long-term memory store for AI agents |
-| [scriptling.ai.tools](ai/tools.md) | Tool schema builder for AI agents |
+| [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/ai.md) | AI and LLM functions and helpers |
+| [AI Client](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/client.md) | Client class reference (completion, embedding, Responses API) |
+| [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/agent.md) | Agentic AI loop with automatic tool execution |
+| [scriptling.ai.agent.interact](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/interact.md) | Interactive terminal interface for AI agents |
+| [scriptling.ai.memory](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/memory.md) | Long-term memory store for AI agents |
+| [scriptling.ai.tools](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/tools.md) | Tool schema builder for AI agents |
 
 ## Quick Start
 
@@ -51,6 +51,6 @@ print(response)
 
 ## See Also
 
-- [scriptling.mcp](mcp.md) - MCP protocol client and tool authoring for AI agents
-- [Libraries](../scriptling-libraries.md) - Full library reference index
-- [Security Guide](../../scriptling-docs/security.md#library-security) - Security guidance for AI and network-enabled libraries
+- [scriptling.mcp](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp.md) - MCP protocol client and tool authoring for AI agents
+- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Full library reference index
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#library-security) - Security guidance for AI and network-enabled libraries

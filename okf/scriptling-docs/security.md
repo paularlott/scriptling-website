@@ -167,6 +167,8 @@ path = pathlib.Path("/tmp/myapp/data/../../../etc/passwd")  # BLOCKED
 These libraries can make network requests:
 
 - `requests` - HTTP client library
+- `scriptling.sql` - MySQL, MariaDB and PostgreSQL client (see [Database Drivers](#database-drivers))
+- `scriptling.valkey` - Valkey/Redis client (see [Database Drivers](#database-drivers))
 - `scriptling.ai` - AI API client
 - `scriptling.ai.agent` - Agentic AI with tool execution
 - `scriptling.mcp` - MCP protocol client
@@ -191,8 +193,8 @@ For scripts that *should* reach the internet but must never reach your private n
 
 With a policy active, loopback, link-local (including cloud metadata endpoints like `169.254.169.254`), private, unspecified, and multicast addresses are all blocked by default, as are URLs that name an IP directly. Host allow/deny lists, CIDR exceptions, https-only, and custom DNS servers grant exactly the access you intend — allowlisted hosts are trusted to resolve internally, and deny rules always win.
 
-- **CLI**: `--network-policy=policy.toml` — the full policy file reference is in the [network policy guide](cli/network-policy.md). Combine with `--no-subprocess` so scripts can't bypass the policy by shelling out to `curl`.
-- **Embedding**: pass a `*netsecurity.Config` (or load the same TOML file with `netsecurity.LoadConfig`) when registering the governed libraries — the `Config` options are documented in the [library registration guide](go-integration/library-registration.md#network-policy). No policy means no restrictions.
+- **CLI**: `--network-policy=policy.toml` — the full policy file reference is in the [network policy guide](https://scriptling.dev/okf/scriptling-docs/cli/network-policy.md). Combine with `--no-subprocess` so scripts can't bypass the policy by shelling out to `curl`.
+- **Embedding**: pass a `*netsecurity.Config` (or load the same TOML file with `netsecurity.LoadConfig`) when registering the governed libraries — the `Config` options are documented in the [library registration guide](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#network-policy). No policy means no restrictions.
 
 ```go
 policy, err := netsecurity.LoadConfig("policy.toml")
@@ -205,6 +207,36 @@ extlibs.RegisterWebSocketLibrary(p, policy)
 ```
 
 The policy governs the three libraries above. `scriptling.ai`, `scriptling.mcp`, and `scriptling.provision.fetch` make network calls too, but to endpoints configured by the host rather than chosen by the script; if scripts can configure those endpoints in your integration, keep them unregistered in untrusted environments.
+
+## Database Drivers
+
+The database plugins enforce the host security policy on every operation, in both compiled-in and external-plugin form (the policy travels in the plugin handshake):
+
+- **`scriptling.sqlite` and `scriptling.badgerdb` (file-backed)** — the database path must fall inside `--allowed-paths` / the embedder's allowed paths. `":memory:"` sqlite databases are always allowed.
+- **`scriptling.sql` and `scriptling.valkey` (network)** — connections dial through the same guard as the `requests` library, so a network policy applies in full. This answers the common question for MySQL/MariaDB/PostgreSQL DSNs: **connecting by hostname or by IP are both covered.** A hostname is resolved through the policy's DNS servers and every resolved address is checked; an IP literal is checked directly — and IP literals are denied by default, so `mysql://user@10.0.0.5/db` needs the address allowed explicitly:
+
+  - `allow_private_ips = true` — the "this script may reach the LAN/database subnet" switch, or
+  - the address inside `allowed_cidrs`, or
+  - the hostname inside `allow_hosts` (allowlisted hosts are trusted to resolve internally — the recommended way to grant access to `db.internal.corp`), and `allow_ip_literals = true` if you must name IPs directly.
+
+  Loopback (`postgres://localhost` on the same machine) needs `allow_loopback = true`. The same rules apply to `valkey://` URLs.
+
+When no policy is configured the drivers connect without restriction, exactly like the other network libraries.
+
+The same holds for any plugin that advertises the `policy` capability, and it
+is worth being precise about what that means: the policy is **delivered to the
+plugin and enforced by it**. It is not a sandbox around a plugin process, so
+`--allowed-paths` and `--network-policy` bound what a *cooperative* plugin
+does, never what a malicious one could. Treat third-party plugin binaries
+like any other executable you choose to run. For plugins that do cooperate
+the protection is real, and the network guard in particular carries genuine
+SSRF and DNS-rebinding defences to every dial the plugin makes.
+
+```toml
+# policy.toml — a script that may reach the database subnet
+allow_private_ips = true
+allow_hosts = ["db.internal.corp"]
+```
 
 ## Secret Provider Security
 
@@ -376,6 +408,6 @@ If you discover a security vulnerability in Scriptling, please report it respons
 
 ## Additional Resources
 
-- [Go Integration Basics](go-integration/basics.md) - Setting up Scriptling in Go
-- [Sandbox Library](../scriptling-libraries/scriptling/runtime/sandbox.md) - Runtime sandbox configuration
-- [Library Registration](go-integration/library-registration.md) - How to register libraries in Go
+- [Go Integration Basics](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md) - Setting up Scriptling in Go
+- [Sandbox Library](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/sandbox.md) - Runtime sandbox configuration
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - How to register libraries in Go

@@ -360,12 +360,12 @@ caps = discord.capabilities(bot)
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-This library sends and receives messages via the Discord Bot API using the bot token supplied to `client()`. The token is held by the embedder: typically passed in via `Register(p, logger)` when embedding in Go: and is not directly exposed to scripts; scripts can send and receive messages on the bot's behalf but cannot read the token back out. Treat the bot token as a secret: anyone who obtains it can act as your bot. See [Security Considerations](../../../scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
+This library sends and receives messages via the Discord Bot API using the bot token supplied to `client()`. The token is held by the embedder: typically passed in via `Register(p, logger)` when embedding in Go: and is not directly exposed to scripts; scripts can send and receive messages on the bot's behalf but cannot read the token back out. Treat the bot token as a secret: anyone who obtains it can act as your bot. See [Security Considerations](https://scriptling.dev/okf/scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
 
 ## See Also
 
-- [scriptling.messaging.telegram](telegram.md): Telegram Bot API client
-- [scriptling.messaging.slack](slack.md): Slack Bot API client
-- [scriptling.messaging.console](console.md): terminal-based client for local testing
+- [scriptling.messaging.telegram](https://scriptling.dev/okf/scriptling-libraries/scriptling/messaging/telegram.md): Telegram Bot API client
+- [scriptling.messaging.slack](https://scriptling.dev/okf/scriptling-libraries/scriptling/messaging/slack.md): Slack Bot API client
+- [scriptling.messaging.console](https://scriptling.dev/okf/scriptling-libraries/scriptling/messaging/console.md): terminal-based client for local testing

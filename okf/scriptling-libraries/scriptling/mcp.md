@@ -20,9 +20,9 @@ MCP (Model Context Protocol) is a protocol for AI models to interact with extern
 
 | Library | Description |
 |---------|-------------|
-| [scriptling.mcp](mcp/client.md) | MCP client for connecting to MCP servers |
-| [scriptling.mcp.tool](mcp/tool.md) | Helper library for authoring MCP tools |
-| [Writing MCP Tools Guide](mcp/writing-mcp-tools.md) | Guide for creating MCP tools |
+| [scriptling.mcp](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/client.md) | MCP client for connecting to MCP servers |
+| [scriptling.mcp.tool](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/tool.md) | Helper library for authoring MCP tools |
+| [Writing MCP Tools Guide](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/writing-mcp-tools.md) | Guide for creating MCP tools |
 
 ## Quick Start
 
@@ -41,6 +41,6 @@ result = client.call_tool("search", {"query": "hello"})
 
 ## See Also
 
-- [scriptling.ai](ai.md) - AI and agent libraries that consume MCP tools
-- [Libraries](../scriptling-libraries.md) - Full library reference index
-- [Security Guide](../../scriptling-docs/security.md#network-security) - Network-enabled libraries risk breakdown
+- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai.md) - AI and agent libraries that consume MCP tools
+- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Full library reference index
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#network-security) - Network-enabled libraries risk breakdown

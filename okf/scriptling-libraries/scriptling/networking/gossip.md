@@ -707,9 +707,9 @@ election.on_event("lost", lambda e, n: print("Leader lost"))
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.net.gossip` opens raw UDP/TCP sockets to bind, join, and exchange traffic with other cluster nodes, and can both send and receive arbitrary script-supplied payloads over the network. The library itself does not restrict which hosts or ports a script can bind to or contact: that is the embedder's responsibility, typically enforced with OS-level firewalling, network namespacing, or by controlling which addresses are reachable from the process. Use `encryption_key` and `bearer_token` to protect traffic and authenticate peers when running across untrusted networks. See [Security Considerations](../../../scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
+`scriptling.net.gossip` opens raw UDP/TCP sockets to bind, join, and exchange traffic with other cluster nodes, and can both send and receive arbitrary script-supplied payloads over the network. The library itself does not restrict which hosts or ports a script can bind to or contact: that is the embedder's responsibility, typically enforced with OS-level firewalling, network namespacing, or by controlling which addresses are reachable from the process. Use `encryption_key` and `bearer_token` to protect traffic and authenticate peers when running across untrusted networks. See [Security Considerations](https://scriptling.dev/okf/scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
 
 ## Examples
 
@@ -865,7 +865,7 @@ cluster.join(["10.0.0.1:8000"])
 
 ## See Also
 
-- [scriptling.net.unicast](unicast.md): direct point-to-point UDP/TCP messaging
-- [scriptling.net.multicast](multicast.md): one-to-many UDP group messaging
-- [scriptling.net.resolve](resolve.md): DNS and SRV record resolution
-- [Security Guide](../../../scriptling-docs/security.md): full risk breakdown across all libraries
+- [scriptling.net.unicast](https://scriptling.dev/okf/scriptling-libraries/scriptling/networking/unicast.md): direct point-to-point UDP/TCP messaging
+- [scriptling.net.multicast](https://scriptling.dev/okf/scriptling-libraries/scriptling/networking/multicast.md): one-to-many UDP group messaging
+- [scriptling.net.resolve](https://scriptling.dev/okf/scriptling-libraries/scriptling/networking/resolve.md): DNS and SRV record resolution
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md): full risk breakdown across all libraries

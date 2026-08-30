@@ -89,7 +89,7 @@ Receives a message from the multicast group.
 **Parameters:**
 - `timeout` (`number`, optional): Timeout in seconds. Default: `30`.
 
-**Returns:** `dict`: a dict with `"data"` ([`bytes`](../../data-formats/bytes.md) — call `.decode()` for text) and `"source"` (`str`) keys, or `None` on timeout.
+**Returns:** `dict`: a dict with `"data"` ([`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) — call `.decode()` for text) and `"source"` (`str`) keys, or `None` on timeout.
 
 ```python
 msg = group.receive(timeout=5)
@@ -113,9 +113,9 @@ group.close()
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.net.multicast` opens a raw UDP socket and joins a multicast group, allowing scripts to send and receive data with any other host on the local network segment (or further, if `ttl` is increased) that joins the same group address and port. The library does not restrict which group addresses or ports a script can join: that is the embedder's responsibility, typically enforced with OS-level firewalling or network namespacing. See [Security Considerations](../../../scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
+`scriptling.net.multicast` opens a raw UDP socket and joins a multicast group, allowing scripts to send and receive data with any other host on the local network segment (or further, if `ttl` is increased) that joins the same group address and port. The library does not restrict which group addresses or ports a script can join: that is the embedder's responsibility, typically enforced with OS-level firewalling or network namespacing. See [Security Considerations](https://scriptling.dev/okf/scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
 
 ## Examples
 
@@ -216,6 +216,6 @@ finally:
 
 ## See Also
 
-- [scriptling.net.unicast](unicast.md): direct point-to-point UDP/TCP messaging
-- [scriptling.net.gossip](gossip.md): gossip protocol cluster membership and messaging
-- [Security Guide](../../../scriptling-docs/security.md): full risk breakdown across all libraries
+- [scriptling.net.unicast](https://scriptling.dev/okf/scriptling-libraries/scriptling/networking/unicast.md): direct point-to-point UDP/TCP messaging
+- [scriptling.net.gossip](https://scriptling.dev/okf/scriptling-libraries/scriptling/networking/gossip.md): gossip protocol cluster membership and messaging
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md): full risk breakdown across all libraries

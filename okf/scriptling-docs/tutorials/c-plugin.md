@@ -356,6 +356,6 @@ scriptling --plugin-dir ./plugins script.py
 
 ## What's Next
 
-- [C Plugins](../plugins/c-plugins.md): full API reference for the C SDK
-- [JSON-RPC Protocol](../plugins/protocol.md): wire format details
-- [Go Plugins](../plugins/go-plugins.md): the Go plugin server for comparison
+- [C Plugins](https://scriptling.dev/okf/scriptling-docs/plugins/c-plugins.md): full API reference for the C SDK
+- [JSON-RPC Protocol](https://scriptling.dev/okf/scriptling-docs/plugins/protocol.md): wire format details
+- [Go Plugins](https://scriptling.dev/okf/scriptling-docs/plugins/go-plugins.md): the Go plugin server for comparison

@@ -14,7 +14,7 @@ type: API Reference
 ---
 # bytes
 
-`bytes` is Scriptling's binary data type — an immutable sequence of byte values (0–255). It is the canonical representation for raw binary data and is returned by [`hashlib.digest()`](../math-numbers/hashlib.md), [`hmac.digest()`](../math-numbers/hmac.md), [`base64.b64decode()`](../math-numbers/base64.md), and [`msgpack.packb()`](msgpack.md).
+`bytes` is Scriptling's binary data type — an immutable sequence of byte values (0–255). It is the canonical representation for raw binary data and is returned by [`hashlib.digest()`](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hashlib.md), [`hmac.digest()`](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hmac.md), [`base64.b64decode()`](https://scriptling.dev/okf/scriptling-libraries/math-numbers/base64.md), and [`msgpack.packb()`](https://scriptling.dev/okf/scriptling-libraries/data-formats/msgpack.md).
 
 `bytes` is a global builtin (no `import` required). The constructor accepts a string, a list/tuple of ints, another `bytes` value, or nothing (empty).
 
@@ -102,7 +102,7 @@ For debug/print contexts (REPL display, `print()`, f-string interpolation withou
 
 ## See Also
 
-- [msgpack](msgpack.md): binary serialisation built on `bytes`.
-- [base64](../math-numbers/base64.md): Base64 encode/decode.
-- [hashlib](../math-numbers/hashlib.md): `.digest()` returns `bytes`.
-- [hmac](../math-numbers/hmac.md): `.digest()` returns `bytes`.
+- [msgpack](https://scriptling.dev/okf/scriptling-libraries/data-formats/msgpack.md): binary serialisation built on `bytes`.
+- [base64](https://scriptling.dev/okf/scriptling-libraries/math-numbers/base64.md): Base64 encode/decode.
+- [hashlib](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hashlib.md): `.digest()` returns `bytes`.
+- [hmac](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hmac.md): `.digest()` returns `bytes`.

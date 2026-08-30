@@ -85,6 +85,6 @@ https_only = true
 allow_cidrs = ["10.1.0.0/16"]
 ```
 
-Note that in the CLI, custom DNS always comes with the policy's address checks — a policy file cannot turn them off. Embedding hosts that want nameservers without any blocking can construct a resolver-only configuration in Go (see `AllowAll` in the [library registration guide](../go-integration/library-registration.md#network-policy)).
+Note that in the CLI, custom DNS always comes with the policy's address checks — a policy file cannot turn them off. Embedding hosts that want nameservers without any blocking can construct a resolver-only configuration in Go (see `AllowAll` in the [library registration guide](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#network-policy)).
 
-Go hosts configure the same policy in code — see the [library registration guide](../go-integration/library-registration.md) for the `netsecurity.Config` reference, and the [security guide](../security.md) for the broader sandboxing model.
+Go hosts configure the same policy in code — see the [library registration guide](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) for the `netsecurity.Config` reference, and the [security guide](https://scriptling.dev/okf/scriptling-docs/security.md) for the broader sandboxing model.

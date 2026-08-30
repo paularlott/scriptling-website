@@ -112,12 +112,12 @@ Commands are registered with the TUI palette when `interact()` is called. Type `
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.ai.agent.interact` inherits the network and agentic-execution risk of `scriptling.ai.agent`: it streams completions from the configured AI provider and runs the same tool-calling loop, just with a terminal UI on top. Never register it for untrusted code. See [Security Considerations](agent.md#security-considerations) on the `ai.agent` page, the [Security Guide](../../../scriptling-docs/security.md#library-security), and [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#ai--agent).
+`scriptling.ai.agent.interact` inherits the network and agentic-execution risk of `scriptling.ai.agent`: it streams completions from the configured AI provider and runs the same tool-calling loop, just with a terminal UI on top. Never register it for untrusted code. See [Security Considerations](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/agent.md#security-considerations) on the `ai.agent` page, the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#library-security), and [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#ai--agent).
 
 ## See Also
 
-- [scriptling.ai](../ai.md): AI client and tool registry
-- [scriptling.ai.agent](agent.md): Agent class and tool execution
-- [scriptling.console](../utilities/console.md): Console TUI library
+- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai.md): AI client and tool registry
+- [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/agent.md): Agent class and tool execution
+- [scriptling.console](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/console.md): Console TUI library

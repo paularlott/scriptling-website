@@ -123,7 +123,7 @@ Receives a message.
 **Parameters:**
 - `timeout` (`number`, optional): Timeout in seconds. Default: `30`.
 
-**Returns:** `dict`: a dict with `"data"` ([`bytes`](../../data-formats/bytes.md) — call `.decode()` for text) and `"source"` (`str`) keys, or `None` on timeout.
+**Returns:** `dict`: a dict with `"data"` ([`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) — call `.decode()` for text) and `"source"` (`str`) keys, or `None` on timeout.
 
 ```python
 msg = conn.receive(timeout=5)
@@ -196,7 +196,7 @@ Receives a message from any sender.
 **Parameters:**
 - `timeout` (`number`, optional): Timeout in seconds. Default: `30`.
 
-**Returns:** `dict`: a dict with `"data"` ([`bytes`](../../data-formats/bytes.md) — call `.decode()` for text) and `"source"` (`str`) keys, or `None` on timeout.
+**Returns:** `dict`: a dict with `"data"` ([`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) — call `.decode()` for text) and `"source"` (`str`) keys, or `None` on timeout.
 
 ```python
 msg = udp_server.receive(timeout=5)
@@ -228,9 +228,9 @@ Closes the UDP listener.
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.net.unicast` opens raw UDP and TCP sockets, letting scripts initiate outbound connections to any reachable host/port (`connect()`) or bind a listening socket to accept inbound connections (`listen()`). The library does not restrict which hosts, ports, or interfaces a script can use: that is the embedder's responsibility, typically enforced with OS-level firewalling or network namespacing around the process. See [Security Considerations](../../../scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
+`scriptling.net.unicast` opens raw UDP and TCP sockets, letting scripts initiate outbound connections to any reachable host/port (`connect()`) or bind a listening socket to accept inbound connections (`listen()`). The library does not restrict which hosts, ports, or interfaces a script can use: that is the embedder's responsibility, typically enforced with OS-level firewalling or network namespacing around the process. See [Security Considerations](https://scriptling.dev/okf/scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
 
 ## Examples
 
@@ -365,7 +365,7 @@ finally:
 
 ## See Also
 
-- [scriptling.net.multicast](multicast.md): one-to-many UDP group messaging
-- [scriptling.net.gossip](gossip.md): gossip protocol cluster membership and messaging
-- [scriptling.net.websocket](websocket.md): WebSocket client library
-- [Security Guide](../../../scriptling-docs/security.md): full risk breakdown across all libraries
+- [scriptling.net.multicast](https://scriptling.dev/okf/scriptling-libraries/scriptling/networking/multicast.md): one-to-many UDP group messaging
+- [scriptling.net.gossip](https://scriptling.dev/okf/scriptling-libraries/scriptling/networking/gossip.md): gossip protocol cluster membership and messaging
+- [scriptling.net.websocket](https://scriptling.dev/okf/scriptling-libraries/scriptling/networking/websocket.md): WebSocket client library
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md): full risk breakdown across all libraries

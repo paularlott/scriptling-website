@@ -39,39 +39,39 @@ scriptling --server :8000 --json-rpc setup.py
 
 ## Documentation
 
-### [Basic Usage](cli/basic-usage.md)
+### [Basic Usage](https://scriptling.dev/okf/scriptling-docs/cli/basic-usage.md)
 
 Running scripts, interactive mode, lint mode, and environment configuration.
 
-### [Command Line Options](cli/command-line-options.md)
+### [Command Line Options](https://scriptling.dev/okf/scriptling-docs/cli/command-line-options.md)
 
 Every CLI flag, environment variable, and configuration file setting, plus container endpoints.
 
-### [Network Policy](cli/network-policy.md)
+### [Network Policy](https://scriptling.dev/okf/scriptling-docs/cli/network-policy.md)
 
 Restricting script outbound network access with a policy file.
 
-### [Libraries](cli/libraries.md)
+### [Libraries](https://scriptling.dev/okf/scriptling-docs/cli/libraries.md)
 
 Loading, disabling, and controlling library and filesystem access.
 
-### [HTTP Server Mode](cli/http-server.md)
+### [HTTP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md)
 
 Running Scriptling as an HTTP server with custom routes, TLS, and authentication.
 
-### [JSON-RPC Server Mode](cli/jsonrpc-server.md)
+### [JSON-RPC Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/jsonrpc-server.md)
 
 Running Scriptling as a concurrent JSON-RPC 2.0 server over stdio or HTTP.
 
-### [Plugin Server Mode](cli/plugin-server.md)
+### [Plugin Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/plugin-server.md)
 
 Running a Scriptling script as a first-class plugin peer with full handshake support (agent variant only).
 
-### [MCP Server Mode](cli/mcp-server.md)
+### [MCP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md)
 
 Running Scriptling as a Model Context Protocol server for AI integration, including the script execution tool.
 
-### [Packages](cli/packages.md)
+### [Packages](https://scriptling.dev/okf/scriptling-docs/cli/packages.md)
 
 Create, distribute, and load Scriptling packages from local files or URLs.
 

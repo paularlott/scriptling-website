@@ -121,6 +121,6 @@ os.write_file("output.csv", csv.format_dict(rows, columns=["name", "age"]))
 
 ## See Also
 
-- [json](../../data-formats/json.md): JSON parsing and formatting
-- [yaml](../../data-formats/yaml.md): YAML parsing
-- [toml](../../data-formats/toml.md): TOML parsing
+- [json](https://scriptling.dev/okf/scriptling-libraries/data-formats/json.md): JSON parsing and formatting
+- [yaml](https://scriptling.dev/okf/scriptling-libraries/data-formats/yaml.md): YAML parsing
+- [toml](https://scriptling.dev/okf/scriptling-libraries/data-formats/toml.md): TOML parsing

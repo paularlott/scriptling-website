@@ -70,9 +70,9 @@ p.RegisterFunc("fetch", func(ctx context.Context, kwargs object.Kwargs, args ...
 
 ## Topics
 
-- [Functions](native-functions.md) - Register individual Go functions
-- [Libraries](native-libraries.md) - Create libraries with functions and constants
-- [Classes](native-classes.md) - Define custom classes
+- [Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md) - Register individual Go functions
+- [Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md) - Create libraries with functions and constants
+- [Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes.md) - Define custom classes
 
 ## Quick Example
 
@@ -102,5 +102,5 @@ func main() {
 
 ## See Also
 
-- [Builder API](builder.md) - Type-safe, cleaner syntax
-- [Script Extensions](scripts.md) - Extend using Scriptling code
+- [Builder API](https://scriptling.dev/okf/scriptling-docs/go-integration/builder.md) - Type-safe, cleaner syntax
+- [Script Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md) - Extend using Scriptling code

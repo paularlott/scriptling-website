@@ -612,4 +612,4 @@ console.run()
 
 ## See Also
 
-- [scriptling.ai.agent.interact](../ai/interact.md) - Interactive agent loop using this library
+- [scriptling.ai.agent.interact](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/interact.md) - Interactive agent loop using this library

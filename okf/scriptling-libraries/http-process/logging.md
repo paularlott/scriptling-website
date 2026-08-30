@@ -225,5 +225,5 @@ Log messages integrate with Scriptling's output capture system alongside `print(
 
 ## See Also
 
-- [sys](sys.md): Access argv and stdin
-- [secrets](secrets.md): Generate tokens, separate from logging concerns
+- [sys](https://scriptling.dev/okf/scriptling-libraries/http-process/sys.md): Access argv and stdin
+- [secrets](https://scriptling.dev/okf/scriptling-libraries/http-process/secrets.md): Generate tokens, separate from logging concerns

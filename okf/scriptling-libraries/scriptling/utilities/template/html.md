@@ -179,5 +179,5 @@ def index(request):
 
 ## See Also
 
-- [scriptling.template.text](text.md) - Unescaped template rendering for non-HTML output
-- [scriptling.markdown](../markdown.md) - Convert Markdown to HTML before rendering it into a template
+- [scriptling.template.text](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/template/text.md) - Unescaped template rendering for non-HTML output
+- [scriptling.markdown](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/markdown.md) - Convert Markdown to HTML before rendering it into a template

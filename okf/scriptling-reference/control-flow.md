@@ -503,6 +503,6 @@ total = sum(x * y for x in range(4) for y in range(4))
 
 ## See Also
 
-- [Functions](functions.md) - Function definitions and parameters
-- [Operators](operators.md) - Comparison and boolean operators
-- [Error Handling](error-handling.md) - Try/except and raise
+- [Functions](https://scriptling.dev/okf/scriptling-reference/functions.md) - Function definitions and parameters
+- [Operators](https://scriptling.dev/okf/scriptling-reference/operators.md) - Comparison and boolean operators
+- [Error Handling](https://scriptling.dev/okf/scriptling-reference/error-handling.md) - Try/except and raise

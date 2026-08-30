@@ -171,12 +171,12 @@ def worker():
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
 `scriptling.runtime.sync` has no network or filesystem access: it's purely in-process concurrency primitives (locks, counters, queues). The risk here is misuse rather than access control: deadlocks from an unmatched `WaitGroup.add()`/`done()`, or a goroutine blocked forever on a full/empty `Queue`. Design coordination carefully rather than treating this as a security boundary.
 
 ## See Also
 
-- [scriptling.runtime](runtime.md): `background()` tasks that typically use these primitives to coordinate
-- [scriptling.runtime.kv](kv.md): simpler key-value sharing for cases that don't need locks or queues
-- [scriptling.runtime.sandbox](sandbox.md): isolated environments that do *not* share state, unlike `sync` primitives
+- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/runtime.md): `background()` tasks that typically use these primitives to coordinate
+- [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/kv.md): simpler key-value sharing for cases that don't need locks or queues
+- [scriptling.runtime.sandbox](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/sandbox.md): isolated environments that do *not* share state, unlike `sync` primitives

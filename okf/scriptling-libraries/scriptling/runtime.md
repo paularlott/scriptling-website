@@ -20,13 +20,13 @@ Libraries for runtime functionality including background task execution, HTTP se
 
 | Library | Description |
 |---------|-------------|
-| [scriptling.runtime](runtime/runtime.md) | Background tasks and async execution |
-| [scriptling.runtime.http](runtime/http.md) | HTTP route registration and response helpers |
-| [scriptling.runtime.jsonrpc](runtime/jsonrpc.md) | Concurrent JSON-RPC 2.0 server over stdio or HTTP |
-| [scriptling.runtime.kv](runtime/kv.md) | Thread-safe key-value store |
-| [scriptling.runtime.plugin](runtime/plugin.md) | Expose a script as a first-class plugin server (agent variant only) |
-| [scriptling.runtime.sync](runtime/sync.md) | Named cross-environment concurrency primitives |
-| [scriptling.runtime.sandbox](runtime/sandbox.md) | Isolated script execution environments |
+| [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/runtime.md) | Background tasks and async execution |
+| [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/http.md) | HTTP route registration and response helpers |
+| [scriptling.runtime.jsonrpc](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/jsonrpc.md) | Concurrent JSON-RPC 2.0 server over stdio or HTTP |
+| [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/kv.md) | Thread-safe key-value store |
+| [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/plugin.md) | Expose a script as a first-class plugin server (agent variant only) |
+| [scriptling.runtime.sync](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/sync.md) | Named cross-environment concurrency primitives |
+| [scriptling.runtime.sandbox](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/sandbox.md) | Isolated script execution environments |
 
 ## Quick Start
 
@@ -48,7 +48,7 @@ print(store.get("key"))
 
 ## See Also
 
-- [scriptling.runtime.kv](runtime/kv.md) - Thread-safe key-value store
-- [scriptling.runtime.sandbox](runtime/sandbox.md) - Isolated script execution environments
-- [Libraries](../scriptling-libraries.md) - Full library reference index
-- [Security Guide](../../scriptling-docs/security.md) - Security guidance for runtime libraries
+- [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/kv.md) - Thread-safe key-value store
+- [scriptling.runtime.sandbox](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/sandbox.md) - Isolated script execution environments
+- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Full library reference index
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security guidance for runtime libraries

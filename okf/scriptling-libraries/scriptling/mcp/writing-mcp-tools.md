@@ -17,7 +17,7 @@ type: API Reference
 Custom MCP tools allow you to expose Scriptling functionality to AI assistants.
 
 
-**Recommended:** Use the [decorator-based format](../runtime/mcp.md) (`@mcp.tool`) for new tools. It keeps metadata and implementation in a single file, eliminates drift between `.toml` and `.py`, and supports multiple tools per file.
+**Recommended:** Use the [decorator-based format](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/mcp.md) (`@mcp.tool`) for new tools. It keeps metadata and implementation in a single file, eliminates drift between `.toml` and `.py`, and supports multiple tools per file.
 
 
 This page documents the **legacy format** where each tool consists of a metadata file (`.toml`) and a script file (`.py`). Both formats are fully supported and can coexist in the same tools folder.
@@ -364,6 +364,6 @@ curl -X POST http://127.0.0.1:8000/mcp \
 
 ## See Also
 
-- [MCP Tool Library](tool.md) - Full API reference for the tool library
-- [MCP Library](../mcp.md) - MCP server library reference
-- [MCP Server Mode](../../../scriptling-docs/cli/mcp-server.md) - Running Scriptling as an MCP server
+- [MCP Tool Library](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/tool.md) - Full API reference for the tool library
+- [MCP Library](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp.md) - MCP server library reference
+- [MCP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md) - Running Scriptling as an MCP server

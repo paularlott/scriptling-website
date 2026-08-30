@@ -272,4 +272,4 @@ benchmark("join()    ", func=lambda: fast_concat(), iterations=100)
 
 ## See Also
 
-- [Built-in Functions](builtins.md) - String and list functions
+- [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md) - String and list functions

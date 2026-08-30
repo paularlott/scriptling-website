@@ -427,5 +427,5 @@ for batch in itertools.batched(items, 100):
 
 ## See Also
 
-- [Language Guide](../scriptling-reference/scriptling-reference.md) - Complete language reference
-- [Libraries](scriptling-libraries.md) - Standard and extended library reference
+- [Language Guide](https://scriptling.dev/okf/scriptling-reference/scriptling-reference.md) - Complete language reference
+- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Standard and extended library reference

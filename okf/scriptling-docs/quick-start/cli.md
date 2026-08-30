@@ -25,6 +25,18 @@ Get up and running with the Scriptling command-line interface.
 brew install paularlott/tap/scriptling
 ```
 
+Database support is optional. The plugin binaries live in their own formula:
+
+```bash
+brew install paularlott/tap/scriptling-plugins
+export SCRIPTLING_PLUGIN_DIR="$(brew --prefix)/opt/scriptling-plugins/libexec/plugins"
+```
+
+Or use `scriptling-full` — the same CLI with all database plugins compiled
+in (mutually exclusive with `scriptling`): `brew install paularlott/tap/scriptling-full`.
+
+See [Plugins](https://scriptling.dev/okf/scriptling-docs/./plugins.md) for how plugins load and the [database reference](https://scriptling.dev/okf/scriptling-libraries/scriptling/databases.md) for the APIs.
+
 ### GitHub Releases
 
 Download pre-built binaries from [GitHub Releases](https://github.com/paularlott/scriptling/releases):
@@ -101,7 +113,7 @@ scriptling --server :8000 --mcp-tools ./tools setup.py
 
 ## Next Steps
 
-- [Language Guide](../../scriptling-reference/scriptling-reference.md) - Learn the complete language syntax
-- [Libraries](../../scriptling-libraries/scriptling-libraries.md) - Explore available libraries and APIs
-- [CLI Reference](../cli.md) - Full command-line interface documentation
-- [Security Guide](../security.md) - Security best practices
+- [Language Guide](https://scriptling.dev/okf/scriptling-reference/scriptling-reference.md) - Learn the complete language syntax
+- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Explore available libraries and APIs
+- [CLI Reference](https://scriptling.dev/okf/scriptling-docs/./cli.md) - Full command-line interface documentation
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security best practices

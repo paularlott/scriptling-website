@@ -703,12 +703,12 @@ except Exception as e:
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`ai.Client` makes outbound HTTP requests to the configured AI provider endpoint (and to any `remote_servers` MCP servers configured on it). API keys and base URLs are supplied by the embedder when constructing the client: scripts only see them if the embedder explicitly passes them in. For a full risk breakdown, see the [Security Guide](../../../scriptling-docs/security.md#library-security) and [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#ai--agent).
+`ai.Client` makes outbound HTTP requests to the configured AI provider endpoint (and to any `remote_servers` MCP servers configured on it). API keys and base URLs are supplied by the embedder when constructing the client: scripts only see them if the embedder explicitly passes them in. For a full risk breakdown, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#library-security) and [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#ai--agent).
 
 ## See Also
 
-- [scriptling.ai](../ai.md): AI namespace overview, response helpers, and tool registry
-- [scriptling.ai.agent](agent.md): Agentic AI loop with automatic tool execution
-- [scriptling.ai.memory](memory.md): Long-term memory store for AI agents
+- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai.md): AI namespace overview, response helpers, and tool registry
+- [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/agent.md): Agentic AI loop with automatic tool execution
+- [scriptling.ai.memory](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/memory.md): Long-term memory store for AI agents

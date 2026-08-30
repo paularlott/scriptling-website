@@ -1060,5 +1060,5 @@ print("Hypotenuse: " + str(hypotenuse))  # Hypotenuse: 5.0
 
 ## See Also
 
-- [statistics](statistics.md): mean, median, variance, and other statistical functions.
-- [random](random.md): random number generation.
+- [statistics](https://scriptling.dev/okf/scriptling-libraries/math-numbers/statistics.md): mean, median, variance, and other statistical functions.
+- [random](https://scriptling.dev/okf/scriptling-libraries/math-numbers/random.md): random number generation.

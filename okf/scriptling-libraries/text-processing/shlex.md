@@ -14,7 +14,7 @@ type: API Reference
 ---
 # shlex
 
-The `shlex` library provides shell-style string quoting and splitting, matching Python's `shlex` module. Use it to safely build command lines for [`subprocess`](../text-processing.md) or to parse shell-like input.
+The `shlex` library provides shell-style string quoting and splitting, matching Python's `shlex` module. Use it to safely build command lines for [`subprocess`](https://scriptling.dev/okf/scriptling-libraries/./text-processing.md) or to parse shell-like input.
 
 ## Available Functions
 
@@ -107,4 +107,4 @@ subprocess.run(shlex.split("echo " + shlex.quote(user_input)))
 
 ## See Also
 
-- [subprocess](../http-process/subprocess.md): Running external commands
+- [subprocess](https://scriptling.dev/okf/scriptling-libraries/http-process/subprocess.md): Running external commands

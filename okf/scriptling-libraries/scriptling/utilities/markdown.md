@@ -113,4 +113,4 @@ detail_html = markdown.to_html(detail_md)
 
 ## See Also
 
-- [scriptling.template.html](template/html.md) - Render the converted HTML into a larger page template
+- [scriptling.template.html](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/template/html.md) - Render the converted HTML into a larger page template

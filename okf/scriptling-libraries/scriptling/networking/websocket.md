@@ -171,9 +171,9 @@ The remote address of the connection.
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.net.websocket` opens outbound WebSocket connections to any URL a script supplies, and can send and receive arbitrary data over that connection, including any headers (such as bearer tokens) the script passes in. The library does not restrict which hosts a script can connect to: that is the embedder's responsibility, typically enforced with OS-level firewalling or network namespacing around the process. See [Security Considerations](../../../scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
+`scriptling.net.websocket` opens outbound WebSocket connections to any URL a script supplies, and can send and receive arbitrary data over that connection, including any headers (such as bearer tokens) the script passes in. The library does not restrict which hosts a script can connect to: that is the embedder's responsibility, typically enforced with OS-level firewalling or network namespacing around the process. See [Security Considerations](https://scriptling.dev/okf/scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
 
 ## Examples
 
@@ -313,7 +313,7 @@ finally:
 
 ## Accepting WebSocket Connections (Server-Side)
 
-This page documents the WebSocket *client*. To accept incoming WebSocket connections in a Scriptling-powered HTTP server, register a handler with `runtime.http.websocket(path, handler)`: see [scriptling.runtime.http](../runtime/http.md) for details. The handler receives a `WebSocketClient` object exposing the same `connected()`, `receive()`, `send()`, `send_binary()`, `close()`, and `remote_addr` surface documented above, plus access to the module-level `is_text()` / `is_binary()` helpers for distinguishing message types:
+This page documents the WebSocket *client*. To accept incoming WebSocket connections in a Scriptling-powered HTTP server, register a handler with `runtime.http.websocket(path, handler)`: see [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/http.md) for details. The handler receives a `WebSocketClient` object exposing the same `connected()`, `receive()`, `send()`, `send_binary()`, `close()`, and `remote_addr` surface documented above, plus access to the module-level `is_text()` / `is_binary()` helpers for distinguishing message types:
 
 ```python
 # setup.py
@@ -346,6 +346,6 @@ def chat_handler(client):
 
 ## See Also
 
-- [scriptling.runtime.http](../runtime/http.md): register server-side WebSocket endpoints with `runtime.http.websocket()`
-- [scriptling.net.unicast](unicast.md): direct point-to-point UDP/TCP messaging
-- [Security Guide](../../../scriptling-docs/security.md): full risk breakdown across all libraries
+- [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/http.md): register server-side WebSocket endpoints with `runtime.http.websocket()`
+- [scriptling.net.unicast](https://scriptling.dev/okf/scriptling-libraries/scriptling/networking/unicast.md): direct point-to-point UDP/TCP messaging
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md): full risk breakdown across all libraries

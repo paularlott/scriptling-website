@@ -210,12 +210,12 @@ if status == file.REMOVED:
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.provision.file` writes, modifies, and deletes files and directories on the local filesystem wherever the embedding process's own OS-level permissions allow. Unlike `os`, `fs`, or `pathlib`, it does not take an `allowedPaths` restriction: there is no per-library sandboxing of which paths it can touch. If you need to confine where provisioning writes can land, restrict it at the OS/process level (e.g. running under a dedicated user, container, or chroot) rather than relying on library-level controls. For a full risk breakdown across all libraries, see the [Security Guide](../../../scriptling-docs/security.md).
+`scriptling.provision.file` writes, modifies, and deletes files and directories on the local filesystem wherever the embedding process's own OS-level permissions allow. Unlike `os`, `fs`, or `pathlib`, it does not take an `allowedPaths` restriction: there is no per-library sandboxing of which paths it can touch. If you need to confine where provisioning writes can land, restrict it at the OS/process level (e.g. running under a dedicated user, container, or chroot) rather than relying on library-level controls. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 
 ## See Also
 
-- [scriptling.provision.fetch](provision-fetch.md): download remote files and unpack zip archives to disk
-- [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries)
-- [Security Guide](../../../scriptling-docs/security.md)
+- [scriptling.provision.fetch](https://scriptling.dev/okf/scriptling-libraries/scriptling/provisioning/provision-fetch.md): download remote files and unpack zip archives to disk
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries)
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md)

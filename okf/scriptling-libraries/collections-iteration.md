@@ -16,7 +16,7 @@ type: API Reference
 
 | Library | Description |
 |---------|-------------|
-| [collections](collections-iteration/collections.md) | Specialized container datatypes |
-| [itertools](collections-iteration/itertools.md) | Iterator functions |
-| [functools](collections-iteration/functools.md) | Higher-order functions and decorators |
-| [contextlib](collections-iteration/contextlib.md) | Utilities for the `with` statement |
+| [collections](https://scriptling.dev/okf/scriptling-libraries/collections-iteration/collections.md) | Specialized container datatypes |
+| [itertools](https://scriptling.dev/okf/scriptling-libraries/collections-iteration/itertools.md) | Iterator functions |
+| [functools](https://scriptling.dev/okf/scriptling-libraries/collections-iteration/functools.md) | Higher-order functions and decorators |
+| [contextlib](https://scriptling.dev/okf/scriptling-libraries/collections-iteration/contextlib.md) | Utilities for the `with` statement |

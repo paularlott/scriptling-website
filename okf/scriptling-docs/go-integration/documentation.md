@@ -316,8 +316,8 @@ HelpText: `fetch(url, timeout=30) - Fetch data from a URL
 
 ## See Also
 
-- [Native Functions](native-functions.md) - Registering Go functions
-- [Native Libraries](native-libraries.md) - Creating Go libraries
-- [Builder Functions](builder-functions.md) - Type-safe function builder
-- [Builder Libraries](builder-libraries.md) - Type-safe library builder
-- [Script Extensions](scripts.md) - Script-based extensions
+- [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md) - Registering Go functions
+- [Native Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md) - Creating Go libraries
+- [Builder Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-functions.md) - Type-safe function builder
+- [Builder Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md) - Type-safe library builder
+- [Script Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md) - Script-based extensions

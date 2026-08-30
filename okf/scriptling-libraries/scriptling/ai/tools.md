@@ -15,7 +15,7 @@ type: API Reference
 ---
 # scriptling.ai.tools
 
-Builds OpenAI-compatible tool schemas from Scriptling functions, so an AI agent can discover and call them. The library exposes the `Registry` class: construct one with `tools.Registry()` (or `ai.ToolRegistry()`, the re-export most scripts use, see [scriptling.ai](ai.md)), then register tools and build schemas to pass to a completion request or an `Agent`.
+Builds OpenAI-compatible tool schemas from Scriptling functions, so an AI agent can discover and call them. The library exposes the `Registry` class: construct one with `tools.Registry()` (or `ai.ToolRegistry()`, the re-export most scripts use, see [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/ai.md)), then register tools and build schemas to pass to a completion request or an `Agent`.
 
 ## Available Functions
 
@@ -109,6 +109,6 @@ result = handler({"path": "/etc/hostname"})
 
 ## See Also
 
-- [scriptling.ai](ai.md): re-exports the class as `ai.ToolRegistry`, plus completion helpers and `execute_tool_calls`.
-- [scriptling.ai.agent](agent.md): the `Agent` class consumes a `Registry` via its `tools=` argument.
-- [scriptling.mcp.tool](../mcp/tool.md): building tools for the MCP protocol instead of direct LLM APIs.
+- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/ai.md): re-exports the class as `ai.ToolRegistry`, plus completion helpers and `execute_tool_calls`.
+- [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/agent.md): the `Agent` class consumes a `Registry` via its `tools=` argument.
+- [scriptling.mcp.tool](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/tool.md): building tools for the MCP protocol instead of direct LLM APIs.

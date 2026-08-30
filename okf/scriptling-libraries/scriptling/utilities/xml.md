@@ -111,7 +111,7 @@ os.write_file("config.xml", xml.dumps(data, indent="  "))
 
 ## See Also
 
-- [json](../../data-formats/json.md): JSON parsing and formatting
-- [yaml](../../data-formats/yaml.md): YAML parsing
-- [toml](../../data-formats/toml.md): TOML parsing
-- [scriptling.csv](csv.md): CSV parsing and formatting
+- [json](https://scriptling.dev/okf/scriptling-libraries/data-formats/json.md): JSON parsing and formatting
+- [yaml](https://scriptling.dev/okf/scriptling-libraries/data-formats/yaml.md): YAML parsing
+- [toml](https://scriptling.dev/okf/scriptling-libraries/data-formats/toml.md): TOML parsing
+- [scriptling.csv](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/csv.md): CSV parsing and formatting

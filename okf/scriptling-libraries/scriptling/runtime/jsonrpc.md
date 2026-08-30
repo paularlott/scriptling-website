@@ -42,6 +42,9 @@ HTTP JSON-RPC is served at `POST /json-rpc` and can run alongside normal `runtim
 | `method(name, handler)` | Register a JSON-RPC method handler |
 | `notification(name, handler)` | Register a notification handler (no response) |
 | `error(code, message, data=None)` | Build a structured JSON-RPC error response |
+| `get_request()` | Get the HTTP request this call arrived on, or `None` over stdio |
+| `request_context()` | Get the context dict set by the middleware (empty dict if none) |
+| `transport()` | How the server is being served: `"http"`, `"stdio"` or `None` |
 
 ## Functions
 
@@ -116,6 +119,50 @@ def divide(params):
     return params["a"] / params["b"]
 ```
 
+### `get_request()`
+
+Returns the HTTP request this call is being served for, when the JSON-RPC server is mounted over HTTP (`POST /json-rpc`): the same [Request object](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/http.md#request-object) the middleware saw, with `method`, `path`, `headers`, `query`, `remote_addr` and `context`. Over the stdio transport there is no HTTP request, so it returns `None`.
+
+**Returns:** `Request` or `None`
+
+```python
+import scriptling.runtime as runtime
+
+def who(params):
+    req = runtime.jsonrpc.get_request()
+    if req != None:
+        return {"ip": req.remote_addr}
+    return {"ip": "stdio"}
+```
+
+### `request_context()`
+
+Returns the context dict the [middleware](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/http.md#middlewarehandler) populated for this request — e.g. `request.context["user"] = name` after authenticating. It is always a dict: empty when no middleware ran or it set nothing, so `.get(name, default)` is always safe. Each call gets its own copy, so writes from the handler are local — with a batch dispatching concurrently, one element's writes are never visible to the others.
+
+**Returns:** `dict`
+
+```python
+import scriptling.runtime as runtime
+
+def who(params):
+    user = runtime.jsonrpc.request_context().get("user", "anonymous")
+    return {"user": user}
+```
+
+### `transport()`
+
+Returns `"http"` when serving at `POST /json-rpc` (also from method handlers mid-request), `"stdio"` for the `--json-rpc` stdio server, and `None` when the script is not being served at all — so one setup script can work in every mode, since middleware never runs over stdio.
+
+**Returns:** `str` or `None`
+
+```python
+import scriptling.runtime as runtime
+
+if runtime.jsonrpc.transport() == "stdio":
+    # No middleware over stdio: treat every caller alike.
+    ...
+```
+
 ## Concurrency Model
 
 Each request is dispatched on its own goroutine with a fresh Scriptling evaluator, mirroring `runtime.http`, MCP, and WebSocket serving. Handlers cannot share in-memory state across requests; coordinate through `runtime.kv` or `runtime.sync` instead.
@@ -184,13 +231,13 @@ HTTP/1.1 204 No Content
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.runtime.jsonrpc` is server-only: it registers method/notification handlers for an incoming JSON-RPC stream and never issues outbound JSON-RPC calls itself. The risk shape matches `runtime.http`: registering a method exposes that handler to any peer that can reach the stdio stream or `POST /json-rpc` endpoint, so treat every registered method as a network-reachable entry point and validate `params` defensively. For a full risk breakdown across all libraries, see the [Security Guide](../../../scriptling-docs/security.md).
+`scriptling.runtime.jsonrpc` is server-only: it registers method/notification handlers for an incoming JSON-RPC stream and never issues outbound JSON-RPC calls itself. The risk shape matches `runtime.http`: registering a method exposes that handler to any peer that can reach the stdio stream or `POST /json-rpc` endpoint, so treat every registered method as a network-reachable entry point and validate `params` defensively. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 
 ## See Also
 
-- [scriptling.runtime.http](http.md): HTTP route registration sharing the same per-request evaluator model
-- [scriptling.runtime.plugin](plugin.md): full plugin protocol server (functions, constants, and classes)
-- [scriptling.runtime.kv](kv.md): share state across JSON-RPC handlers
-- [Security Guide](../../../scriptling-docs/security.md)
+- [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/http.md): HTTP route registration sharing the same per-request evaluator model
+- [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/plugin.md): full plugin protocol server (functions, constants, and classes)
+- [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/kv.md): share state across JSON-RPC handlers
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md)

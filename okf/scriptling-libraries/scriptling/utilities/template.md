@@ -19,8 +19,8 @@ Go-powered template rendering. Two sub-libraries are available: import only what
 
 | Library | Import | Description |
 |---------|--------|-------------|
-| [`scriptling.template.html`](template/html.md) | `import scriptling.template.html as html` | `html/template`: automatic HTML escaping |
-| [`scriptling.template.text`](template/text.md) | `import scriptling.template.text as text` | `text/template`: no escaping, plain text output |
+| [`scriptling.template.html`](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/template/html.md) | `import scriptling.template.html as html` | `html/template`: automatic HTML escaping |
+| [`scriptling.template.text`](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/template/text.md) | `import scriptling.template.text as text` | `text/template`: no escaping, plain text output |
 
 Both expose a single `Set()` constructor that returns a `Set` object with `add(source)` and `render([name,] data)` methods.
 
@@ -89,6 +89,6 @@ print(tmpl.render("page", {"Title": "Home"}))
 
 ## See Also
 
-- [Utilities](../utilities.md) - Parent utilities namespace
-- [scriptling.markdown](markdown.md) - Markdown to HTML conversion
-- [Libraries](../../scriptling-libraries.md) - Full library reference index
+- [Utilities](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities.md) - Parent utilities namespace
+- [scriptling.markdown](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/markdown.md) - Markdown to HTML conversion
+- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Full library reference index

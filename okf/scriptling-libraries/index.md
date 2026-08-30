@@ -7,13 +7,13 @@ API reference for every standard, Scriptling, and extended library.
 
 ## Concepts
 
-- [Libraries](scriptling-libraries.md)
-- [Library Cheat Sheet](cheat-sheet.md)
-- [Collections & Iteration](collections-iteration.md)
-- [Data Formats](data-formats.md)
-- [File System](filesystem.md)
-- [HTTP & Process](http-process.md)
-- [Math & Numbers](math-numbers.md)
-- [Scriptling Libraries](scriptling.md)
-- [Text Processing](text-processing.md)
-- [Time & System](time-system.md)
+- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md)
+- [Library Cheat Sheet](https://scriptling.dev/okf/scriptling-libraries/cheat-sheet.md)
+- [Collections & Iteration](https://scriptling.dev/okf/scriptling-libraries/collections-iteration.md)
+- [Data Formats](https://scriptling.dev/okf/scriptling-libraries/data-formats.md)
+- [File System](https://scriptling.dev/okf/scriptling-libraries/filesystem.md)
+- [HTTP & Process](https://scriptling.dev/okf/scriptling-libraries/http-process.md)
+- [Math & Numbers](https://scriptling.dev/okf/scriptling-libraries/math-numbers.md)
+- [Scriptling Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling.md)
+- [Text Processing](https://scriptling.dev/okf/scriptling-libraries/text-processing.md)
+- [Time & System](https://scriptling.dev/okf/scriptling-libraries/time-system.md)

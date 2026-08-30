@@ -57,7 +57,7 @@ Send an HTTP POST request to the specified URL with the given data.
 
 **Parameters:**
 - `url` (`str`): URL to request.
-- `data` (`str` or [`bytes`](../data-formats/bytes.md), optional): Request body. Use `bytes` for binary payloads (msgpack, etc.). Default: `None`.
+- `data` (`str` or [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md), optional): Request body. Use `bytes` for binary payloads (msgpack, etc.). Default: `None`.
 - `**kwargs` (optional):
   - `timeout` (`int`): Request timeout in seconds. Default: `5`.
   - `headers` (`dict`): HTTP headers to send.
@@ -85,7 +85,7 @@ Send an HTTP PUT request to the specified URL with the given data.
 
 **Parameters:**
 - `url` (`str`): URL to request.
-- `data` (`str` or [`bytes`](../data-formats/bytes.md), optional): Request body. Use `bytes` for binary payloads (msgpack, etc.). Default: `None`.
+- `data` (`str` or [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md), optional): Request body. Use `bytes` for binary payloads (msgpack, etc.). Default: `None`.
 - `**kwargs` (optional):
   - `timeout` (`int`): Request timeout in seconds. Default: `5`.
   - `headers` (`dict`): HTTP headers to send.
@@ -127,7 +127,7 @@ Send an HTTP PATCH request to the specified URL with the given data.
 
 **Parameters:**
 - `url` (`str`): URL to request.
-- `data` (`str` or [`bytes`](../data-formats/bytes.md), optional): Request body. Use `bytes` for binary payloads (msgpack, etc.). Default: `None`.
+- `data` (`str` or [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md), optional): Request body. Use `bytes` for binary payloads (msgpack, etc.). Default: `None`.
 - `**kwargs` (optional):
   - `timeout` (`int`): Request timeout in seconds. Default: `5`.
   - `headers` (`dict`): HTTP headers to send.
@@ -182,7 +182,7 @@ All HTTP functions return a `Response` object with the following attributes, acc
 
 - `status_code` / `["status_code"]` (`int`): HTTP status code.
 - `text` / `["text"]` (`str`): Response body decoded as a string.
-- `content` / `["content"]` ([`bytes`](../data-formats/bytes.md)): Raw response body. Use this instead of `.text` for binary content (images, msgpack, etc.).
+- `content` / `["content"]` ([`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md)): Raw response body. Use this instead of `.text` for binary content (images, msgpack, etc.).
 - `body` / `["body"]` (`str`): Deprecated alias for `text`.
 - `headers` / `["headers"]` (`dict`): Response headers.
 - `url` / `["url"]` (`str`): The URL of the response.
@@ -226,9 +226,9 @@ The `requests` library exposes the following exception types for error handling:
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`requests` can make arbitrary HTTP/HTTPS requests to any URL reachable from the host. There is no built-in URL allowlisting: if you need to restrict which hosts a script can reach, filter URLs at the application layer before passing them to script execution. See the [Security Guide](../../scriptling-docs/security.md#network-security).
+`requests` can make arbitrary HTTP/HTTPS requests to any URL reachable from the host. There is no built-in URL allowlisting: if you need to restrict which hosts a script can reach, filter URLs at the application layer before passing them to script execution. See the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#network-security).
 
 ## Notes
 
@@ -239,5 +239,5 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## See Also
 
-- [subprocess](subprocess.md): Run external commands
-- [secrets](secrets.md): Generate tokens for API authentication
+- [subprocess](https://scriptling.dev/okf/scriptling-libraries/http-process/subprocess.md): Run external commands
+- [secrets](https://scriptling.dev/okf/scriptling-libraries/http-process/secrets.md): Generate tokens for API authentication

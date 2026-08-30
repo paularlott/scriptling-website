@@ -276,7 +276,7 @@ import "github.com/paularlott/scriptling/stdlib"
 stdlib.RegisterAll(p)
 ```
 
-Extended and `scriptling.*` libraries are registered individually, and filesystem libraries take an `allowedPaths` argument for access control. See [Library Registration](library-registration.md) for the complete list of libraries and their registration functions.
+Extended and `scriptling.*` libraries are registered individually, and filesystem libraries take an `allowedPaths` argument for access control. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) for the complete list of libraries and their registration functions.
 
 ### Programmatic Import
 
@@ -332,7 +332,7 @@ chain := libloader.NewChain(
 p.SetLibraryLoader(chain)
 ```
 
-See [Library Loader Chain](loader-chain.md) for full documentation.
+See [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md) for full documentation.
 
 ## Error Handling
 
@@ -424,8 +424,8 @@ else:
 
 ## See Also
 
-- [Library Registration](library-registration.md) - How to register built-in libraries
-- [Native API](native.md) - Direct control with maximum performance
-- [Builder API](builder.md) - Type-safe, cleaner syntax
-- [Security Guide](../security.md) - Security best practices for embedding
-- [Libraries](../../scriptling-libraries/scriptling-libraries.md) - Usage reference for all libraries
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - How to register built-in libraries
+- [Native API](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md) - Direct control with maximum performance
+- [Builder API](https://scriptling.dev/okf/scriptling-docs/go-integration/builder.md) - Type-safe, cleaner syntax
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security best practices for embedding
+- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Usage reference for all libraries

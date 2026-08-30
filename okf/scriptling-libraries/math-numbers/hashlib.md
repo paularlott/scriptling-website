@@ -15,7 +15,7 @@ type: API Reference
 ---
 # hashlib
 
-The `hashlib` library provides cryptographic hash functions (MD5, SHA-1, SHA-256). Its constructors return **hash objects** rather than raw strings: call `.hexdigest()` (lowercase hex) or `.digest()` (raw binary as a [`bytes`](../data-formats/bytes.md) value) on the returned object to get the result.
+The `hashlib` library provides cryptographic hash functions (MD5, SHA-1, SHA-256). Its constructors return **hash objects** rather than raw strings: call `.hexdigest()` (lowercase hex) or `.digest()` (raw binary as a [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) value) on the returned object to get the result.
 
 ## Available Functions
 
@@ -83,7 +83,7 @@ Objects returned by `md5()`, `sha1()`, and `sha256()` support:
 |----------------|-------------|
 | `.update(data)` | Feed more data into the hash. Returns `None`. |
 | `.hexdigest()` | Return the digest as a lowercase hex string. |
-| `.digest()` | Return the digest as a [`bytes`](../data-formats/bytes.md) value. |
+| `.digest()` | Return the digest as a [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) value. |
 | `.copy()` | Return an independent copy of the hash object. |
 | `.name` | Algorithm name, e.g. `"sha256"`. |
 | `.digest_size` | Digest size in bytes (`md5` 16, `sha1` 20, `sha256` 32). |
@@ -107,6 +107,6 @@ assert h.hexdigest() == hashlib.sha256("foobarbaz").hexdigest()
 
 ## See Also
 
-- [hmac](hmac.md): message authentication codes, often paired with `hashlib` constructors.
-- [base64](base64.md): Base64 encoding and decoding.
-- [bytes](../data-formats/bytes.md): the binary type returned by `.digest()`.
+- [hmac](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hmac.md): message authentication codes, often paired with `hashlib` constructors.
+- [base64](https://scriptling.dev/okf/scriptling-libraries/math-numbers/base64.md): Base64 encoding and decoding.
+- [bytes](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md): the binary type returned by `.digest()`.

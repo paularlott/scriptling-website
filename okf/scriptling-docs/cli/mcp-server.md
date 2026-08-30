@@ -233,7 +233,7 @@ Custom tools are loaded from the directory specified by `--mcp-tools`. Each tool
 scriptling --server :8000 --mcp-tools ./tools setup.py
 ```
 
-For details on creating custom tools, see [Writing MCP Tools](../../scriptling-libraries/scriptling/mcp/writing-mcp-tools.md).
+For details on creating custom tools, see [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/writing-mcp-tools.md).
 
 ### Conditional Tool Registration
 
@@ -377,10 +377,10 @@ A built-in `scriptling://script/{name}` resource template (tool source code,
 when `--mcp-tools` is set) and a `write_script` prompt are always available.
 
 **For a walkthrough of creating resources and prompts** — including the shared
-`.toml` format — see the [Building an MCP Resources & Prompts Server tutorial](../tutorials/mcp-resources-prompts.md).
-The [tool metadata reference](../../scriptling-libraries/scriptling/mcp/writing-mcp-tools.md)
+`.toml` format — see the [Building an MCP Resources & Prompts Server tutorial](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-resources-prompts.md).
+The [tool metadata reference](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/writing-mcp-tools.md)
 covers the `.toml` fields prompts share. To read resources and prompts from a
-server in a script, see the [scriptling.mcp client](../../scriptling-libraries/scriptling/mcp/client.md#resources-and-prompts).
+server in a script, see the [scriptling.mcp client](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/client.md#resources-and-prompts).
 
 ## Live Reload and Change Notifications
 
@@ -409,7 +409,7 @@ The `--mcp-exec-script` flag allows AI assistants to execute arbitrary code. Con
 - Use `--allowed-paths` to restrict filesystem access
 - Use `--bearer-token` to require authentication, or register a script
   middleware for per-user keys — it guards `/mcp` the same as HTTP routes
-  (see [Per-User Keys](http-server.md#per-user-keys))
+  (see [Per-User Keys](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md#per-user-keys))
 - Run in a sandboxed environment for untrusted AI systems
 
 ```bash
@@ -445,9 +445,9 @@ This configuration:
 
 ## See Also
 
-- [Basic Usage](basic-usage.md) - Running scripts, interactive mode, and lint mode
-- [Command Line Options](command-line-options.md) - Every flag and configuration file setting
-- [HTTP Server Mode](http-server.md) - HTTP server without MCP
-- [Writing MCP Tools](../../scriptling-libraries/scriptling/mcp/writing-mcp-tools.md) - Creating custom MCP tools
-- [MCP Library](../../scriptling-libraries/scriptling/mcp.md) - MCP library reference
-- [MCP Tool Library](../../scriptling-libraries/scriptling/mcp/tool.md) - Tool implementation API
+- [Basic Usage](https://scriptling.dev/okf/scriptling-docs/cli/basic-usage.md) - Running scripts, interactive mode, and lint mode
+- [Command Line Options](https://scriptling.dev/okf/scriptling-docs/cli/command-line-options.md) - Every flag and configuration file setting
+- [HTTP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md) - HTTP server without MCP
+- [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/writing-mcp-tools.md) - Creating custom MCP tools
+- [MCP Library](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp.md) - MCP library reference
+- [MCP Tool Library](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp/tool.md) - Tool implementation API

@@ -17,7 +17,7 @@ type: API Reference
 
 The `scriptling.find` library finds files and directories under a path by name, type, modification time, and size — similar in spirit to the Unix `find` command. It fills the gap between `glob` (which matches names but cannot filter on metadata) and a hand-rolled `os.walk` loop.
 
-When searching recursively, entries are stat'd and filtered concurrently using the same bounded worker-pool model as [`scriptling.grep`](grep.md), so large trees are scanned in parallel.
+When searching recursively, entries are stat'd and filtered concurrently using the same bounded worker-pool model as [`scriptling.grep`](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/grep.md), so large trees are scanned in parallel.
 
 The library exposes two functions: `path()` returns matching paths as a list of strings, and `entries()` returns the same matches as a list of dicts carrying `size`, `mtime`, and `is_dir` per entry. Use `entries()` when you need the metadata (e.g. comparing two trees without re-reading bytes); use `path()` when only the strings are needed, since it skips the per-entry `stat` in the no-filter common case.
 
@@ -133,12 +133,12 @@ for e in find.entries("/project", include_symlinks=True):
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`find` provides read access to the host filesystem (directory listings and `stat` calls). When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterFindLibrary(p, allowedPaths)`: path traversal (`../`) is blocked automatically and symlinks resolving outside the allowed paths are skipped. See [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](../../../scriptling-docs/security.md#file-system-security).
+`find` provides read access to the host filesystem (directory listings and `stat` calls). When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterFindLibrary(p, allowedPaths)`: path traversal (`../`) is blocked automatically and symlinks resolving outside the allowed paths are skipped. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
 
 ## See Also
 
-- [glob](../../filesystem/glob.md): Shell-style wildcard matching by name
-- [pathlib](../../filesystem/pathlib.md): Object-oriented filesystem paths
-- [scriptling.grep](grep.md): File content search, using the same parallel worker model
+- [glob](https://scriptling.dev/okf/scriptling-libraries/filesystem/glob.md): Shell-style wildcard matching by name
+- [pathlib](https://scriptling.dev/okf/scriptling-libraries/filesystem/pathlib.md): Object-oriented filesystem paths
+- [scriptling.grep](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/grep.md): File content search, using the same parallel worker model

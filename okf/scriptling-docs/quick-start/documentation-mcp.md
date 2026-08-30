@@ -23,7 +23,7 @@ The same bundles are also hosted as plain markdown at [scriptling.dev/okf/](http
 
 ## Prerequisites
 
-- **Scriptling 0.18.0 or later** installed and on your `PATH` (`scriptling --version`). See [CLI Getting Started](cli.md) to install.
+- **Scriptling 0.18.0 or later** installed and on your `PATH` (`scriptling --version`). See [CLI Getting Started](https://scriptling.dev/okf/scriptling-docs/quick-start/cli.md) to install.
 
 ## 1. Download the bundles
 

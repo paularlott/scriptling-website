@@ -149,7 +149,7 @@ score = sim.minhash_similarity(a, b)
 
 ### `cosine_similarity(a, b)`
 
-Compute the cosine of the angle between two numeric vectors. Returns a score from -1.0 (opposite) to 1.0 (identical direction); 0.0 means orthogonal. Works with embedding vectors from [`scriptling.ai`](../ai.md)'s `client.embedding()` or with vectors from `vectorize()`.
+Compute the cosine of the angle between two numeric vectors. Returns a score from -1.0 (opposite) to 1.0 (identical direction); 0.0 means orthogonal. Works with embedding vectors from [`scriptling.ai`](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai.md)'s `client.embedding()` or with vectors from `vectorize()`.
 
 **Parameters:**
 - `a` (`list[float]`): First vector.
@@ -211,4 +211,4 @@ print(len(v))  # 128
 
 ## See Also
 
-- [scriptling.toon](toon.md) - Compact data encoding, often paired with similarity search over decoded records
+- [scriptling.toon](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/toon.md) - Compact data encoding, often paired with similarity search over decoded records

@@ -179,12 +179,12 @@ Directory operations use the same concurrent worker pool as `scriptling.grep`: b
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.sed` has filesystem read-write access, restricted via the `allowedPaths` parameter to `RegisterSedLibrary(p, allowedPaths)`. Any path outside the allowed directories returns a permission error, and symlinks are only followed if `follow_links=True` **and** the resolved target is within the allowed paths. See [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#filesystem-libraries) for configuration details.
+`scriptling.sed` has filesystem read-write access, restricted via the `allowedPaths` parameter to `RegisterSedLibrary(p, allowedPaths)`. Any path outside the allowed directories returns a permission error, and symlinks are only followed if `follow_links=True` **and** the resolved target is within the allowed paths. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) for configuration details.
 
 ## See Also
 
-- [scriptling.grep](grep.md) - Pair with sed to find-then-transform file content
-- [Library Registration](../../../scriptling-docs/go-integration/library-registration.md) - Registering extended libraries when embedding in Go
-- [Security Guide](../../../scriptling-docs/security.md) - Security guidance for host-provided libraries
+- [scriptling.grep](https://scriptling.dev/okf/scriptling-libraries/scriptling/utilities/grep.md) - Pair with sed to find-then-transform file content
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - Registering extended libraries when embedding in Go
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security guidance for host-provided libraries

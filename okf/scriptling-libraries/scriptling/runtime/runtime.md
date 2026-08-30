@@ -108,16 +108,16 @@ t2.wait()
 print(state["count"])  # 2000
 ```
 
-For ongoing coordination between tasks, use `runtime.sync` primitives (`Shared`, `Atomic`, `Queue`, `WaitGroup`). To yield the interpreter lock from a tight CPU-bound loop, use the global [`yield_now()`](../../../scriptling-reference/builtins.md#yield_now) builtin: it is always available without importing `runtime`.
+For ongoing coordination between tasks, use `runtime.sync` primitives (`Shared`, `Atomic`, `Queue`, `WaitGroup`). To yield the interpreter lock from a tight CPU-bound loop, use the global [`yield_now()`](https://scriptling.dev/okf/scriptling-reference/builtins.md#yield_now) builtin: it is always available without importing `runtime`.
 
 ## Sub-Libraries
 
-- [scriptling.runtime.http](http.md): HTTP route registration and response helpers
-- [scriptling.runtime.jsonrpc](jsonrpc.md): JSON-RPC 2.0 server over stdio or HTTP
-- [scriptling.runtime.kv](kv.md): thread-safe key-value store
-- [scriptling.runtime.plugin](plugin.md): expose a script as a first-class plugin server (agent variant only)
-- [scriptling.runtime.sync](sync.md): named cross-environment concurrency primitives
-- [scriptling.runtime.sandbox](sandbox.md): isolated script execution environments
+- [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/http.md): HTTP route registration and response helpers
+- [scriptling.runtime.jsonrpc](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/jsonrpc.md): JSON-RPC 2.0 server over stdio or HTTP
+- [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/kv.md): thread-safe key-value store
+- [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/plugin.md): expose a script as a first-class plugin server (agent variant only)
+- [scriptling.runtime.sync](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/sync.md): named cross-environment concurrency primitives
+- [scriptling.runtime.sandbox](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/sandbox.md): isolated script execution environments
 
 ## Quick Start
 
@@ -209,12 +209,12 @@ def increment_counter():
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-Background task execution itself (`background()`, `start_server()`, `server_running()`) carries low direct risk: it schedules existing script functions concurrently rather than exposing new attack surface. The risk lives in the sub-libraries it groups: `runtime.http` turns the process into an HTTP listener, and `runtime.sandbox` executes arbitrary code strings within the same process. See their pages: [HTTP](http.md#security-considerations) and [Sandbox](sandbox.md#security-considerations): for the specifics.
+Background task execution itself (`background()`, `start_server()`, `server_running()`) carries low direct risk: it schedules existing script functions concurrently rather than exposing new attack surface. The risk lives in the sub-libraries it groups: `runtime.http` turns the process into an HTTP listener, and `runtime.sandbox` executes arbitrary code strings within the same process. See their pages: [HTTP](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/http.md#security-considerations) and [Sandbox](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/sandbox.md#security-considerations): for the specifics.
 
 ## See Also
 
-- [scriptling.runtime.sandbox](sandbox.md): isolated code execution
-- [scriptling.runtime.http](http.md): HTTP server integration
-- [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#runtime-libraries)
+- [scriptling.runtime.sandbox](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/sandbox.md): isolated code execution
+- [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/http.md): HTTP server integration
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#runtime-libraries)

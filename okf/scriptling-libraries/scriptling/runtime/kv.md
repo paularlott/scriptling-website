@@ -266,12 +266,12 @@ runtime.background("b", "task_b")
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
 `scriptling.runtime.kv` has no network or filesystem access implications of its own (a persistent store's on-disk path is the only filesystem touchpoint, and that's an explicit, caller-chosen path). The practical risk is unbounded memory growth from named in-memory stores that are never cleared or closed: size keys and TTLs accordingly rather than treating this as an access-control concern.
 
 ## See Also
 
-- [scriptling.runtime](runtime.md): background tasks that often coordinate through `kv`
-- [scriptling.runtime.sync](sync.md): concurrency primitives for coordinating tasks beyond simple key-value state
-- [scriptling.runtime.http](http.md): HTTP handlers commonly read/write `kv.default`
+- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/runtime.md): background tasks that often coordinate through `kv`
+- [scriptling.runtime.sync](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/sync.md): concurrency primitives for coordinating tasks beyond simple key-value state
+- [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/scriptling/runtime/http.md): HTTP handlers commonly read/write `kv.default`

@@ -533,7 +533,7 @@ Other differences worth noting:
 
 ## See Also
 
-- [html](html.md): HTML escaping and unescaping utilities
-- [html.parser](html.parser.md): HTML/XHTML parser for structured markup
-- [string](string.md): String constants
-- [difflib](difflib.md): Sequence comparison and diff generation
+- [html](https://scriptling.dev/okf/scriptling-libraries/text-processing/html.md): HTML escaping and unescaping utilities
+- [html.parser](https://scriptling.dev/okf/scriptling-libraries/text-processing/html.parser.md): HTML/XHTML parser for structured markup
+- [string](https://scriptling.dev/okf/scriptling-libraries/text-processing/string.md): String constants
+- [difflib](https://scriptling.dev/okf/scriptling-libraries/text-processing/difflib.md): Sequence comparison and diff generation

@@ -578,6 +578,6 @@ print("Inventory:", status["inventory"])
 
 ## See Also
 
-- [Builder Functions](builder-functions.md) - Type-safe function builder
-- [Builder Libraries](builder-libraries.md) - Type-safe library builder
-- [Native Classes](native-classes.md) - Direct control with maximum performance
+- [Builder Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-functions.md) - Type-safe function builder
+- [Builder Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md) - Type-safe library builder
+- [Native Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes.md) - Direct control with maximum performance

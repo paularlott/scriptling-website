@@ -27,6 +27,11 @@ type: Guide
 | `--cache-dir`         | `SCRIPTLING_CACHE_DIR`     | `cache.dir`                  | Cache directory for remote packages                  | OS default       |
 | `-L`, `--libpath`     | `SCRIPTLING_LIBPATH`       | `libpath`                    | Extra library search directory (repeatable)          | (none)           |
 | `--plugin-dir`       | `SCRIPTLING_PLUGIN_DIR`    | `plugins.dirs`               | Plugin executable directory (repeatable)             | (none)           |
+| `--plugin`           | `SCRIPTLING_PLUGIN`        | `plugins.paths`              | Plugin executable to load, path taken literally (repeatable) | (none) |
+| `--plugin-arg`       | `SCRIPTLING_PLUGIN_ARG`    | `plugins.args`               | Argument to pass to a `--plugin` executable (repeatable)   | (none)           |
+| `--plugin-env`       | `SCRIPTLING_PLUGIN_ENV`    | `plugins.env`                | KEY=VALUE environment entry for a `--plugin` executable (repeatable) | (none) |
+| `--plugin-header`    | `SCRIPTLING_PLUGIN_HEADER` | `plugins.headers`            | HTTP header KEY=VALUE for an http(s) `--plugin` (repeatable) | (none) |
+| `--plugin-insecure`  | `SCRIPTLING_PLUGIN_INSECURE` | `plugins.insecure`         | Mark this https:// `--plugin` URL as insecure, skipping TLS verification (repeatable) | (none) |
 | `--log-level`         | `SCRIPTLING_LOG_LEVEL`     | `log.level`                  | Log level (trace/debug/info/warn/error)              | info             |
 | `--log-format`        | `SCRIPTLING_LOG_FORMAT`    | `log.format`                 | Log format (console/json)                            | console          |
 | `-S`, `--server`      | `SCRIPTLING_SERVER`        | `server.address`             | HTTP server address (host:port)                      | (disabled)       |
@@ -48,7 +53,122 @@ type: Guide
 | `--tls-key`           | `SCRIPTLING_TLS_KEY`       | `tls.key`                    | TLS key file                                         | none             |
 | `--tls-generate`      | -                          | `tls.generate`               | Generate self-signed certificate                     | -            |
 
-The [network policy](network-policy.md) flag has its own page with the policy file reference.
+The [network policy](https://scriptling.dev/okf/scriptling-docs/cli/network-policy.md) flag has its own page with the policy file reference.
+
+## Loading Plugins {#loading-plugins}
+
+Plugins come from two places, and both can be repeated:
+
+- `--plugin-dir` scans a directory and loads every executable in it.
+- `--plugin` loads one plugin: an executable path, or the `http://`/`https://`
+  URL of a plugin server, where the plugin protocol speaks JSON-RPC over POST
+  instead of stdio (the same plugin either way; a
+  [PHP example](https://github.com/paularlott/scriptling/tree/main/examples/plugins/php-server)
+  shows how little it takes to serve one).
+
+A `--plugin` value is used literally, so a path containing spaces needs nothing
+beyond ordinary shell quoting:
+
+```bash
+scriptling --plugin "/Applications/Knot.app/Contents/MacOS/knot" script.py
+```
+
+Arguments for a plugin come from `--plugin-arg`, applied in the order given:
+
+```bash
+scriptling --plugin /usr/local/bin/knot \
+           --plugin-arg scriptling-server \
+           --plugin-arg=--alias=testing \
+           script.py
+```
+
+Values that begin with `-` need the `--plugin-arg=value` form, otherwise the
+parser reads them as another flag.
+
+With one `--plugin`, every `--plugin-arg` belongs to it. With several, qualify
+each argument as `<plugin>=<arg>`, where `<plugin>` is the executable's base
+name or its full path:
+
+```bash
+scriptling --plugin /usr/local/bin/knot --plugin /usr/local/bin/vault-helper \
+           --plugin-arg knot=scriptling-server \
+           --plugin-arg vault-helper=--role=reader \
+           script.py
+```
+
+An unqualified argument with more than one plugin is an error rather than a
+guess. A value whose text before `=` matches no `--plugin` is treated as a
+plain argument, so ordinary flags like `--alias=testing` pass through
+unqualified.
+
+Environment variables reach an executable plugin with `--plugin-env`, binding
+exactly like `--plugin-arg` with `KEY=VALUE` payloads:
+
+```bash
+scriptling --plugin /usr/local/bin/knot            --plugin-env KNOT_DB=/var/lib/knot            --plugin-env LOG=debug            script.py
+```
+
+The entries layer on top of the inherited environment, so a variable already
+set is overridden and everything else passes through. They apply to executable
+plugins, which the host spawns; a plugin server owns its own environment,
+since the host connects to it.
+
+An HTTP plugin that needs authentication takes headers with
+`--plugin-header`, binding like the other plugin flags (bare with one plugin,
+`<plugin>=` qualified with several); the value keeps its own equals sign, so
+bearer tokens pass through whole. The token does not belong on the command
+line, where it is visible in process listings: prefer the environment
+variable or the config file, both of which accept the same values:
+
+```bash
+export SCRIPTLING_PLUGIN_HEADER="Authorization=Bearer $PLUGIN_TOKEN"
+scriptling --plugin https://plugins.internal:8443 script.py
+```
+
+```toml
+# scriptling.toml
+[plugins]
+paths = ["https://plugins.internal:8443"]
+headers = ["Authorization=Bearer eyJ..."]
+```
+
+The flag form exists for quick tests:
+
+```bash
+scriptling --plugin https://plugins.internal:8443 \
+           --plugin-header "Authorization=Bearer $PLUGIN_TOKEN" \
+           script.py
+```
+
+Username and password can also ride the URL itself, as HTTP Basic auth:
+
+```bash
+scriptling --plugin https://user:pass@plugins.internal:8443 script.py
+```
+
+The credentials travel as the Authorization header and never appear in the
+request line or Host header; an explicit `--plugin-header Authorization=...`
+wins over URL credentials.
+
+For https plugin URLs whose certificate is self-signed (development, internal
+networks), `--plugin-insecure` names the URLs to load without certificate
+verification, so one self-signed endpoint never weakens the others:
+
+```bash
+scriptling --plugin https://plugins.internal:8443 \
+           --plugin-insecure https://plugins.internal:8443 \
+           script.py
+```
+
+Explicit `--plugin` entries load before `--plugin-dir` scans. Plugin identity
+is the resolved executable path, so the same binary found in a scanned
+directory is skipped — the explicit entry and its arguments win. Plugins
+register under the library name they declare in their handshake, however they
+were loaded.
+
+Plugins only start when the invocation can use them. `--lint`, `--list-libs`,
+and the `pack`, `unpack` and `cache` subcommands never spawn plugin
+processes.
 
 ## Configuration File
 
@@ -73,6 +193,11 @@ libpath = ["/shared/libs", "/company/libs"]
 
 packages = ["./mypackage.zip", "https://example.com/lib.zip"]
 insecure = false
+
+[plugins]
+dirs = ["/usr/local/lib/scriptling/plugins"]
+paths = ["/usr/local/bin/knot"]
+args = ["scriptling-server", "--alias=testing"]
 
 [server]
 address = ":8000"

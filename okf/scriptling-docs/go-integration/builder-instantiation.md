@@ -503,6 +503,6 @@ For classes, add a constructor that stores config on `instance.NativeData`, and 
 
 ## See Also
 
-- [Builder Libraries](builder-libraries.md) - Basic library building
-- [Native Classes](native-classes.md) - Native class creation
-- [Builder Classes](builder-classes.md) - Builder class creation
+- [Builder Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md) - Basic library building
+- [Native Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes.md) - Native class creation
+- [Builder Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-classes.md) - Builder class creation

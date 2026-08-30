@@ -18,10 +18,10 @@ AI and LLM functions for interacting with OpenAI-compatible APIs: clients, compl
 
 ## Submodules
 
-- [scriptling.ai.Client](client.md): Create clients and make completions, embeddings, and Responses API calls
-- [scriptling.ai.agent](agent.md): Agentic AI loop with automatic tool execution
-- [scriptling.ai.agent.interact](interact.md): Interactive terminal session for agents
-- [scriptling.ai.memory](memory.md): Long-term memory store for AI agents
+- [scriptling.ai.Client](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/client.md): Create clients and make completions, embeddings, and Responses API calls
+- [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/agent.md): Agentic AI loop with automatic tool execution
+- [scriptling.ai.agent.interact](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/interact.md): Interactive terminal session for agents
+- [scriptling.ai.memory](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/memory.md): Long-term memory store for AI agents
 
 The `scriptling.ai` namespace itself also exposes a handful of functions directly: response helpers, token estimation, vector similarity, and a `ToolRegistry` for building tool schemas (see below).
 
@@ -39,13 +39,13 @@ print(response.choices[0].message.content)
 print(ai.text(response))
 ```
 
-For the full client method reference (completion, streaming, parallel, embeddings, Responses API, background processing), see [scriptling.ai.Client](client.md).
+For the full client method reference (completion, streaming, parallel, embeddings, Responses API, background processing), see [scriptling.ai.Client](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/client.md).
 
 ## Available Functions
 
 | Function | Description |
 |----------|-------------|
-| `Client(base_url, **kwargs)` | Create an AI client for API interactions: see [scriptling.ai.Client](client.md) |
+| `Client(base_url, **kwargs)` | Create an AI client for API interactions: see [scriptling.ai.Client](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/client.md) |
 | `text(response)` | Extract text content from a response |
 | `thinking(response)` | Extract thinking blocks from a response |
 | `extract_thinking(text)` | Extract thinking blocks from a text string |
@@ -274,7 +274,7 @@ print(score)  # Lower similarity
 
 ### `ai.ToolRegistry()`
 
-Creates a new tool registry for building OpenAI-compatible tool schemas for AI agents. This is a re-export of the `Registry` class from [scriptling.ai.tools](tools.md): `ai.ToolRegistry()` and `scriptling.ai.tools.Registry()` both return a `Registry` instance.
+Creates a new tool registry for building OpenAI-compatible tool schemas for AI agents. This is a re-export of the `Registry` class from [scriptling.ai.tools](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/tools.md): `ai.ToolRegistry()` and `scriptling.ai.tools.Registry()` both return a `Registry` instance.
 
 **Returns:** `ToolRegistry`: a registry object with `add()`, `build()`, and `get_handler()` methods.
 
@@ -282,18 +282,18 @@ Creates a new tool registry for building OpenAI-compatible tool schemas for AI a
 registry = ai.ToolRegistry()
 ```
 
-See [scriptling.ai.tools](tools.md) for the `add()`, `build()`, and `get_handler()` method reference and the full list of accepted parameter types. For automatic tool execution with an agent loop, see [scriptling.ai.agent](agent.md).
+See [scriptling.ai.tools](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/tools.md) for the `add()`, `build()`, and `get_handler()` method reference and the full list of accepted parameter types. For automatic tool execution with an agent loop, see [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/agent.md).
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.ai` and its submodules make outbound HTTP requests to AI provider APIs (and, via `agent`, can drive multi-step tool-calling loops). API keys and endpoints are supplied by the embedder when creating a client: scripts don't see them directly unless explicitly passed. For a full risk breakdown, see the [Security Guide](../../../scriptling-docs/security.md#library-security) and [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#ai--agent).
+`scriptling.ai` and its submodules make outbound HTTP requests to AI provider APIs (and, via `agent`, can drive multi-step tool-calling loops). API keys and endpoints are supplied by the embedder when creating a client: scripts don't see them directly unless explicitly passed. For a full risk breakdown, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#library-security) and [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#ai--agent).
 
 ## See Also
 
-- [scriptling.ai.Client](client.md): Full client method reference (completion, streaming, embeddings, Responses API)
-- [scriptling.ai.agent](agent.md): Agentic AI loop with automatic tool execution
-- [scriptling.ai.memory](memory.md): Long-term memory store for AI agents
-- [scriptling.ai.tools](tools.md): Tool schema builder (`Registry` / `ai.ToolRegistry`)
-- [scriptling.mcp](../mcp.md): MCP client for connecting to MCP servers
+- [scriptling.ai.Client](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/client.md): Full client method reference (completion, streaming, embeddings, Responses API)
+- [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/agent.md): Agentic AI loop with automatic tool execution
+- [scriptling.ai.memory](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/memory.md): Long-term memory store for AI agents
+- [scriptling.ai.tools](https://scriptling.dev/okf/scriptling-libraries/scriptling/ai/tools.md): Tool schema builder (`Registry` / `ai.ToolRegistry`)
+- [scriptling.mcp](https://scriptling.dev/okf/scriptling-libraries/scriptling/mcp.md): MCP client for connecting to MCP servers

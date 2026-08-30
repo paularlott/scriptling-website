@@ -168,7 +168,7 @@ fb.FunctionWithHelp(func(a, b float64) (float64, error) {
 
 ## Variadic Functions
 
-For variadic functions, see [Library Builder](builder-libraries.md) `FunctionFromVariadicWithHelp`.
+For variadic functions, see [Library Builder](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md) `FunctionFromVariadicWithHelp`.
 
 ## Builder Methods Reference
 
@@ -190,6 +190,6 @@ For variadic functions, see [Library Builder](builder-libraries.md) `FunctionFro
 
 ## See Also
 
-- [Builder Libraries](builder-libraries.md) - Type-safe library builder
-- [Builder Classes](builder-classes.md) - Type-safe class builder
-- [Native Functions](native-functions.md) - Direct control with maximum performance
+- [Builder Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md) - Type-safe library builder
+- [Builder Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-classes.md) - Type-safe class builder
+- [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md) - Direct control with maximum performance

@@ -16,7 +16,7 @@ type: API Reference
 
 The `scriptling.container` library provides container lifecycle management for Docker, Podman, and Apple Containers through a single unified interface. All operations go through a `ContainerClient` obtained from `Client()`.
 
-Docker and Podman endpoints are configured via the `--docker-host` / `--podman-host` CLI flags or the `DOCKER_HOST` / `CONTAINER_HOST` environment variables: see [Command Line Options](../../../scriptling-docs/cli/command-line-options.md#container-endpoints) for details.
+Docker and Podman endpoints are configured via the `--docker-host` / `--podman-host` CLI flags or the `DOCKER_HOST` / `CONTAINER_HOST` environment variables: see [Command Line Options](https://scriptling.dev/okf/scriptling-docs/cli/command-line-options.md#container-endpoints) for details.
 
 ## Available Functions
 
@@ -382,11 +382,11 @@ c.image_remove("ubuntu:24.04")
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.container` controls Docker/Podman containers over the socket paths passed to `Register(p, dockerSock, podmanSock)`, effectively granting the ability to run arbitrary containers and images on the host: this is a significant risk, on par with direct process execution. Never register this library for untrusted code. For a full risk breakdown across all libraries, see the [Security Guide](../../../scriptling-docs/security.md).
+`scriptling.container` controls Docker/Podman containers over the socket paths passed to `Register(p, dockerSock, podmanSock)`, effectively granting the ability to run arbitrary containers and images on the host: this is a significant risk, on par with direct process execution. Never register this library for untrusted code. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 
 ## See Also
 
-- [Library Registration](../../../scriptling-docs/go-integration/library-registration.md) - Registering extended libraries when embedding in Go
-- [Security Guide](../../../scriptling-docs/security.md) - Security guidance for host-provided libraries
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - Registering extended libraries when embedding in Go
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security guidance for host-provided libraries
