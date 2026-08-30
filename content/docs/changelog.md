@@ -14,7 +14,7 @@ nav-skip: true
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
-**`get_orm()`.** Relational connections gain an ORM: kwargs helpers for dict-shaped rows (`insert`, `update`, `delete`, `count`), a query builder that composes conditions with chained `.where(...)` calls and `.order_by(...)`, and `orm.table()` model gateways that map rows onto your objects. One implementation serves all four relational backends.
+**`get_orm()`.** Relational connections gain an ORM: query builders for `select`, `update` and `delete` that compose conditions with chained `.where(...)` calls and `.order_by(...)` (executing a mutation without a where is refused), a quick `insert(table, dict)` form, table builders, and `orm.table()` model gateways that map rows onto your objects (write columns default to the table's schema, read once and cached). One implementation serves all four relational backends.
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}

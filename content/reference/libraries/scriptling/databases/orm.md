@@ -10,8 +10,8 @@ weight: 6
 
 Both relational plugins, [sqlite](../sqlite/) and [sql](../sql/), hand out the same ORM from `conn.get_orm()`. It has three layers, each useful on its own:
 
-- **kwargs forms**: `insert(table, dict)`, `update`/`delete` (where required), `count`, `tables()`, plus `create_table`/`drop_table` builders.
-- **query builder**: `orm.select(table, *columns)` returns a chainable query: `.where(...)` links AND together, criteria objects compose `OR` groups, `.fetch()` runs exactly one query.
+- **query builders**: `orm.select(table, *columns)`, `orm.update(table, values)` and `orm.delete(table)` return chainable queries: `.where(...)` links AND together, criteria objects compose `OR` groups, and a terminal (`fetch()`, `execute()`, `count()`) runs exactly one statement.
+- **quick forms**: `insert(table, dict)` for the write with nothing to filter, and `tables()`.
 - **model gateways**: `orm.table(factory, table, ...)` maps rows onto your objects through a factory function.
 
 The whole ORM is scriptling script that executes host-side in both plugin modes (compiled-in and external): chained builder calls cost no round trips, not even at `get_orm()`: and one implementation serves every backend. Each plugin bakes its dialect into the kit it hands out (the sql plugin picks per connection from the DSN scheme): backtick quoting on MySQL/MariaDB, double quotes and `$n` placeholders on PostgreSQL, whatever SQLite likes. Orms from different connections never interfere, so one script can drive MySQL, SQLite and PostgreSQL at the same time.
@@ -40,11 +40,12 @@ conn.close()
 
 The table builder renders the auto-increment primary key per backend, so this intro runs unchanged on SQLite, MySQL/MariaDB and PostgreSQL; see [Table Builder](#table-builder) for the full column options.
 
-## Query Builder
+## Query Builders
 
-`orm.select(table, *columns)` returns a query; every method returns the same query so calls chain; `.fetch()` (or `.one()`, `.count()`) assembles the SQL, binds the parameters and runs it.
+`orm.select(table, *columns)`, `orm.update(table, values)` and `orm.delete(table)` each return a chainable query; every method returns the same query so calls chain; the terminal (`fetch()`, `execute()`, `count()`) assembles the SQL, binds the parameters and runs exactly one statement.
 
 ```python
+# select: filter, order, page, then fetch() (or one(), iterate(), count())
 rows = (orm.select("people", "name")
         .where("active", "=", 1)                                    # flat AND
         .where("score", ">=", 8.0)
@@ -53,6 +54,17 @@ rows = (orm.select("people", "name")
         .order_by("score", desc=True)
         .limit(10)
         .fetch())
+
+# count: the same filters, SELECT count(*) underneath
+high = orm.select("people").where("score", ">=", 8.0).count()
+
+# update: the same filters, execute() returns rows_affected
+result = (orm.update("people", {"score": 0.0})
+          .where("score", "<", 5.0)
+          .execute())                       # -> {"rows_affected": 2}
+
+# delete: the same filters
+orm.delete("people").where("active", "=", 0).execute()
 ```
 
 ### Conditions
@@ -87,29 +99,28 @@ Every value binds as a parameter and every identifier is quoted and validated ag
 
 ### Methods
 
+`where` and `where_sql` work the same on all three builders; the rest belong to the select query.
+
 | Method | Description |
 |--------|-------------|
-| `where(column, op, value)` / `where(criterion)` | add a condition (AND) |
-| `iterate()` | stream rows instead of materialising: `for row in q.iterate():`; close early with the iterator's `close()` |
-| `where_sql(fragment, *params)` | escape hatch: raw SQL fragment, `?` placeholders bind to params (renumbered on postgres) |
-| `order_by(column, desc=False)` | order; repeatable |
-| `limit(n)` / `offset(n)` | paging |
-| `fetch()` | run and return all rows as a list of dicts |
+| `where(column, op, value)` / `where(criterion)` | add a condition (AND); select, update and delete |
+| `where_sql(fragment, *params)` | escape hatch: raw SQL fragment, `?` placeholders bind to params (renumbered on postgres); select, update and delete |
+| `order_by(column, desc=False)` | order; repeatable; select |
+| `limit(n)` / `offset(n)` | paging; select |
+| `fetch()` | run and return all rows as a list of dicts; select |
 | `iterate()` | run and return an iterator: `for row in q.iterate():` streams row by row; compiled-in builds read lazily from the driver, external-plugin builds make one call per row (constant memory either way) |
-| `one()` | first row or `None` |
-| `count()` | run as `SELECT count(*)` and return the number |
+| `one()` | first row or `None`; select |
+| `count()` | run as `SELECT count(*)` and return the number; select |
+| `execute()` | run the `UPDATE`/`DELETE` and return `{"rows_affected": int}`; update and delete |
 
-## Kwargs Forms
+## Quick Forms
 
 | Method | Description |
 |--------|-------------|
 | `insert(table, values, pk="id")` | Insert one row from a dict; returns `{"last_insert_id": int, "rows_affected": int}`: the id is recovered via `RETURNING` on postgres, through the primary key named by `pk` |
-| `update(table, values, where, *params)` | Set columns from a dict on matching rows; **where required** |
-| `delete(table, where, *params)` | Delete matching rows; **where required** |
-| `count(table, where="", *params)` | Row count |
 | `tables()` | User table names in the current database, sorted |
 
-Blanket updates and deletes are refused: if you genuinely want every row, say so explicitly with `conn.execute("delete from t")`.
+Blanket updates and deletes are refused: `.execute()` without any `where` raises, so if you genuinely want every row, say so explicitly with `conn.execute("delete from t")`.
 
 ## Table Builder
 
@@ -136,24 +147,32 @@ Column types pass through as-is: `integer`, `text` and `real` work on all three 
 
 ## Model Gateways
 
-`orm.table(factory, table, pk="id", columns=[...])` returns a gateway bound to the connection. The factory is a plain function that turns a row dict into your object (a dict, an instance of your class: anything with the columns as attributes or keys):
+`orm.table(factory, table, pk="id")` returns a gateway bound to the connection. The factory is a plain function that turns a row dict into your object (a dict, an instance of your class: anything with the columns as attributes or keys):
 
 ```python
 def make_person(id=None, name=None, score=None, active=None):
     return Person(id, name, score, active)     # or just return a dict
 
-people = orm.table(make_person, "people", pk="id",
-                   columns=["id", "name", "score", "active"])
+# no columns: the gateway writes every column the table has
+people = orm.table(make_person, "people", pk="id")
 
-p = people.get(1)          # factory(rows) or None
+p = people.get(1)          # factory(row) or None
 people.save(p)             # update by pk
 people.insert(make_person(name="kurt", score=6.0))
 people.delete(p)           # by instance or raw pk
 people.count()
 people.select("name").where("active", "=", 0).fetch()   # full builder
+
+# columns=[...]: the same table through a narrower gateway
+names = orm.table(make_person, "people", pk="id", columns=["id", "name"])
+n = names.get(1)
+n.name = "ada lovelace"
+names.save(n)              # writes name only; score and active stay untouched
 ```
 
-`columns` is required for `insert`/`save` (the gateway needs to know what to write); `get`, `select`, `count` and `delete` work without it.
+`columns` is optional. Without it the gateway writes every column the table has: the column list is read from the schema once per `get_orm()` and cached, so adding or removing a column in the table needs no script change. Pass `columns=["id", "name"]` to manage a subset (a wide table, or columns you deliberately do not want writes to touch); the list then applies to `insert` and `save` only, and costs no schema lookup.
+
+Two write semantics worth knowing: `insert` skips `None` values, so unset fields take their schema defaults and the primary key auto-assigns; `save` writes every managed column, including `None` (that is how you clear one).
 
 ## See Also
 
