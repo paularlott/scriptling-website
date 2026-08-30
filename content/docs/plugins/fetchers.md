@@ -74,6 +74,11 @@ scriptling --plugin /usr/local/bin/knot \
 scriptling --plugin /usr/local/bin/knot knot://scripts/hello
 ```
 
+A scheme source that serves its own `manifest.toml` is a whole app bundle:
+main script, libs, serve list, MCP tools and webroot all arrive from the
+plugin, and the server runs it exactly like a directory or zip bundle. A
+source without one keeps the synthesized library layout.
+
 A plugin's library attaches when the plugin is loaded, so nothing else is
 needed. `--package` is for ordinary packages (a `.zip`, a directory, or a
 URL) and does not take a plugin scheme source; there is no reason to name
