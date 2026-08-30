@@ -209,7 +209,7 @@ static sl_fetch_result *my_read(const char *source, const char *path, void *ctx)
     return sl_fetch_data("# content\n", 10);  /* copies the bytes; host does not cache */
 }
 
-static sl_fetch_entry *my_list(const char *source, const char *path,
+static sl_fetch_entry *my_glob(const char *source, const char *path,
                                size_t *count, void *ctx) {
     /* names must stay valid until the handler returns; the SDK frees only
        the array itself. */
@@ -220,7 +220,7 @@ static sl_fetch_entry *my_list(const char *source, const char *path,
     return out;
 }
 
-sl_register_fetcher(srv, "mylib", my_read, my_list);
+sl_register_fetcher(srv, "mylib", my_read, my_glob);
 ```
 
 Read handler results:

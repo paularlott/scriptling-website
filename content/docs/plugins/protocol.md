@@ -381,39 +381,61 @@ The plugin removes the instance and calls `__del__` if defined. Destroy is idemp
 | --- | --- | --- | --- |
 | `data` | string | Yes | File content, base64-encoded |
 
-A missing source or path is reported as error code `-32001`. The host treats
-that as a plain not-found (a failed module probe), not a fatal error. Any
-other error aborts package loading with the source named, because hosts
-deliberately distinguish "module is not there" from "plugin could not be asked". The host
-caches nothing it fetches, so every read reaches the plugin and returns content;
-there is no conditional-read form. `data` is base64-encoded, which is what lets
-binary assets travel intact.
+Fetch errors are typed, so the host can tell a miss from a refusal from a
+flaky backend without parsing messages:
+
+| Code | Sentinel | Meaning | Host behaviour |
+| --- | --- | --- | --- |
+| `-32001` | `ErrFetchNotFound` | source or path missing | plain not-found (a failed module probe) |
+| `-32002` | `ErrFetchDenied` | access refused (credentials, permissions) | surfaced as a permission error; never retried |
+| `-32003` | `ErrFetchUnavailable` | backend could not answer right now | retried a bounded number of times |
+
+Fetch operations are idempotent reads, so the host retries `-32003` (and
+transport-level failures) up to three attempts with a short backoff; coded
+answers are final. Any other error aborts package loading with the source
+named, because hosts deliberately distinguish "module is not there" from
+"plugin could not be asked". The host caches nothing it fetches, so every
+read reaches the plugin and returns content; there is no conditional-read
+form. `data` is base64-encoded, which is what lets binary assets travel
+intact.
 
 ```json
 → {"jsonrpc":"2.0","id":7,"method":"fetch.read","params":{"source":"knot://libs","path":"lib/greet.py"}}
 ← {"jsonrpc":"2.0","id":7,"result":{"data":"ZGVmIGdyZWV0aW5nKG5hbWUpOg=="}}
 ```
 
-### `fetch.list`
+### `fetch.glob`
 
 **Direction:** Host → Plugin
-**When:** The host enumerates a directory of a source (globbing, listings, `scriptling.package` list functions).
+**When:** The host resolves a path, lists a directory, or matches a pattern over a source (existence checks, listings, globbing, subtree walks).
 
 **Request params:**
 
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `source` | string | No | Full source string |
-| `path` | string | Yes | Directory to list; empty or `.` for the root |
+| `pattern` | string | Yes | Glob pattern; empty means the root |
 
 **Response result:**
 
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
-| `entries` | [{name, is_dir}] | No | One level of directory entries |
+| `entries` | [{name, is_dir}] | No | Every match, in one answer |
 
-A missing directory is reported as error code `-32001`. The host memoizes
-listings for the lifetime of a package.
+The pattern language: slash-separated paths relative to the source root;
+`*` matches within one segment (never `/`), `?` one character, `[class]` a
+character class, and a `**` segment matches any number of segments including
+none. A wildcard-free pattern is legal and answers at most one entry, which
+is how existence and directory-ness are probed: a matched directory carries
+`is_dir: true`, so an empty directory is distinguishable from a missing one.
+Entry names are full paths relative to the source root.
+
+No match is an empty `entries` list, never an error: errors mean the fetcher
+could not answer (the codes above). The whole point is one round trip: a
+listing is `<dir>/*`, a subtree is `<dir>/**`, and the plugin (which knows
+its backend) does the matching instead of the host walking level by level.
+Errors are retried per the fetch retry policy above. The host memoizes
+directory listings for its listing TTL; content is never held.
 
 ## Lifecycle
 

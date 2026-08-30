@@ -30,8 +30,8 @@ returns is file content, nothing prefixed, nothing wrapped.
 2. The plugin's handshake advertises the scheme; its presence is the whole
    advertisement.
 3. The host routes `scheme://...` sources to that plugin and issues
-   `fetch.read` / `fetch.list` JSON-RPC requests for individual files and
-   directory listings. The library bundle the host attaches is synthesized
+   `fetch.read` / `fetch.glob` JSON-RPC requests for individual files and
+   pattern matches. The library bundle the host attaches is synthesized
    from the handshake (name, version, `libs = ["lib"]`); the plugin never
    serves a manifest.
 4. File content travels base64-encoded inside the JSON-RPC result, so binary
@@ -39,14 +39,17 @@ returns is file content, nothing prefixed, nothing wrapped.
 5. The host keeps none of it. Every read is a fetch, and script sources are
    refetched on every run.
 
-A missing source or path is reported as JSON-RPC error code `-32001`, which
-the host treats as a plain not-found (a failed module probe), never as a fatal
-error. Any other failure (the plugin process died, the backend it proxies is
-unreachable) is a different matter: the host aborts the import with an error
-naming the package source, rather than silently skipping its modules. A
-configured source you cannot reach should be an incident, not a script that
-mysteriously runs without its libraries. Local files and higher-priority
-packages still resolve without contacting the failed plugin at all.
+Fetch errors are typed, and the host treats each kind differently:
+`-32001` (not found) is a plain miss, never fatal; `-32002` (denied)
+surfaces as a permission error and is never retried; `-32003` (unavailable)
+is retried a bounded number of times before failing. Any other failure (the
+plugin process died, the backend it proxies is unreachable in a way the
+fetcher cannot classify) is a different matter: the host aborts the import
+with an error naming the package source, rather than silently skipping its
+modules. A configured source you cannot reach should be an incident, not a
+script that mysteriously runs without its libraries. Local files and
+higher-priority packages still resolve without contacting the failed plugin
+at all.
 
 ## Caching
 
@@ -151,8 +154,18 @@ func (myFetcher) Read(ctx context.Context, source, path string) ([]byte, error) 
     return []byte(content), nil
 }
 
-func (myFetcher) List(ctx context.Context, source, path string) ([]plugin.FetchEntry, error) {
-    // One level of directory entries: {Name: "lib", IsDir: true}, ...
+func (myFetcher) Glob(ctx context.Context, source, pattern string) ([]plugin.FetchEntry, error) {
+    // Every path matching pattern, directories included, full paths.
+    // Wrap plugin.ErrFetchDenied for refusals and
+    // plugin.ErrFetchUnavailable for a backend that cannot answer (the
+    // host retries those).
+    entries := []plugin.FetchEntry{}
+    for _, name := range knownPaths(source) {
+        if plugin.MatchGlob(pattern, name) {
+            entries = append(entries, plugin.FetchEntry{Name: name})
+        }
+    }
+    return entries, nil
 }
 ```
 
@@ -160,10 +173,18 @@ func (myFetcher) List(ctx context.Context, source, path string) ([]plugin.FetchE
 for a miss. Data travels base64-encoded inside the JSON-RPC result, so binary
 assets arrive intact. There are no validators to deal with: the host does not
 cache, so every read reaches your handler. Cache inside `Read` if your backend
-needs it.
+needs it. Serving from disk? `plugin.GlobDisk` implements `Glob` with the
+root containment built in, so symlink escapes are not served.
+
+`Glob` answers in one round trip what a directory walk would need one per
+level for: existence is a wildcard-free pattern (the entry itself comes
+back, so an empty directory is distinguishable from a missing one), a
+listing is `<dir>/*`, a subtree is `<dir>/**`. No match is an empty result,
+never an error. `MatchGlob` implements the pattern language; the C SDK
+exposes the same matching as `sl_glob_match`.
 
 There is no stat round trip either: `Open` and `Stat` read the file (a
-directory is simply a path whose listing succeeds), so a plugin only ever
+directory is simply one whose glob answers its entry), so a plugin only ever
 answers "here are the bytes" or "not found".
 
 A complete example lives at `examples/plugins/fetcher-go` in the repository.
@@ -177,7 +198,12 @@ static sl_fetch_result *my_read(const char *source, const char *path, void *ctx)
     return sl_fetch_data("# content\n", 10);  /* host does not cache */
 }
 
-sl_register_fetcher(srv, "mylib", my_read, my_list);
+static sl_fetch_entry *my_glob(const char *source, const char *pattern,
+                               size_t *count, void *ctx) {
+    /* keep the known paths sl_glob_match(pattern, name) accepts */
+}
+
+sl_register_fetcher(srv, "mylib", my_read, my_glob);
 ```
 
 See [C Plugins](/docs/plugins/c-plugins/) for the handler contracts and the
@@ -195,14 +221,14 @@ for the wiring and reloading, and
 
 Fetch traffic is two host-to-plugin JSON-RPC methods, documented with the
 rest of the [plugin protocol](/docs/plugins/protocol/): `fetch.read` and
-`fetch.list`. Both transports carry them; over HTTP the fetcher runs as a
+`fetch.glob`. Both transports carry them; over HTTP the fetcher runs as a
 plain request/response service, and stdio additionally allows logging from
 inside handlers via `plugin.Logger(ctx)`.
 
-`List` is required by the `Fetcher` interface: path resolution consults its
-parent's listing before reading, and enumeration (globbing, tooling that walks
-a source) depends on it. Listings are treated as advisory: a file a listing
-omits is still readable, so a fetcher may keep them cheap.
+`Glob` is required by the `Fetcher` interface: path resolution, listings and
+enumeration all reduce to pattern matches, each answered in one call. Matches
+are treated as advisory in the same spirit: a file a pattern match omits is
+still readable, so a fetcher may keep its matching cheap.
 
 Path safety has two halves, and the host owns only one of them. Before any
 RPC is issued the host validates the virtual path with `fs.ValidPath`
