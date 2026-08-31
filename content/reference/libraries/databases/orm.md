@@ -173,7 +173,7 @@ n.name = "ada lovelace"
 names.save(n)              # writes name only; score and active stay untouched
 ```
 
-`columns` is optional. Without it the gateway writes every column the table has: the column list is read from the schema once per `get_orm()` and cached, so adding or removing a column in the table needs no script change. Pass `columns=["id", "name"]` to manage a subset (a wide table, or columns you deliberately do not want writes to touch); the list then applies to `insert` and `save` only, and costs no schema lookup.
+`columns` is optional. Without it the gateway writes every column the table has: the column list is read from the schema once per `get_orm()` and cached, so adding or removing a column in the table needs no script change. Pass `columns=["id", "name"]` to manage a subset (a wide table, or columns you deliberately do not want writes to touch); the list then applies to `insert` and `save` only, and costs no schema lookup. The write shape is fixed when the gateway is created: need a different subset elsewhere and open another `orm.table(...)` for it, or use `orm.update(table, {...}).where(...)` for a one-off partial write.
 
 Two write semantics worth knowing: `insert` skips `None` values, so unset fields take their schema defaults and the primary key auto-assigns; `save` writes every managed column, including `None` (that is how you clear one).
 
