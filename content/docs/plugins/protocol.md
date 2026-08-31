@@ -165,7 +165,10 @@ host does not sandbox the plugin process, so the policy bounds what a
 cooperative plugin does, not what a malicious one could. Treat plugins like
 any other executable you choose to run: the policy protects scripts from
 mistakes and misconfiguration inside a plugin you trust, and it is no
-substitute for trusting the plugin binary itself.
+substitute for trusting the plugin binary itself. Over the HTTP transport
+the distance is one step larger: the host hands the policy across the
+network to a server it does not control, and only that server's own
+enforcement stands behind it.
 
 A plugin with a fetcher is identified by its `scheme`, whose presence is the
 whole advertisement (see [Plugin Fetchers](/docs/plugins/fetchers/)). Unknown

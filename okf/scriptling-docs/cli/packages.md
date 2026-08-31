@@ -411,6 +411,15 @@ its first argument, so there's no ambiguity when multiple packages are loaded.
 Use `package.exists("name")` to check if a package is loaded, and
 `package.file_exists("name", "path")` to check for a specific file.
 
+A fetcher plugin's attached library is a package here too, named after the
+plugin — `package.read_file("knot", "...")` reads a served file with the same
+functions. See [Plugin Fetchers](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md) for the serving
+side.
+
+`glob` speaks the same pattern language as the fetcher protocol: `*` and `?`
+stay within a path segment, `**` crosses any number of segments (including
+none, so `**/*.md` also matches a file at the package root).
+
 Note: `os.read_file` reads from the real filesystem only — it cannot read
 files inside a zip package. Use `scriptling.package` for that.
 

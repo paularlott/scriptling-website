@@ -27,6 +27,10 @@ Write a CLI script that fetches data from a public API, processes it with JSON, 
 
 Build a Go executable plugin that exposes functions and classes under `plugin.*`.
 
+### [Writing a Fetcher Plugin](https://scriptling.dev/okf/scriptling-docs/tutorials/fetcher-plugin.md)
+
+Serve libraries in any namespace, static assets, and script sources from a plugin-owned scheme such as `demo://`.
+
 ### [Writing a Bash Plugin](https://scriptling.dev/okf/scriptling-docs/tutorials/bash-plugin.md)
 
 Implement the plugin JSON-RPC protocol directly from a shell script.

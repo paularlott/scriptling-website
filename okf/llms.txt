@@ -1,6 +1,6 @@
 # Scriptling OKF bundles
 
-> All 179 OKF 0.2 concepts, plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
+> All 180 OKF 0.2 concepts, plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
 
 ## scriptling-docs
 
@@ -58,6 +58,7 @@
 - [Writing a Bash Plugin](https://scriptling.dev/okf/scriptling-docs/tutorials/bash-plugin.md): Implement the plugin JSON-RPC protocol directly from a shell script.
 - [Writing a C Plugin](https://scriptling.dev/okf/scriptling-docs/tutorials/c-plugin.md): Build a multi-threaded C plugin with functions, classes, properties, callbacks, and logging.
 - [Embedding a Rules Engine](https://scriptling.dev/okf/scriptling-docs/tutorials/embedding-rules-engine.md): Embed Scriptling in a Go application to evaluate business rules at runtime.
+- [Writing a Fetcher Plugin](https://scriptling.dev/okf/scriptling-docs/tutorials/fetcher-plugin.md): Serve libraries, assets and script sources from a plugin-owned scheme such as demo://.
 - [Writing a Go Plugin](https://scriptling.dev/okf/scriptling-docs/tutorials/go-plugin.md): Build an executable plugin that exposes functions and classes under plugin.*.
 - [Building an MCP Resources & Prompts Server](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-resources-prompts.md): Create MCP resources and prompts as files, alongside tools.
 - [Building an MCP Tool Server](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-tool-server.md): Create a Model Context Protocol server with custom tools for AI assistants.
