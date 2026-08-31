@@ -48,6 +48,10 @@ All four enforce the host security policy (allowed paths for the file-backed pai
 - [JSON-RPC Protocol](protocol/) - Wire format reference for all methods and value encoding.
 - [Plugin Fetchers](fetchers/) - Serve scheme sources such as `knot://` on demand.
 
+A hands-on walkthrough of a fetcher plugin — libraries in any namespace,
+static assets, a served script — is in the
+[fetcher plugin tutorial](../tutorials/fetcher-plugin/).
+
 ## Scriptling Scripts as Plugins
 
 A Scriptling script can itself act as a plugin server using `runtime.plugin`,

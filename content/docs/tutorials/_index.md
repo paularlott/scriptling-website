@@ -19,6 +19,10 @@ Write a CLI script that fetches data from a public API, processes it with JSON, 
 
 Build a Go executable plugin that exposes functions and classes under `plugin.*`.
 
+### [Writing a Fetcher Plugin](fetcher-plugin/)
+
+Serve libraries in any namespace, static assets, and script sources from a plugin-owned scheme such as `demo://`.
+
 ### [Writing a Bash Plugin](bash-plugin/)
 
 Implement the plugin JSON-RPC protocol directly from a shell script.

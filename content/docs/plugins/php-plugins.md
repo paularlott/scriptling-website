@@ -7,8 +7,8 @@ weight: 6
 
 PHP serves the HTTP plugin transport: instead of stdio, the same protocol
 speaks JSON-RPC over HTTP POST, so any language that can read and write JSON
-can host a plugin and no SDK is needed. The whole contract is two methods,
-`scriptling.handshake` and `function.call`.
+can host a plugin and no SDK is needed. The contract is a handful of methods:
+the handshake, `function.call`, and the `object.*` pair for classes.
 
 The complete, commented example lives at
 `examples/plugins/php-server` in the repository
@@ -70,6 +70,86 @@ Values travel as tagged objects, which is how scripts see native types across
 the wire: a string is `{"type": "string", "value": "..."}`, a dict carries
 `entries`, a list carries `items`. See the
 [protocol reference](../protocol/) for every type and method.
+
+## Serving a Class
+
+The handshake's schema also lists classes, and the host turns each entry into
+a proxy class. Construction answers `object.new` with the instance's remote
+reference; every listed method arrives as `object.call_method` carrying the
+`object_id` from construction. The repository example serves a `Greeter`
+whose state travels inside the object id itself, because the PHP built-in
+server forgets everything between requests:
+
+```php
+<?php
+// Handshake excerpt: declare the class and its methods. The host synthesizes
+// the constructor; listed methods become callable on instances.
+'schema' => [
+    'functions' => [['name' => 'greet']],
+    'classes' => [
+        ['name' => 'Greeter', 'methods' => [
+            ['name' => 'greet'], ['name' => 'shout'], ['name' => 'rename'],
+        ]],
+    ],
+    'constants' => [],
+],
+
+// object.new: build the instance and answer with the bare remote reference.
+function new_object(string $class, array $args): array
+{
+    $state = match ($class) {
+        'Greeter' => ['name' => $args[0]['value'] ?? 'world'],
+        default => throw new RpcError("unknown class {$class}", -32602),
+    };
+    return [
+        'library' => 'phpdemo',
+        'class' => $class,
+        'id' => base64_encode(json_encode($state)),
+    ];
+}
+
+// object.call_method: decode the state the id carries and dispatch.
+function call_method(string $objectId, string $method, array $args): array
+{
+    $state = json_decode(base64_decode($objectId), true) ?? [];
+    $name = $state['name'] ?? 'world';
+    switch ($method) {
+        case 'greet':
+            return ['type' => 'string', 'value' => "Hello, {$name}"];
+        case 'shout':
+            return ['type' => 'string', 'value' => strtoupper("Hello, {$name}!")];
+        case 'rename':
+            // Statelessness: mutation returns a fresh instance; the script rebinds.
+            return ['type' => 'remote', 'remote' => [
+                'library' => 'phpdemo', 'class' => 'Greeter',
+                'id' => base64_encode(json_encode(['name' => $args[0]['value'] ?? $name])),
+            ]];
+        default:
+            throw new RpcError("unknown method {$method} on Greeter", -32602);
+    }
+}
+```
+
+Scripts use it like any class:
+
+```bash
+scriptling --plugin http://127.0.0.1:8080 -c '
+import plugin.phpdemo as d
+
+g = d.Greeter("Ada")
+print(g.greet())          # Hello, Ada
+print(g.shout())          # HELLO, ADA!
+g = g.rename("Bob")       # returns a new instance; rebind
+print(g.greet())          # Hello, Bob
+'
+```
+
+A method may return a new instance (a `remote` value), and the script-side
+proxy materializes it as a live object — that is how `rename` works. A server
+with real storage (a database, Redis) keeps instances there and puts its key
+in the id instead; the protocol takes either shape. `object.destroy` arrives
+when an instance is released; a stateless server can answer `null` and move
+on.
 
 ## Running and Loading
 

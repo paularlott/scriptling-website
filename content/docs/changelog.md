@@ -66,6 +66,10 @@ nav-skip: true
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
+**`package.glob` recursive patterns matched nothing.** `scriptling.package`'s `glob` handled `**` by matching literal prefix and suffix halves, so the common `**/*.md` form returned an empty list for every package kind. It now speaks the same pattern language as `fetch.glob`, where `**` crosses any number of segments (including none, so a file at the package root still matches).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
 **`runtime.background()` no longer races the caller's environment.** A spawned task read the calling script's variables from its own goroutine, racing any concurrent evaluation of the same environment — intermittent and unreproducible under concurrent handlers. Task setup now runs on the caller's goroutine before the task starts.
 {{< /changelog-item >}}
 

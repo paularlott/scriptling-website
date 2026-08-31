@@ -114,6 +114,37 @@ with --plugin or --plugin-dir
 When other fetcher plugins are loaded, the message also lists the schemes that
 are available.
 
+## Namespaces and Static Assets
+
+Modules under `lib/` nest to any depth and import with dotted names:
+`lib/fred/__init__.py` is `import fred`, and `lib/blah/blah/__init__.py` is
+`import blah.blah`. A module beside a package's `__init__.py`
+(`lib/blah/extra.py`) is `import blah.extra`. The resolution order mirrors
+local libraries: `<dir>/a/b.py`, then `<dir>/a/b/__init__.py`, then the flat
+`<dir>/a.b.py` spelling.
+
+A fetcher can serve more than code. Any file in the bundle — markdown, JSON,
+images, fonts — is readable from scripts through the
+[`scriptling.package` library](/docs/cli/packages/#using-packages-in-code),
+using the plugin's name as the package name:
+
+```python
+import scriptling.package as package
+
+text = package.read_file("demo", "docs/getting-started.md")
+config = package.read_bytes("demo", "data/config.json")
+docs = package.glob("demo", "**/*.md")
+```
+
+The reads are on-demand fetches like imports are: a file nothing reads is
+never transferred. `package.glob` speaks the same pattern language as
+`fetch.glob`.
+
+A fetcher is just one more thing a plugin can serve: the same binary can also
+register functions and classes under `plugin.<name>` alongside its scheme.
+The [fetcher plugin tutorial](../tutorials/fetcher-plugin/) walks through a
+plugin that does all of it.
+
 ## Setup Scripts in Server Modes
 
 The server modes take their setup script through the plugin too. A scheme
@@ -192,7 +223,9 @@ There is no stat round trip either: `Open` and `Stat` read the file (a
 directory is simply one whose glob answers its entry), so a plugin only ever
 answers "here are the bytes" or "not found".
 
-A complete example lives at `examples/plugins/fetcher-go` in the repository.
+A complete example lives at `examples/plugins/fetcher-go` in the repository;
+the [fetcher plugin tutorial](../tutorials/fetcher-plugin/) walks through it,
+including the function and class halves of the same plugin.
 
 ## C Plugins
 
