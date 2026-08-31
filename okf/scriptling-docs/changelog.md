@@ -28,7 +28,7 @@ type: Guide
 
 
 
-**Plugin-provided scripts, libraries, and packages.** Fetcher plugins can expose content through custom schemes such as `knot://`, supplying packages for Scriptling's existing app-bundle and server machinery. Fetchers support recursive glob matching and lazy loading, and Go applications can use the same scheme resolution through `pluginpack`. The built-in `plugin.GlobDisk` helper now keeps patterns and resolved symlinks inside its configured root. See [Plugin Fetchers](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md).
+**Plugin-provided scripts, libraries, and packages.** Fetcher plugins can expose content through custom schemes such as `knot://`, supplying packages for Scriptling's existing app-bundle and server machinery. Fetchers support recursive glob matching and lazy loading, and Go applications can use the same scheme resolution through `pluginpack`. See [Plugin Fetchers](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md).
 
 
 
