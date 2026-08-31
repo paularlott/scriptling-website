@@ -194,6 +194,12 @@ Common capabilities:
 | `keyboard` | Supports inline keyboards |
 | `callback` | Supports button callbacks |
 
+## Credential and Access-Control Security
+
+Telegram and Discord scripts pass one bot token to `client()`; Slack scripts pass bot and app tokens. The Go `Register(p, logger)` calls register each library with a logger only: they do not receive or hold those credentials. A script must obtain the token values before constructing a client, so treat the script and its configuration source as credential-bearing. Keep tokens out of source control and logs and inject them from an appropriate secret source.
+
+An omitted or empty `allowed_users` list installs no default restriction. For an exposed bot, provide an allowlist or a custom `auth()` handler and verify authorization for every privileged action. These platform clients are separate networking surfaces and are not governed by the `requests` URL policy; use host-level egress controls when required.
+
 ## See Also
 
 - [scriptling libraries](../) - Parent namespace for all scriptling extended libraries

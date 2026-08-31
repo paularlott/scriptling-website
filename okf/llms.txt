@@ -1,6 +1,6 @@
 # Scriptling OKF bundles
 
-> All 180 OKF 0.2 concepts, plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
+> All 181 OKF 0.2 concepts, plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
 
 ## scriptling-docs
 
@@ -26,12 +26,12 @@
 - [Documenting Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/documentation.md): Add help text to functions, libraries, and classes for discoverability.
 - [GC Release Hooks](https://scriptling.dev/okf/scriptling-docs/go-integration/gc-release-hooks.md): Best-effort cleanup hooks for Go-owned Scriptling objects.
 - [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md): How to register built-in libraries when embedding Scriptling in Go.
-- [Linting](https://scriptling.dev/okf/scriptling-docs/go-integration/lint.md): Code analysis for detecting syntax errors without execution.
+- [Linting](https://scriptling.dev/okf/scriptling-docs/go-integration/lint.md): Lex and parse Scriptling source without execution.
 - [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md): Flexible library loading from multiple sources.
 - [Native Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes.md): Create custom classes with full control over methods and inheritance.
 - [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md): Register individual Go functions with direct control.
 - [Native Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md): Create libraries with functions, constants, and sub-libraries.
-- [Native API](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md): Direct control with maximum performance for extending Scriptling.
+- [Native API](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md): Direct object-level control for extending Scriptling.
 - [Embedding Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md): Enable executable plugins when embedding Scriptling in Go.
 - [Script Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md): Extend Scriptling using Scriptling code itself.
 - [Go Integration](https://scriptling.dev/okf/scriptling-docs/go-integration.md): Embed Scriptling in your Go application.
@@ -149,6 +149,7 @@
 - [scriptling.net.unicast](https://scriptling.dev/okf/scriptling-libraries/networking/unicast.md): UDP and TCP point-to-point messaging for direct host-to-host communication.
 - [scriptling.net.websocket](https://scriptling.dev/okf/scriptling-libraries/networking/websocket.md): WebSocket client for sending and receiving text or binary messages.
 - [Networking Libraries](https://scriptling.dev/okf/scriptling-libraries/networking.md): Networking libraries for cluster membership, multicast, point-to-point messaging, and WebSocket communication.
+- [scriptling.package](https://scriptling.dev/okf/scriptling-libraries/package.md): Read metadata and files from app and plugin bundles loaded by the host.
 - [scriptling.plugin](https://scriptling.dev/okf/scriptling-libraries/plugin.md): Control library for listing, inspecting, calling, and loading executable plugins at runtime.
 - [scriptling.provision.fetch](https://scriptling.dev/okf/scriptling-libraries/provisioning/provision-fetch.md): Download files over HTTP/HTTPS and optionally unpack zip archives, idempotently.
 - [scriptling.provision.file](https://scriptling.dev/okf/scriptling-libraries/provisioning/provision-file.md): Create, update, and remove files and directories idempotently, including marker-delimited managed blocks.
@@ -158,7 +159,7 @@
 - [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/runtime/kv.md): Thread-safe key-value store for sharing state across requests and background tasks.
 - [scriptling.runtime.mcp](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md): Register MCP tools via decorators — metadata and implementation in a single file.
 - [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/runtime/plugin.md): Declare a Scriptling script as a first-class plugin server exposing functions, constants, and classes to remote clients.
-- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/runtime/runtime.md): Background tasks and concurrency, plus the runtime namespace grouping HTTP, JSON-RPC, KV, sync, sandbox, and plugin sub-libraries.
+- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/runtime/runtime.md): Background tasks and concurrency, plus the runtime namespace grouping HTTP, JSON-RPC, KV, MCP, sync, sandbox, and plugin sub-libraries.
 - [scriptling.runtime.sandbox](https://scriptling.dev/okf/scriptling-libraries/runtime/sandbox.md): Create isolated Scriptling execution environments for running script code with its own variable scope.
 - [scriptling.runtime.sync](https://scriptling.dev/okf/scriptling-libraries/runtime/sync.md): Named cross-environment concurrency primitives, atomics, shared variables, wait groups, and queues.
 - [Runtime](https://scriptling.dev/okf/scriptling-libraries/runtime.md): Runtime utilities for background tasks, HTTP servers, key-value storage, concurrency, and plugin server support.

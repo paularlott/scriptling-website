@@ -1,7 +1,7 @@
 ---
 title: scriptling.runtime
 linkTitle: runtime
-description: Background tasks and concurrency, plus the runtime namespace grouping HTTP, JSON-RPC, KV, sync, sandbox, and plugin sub-libraries.
+description: Background tasks and concurrency, plus the runtime namespace grouping HTTP, JSON-RPC, KV, MCP, sync, sandbox, and plugin sub-libraries.
 tags: [libraries, runtime]
 weight: 1
 
@@ -11,7 +11,7 @@ aliases:
 
 ## Overview
 
-The `scriptling.runtime` namespace provides background task execution (`background()`, `start_server()`, `server_running()`) for running concurrent work alongside a script or server. It also groups the `scriptling.runtime.*` sub-libraries: `http`, `jsonrpc`, `kv`, `plugin`, `sandbox`, and `sync`: under a single import.
+The `scriptling.runtime` namespace provides background task execution (`background()`, `start_server()`, `server_running()`) for running concurrent work alongside a script or server. It also groups the `scriptling.runtime.*` sub-libraries `http`, `jsonrpc`, `kv`, `mcp`, `plugin`, `sandbox`, and `sync` under a single import.
 
 ## Available Functions
 
@@ -110,7 +110,8 @@ For ongoing coordination between tasks, use `runtime.sync` primitives (`Shared`,
 - [scriptling.runtime.http](../http/): HTTP route registration and response helpers
 - [scriptling.runtime.jsonrpc](../jsonrpc/): JSON-RPC 2.0 server over stdio or HTTP
 - [scriptling.runtime.kv](../kv/): thread-safe key-value store
-- [scriptling.runtime.plugin](../../plugin/): expose a script as a first-class plugin server (agent variant only)
+- [scriptling.runtime.mcp](../mcp/): decorator and request-scoped MCP registration
+- [scriptling.runtime.plugin](../plugin/): expose a script as a first-class plugin server
 - [scriptling.runtime.sync](../sync/): named cross-environment concurrency primitives
 - [scriptling.runtime.sandbox](../sandbox/): isolated script execution environments
 

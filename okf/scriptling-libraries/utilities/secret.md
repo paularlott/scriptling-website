@@ -105,6 +105,6 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## See Also
 
-- [CLI Guide](https://scriptling.dev/okf/scriptling-docs/./cli.md) - Command-line flags and runtime behavior
+- [CLI Guide](https://scriptling.dev/okf/scriptling-docs/cli.md) - Command-line flags and runtime behavior
 - [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - Registering extended libraries when embedding in Go
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security guidance for host-provided libraries

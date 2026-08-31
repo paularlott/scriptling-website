@@ -14,7 +14,7 @@ weight: 2
 | `-c`, `--code`        | -                          | -                            | Execute inline code string                           | -                |
 | `-l`, `--lint`        | -                          | -                            | Lint script files without executing                  | -            |
 | `--lint-format`       | `SCRIPTLING_LINT_FORMAT`   | `lint.format`                | Output format for lint (text/json)                   | text             |
-| `-p`, `--package`     | -                          | `packages`                   | Package (.zip) path or URL to load (repeatable)      | (none)           |
+| `-p`, `--package`     | -                          | `packages`                   | Package directory, zip, or HTTP(S) URL (repeatable) | (none)           |
 | `-k`, `--insecure`    | -                          | `insecure`                   | Allow self-signed HTTPS certificates                 | false            |
 | `--cache-dir`         | `SCRIPTLING_CACHE_DIR`     | `cache.dir`                  | Cache directory for remote packages                  | OS default       |
 | `-L`, `--libpath`     | `SCRIPTLING_LIBPATH`       | `libpath`                    | Extra library search directory (repeatable)          | (none)           |
@@ -25,25 +25,28 @@ weight: 2
 | `--plugin-header`    | `SCRIPTLING_PLUGIN_HEADER` | `plugins.headers`            | HTTP header KEY=VALUE for an http(s) `--plugin` (repeatable) | (none) |
 | `--plugin-insecure`  | `SCRIPTLING_PLUGIN_INSECURE` | `plugins.insecure`         | Mark this https:// `--plugin` URL as insecure, skipping TLS verification (repeatable) | (none) |
 | `--log-level`         | `SCRIPTLING_LOG_LEVEL`     | `log.level`                  | Log level (trace/debug/info/warn/error)              | info             |
-| `--log-format`        | `SCRIPTLING_LOG_FORMAT`    | `log.format`                 | Log format (console/json)                            | console          |
+| `--log-format`        | `SCRIPTLING_LOG_FORMAT`    | `log.format`                 | Log format (console/json/null)                       | console          |
 | `-S`, `--server`      | `SCRIPTLING_SERVER`        | `server.address`             | HTTP server address (host:port)                      | (disabled)       |
 | `--web-root`          | `SCRIPTLING_WEB_ROOT`      | `server.web_root`            | Directory to serve static files from                 | (disabled)       |
 | `--json-rpc`          | `SCRIPTLING_JSONRPC`       | -                            | JSON-RPC server mode: stdio by default, HTTP `/json-rpc` with `--server` | false            |
 | `--mcp-tools`         | `SCRIPTLING_MCP_TOOLS`     | `mcp.tools`                  | Directory containing MCP tools                       | (disabled)       |
 | `--mcp-exec-script`   | `SCRIPTLING_MCP_EXEC_SCRIPT` | `mcp.exec_script`          | Enable MCP script execution tool                     | false            |
+| `--mcp-resources`     | `SCRIPTLING_MCP_RESOURCES` | `mcp.resources`              | Directory containing MCP resources                   | (disabled)       |
+| `--mcp-prompts`       | `SCRIPTLING_MCP_PROMPTS`   | `mcp.prompts`                | Directory containing MCP prompts                     | (disabled)       |
 | `--bearer-token`      | `SCRIPTLING_BEARER_TOKEN`  | `server.bearer_token`        | Bearer token for authentication                      | none             |
-| `--allowed-paths`     | `SCRIPTLING_ALLOWED_PATHS` | `security.allowed_paths`     | Comma-separated allowed filesystem paths             | (no restriction) |
+| `--max-request-body`  | `SCRIPTLING_MAX_REQUEST_BODY` | `server.max_request_body` | Maximum HTTP request body in bytes (0 = 32MiB, negative = unlimited) | 0 (32MiB)        |
+| `--websocket-origin`  | `SCRIPTLING_WEBSOCKET_ORIGIN` | `server.websocket_origins` | Allowed browser origin for WebSocket upgrades (repeatable, `*` for any) | same-origin      |
+| `--allowed-paths`     | `SCRIPTLING_ALLOWED_PATHS` | `security.allowed_paths`     | Restrict participating library filesystem I/O; `-` denies it entirely | (no restriction) |
 | `--network-policy`    | `SCRIPTLING_NETWORK_POLICY`| `security.network_policy`    | TOML network policy file for script outbound access  | (no restriction) |
-| `--no-subprocess`     | `SCRIPTLING_NO_SUBPROCESS` | `security.no_subprocess`     | Do not register the subprocess library               | false            |
 | `--disable-lib`       | `SCRIPTLING_DISABLE_LIB`   | `security.disable_libs`      | Disable a built-in library by name (repeatable)      | (none)           |
-| `--list-libs`         | -                          | -                            | List available built-in libraries and exit           | -            |
+| `--list-libs`         | -                          | -                            | Print the CLI's current built-in inventory and exit  | -            |
 | `--kv-storage`        | `SCRIPTLING_KV_STORAGE`    | `kv.storage`                 | Directory for persistent KV store                    | (in-memory)      |
 | `--docker-host`       | `DOCKER_HOST`              | `container.docker_host`      | Docker endpoint (socket path, tcp://, https://)      | `/var/run/docker.sock` |
 | `--podman-host`       | `CONTAINER_HOST`           | `container.podman_host`      | Podman endpoint (socket path or unix:// URI)         | `/var/run/podman.sock` |
 | `--secret-config`     | `SCRIPTLING_SECRET_CONFIG` | `secret.config`              | TOML file for secret provider aliases                | none             |
 | `--tls-cert`          | `SCRIPTLING_TLS_CERT`      | `tls.cert`                   | TLS certificate file                                 | none             |
 | `--tls-key`           | `SCRIPTLING_TLS_KEY`       | `tls.key`                    | TLS key file                                         | none             |
-| `--tls-generate`      | -                          | `tls.generate`               | Generate self-signed certificate                     | -            |
+| `--tls-generate`      | -                          | `tls.generate`               | Generate self-signed certificate                     | false            |
 
 The [network policy](../network-policy/) flag has its own page with the policy file reference.
 
@@ -177,30 +180,37 @@ All flags that have a config path can be set in the file. The TOML structure mir
 ```toml
 # scriptling.toml
 
-[log]
-level = "debug"
-format = "console"
-
+# Root-level options must appear before the first [table].
 libpath = ["/shared/libs", "/company/libs"]
-
 packages = ["./mypackage.zip", "https://example.com/lib.zip"]
 insecure = false
+
+[log]
+level = "debug"
+format = "console" # console, json, or null
 
 [plugins]
 dirs = ["/usr/local/lib/scriptling/plugins"]
 paths = ["/usr/local/bin/knot"]
 args = ["scriptling-server", "--alias=testing"]
+env = ["KNOT_DB=/var/lib/knot"]
+headers = ["Authorization=Bearer token"]
+insecure = ["https://plugins.internal:8443"]
 
 [server]
 address = ":8000"
+web_root = "./public"
 bearer_token = "secret"
 
 [mcp]
 tools = "./tools"
 exec_script = false
+resources = "./resources"
+prompts = "./prompts"
 
 [security]
 allowed_paths = "/tmp/data,./uploads"
+network_policy = "./network-policy.toml"
 disable_libs = ["subprocess", "os"]
 
 [kv]

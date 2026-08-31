@@ -388,7 +388,7 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## See Also
 
-- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/./runtime.md): background tasks, `start_server()`, and the rest of the runtime namespace
+- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/runtime.md): background tasks, `start_server()`, and the rest of the runtime namespace
 - [scriptling.runtime.jsonrpc](https://scriptling.dev/okf/scriptling-libraries/runtime/jsonrpc.md): JSON-RPC 2.0 server sharing the same handler model
 - [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/runtime/kv.md): share state across HTTP handlers
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md)

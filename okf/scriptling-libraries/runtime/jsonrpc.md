@@ -238,6 +238,6 @@ This is an extended library, requiring registration in Go, see [Library Registra
 ## See Also
 
 - [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/runtime/http.md): HTTP route registration sharing the same per-request evaluator model
-- [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/./plugin.md): full plugin protocol server (functions, constants, and classes)
+- [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/plugin.md): full plugin protocol server (functions, constants, and classes)
 - [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/runtime/kv.md): share state across JSON-RPC handlers
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md)

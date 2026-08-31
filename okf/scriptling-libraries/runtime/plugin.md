@@ -19,7 +19,7 @@ type: API Reference
 
 The `scriptling.runtime.plugin` library lets a setup script expose itself via the full Scriptling plugin protocol: the same protocol used by compiled Go or C plugin executables. When the server starts, clients can load it with `scriptling=True` and receive auto-generated `plugin.<name>` proxy libraries with wrappers for every registered function, constant, and class.
 
-Available only in the **agent variant** of Scriptling, registered alongside `scriptling.ai.agent`.
+It is registered as a runtime server surface and is independent of `scriptling.ai.agent`.
 
 ## Available Functions
 
@@ -262,5 +262,5 @@ This is an extended library, requiring registration in Go via `RegisterRuntimePl
 
 - [scriptling.runtime.jsonrpc](https://scriptling.dev/okf/scriptling-libraries/runtime/jsonrpc.md): lower-level JSON-RPC method registration without the full plugin handshake
 - [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/runtime/http.md): HTTP route registration sharing the same per-request evaluator model
-- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/./runtime.md): `start_server()` lifecycle shared with the plugin server
+- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/runtime.md): `start_server()` lifecycle shared with the plugin server
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md)

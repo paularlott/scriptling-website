@@ -57,7 +57,15 @@ Error codes:
 
 | Code | Meaning |
 | --- | --- |
-| `-32000` | Application error (function not found, bad arguments, unknown method, etc.) |
+| `-32700` | Parse error: malformed JSON |
+| `-32600` | Invalid JSON-RPC request |
+| `-32601` | Method not found |
+| `-32602` | Invalid method parameters |
+| `-32603` | Internal JSON-RPC error |
+| `-32000` | Generic application/server error |
+| `-32001` | Fetch source or path not found; not retried |
+| `-32002` | Fetch access denied; not retried |
+| `-32003` | Fetch backend temporarily unavailable; retried with a bounded backoff |
 
 ## Transport Values
 
@@ -378,7 +386,7 @@ The plugin removes the instance and calls `__del__` if defined. Destroy is idemp
 ### `fetch.read`
 
 **Direction:** Host → Plugin
-**When:** The host needs one file from a `scheme://` source this plugin's fetcher serves. Sources arrive as `--package` values or the script argument; only files an import actually touches are read.
+**When:** The host needs one file from a plugin-served `scheme://` source. This includes a directly executed scheme script and the library bundle attached automatically for the plugin; only files an import or package read actually touches are fetched.
 
 **Request params:**
 

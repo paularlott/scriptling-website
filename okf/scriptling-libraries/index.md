@@ -19,6 +19,7 @@ API reference for every standard, Scriptling, and extended library.
 - [MCP Protocol](https://scriptling.dev/okf/scriptling-libraries/mcp.md)
 - [Messaging](https://scriptling.dev/okf/scriptling-libraries/messaging.md)
 - [Networking Libraries](https://scriptling.dev/okf/scriptling-libraries/networking.md)
+- [scriptling.package](https://scriptling.dev/okf/scriptling-libraries/package.md)
 - [scriptling.plugin](https://scriptling.dev/okf/scriptling-libraries/plugin.md)
 - [Provisioning Libraries](https://scriptling.dev/okf/scriptling-libraries/provisioning.md)
 - [Runtime](https://scriptling.dev/okf/scriptling-libraries/runtime.md)

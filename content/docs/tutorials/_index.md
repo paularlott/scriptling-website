@@ -5,7 +5,9 @@ tags: [tutorials]
 weight: 8
 ---
 
-Hands-on tutorials that walk through real-world scenarios from start to finish.
+Hands-on tutorials that walk through real-world scenarios from start to finish. Choose the section for your role: CLI user, plugin author, Go embedder, or AI/server integrator.
+
+These are project walkthroughs, not exhaustive reference pages. For language learning, library lookup, or database APIs, use the [Language Guide](/reference/), [Library Reference](/reference/libraries/), or [Database Libraries](/reference/libraries/databases/).
 
 ## CLI Tutorials
 

@@ -177,6 +177,6 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## See Also
 
-- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/./runtime.md): `background()` tasks that typically use these primitives to coordinate
+- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/runtime.md): `background()` tasks that typically use these primitives to coordinate
 - [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/runtime/kv.md): simpler key-value sharing for cases that don't need locks or queues
 - [scriptling.runtime.sandbox](https://scriptling.dev/okf/scriptling-libraries/runtime/sandbox.md): isolated environments that do *not* share state, unlike `sync` primitives

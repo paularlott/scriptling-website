@@ -94,6 +94,9 @@ SCRIPTLING_LIBPATH=/shared/libs
 # Server configuration
 SCRIPTLING_SERVER=:8000
 SCRIPTLING_MCP_TOOLS=./tools
+SCRIPTLING_MCP_EXEC_SCRIPT=false
+SCRIPTLING_MCP_RESOURCES=./resources
+SCRIPTLING_MCP_PROMPTS=./prompts
 SCRIPTLING_BEARER_TOKEN=your-secret-token
 
 # Filesystem restrictions

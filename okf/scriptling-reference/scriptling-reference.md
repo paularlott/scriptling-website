@@ -15,6 +15,13 @@ type: Reference
 
 Scriptling is a dynamically-typed, interpreted language with Python-inspired syntax designed for embedding in Go applications.
 
+## Choose a reference path
+
+- **Learning Scriptling:** Read the quick reference below, then follow the detailed language topics in order as needed.
+- **Looking up an API:** Go directly to [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md) or the [Library Reference](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md).
+- **Adding database access:** Browse the [Database Libraries](https://scriptling.dev/okf/scriptling-libraries/databases.md) for drivers and the ORM.
+- **Using a runtime or host feature:** See the [CLI Guide](https://scriptling.dev/okf/scriptling-docs/cli.md), [Go Integration](https://scriptling.dev/okf/scriptling-docs/go-integration.md), or [Plugins](https://scriptling.dev/okf/scriptling-docs/plugins.md) rather than treating it as language syntax.
+
 ## Quick Reference
 
 ### Variables and Types
@@ -176,7 +183,7 @@ if __name__ == "__main__":
 
 - [Indexing & Slicing](https://scriptling.dev/okf/scriptling-reference/slicing.md) - Single index, slice notation, slice() builtin
 
-- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - 60+ built-in and extended libraries reference
+- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Standard, Scriptling, and extended library reference
 
 - [Python Differences](https://scriptling.dev/okf/scriptling-reference/python-differences.md) - What's NOT supported, key differences from Python
 
@@ -191,7 +198,7 @@ if __name__ == "__main__":
 
 ## See Also
 
-- [Quick Start](https://scriptling.dev/okf/scriptling-docs/./quick-start.md) - Get started with CLI or embedding
-- [Go Integration](https://scriptling.dev/okf/scriptling-docs/./go-integration.md) - Embedding Scriptling in Go
-- [CLI Guide](https://scriptling.dev/okf/scriptling-docs/./cli.md) - Command-line interface documentation
+- [Quick Start](https://scriptling.dev/okf/scriptling-docs/quick-start.md) - Get started with CLI or embedding
+- [Go Integration](https://scriptling.dev/okf/scriptling-docs/go-integration.md) - Embedding Scriptling in Go
+- [CLI Guide](https://scriptling.dev/okf/scriptling-docs/cli.md) - Command-line interface documentation
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security best practices

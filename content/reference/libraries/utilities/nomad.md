@@ -396,7 +396,10 @@ Converts an HCL job specification into Nomad's JSON job format, so it can be pas
 **Returns:** `dict`: job specification in Nomad's JSON job format.
 
 ```python
-parsed = c.jobs_parse(open("job.nomad.hcl").read())
+import os
+
+hcl = os.read_file("job.nomad.hcl")
+parsed = c.jobs_parse(hcl)
 c.job_register(parsed)
 ```
 
@@ -405,11 +408,12 @@ c.job_register(parsed)
 Reconcile CSI volumes against a source-of-truth list, deregistering anything Nomad has that shouldn't exist:
 
 ```python
+import os
 import scriptling.nomad as nomad
 
 c = nomad.Client("https://nomad.example.com:4646", token="secret")
 
-expected = set(open("expected_volumes.txt").read().split())
+expected = set(os.read_file("expected_volumes.txt").split())
 
 for v in c.csi_volumes_list(namespace="*"):
     vid = v["id"]

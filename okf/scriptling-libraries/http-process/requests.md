@@ -159,7 +159,7 @@ Execute multiple HTTP requests concurrently with a configurable concurrency limi
   - `timeout` (`int`, optional): Request timeout in seconds. Default: `30`.
 - `max_parallel` (`int`, optional): Maximum number of concurrent requests. Default: `4`.
 
-**Returns:** `list`: `Response` objects in the same order as the input list. A malformed request spec (missing `url` or un-encodable `json`) yields a `Response` with `status_code=0` and the error message in `body`; a transport-level failure (timeout, DNS, connection refused) surfaces as an `Error` object in the corresponding position.
+**Returns:** `list`: `Response` objects in the same order as the input list. A malformed request spec (missing `url` or un-encodable `json`) yields a `Response` with `status_code=0` and the error message in `text`; a transport-level failure (timeout, DNS, connection refused) surfaces as an `Error` object in the corresponding position.
 
 ```python
 import requests
@@ -228,7 +228,9 @@ The `requests` library exposes the following exception types for error handling:
 
 This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`requests` can make arbitrary HTTP/HTTPS requests to any URL reachable from the host. There is no built-in URL allowlisting: if you need to restrict which hosts a script can reach, filter URLs at the application layer before passing them to script execution. See the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#network-security).
+`requests` uses an unrestricted pooled HTTP client when the embedder calls `RegisterRequestsLibrary` without a policy. Embedders can instead pass a non-nil `*netsecurity.Config`; this enables the built-in guard, including host allow/deny rules, address-category and CIDR controls, HTTPS/IP-literal settings, redirect checks, and DNS-rebinding-resistant validated-IP dialing. A non-nil zero-value config applies safe defaults, and an invalid config fails closed.
+
+The CLI configures the same guard through its `--network-policy` TOML file and passes that policy to `requests`; scripts do not configure it through request arguments. This policy is specific to participating clients, not a blanket process firewall, so do not assume raw networking, messaging, container, Nomad, plugin, or provisioning clients inherit it. See the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#network-security).
 
 ## Notes
 

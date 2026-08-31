@@ -38,6 +38,6 @@ file.ensure_directory("~/.config/myapp")
 
 ## See Also
 
-- [Utilities](https://scriptling.dev/okf/scriptling-libraries/./utilities.md) - General purpose utility libraries
+- [Utilities](https://scriptling.dev/okf/scriptling-libraries/utilities.md) - General purpose utility libraries
 - [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Full library reference index
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Filesystem risk breakdown

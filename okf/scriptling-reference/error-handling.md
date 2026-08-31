@@ -23,9 +23,9 @@ Scriptling has two distinct types of runtime error conditions:
 | Aspect | **Error** | **Exception** |
 |--------|-----------|---------------|
 | **Purpose** | Runtime errors surfaced by the interpreter | Explicitly raised conditions |
-| **Can be caught?** | Yes. `try`/`except` catches both Errors and Exceptions, inferring the exception type from the error message (see [Automatic Exception Type Inference](#automatic-exception-type-inference)). | Yes (with try/except) |
-| **Examples** | Type errors, name errors, index/key errors, division by zero | SystemExit, ValueError, user-defined |
-| **Propagation** | Converted into a typed Exception when caught | Propagated for try/except |
+| **Can be caught?** | Yes. `try`/`except` catches Errors by inferring an exception type from the error message (see [Automatic Exception Type Inference](#automatic-exception-type-inference)). | Yes, except for the special `SystemExit`, which bypasses script `except` handlers. |
+| **Examples** | Type errors, name errors, index/key errors, division by zero | ValueError, user-defined exceptions, and the special SystemExit |
+| **Propagation** | Converted into a typed Exception when caught | Propagated through `try`/`except`; SystemExit propagates directly to the host after `finally` blocks run |
 
 ## Try/Except/Finally
 
@@ -308,7 +308,6 @@ finally:
 ### HTTP Error Handling
 
 ```python
-import json
 import requests
 
 try:
@@ -318,7 +317,7 @@ try:
     if response.status_code != 200:
         raise RuntimeError("HTTP error: " + str(response.status_code))
 
-    data = json.loads(response.body)
+    data = response.json()
     print("Success: " + str(len(data)))
 except:
     print("Request failed")
@@ -357,19 +356,23 @@ def load_config(path):
 
 ## SystemExit Exception
 
-The `sys.exit()` function raises a SystemExit exception that can be caught:
+`sys.exit()` raises a special `SystemExit` exception that bypasses all script `except` handlers. `finally` blocks still run, then the exception returns to the Go host:
 
 ```python
 import sys
 
 try:
     sys.exit(42)
-except Exception as e:
-    print("Caught: " + str(e))  # "Caught: SystemExit: 42"
+except Exception:
+    print("not reached")
+finally:
+    print("cleanup runs")
 
-# Exit with custom message
-sys.exit("Fatal error occurred")
+# This line is not reached.
+print("continuing")
 ```
+
+`sys.exit("Fatal error occurred")` carries the message and uses exit code 1. A host can inspect the returned exception and decide whether to terminate the process, return an HTTP status, or continue using the interpreter.
 
 ## Exception Handling in Libraries
 
@@ -406,11 +409,11 @@ def parse_date(date_string):
 ### Catching Too Broadly
 
 ```python
-# Bad - catches everything including system exits
+# Bad - catches every ordinary Error and Exception and hides the cause
 try:
     some_operation()
 except Exception:
-    pass  # Silently ignores all errors
+    pass  # Silently ignores most failures; SystemExit still bypasses this
 
 # Good - catch specific exceptions
 try:
@@ -477,27 +480,26 @@ value = dict.get("key", default)
 
 ## For Go Developers
 
-When calling Scriptling from Go:
+Inspect the returned object even when `err` is nil: `SystemExit(0)` is treated as a clean exit and may return a nil Go error. Non-zero exits return the exception with an error.
 
 ```go
-// Check for Error objects
-if obj.IsError(result) {
-    // Handle fatal error
-}
+result, err := p.Eval(script)
 
-// Check for Exception objects
-if ex, ok := result.(*object.Exception); ok {
-    // Check for SystemExit specifically
-    if ex.IsSystemExit() {
-        exitCode := ex.GetExitCode()
-        // Handle exit
-    }
+if ex, ok := object.AsException(result); ok && ex.IsSystemExit() {
+    exitCode := ex.GetExitCode()
+    // Map the exit to host behavior; do not assume the Go process must exit.
+    handleExit(exitCode)
+    return
+}
+if err != nil {
+    // Handle other evaluation failures.
+    return
 }
 ```
 
 ## Summary
 
-- Use `try/except/else/finally` for structured error handling
+- Use `try/except/else/finally` for structured error handling; `SystemExit` bypasses `except` but still runs `finally`
 - Use `else` to run code only when no exception was raised
 - Catch specific exception types when possible
 - Use exceptions for exceptional cases, not control flow

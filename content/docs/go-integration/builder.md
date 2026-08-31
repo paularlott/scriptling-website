@@ -16,9 +16,9 @@ The Builder API provides a type-safe, clean way to create functions, classes, an
 | Type safety | Manual checking | Automatic |
 | Code clarity | Verbose | Clean |
 | Error handling | Manual | Automatic |
-| Performance | Maximum | Slight overhead at registration |
+| Performance | Direct object handling | Cached signature analysis plus type conversion |
 
-Use the **Builder API** for cleaner code and type safety. Use the **Native API** only for performance-critical code.
+Use the **Builder API** for cleaner code and type safety. For measured hot paths where conversion overhead matters, compare it with the **Native API** using your real signatures and workload.
 
 ## Topics
 
@@ -88,8 +88,8 @@ p.RegisterFunc("fast_add", func(ctx context.Context, kwargs object.Kwargs, args 
 
 ### Optimization Tips
 
-1. **Register once** - Builders have overhead at registration, not execution
-2. **Pre-build classes** - Create class instances before scripts run
+1. **Register once** - Signature inspection is cached when wrappers are built; argument conversion and fallback `reflect.Call` may still occur per invocation
+2. **Pre-build classes** - Create class definitions before scripts run
 3. **Cache built objects** - Reuse built libraries across interpreters
 
 ```go
@@ -112,5 +112,5 @@ Builder and native functions both run holding the environment's interpreter lock
 
 ## See Also
 
-- [Native API](../native/) - Direct control with maximum performance
+- [Native API](../native/) - Direct object-level control
 - [Script Extensions](../scripts/) - Extend using Scriptling code

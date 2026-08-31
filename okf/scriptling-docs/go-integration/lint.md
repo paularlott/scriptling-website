@@ -1,5 +1,5 @@
 ---
-description: Code analysis for detecting syntax errors without execution.
+description: Lex and parse Scriptling source without execution.
 generated:
     by: scriptling-website/okf.py
 resource: https://scriptling.dev/docs/go-integration/lint/
@@ -15,7 +15,7 @@ type: Guide
 ---
 # Linting
 
-The `lint` package provides code analysis functionality for Scriptling scripts. It can detect syntax errors and potential issues without executing the code, making it safe for untrusted input.
+The `lint` package lexes and parses Scriptling source without executing it. It reports syntax errors from the parser; it does not perform semantic analysis, name resolution, style checks, or security analysis. Parsing untrusted text is safe because no script code runs, but a successful result does not make later execution safe.
 
 ## Basic Linting
 
@@ -61,7 +61,7 @@ result := lint.Lint(code, &lint.Options{
 
 ## LintError Type
 
-Each issue found is represented as a `LintError`:
+Each issue found is represented as a `LintError`. The severity constants are part of the result schema, but the current parser-only implementation emits `SeverityError` with code `parse-error`; it does not currently produce warning or informational findings:
 
 ```go
 type LintError struct {
@@ -143,21 +143,20 @@ Output:
 
 ## Use Cases
 
-- **Pre-execution validation**: Check scripts before running them
+- **Pre-execution syntax validation**: Reject source that cannot be parsed
 - **CI/CD integration**: Fail pipelines on syntax errors
-- **Editor integration**: Real-time syntax checking
-- **Security scanning**: Validate untrusted scripts without execution
+- **Editor integration**: Report parser diagnostics without running code
+- **Untrusted-source parsing**: Inspect syntax without executing the source
 
 ```go
-// Example: Validate script before execution
-func safeExecute(p *scriptling.Scriptling, code string) (object.Object, error) {
-    // First, lint the code
+// Validate syntax, then execute under the host's normal runtime controls.
+func validateAndExecute(p *scriptling.Scriptling, code string) (object.Object, error) {
     result := lint.Lint(code, nil)
     if result.HasErrors {
         return nil, fmt.Errorf("script has syntax errors:\n%s", result.String())
     }
 
-    // Safe to execute
+    // A successful parse does not establish that execution is safe.
     return p.Eval(code)
 }
 ```

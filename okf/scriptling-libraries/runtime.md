@@ -24,7 +24,7 @@ Libraries for runtime functionality including background task execution, HTTP se
 | [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/runtime/http.md) | HTTP route registration and response helpers |
 | [scriptling.runtime.jsonrpc](https://scriptling.dev/okf/scriptling-libraries/runtime/jsonrpc.md) | Concurrent JSON-RPC 2.0 server over stdio or HTTP |
 | [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/runtime/kv.md) | Thread-safe key-value store |
-| [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/runtime/plugin.md) | Expose a script as a first-class plugin server (agent variant only) |
+| [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/runtime/plugin.md) | Expose a script as a first-class plugin server |
 | [scriptling.runtime.sync](https://scriptling.dev/okf/scriptling-libraries/runtime/sync.md) | Named cross-environment concurrency primitives |
 | [scriptling.runtime.sandbox](https://scriptling.dev/okf/scriptling-libraries/runtime/sandbox.md) | Isolated script execution environments |
 | [scriptling.runtime.mcp](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md) | Register MCP tools via decorators |

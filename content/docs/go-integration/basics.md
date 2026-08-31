@@ -5,7 +5,7 @@ tags: [go-integration, embedding, go]
 weight: 1
 ---
 
-Core concepts for using Scriptling from Go applications.
+Core concepts for using Scriptling from Go applications. After the basic setup, focused fragments assume the same initialized `p`; standalone examples repeat setup only when registration or lifecycle is relevant.
 
 ## Creating an Interpreter
 
@@ -28,7 +28,7 @@ func main() {
     stdlib.RegisterAll(p)
 
     // Execute Scriptling code
-    result, err := p.Eval(`x = 5 + 3`)
+    _, err := p.Eval(`x = 5 + 3`)
     if err != nil {
         fmt.Println("Error:", err)
     }
@@ -157,7 +157,8 @@ if elems, err := p.GetVarAsTuple("my_tuple"); err == nil {
 ### Inspect and Modify the Environment
 
 ```go
-// List all variable names (sorted, excludes internals)
+// List names in lexical order. Only the injected "import" key is omitted;
+// other globals, including imported bindings and dunder names, may appear.
 names := p.ListVars()
 fmt.Println("Variables:", names)
 
@@ -165,22 +166,33 @@ fmt.Println("Variables:", names)
 p.UnsetVar("temp_result")
 ```
 
-### Raw Object Access
+### Converted and Raw Object Access
+
+`GetVar` converts a Scriptling value to its Go representation and reports lookup failures as an `object.Object` error:
 
 ```go
-// Get raw object for advanced operations
-obj, exists := p.GetVar("result")
-if exists {
-    switch obj.(type) {
+value, objErr := p.GetVar("result")
+if objErr != nil {
+    fmt.Println("Lookup failed:", objErr.Inspect())
+} else {
+    fmt.Printf("Go value: %T(%v)\n", value, value)
+}
+```
+
+Use `GetVarAsObject` when you need the original Scriptling object. Unlike `GetVar` and the typed convenience methods, its second return value is a Go `error`:
+
+```go
+obj, err := p.GetVarAsObject("result")
+if err != nil {
+    fmt.Println("Lookup failed:", err)
+} else {
+    switch value := obj.(type) {
     case *object.Integer:
-        val, _ := obj.AsInt()
-        fmt.Printf("Integer: %d\n", val)
+        fmt.Printf("Integer: %d\n", value.IntValue())
     case *object.String:
-        val, _ := obj.AsString()
-        fmt.Printf("String: %s\n", val)
+        fmt.Printf("String: %s\n", value.StringValue())
     case *object.Dict:
-        val, _ := obj.AsDict()
-        fmt.Printf("Dict with %d keys\n", len(val))
+        fmt.Printf("Dict with %d keys\n", len(value.Pairs))
     }
 }
 ```
@@ -282,6 +294,24 @@ result = math.sqrt(16)
 `)
 ```
 
+### Interpreter Lifecycle
+
+An interpreter is stateful: globals, functions, classes, and imported bindings persist across `Eval` calls. Reuse it unchanged only when those calls belong to the same logical script session.
+
+For independent sequential jobs, preserve registrations but clear script state before the next job:
+
+```go
+if _, err := p.Eval(firstJob); err != nil {
+    return err
+}
+p.Reset() // also clears captured output; imports load again on demand
+if _, err := p.Eval(nextJob); err != nil {
+    return err
+}
+```
+
+Use `ResetEnv("name", "config")` when selected bindings should survive; the injected `import` builtin is always retained. Use `Clone()` when each request, tenant, or concurrent job needs a fresh environment based on the same registrations.
+
 ### Cloning Interpreters
 
 Create an isolated interpreter that shares library registrations but has a fresh environment. Useful for per-request or multi-tenant isolation:
@@ -342,14 +372,14 @@ if err != nil {
 import "github.com/paularlott/scriptling/object"
 
 result, err := p.Eval(script)
+
+// Inspect the result before err: SystemExit(0) is a clean exit and may have
+// a nil Go error, while non-zero exits return both the exception and an error.
+if ex, ok := object.AsException(result); ok && ex.IsSystemExit() {
+    os.Exit(ex.GetExitCode())
+}
 if err != nil {
-    // Check for exception objects
-    if ex, ok := object.AsException(result); ok {
-        if ex.IsSystemExit() {
-            os.Exit(ex.GetExitCode())
-        }
-        fmt.Printf("Exception: %s\n", ex.Message)
-    }
+    fmt.Printf("Script error: %v\n", err)
     return
 }
 ```
@@ -374,7 +404,7 @@ func main() {
 
     // Register libraries
     stdlib.RegisterAll(p)
-    p.RegisterLibrary(extlibs.RequestsLibrary)
+    extlibs.RegisterRequestsLibrary(p)
 
     // Set configuration
     p.SetVar("api_base", "https://api.example.com")
@@ -390,7 +420,7 @@ options = {"timeout": timeout}
 response = requests.get(url, options)
 
 if response.status_code == 200:
-    users = json.loads(response.body)
+    users = response.json()
     result = {"count": len(users), "success": True}
 else:
     result = {"count": 0, "success": False}
@@ -415,7 +445,7 @@ else:
 ## See Also
 
 - [Library Registration](../library-registration/) - How to register built-in libraries
-- [Native API](../native/) - Direct control with maximum performance
+- [Native API](../native/) - Direct object-level control
 - [Builder API](../builder/) - Type-safe, cleaner syntax
 - [Security Guide](../../security/) - Security best practices for embedding
 - [Libraries](../../../reference/libraries/) - Usage reference for all libraries

@@ -9,23 +9,26 @@ Scriptling provides a sandboxed Python-like execution environment, but proper se
 
 ## Overview
 
-Scriptling is designed with security in mind, but **you are responsible for configuring the sandbox appropriately** for your use case. The default configuration provides a balance between functionality and safety, but you should understand the security implications of your choices.
+Scriptling's security boundary depends on how it is configured. **You are responsible for registering only the capabilities your scripts need and for applying process-level isolation where appropriate.**
 
-## Default Sandbox Behavior
+## Bare Embedding vs CLI Defaults
 
-By default, Scriptling:
+A bare `scriptling.New()` interpreter starts without standard or extended libraries; the embedding host chooses what to register. It still provides the language runtime and `import` mechanism, but an import succeeds only after the host registers a library or configures a loader.
 
-- **Has NO access to the host file system** (unless explicitly granted)
-- **Has NO network access** (unless explicitly enabled via `requests` library)
-- **Runs in a memory-safe Go environment** (no C extensions)
-- **Provides no direct access to Go's runtime or OS**
-- **Has no access to environment variables** (unless explicitly provided)
+The `scriptling` CLI is intentionally more permissive. Unless disabled, its setup registers the standard libraries plus extended capabilities including `requests`, `os`, and `subprocess`:
+
+- `requests` can reach the network unless `--network-policy` restricts it.
+- `os` can access the filesystem unless `--allowed-paths` restricts its filesystem operations.
+- `os.getenv()` reads the live process environment, and `os.environ()` exposes a snapshot of it. Filesystem allowlists do not filter environment variables.
+- `subprocess` can execute host commands and bypass library-level filesystem and network controls.
+
+Scriptling runs in a memory-safe Go environment without C extensions and does not directly expose the Go runtime, but the CLI capabilities above still provide host access. Do not describe the default CLI as a no-filesystem, no-network, or no-environment sandbox.
 
 ## Library Security
 
-### Safe Libraries (Standard Library)
+### Pure Standard Libraries
 
-These libraries are safe to use in most sandboxed environments and are available by default:
+Embedding hosts can register these pure libraries without granting filesystem or network access. The CLI's normal setup includes them; a bare `scriptling.New()` does not register them automatically.
 
 | Library       | Security Notes                               |
 | ------------- | -------------------------------------------- |
@@ -51,15 +54,21 @@ These libraries are safe to use in most sandboxed environments and are available
 
 ### Scriptling-Specific Libraries
 
-These libraries provide Scriptling-specific functionality:
+These libraries provide Scriptling-specific functionality. This is a capability inventory, not a list of libraries available in every runtime; embedding hosts register them explicitly and CLI availability varies by mode and build.
 
 | Library               | Security Considerations                                       |
 | --------------------- | ------------------------------------------------------------- |
 | `scriptling.ai`       | **NETWORK ACCESS** - Makes HTTP requests to AI APIs           |
 | `scriptling.ai.agent` | **NETWORK + CODE EXECUTION** - Agentic AI with tool execution |
 | `scriptling.mcp`      | **NETWORK ACCESS** - MCP protocol communication               |
-| `scriptling.secret`   | Host-controlled secret access; scripts see aliases, not credentials |
-| `scriptling.console`  | Console I/O, safe for interactive use                         |
+| `scriptling.net.*`    | **NETWORK ACCESS** - DNS, UDP/TCP, gossip, multicast, and WebSocket clients |
+| `scriptling.messaging.*` | **NETWORK + REMOTE INPUT** - Bot clients receive events and send messages using script-supplied credentials |
+| `scriptling.container` | **INFRASTRUCTURE CONTROL** - Manages Docker, Podman, and Apple Containers |
+| `scriptling.nomad`    | **INFRASTRUCTURE CONTROL** - Registers/stops jobs and manages Nomad resources |
+| `scriptling.plugin`   | **PROCESS OR NETWORK ACCESS** - Starts executable peers or connects to plugin servers |
+| `scriptling.provision.*` | **FILESYSTEM + NETWORK ACCESS** - Changes files and can download remote content |
+| `scriptling.secret`   | Host-controlled secret access; scripts see aliases, not provider credentials |
+| `scriptling.console`  | Console I/O, including interactive input                       |
 | `scriptling.similarity` | Pure computation, no external access                        |
 | `scriptling.toon`     | Pure computation, no external access                          |
 
@@ -184,7 +193,7 @@ For scripts that *should* reach the internet but must never reach your private n
 
 With a policy active, loopback, link-local (including cloud metadata endpoints like `169.254.169.254`), private, unspecified, and multicast addresses are all blocked by default, as are URLs that name an IP directly. Host allow/deny lists, CIDR exceptions, https-only, and custom DNS servers grant exactly the access you intend — allowlisted hosts are trusted to resolve internally, and deny rules always win.
 
-- **CLI**: `--network-policy=policy.toml` — the full policy file reference is in the [network policy guide](/docs/cli/network-policy/). Combine with `--no-subprocess` so scripts can't bypass the policy by shelling out to `curl`.
+- **CLI**: `--network-policy=policy.toml` — the full policy file reference is in the [network policy guide](/docs/cli/network-policy/). Combine it with `--disable-lib subprocess` in any mode so code cannot bypass the policy by shelling out.
 - **Embedding**: pass a `*netsecurity.Config` (or load the same TOML file with `netsecurity.LoadConfig`) when registering the governed libraries — the `Config` options are documented in the [library registration guide](/docs/go-integration/library-registration/#network-policy). No policy means no restrictions.
 
 ```go
@@ -206,9 +215,9 @@ The database plugins enforce the host security policy on every operation, in bot
 - **`scriptling.sqlite` and `scriptling.badgerdb` (file-backed)** — the database path must fall inside `--allowed-paths` / the embedder's allowed paths. `":memory:"` sqlite databases are always allowed.
 - **`scriptling.sql` and `scriptling.valkey` (network)** — connections dial through the same guard as the `requests` library, so a network policy applies in full. This answers the common question for MySQL/MariaDB/PostgreSQL DSNs: **connecting by hostname or by IP are both covered.** A hostname is resolved through the policy's DNS servers and every resolved address is checked; an IP literal is checked directly — and IP literals are denied by default, so `mysql://user@10.0.0.5/db` needs the address allowed explicitly:
 
-  - `allow_private_ips = true` — the "this script may reach the LAN/database subnet" switch, or
-  - the address inside `allowed_cidrs`, or
-  - the hostname inside `allow_hosts` (allowlisted hosts are trusted to resolve internally — the recommended way to grant access to `db.internal.corp`), and `allow_ip_literals = true` if you must name IPs directly.
+  - `allow_private_ips = true` together with `allow_ip_literals = true` for arbitrary private IP literals, or
+  - the address inside `allow_cidrs` (an explicit CIDR grant permits that IP literal without `allow_ip_literals`), or
+  - the hostname inside `allow_hosts` (allowlisted hosts are trusted to resolve internally — the recommended way to grant access to `db.internal.corp`).
 
   Loopback (`postgres://localhost` on the same machine) needs `allow_loopback = true`. The same rules apply to `valkey://` URLs.
 
@@ -300,27 +309,26 @@ if operation in allowed_operations:
 
 ## Environment Variables
 
-Environment variables are only accessible if the `sys` library is registered. Never register `sys` with untrusted code:
+The CLI registers `os` by default: `os.getenv()` reads the live process environment and `os.environ()` returns the snapshot captured when the library was registered. `--allowed-paths` does not filter either API. For untrusted CLI code, sanitize the host process environment and disable `os`; embedding hosts can omit the library and expose only selected values:
 
 ```go
-// DANGEROUS: Allows access to all environment variables
-extlibs.RegisterSysLibrary(p)
-
-// SAFE: Don't register sys library for untrusted code
-// Use SetVar to pass only necessary configuration
+// A bare scriptling.New() has no libraries; pass only approved values.
 p.SetVar("APP_VERSION", "1.0.0")
 p.SetVar("API_ENDPOINT", apiEndpoint)
 ```
+
+Do not rely on omitting `sys` alone: it is not the CLI's only environment-access path.
 
 ## Security Checklist
 
 Use this checklist when deploying Scriptling in production:
 
 - [ ] File system access is restricted to specific paths (`os`, `pathlib`, `glob`)
-- [ ] Network access is disabled or URL-filtered (`requests`, `scriptling.ai`, `scriptling.mcp`)
+- [ ] Network access is disabled or restricted per client (`requests`, databases, networking, messaging, AI, MCP)
 - [ ] Execution timeout is configured
 - [ ] `subprocess` library is NOT registered
-- [ ] `sys` library is NOT registered (or carefully controlled)
+- [ ] `sys` and `os` are omitted or carefully controlled for untrusted code
+- [ ] Container, Nomad, plugin, messaging, and provisioning libraries are omitted unless explicitly required
 - [ ] `scriptling.runtime.sandbox` is NOT registered for untrusted code
 - [ ] `scriptling.ai.agent` is NOT registered for untrusted code
 - [ ] Environment variables are filtered
@@ -367,12 +375,12 @@ os.read_file("../../etc/passwd")
 ### 4. Information Disclosure
 
 ```python
-# Try to access internals
-import sys
-sys.get_environment_variables()  # Not available in default sandbox
+# Read a host secret when the CLI's default os library is enabled
+import os
+secret = os.getenv("SECRET_TOKEN")
 ```
 
-**Mitigation**: Don't register `sys` or other introspection libraries.
+**Mitigation**: Sanitize the process environment and disable or omit `os` for untrusted code; filesystem path restrictions do not filter environment variables.
 
 ## Best Practices
 

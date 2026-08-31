@@ -1,5 +1,5 @@
 ---
-description: Background tasks and concurrency, plus the runtime namespace grouping HTTP, JSON-RPC, KV, sync, sandbox, and plugin sub-libraries.
+description: Background tasks and concurrency, plus the runtime namespace grouping HTTP, JSON-RPC, KV, MCP, sync, sandbox, and plugin sub-libraries.
 generated:
     by: scriptling-website/okf.py
 resource: https://scriptling.dev/reference/libraries/runtime/runtime/
@@ -16,7 +16,7 @@ type: API Reference
 
 ## Overview
 
-The `scriptling.runtime` namespace provides background task execution (`background()`, `start_server()`, `server_running()`) for running concurrent work alongside a script or server. It also groups the `scriptling.runtime.*` sub-libraries: `http`, `jsonrpc`, `kv`, `plugin`, `sandbox`, and `sync`: under a single import.
+The `scriptling.runtime` namespace provides background task execution (`background()`, `start_server()`, `server_running()`) for running concurrent work alongside a script or server. It also groups the `scriptling.runtime.*` sub-libraries `http`, `jsonrpc`, `kv`, `mcp`, `plugin`, `sandbox`, and `sync` under a single import.
 
 ## Available Functions
 
@@ -115,7 +115,8 @@ For ongoing coordination between tasks, use `runtime.sync` primitives (`Shared`,
 - [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/runtime/http.md): HTTP route registration and response helpers
 - [scriptling.runtime.jsonrpc](https://scriptling.dev/okf/scriptling-libraries/runtime/jsonrpc.md): JSON-RPC 2.0 server over stdio or HTTP
 - [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/runtime/kv.md): thread-safe key-value store
-- [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/./plugin.md): expose a script as a first-class plugin server (agent variant only)
+- [scriptling.runtime.mcp](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md): decorator and request-scoped MCP registration
+- [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/runtime/plugin.md): expose a script as a first-class plugin server
 - [scriptling.runtime.sync](https://scriptling.dev/okf/scriptling-libraries/runtime/sync.md): named cross-environment concurrency primitives
 - [scriptling.runtime.sandbox](https://scriptling.dev/okf/scriptling-libraries/runtime/sandbox.md): isolated script execution environments
 

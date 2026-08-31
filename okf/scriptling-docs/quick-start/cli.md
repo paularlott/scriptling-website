@@ -35,7 +35,7 @@ export SCRIPTLING_PLUGIN_DIR="$(brew --prefix)/opt/scriptling-plugins/libexec/pl
 Or use `scriptling-full` — the same CLI with all database plugins compiled
 in (mutually exclusive with `scriptling`): `brew install paularlott/tap/scriptling-full`.
 
-See [Plugins](https://scriptling.dev/okf/scriptling-docs/./plugins.md) for how plugins load and the [database reference](https://scriptling.dev/okf/scriptling-libraries/./databases.md) for the APIs.
+See [Plugins](https://scriptling.dev/okf/scriptling-docs/plugins.md) for how plugins load and the [database reference](https://scriptling.dev/okf/scriptling-libraries/databases.md) for the APIs.
 
 ### GitHub Releases
 
@@ -97,7 +97,13 @@ echo 'print("Hello")' | scriptling
 
 ## HTTP Server
 
-Run Scriptling as an HTTP server:
+Server modes evaluate a startup script before accepting requests. Create `setup.py` for any one-time initialization:
+
+```python
+print("Server initialized")
+```
+
+Then run Scriptling as an HTTP server:
 
 ```bash
 scriptling --server :8000 setup.py
@@ -105,7 +111,7 @@ scriptling --server :8000 setup.py
 
 ## MCP Server
 
-Run Scriptling as a Model Context Protocol server for AI integration:
+The same startup script can initialize a Model Context Protocol server; tools are loaded from the directory passed to `--mcp-tools`:
 
 ```bash
 scriptling --server :8000 --mcp-tools ./tools setup.py
@@ -115,5 +121,5 @@ scriptling --server :8000 --mcp-tools ./tools setup.py
 
 - [Language Guide](https://scriptling.dev/okf/scriptling-reference/scriptling-reference.md) - Learn the complete language syntax
 - [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Explore available libraries and APIs
-- [CLI Guide](https://scriptling.dev/okf/scriptling-docs/./cli.md) - Full command-line interface documentation
+- [CLI Guide](https://scriptling.dev/okf/scriptling-docs/cli.md) - Full command-line interface documentation
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security best practices

@@ -11,7 +11,7 @@ aliases:
 
 ## Overview
 
-`scriptling.sqlite` provides the SQLite database as a pure-Go embedded engine: no server, no cgo, so it works on every platform Scriptling builds for. It shares its API with [plugin.sql](../sql/), so scripts port between SQLite and the network databases unchanged.
+`scriptling.sqlite` provides the SQLite database as a pure-Go embedded engine: no server, no cgo, so it works on every platform Scriptling builds for. It shares the core connection shape and documented ORM subset with [scriptling.sql](../sql/), but DSNs, raw SQL and DDL, types, collations, and backend-specific features still differ.
 
 ```python
 import scriptling.sqlite as sqlite
@@ -55,6 +55,10 @@ Rows are dicts keyed by column name; values are ints, floats, bools, strings or 
 | `close()` | Close the connection and release the database handle |
 
 The class can also be constructed directly: `sqlite.Connection(path, timeout_ms=5000)`.
+
+## Transactions
+
+The script-facing relational API is autocommit: each `query()`, `execute()`, or ORM terminal call runs independently. It exposes no transaction handle and no `begin()`, `commit()`, or `rollback()` methods, so multiple calls cannot be grouped into one atomic transaction through this API.
 
 ## Streaming Large Results
 

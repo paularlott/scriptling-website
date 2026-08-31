@@ -531,5 +531,5 @@ This is an extended library, requiring registration in Go, see [Library Registra
 ## See Also
 
 - [scriptling.mcp.tool](https://scriptling.dev/okf/scriptling-libraries/mcp/tool.md): Helper library for authoring MCP tools
-- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/./ai.md): AI client and completion functions
+- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/ai.md): AI client and completion functions
 - [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/ai/agent.md): Building AI agents with automatic tool execution

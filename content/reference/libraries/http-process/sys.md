@@ -170,7 +170,13 @@ for i in range(len(sys.argv) - 1):
 
 This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-`sys` exposes whatever `argv` and `stdin` the embedder passes to `RegisterSysLibrary(p, argv, stdin)`: if those contain secrets, a script can read them. Never register this library (or pass sensitive argv/env) for untrusted code. See the [Security Guide](/docs/security/#environment-variables).
+`sys` exposes whatever `argv` and `stdin` the embedder passes during registration: if those contain secrets, a script can read them. The actual Go signature requires both values:
+
+```go
+extlibs.RegisterSysLibrary(p, argv, stdin)
+```
+
+Pass `nil` for `stdin` when input should not be available. Never register this library (or pass sensitive argv/stdin) for untrusted code. See the [Security Guide](/docs/security/#environment-variables).
 
 ## Python Compatibility
 

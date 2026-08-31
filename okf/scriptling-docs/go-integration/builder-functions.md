@@ -36,14 +36,15 @@ func registerAddFunction(p *scriptling.Scriptling) {
 
 ## Function Signatures
 
-The Builder API supports flexible function signatures:
+The Builder API supports fixed and variadic typed Go parameters:
 
-- `func(args...) result` - Positional arguments only
-- `func(ctx context.Context, args...) result` - Context + positional arguments
-- `func(kwargs object.Kwargs, args...) result` - Kwargs + positional arguments
-- `func(ctx context.Context, kwargs object.Kwargs, args...) result` - All parameters
-- `func(kwargs object.Kwargs) result` - Kwargs only
-- `func(ctx context.Context, kwargs object.Kwargs) result` - Context + kwargs only
+- `func(a T, b U) R` - Fixed positional arguments
+- `func(values ...T) R` - Variadic positional arguments
+- `func(ctx context.Context, a T, values ...U) R` - Context + positional arguments
+- `func(kwargs object.Kwargs, a T, values ...U) R` - Kwargs + positional arguments
+- `func(ctx context.Context, kwargs object.Kwargs, a T, values ...U) R` - All parameter groups
+- `func(kwargs object.Kwargs) R` - Kwargs only
+- `func(ctx context.Context, kwargs object.Kwargs) R` - Context + kwargs only
 
 **Parameter Order Rules (ALWAYS in this order):**
 
@@ -168,7 +169,22 @@ fb.FunctionWithHelp(func(a, b float64) (float64, error) {
 
 ## Variadic Functions
 
-For variadic functions, see [Library Builder](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md) `FunctionFromVariadicWithHelp`.
+Ordinary typed Go variadics are supported by `Function` and `FunctionWithHelp`; pass the final parameter with Go's `...T` syntax:
+
+```go
+fb.FunctionWithHelp(func(prefix string, values ...int) string {
+    parts := make([]string, len(values))
+    for i, value := range values {
+        parts[i] = strconv.Itoa(value)
+    }
+    return prefix + strings.Join(parts, ",")
+}, "format_numbers(prefix, *values) - Format integer values")
+p.RegisterFunc("format_numbers", fb.Build())
+
+// Usage: format_numbers("IDs: ", 10, 20, 30)
+```
+
+Library and class builders support typed variadics in the same way. The library-specific `FunctionFromVariadicWithHelp` helper is another option when adapting an existing variadic function; see [Builder Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md).
 
 ## Builder Methods Reference
 
@@ -182,14 +198,16 @@ For variadic functions, see [Library Builder](https://scriptling.dev/okf/scriptl
 
 | Factor | Native API | Builder API |
 |--------|------------|-------------|
-| **Performance** | Faster (no reflection overhead) | Slight overhead |
+| **Performance** | Predictable direct object handling | Cached signature analysis; conversion overhead varies by signature |
 | **Code Clarity** | More verbose | Cleaner |
 | **Type Safety** | Manual checking | Automatic |
 | **Flexibility** | Full control | Convention-based |
-| **Best For** | Performance-critical, complex logic | Rapid development, simple functions |
+| **Best For** | Measured hot paths, complex logic | Most typed integrations |
+
+Builders inspect and cache each Go signature when the wrapper is created. Common signatures use generated fast wrappers; unsupported shapes fall back to conversion plus `reflect.Call` on each invocation. Benchmark the actual function before choosing the Native API solely for performance.
 
 ## See Also
 
 - [Builder Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md) - Type-safe library builder
 - [Builder Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-classes.md) - Type-safe class builder
-- [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md) - Direct control with maximum performance
+- [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md) - Direct object-level function control

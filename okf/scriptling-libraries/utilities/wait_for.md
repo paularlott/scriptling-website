@@ -214,5 +214,5 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## See Also
 
-- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/./runtime.md) - Background tasks and coordination primitives that often pair with wait_for
+- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/runtime.md) - Background tasks and coordination primitives that often pair with wait_for
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security guidance for host-provided libraries

@@ -214,7 +214,7 @@ func pathJoinpath(ctx context.Context, kwargs object.Kwargs, args ...object.Obje
     newPath := filepath.Join(segments...)
 
     // Create new Path instance with same config
-    return createPath(config, ctx, kwargs, []object.Object{object.NewString(newPath)})
+    return createPath(config, ctx, kwargs, []object.Object{object.NewString(newPath)}...)
 }
 ```
 
@@ -404,7 +404,7 @@ go func() {
 }()
 
 // ...or a single shared environment (serialized by the GIL).
-go func() { shared.Eval("mylib.do_something())" }()
+go func() { shared.Eval("mylib.do_something()") }()
 ```
 
 ## Best Practices
@@ -473,7 +473,7 @@ func pathJoinpath(ctx context.Context, kwargs object.Kwargs, args ...object.Obje
     // ... compute newPath ...
 
     // Create new instance with same config
-    return createPath(config, ctx, kwargs, []object.Object{object.NewString(newPath)})
+    return createPath(config, ctx, kwargs, []object.Object{object.NewString(newPath)}...)
 }
 ```
 

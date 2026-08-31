@@ -63,13 +63,15 @@ For nested imports like `knot.groups`, the loader checks:
 
 ### List Available Libraries
 
-Use `--list-libs` to print all built-in library names and exit:
+Use `--list-libs` to print the CLI's built-in library inventory and exit:
 
 ```bash
 scriptling --list-libs
 ```
 
-When combined with `--disable-lib`, disabled libraries are excluded from the output:
+The current inventory is not exhaustive: it omits some helper and contextual libraries that CLI setup registers. In particular, `msgpack` is available in the default no-disable CLI setup but is currently omitted from `--list-libs`. Supplying any `--disable-lib` also takes a selective registration path that currently omits `msgpack`.
+
+When combined with `--disable-lib`, named libraries are excluded from the reported inventory:
 
 ```bash
 scriptling --disable-lib subprocess --list-libs
@@ -92,27 +94,27 @@ SCRIPTLING_DISABLE_LIB=subprocess scriptling script.py
 
 If a script attempts to import a disabled library, it raises `ImportError`, which can be caught with `try` / `except`.
 
-## Script Execution Modes
+## Script Filesystem Controls
 
-Scriptling supports three levels of filesystem access control:
+`--allowed-paths` constrains filesystem operations made through participating Scriptling libraries. It is not a complete filesystem sandbox: subprocesses, plugin processes, module/package loading, setup scripts, TLS files, static assets, and other host-side operations are outside this library-level allowlist.
 
-| Mode           | Flag                            | Filesystem Access       | Path Restrictions    |
-| -------------- | ------------------------------- | ----------------------- | -------------------- |
-| **Full**       | (default)                       | All libraries           | None                 |
-| **Restricted** | `--allowed-paths /path1,/path2` | All libraries           | Only specified paths |
-| **None**       | `--allowed-paths -`             | All libraries           | No paths allowed     |
+| Mode                 | Flag                            | Participating library access |
+| -------------------- | ------------------------------- | ---------------------------- |
+| **Unrestricted**     | (default)                       | Any path                     |
+| **Allowlisted**      | `--allowed-paths /path1,/path2` | Only specified paths         |
+| **Deny library I/O** | `--allowed-paths -`             | No paths                     |
 
-### Full Mode (default)
+### Unrestricted Mode (default)
 
-All libraries available, no restrictions:
+The CLI registers its broad library set without filesystem restrictions:
 
 ```bash
 scriptling script.py
 ```
 
-### Restricted Mode
+### Allowlisted Mode
 
-All libraries available, but filesystem operations restricted to specified paths:
+Participating library filesystem operations are restricted to specified paths:
 
 ```bash
 # Restrict to specific directories
@@ -125,15 +127,15 @@ scriptling --allowed-paths "./data,../shared" script.py
 SCRIPTLING_ALLOWED_PATHS="/var/www,./public" scriptling script.py
 ```
 
-### No File Access Mode
+### Deny Participating Library File Access
 
-Disable all filesystem access (useful for running untrusted scripts):
+Deny filesystem access through the libraries wired to the allowlist:
 
 ```bash
 scriptling --allowed-paths - script.py
 ```
 
-All file operations (`os.read_file`, `os.write_file`, `pathlib`, `glob`, `sandbox.exec_file`) will be denied.
+This denies operations such as `os.read_file`, `os.write_file`, `pathlib`, `glob`, and `sandbox.exec_file`; it does not prevent an enabled `subprocess` from reading files with host commands. Disable that capability explicitly with `--disable-lib subprocess` in every mode.
 
 When a script tries to access a path outside the allowed directories:
 
@@ -147,9 +149,9 @@ except Exception as e:
     # Output: Access denied: access denied: path '/etc/passwd' is outside allowed directories
 ```
 
-**Available libraries:**
+**Common libraries (not an exhaustive inventory):**
 
-- Standard libraries: `json`, `math`, `random`, `re`, `time`, `base64`, `hashlib`, `hmac`, `urllib`
+- Standard libraries: `json`, `msgpack`, `math`, `random`, `re`, `time`, `base64`, `hashlib`, `hmac`, `urllib`
 - `datetime` - Date and time operations
 - `yaml`, `toml` - YAML and TOML parsing
 - `html.parser` - HTML parsing

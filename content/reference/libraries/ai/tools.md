@@ -11,6 +11,10 @@ aliases:
 
 Builds OpenAI-compatible tool schemas from Scriptling functions, so an AI agent can discover and call them. The library exposes the `Registry` class: construct one with `tools.Registry()` (or `ai.ToolRegistry()`, the re-export most scripts use, see [scriptling.ai](../../ai/)), then register tools and build schemas to pass to a completion request or an `Agent`.
 
+## Availability
+
+The standalone `scriptling.ai.tools` import is conditionally registered and is not added by normal CLI setup. When `scriptling.ai` is available, prefer its `ai.ToolRegistry()` re-export, which provides the same class without requiring the standalone namespace. Embedders that need `import scriptling.ai.tools` must register that library explicitly.
+
 ## Available Functions
 
 | Function | Description |

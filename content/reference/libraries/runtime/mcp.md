@@ -263,6 +263,26 @@ myapp/
     └── ...
 ```
 
+## Go Registration
+
+`scriptling.runtime.mcp` is part of the runtime aggregate:
+
+```go
+extlibs.RegisterRuntimeLibraryAll(p, allowedPaths)
+```
+
+That call registers the sub-library independently and also exposes it as `scriptling.runtime.mcp` through the parent `scriptling.runtime` object. An embedder that needs only this namespace can call:
+
+```go
+extlibs.RegisterRuntimeMCPLibrary(p)
+```
+
+This server/decorator namespace is distinct from `scriptling.mcp`, which is an MCP client library.
+
+## Security Considerations
+
+Static decorators expose the registered functions to every client that can reach the MCP server. Request-scoped registrations let HTTP middleware choose entries per request, but the middleware must authenticate and authorize the caller before registering privileged handlers. Stdio has no middleware, so static entries there are available to the process connected to stdin/stdout. Treat each tool, resource, and prompt handler as a remotely callable entry point and grant it only the host capabilities it needs.
+
 ## See Also
 
 - [Writing MCP Tools (legacy format)](/reference/libraries/mcp/writing-mcp-tools/) — The `.toml` + `.py` format reference

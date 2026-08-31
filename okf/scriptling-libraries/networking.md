@@ -44,7 +44,7 @@ conn.close()
 
 ## See Also
 
-- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/./runtime.md) - HTTP and JSON-RPC server libraries
-- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/./ai.md) - AI agents that can drive networked tools
+- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/runtime.md) - HTTP and JSON-RPC server libraries
+- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/ai.md) - AI agents that can drive networked tools
 - [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Full library reference index
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#network-security) - Network-enabled libraries risk breakdown

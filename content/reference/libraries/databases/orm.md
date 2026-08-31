@@ -17,31 +17,34 @@ Both relational plugins, [sqlite](../sqlite/) and [sql](../sql/), hand out the s
 - **quick forms**: `insert(table, dict)` for the write with nothing to filter, and `tables()`.
 - **model gateways**: `orm.table(factory, table, ...)` maps rows onto your objects through a factory function.
 
-The whole ORM is scriptling script that executes host-side in both plugin modes (compiled-in and external): chained builder calls cost no round trips, not even at `get_orm()`: and one implementation serves every backend. Each plugin bakes its dialect into the kit it hands out (the sql plugin picks per connection from the DSN scheme): backtick quoting on MySQL/MariaDB, double quotes and `$n` placeholders on PostgreSQL, whatever SQLite likes. Orms from different connections never interfere, so one script can drive MySQL, SQLite and PostgreSQL at the same time.
+The ORM is Scriptling code that runs host-side in both plugin modes, so chained builder calls do not cross the plugin boundary. Each connection supplies its dialect: backtick quoting on MySQL/MariaDB, double quotes and `$n` placeholders on PostgreSQL, and SQLite syntax for SQLite. ORMs from different connections do not interfere.
+
+The example is backend-neutral: pass it a connection created by either `scriptling.sqlite.connect(...)` or `scriptling.sql.connect(...)`.
 
 ```python
-import scriptling.sqlite as sqlite
+def high_scores(conn):
+    orm = conn.get_orm()
 
-conn = sqlite.connect("app.db")
-orm = conn.get_orm()
+    (orm.create_table("people")
+     .column("id", "integer", primary_key=True, autoincrement=True)
+     .column("name", "text")
+     .column("score", "real")
+     .column("active", "integer", default=1)
+     .if_not_exists()
+     .execute())
 
- (orm.create_table("people")
- .column("id", "integer", primary_key=True, autoincrement=True)
- .column("name", "text")
- .column("score", "real")
- .column("active", "integer", default=1)
- .execute())
-
-orm.insert("people", {"name": "ada", "score": 9.5})
-rows = (orm.select("people", "name", "score")
-        .where("score", ">=", 8.0)
-        .order_by("score", desc=True)
-        .fetch())
-
-conn.close()
+    orm.insert("people", {"name": "ada", "score": 9.5})
+    return (orm.select("people", "name", "score")
+            .where("score", ">=", 8.0)
+            .order_by("score", desc=True)
+            .fetch())
 ```
 
-The table builder renders the auto-increment primary key per backend, so this intro runs unchanged on SQLite, MySQL/MariaDB and PostgreSQL; see [Table Builder](#table-builder) for the full column options.
+The table builder renders the auto-increment primary key per backend, so the function works with SQLite, MySQL/MariaDB, or PostgreSQL connections; the caller is still responsible for importing the selected plugin and supplying its file path or DSN.
+
+## Transactions
+
+ORM terminal operations use the connection's autocommit API. Each `fetch()`, `count()`, `insert()`, `execute()`, `save()`, or `delete()` call is independent, and the ORM exposes no transaction handle. It cannot group several calls into one atomic transaction.
 
 ## Query Builders
 
@@ -108,12 +111,14 @@ Every value binds as a parameter and every identifier is quoted and validated ag
 |--------|-------------|
 | `where(column, op, value)` / `where(criterion)` | add a condition (AND); select, update and delete |
 | `where_sql(fragment, *params)` | escape hatch: raw SQL fragment, `?` placeholders bind to params (renumbered on postgres); select, update and delete |
+
+On postgres the renumbering leaves quoted literals, quoted identifiers, comments, and the jsonb `?|`/`?&` operators alone. A bare jsonb `?` is indistinguishable from a placeholder on this path; `jsonb_exists(data, 'k')` is the function form that works.
 | `order_by(column, desc=False)` | order; repeatable; select |
 | `limit(n)` / `offset(n)` | paging; select |
 | `fetch()` | run and return all rows as a list of dicts; select |
-| `iterate()` | run and return an iterator: `for row in q.iterate():` streams row by row; compiled-in builds read lazily from the driver, external-plugin builds make one call per row (constant memory either way) |
+| `iterate()` | stream rows from the query; compiled-in relational builds read lazily, while external plugins fetch one row per call across the plugin boundary |
 | `one()` | first row or `None`; select |
-| `count()` | run as `SELECT count(*)` and return the number; select |
+| `count()` | run as `SELECT count(*)` and return an `int`; select |
 | `execute()` | run the `UPDATE`/`DELETE` and return `{"rows_affected": int}`; update and delete |
 
 ## Quick Forms
@@ -127,7 +132,7 @@ Blanket updates and deletes are refused: `.execute()` without any `where` raises
 
 ## Table Builder
 
-`orm.create_table(table)` returns a builder with the same shape as the query builder; `.execute()` runs the DDL. Identifiers are quoted and validated like everywhere else, and the auto-incrementing primary key renders per backend: `AUTOINCREMENT` on SQLite, `AUTO_INCREMENT` on MySQL/MariaDB, `SERIAL` on PostgreSQL: so one script builds the same table everywhere.
+`orm.create_table(table)` returns a builder with the same shape as the query builder; `.execute()` runs the DDL. Identifiers are quoted and validated like everywhere else, and the documented integer auto-incrementing primary-key shape renders per backend: `AUTOINCREMENT` on SQLite, `AUTO_INCREMENT` on MySQL/MariaDB, and `SERIAL` on PostgreSQL. Portability is limited to this documented generated subset; raw DDL, type names, constraints, indexes, collations, and backend-specific features still differ.
 
 ```python
 (orm.create_table("people")
@@ -146,7 +151,7 @@ orm.drop_table("people")     # DROP TABLE IF EXISTS, same everywhere
 | `if_not_exists()` | `CREATE TABLE IF NOT EXISTS` |
 | `execute()` | run and return the execute result |
 
-Column types pass through as-is: `integer`, `text` and `real` work on all three backends; anything backend-specific (e.g. `serial`, `jsonb`) is yours to spell. `default` accepts numbers, strings, booleans and `None`. Indexes and foreign keys stay with raw `conn.execute`: DDL beyond tables is where the backends genuinely disagree.
+Column types pass through as-is: `integer`, `text` and `real` work on all three backends; anything backend-specific (for example, `serial` or `jsonb`) is yours to spell. `default` accepts integers, finite floats, strings, and booleans. `None` means no `DEFAULT` clause; non-finite floats (`NaN`, positive infinity, or negative infinity) are rejected with `ValueError`. Indexes and foreign keys stay with raw `conn.execute`: DDL beyond tables is where the backends genuinely disagree.
 
 ## Model Gateways
 
@@ -171,11 +176,15 @@ names = orm.table(make_person, "people", pk="id", columns=["id", "name"])
 n = names.get(1)
 n.name = "ada lovelace"
 names.save(n)              # writes name only; score and active stay untouched
+
+# per-call columns: narrow one save or insert without a second gateway
+people.save(p, columns=["score"])
+people.insert(make_person(name="kurt", score=6.0), columns=["name", "score"])
 ```
 
-`columns` is optional. Without it the gateway writes every column the table has: the column list is read from the schema once per `get_orm()` and cached, so adding or removing a column in the table needs no script change. Pass `columns=["id", "name"]` to manage a subset (a wide table, or columns you deliberately do not want writes to touch); the list then applies to `insert` and `save` only, and costs no schema lookup. The write shape is fixed when the gateway is created: need a different subset elsewhere and open another `orm.table(...)` for it, or use `orm.update(table, {...}).where(...)` for a one-off partial write.
+`columns` is optional. Without it the gateway writes every column the table has: the column list is read from the schema once per `get_orm()` and cached, so adding or removing a column in the table needs no script change. Pass `columns=["id", "name"]` to manage a subset (a wide table, or columns you deliberately do not want writes to touch); the list then applies to `insert` and `save` only, and costs no schema lookup. That list is the gateway's default write shape — `save(p, columns=[...])` and `insert(p, columns=[...])` narrow it for a single call.
 
-Two write semantics worth knowing: `insert` skips `None` values, so unset fields take their schema defaults and the primary key auto-assigns; `save` writes every managed column, including `None` (that is how you clear one).
+Two write semantics worth knowing: `insert` skips `None` values, so unset fields take their schema defaults and the primary key auto-assigns (an object with everything unset inserts a pure-defaults row); `save` writes every managed column, including `None` (that is how you clear one). An explicit `columns=` list on either call is explicit: `None` in a listed column is written as `NULL`, which is the way to override a schema default on insert through the gateway (the kit form `orm.insert(table, {"cleared_at": None})` does the same).
 
 ## See Also
 

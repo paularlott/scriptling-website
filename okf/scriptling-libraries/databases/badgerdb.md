@@ -58,6 +58,8 @@ Identical surface to the [valkey Client](https://scriptling.dev/okf/scriptling-l
 | `incr(key, amount=1)` | Add to the integer stored at key, returning the new value |
 | `decr(key, amount=1)` | Subtract from the integer stored at key |
 | `hash_set(key, field, value)` | Set one hash field, returning `1` when the field was new, `0` when it overwrote |
+
+Hashes and plain values keep separate identities, as they do on valkey: a hash command on a key holding a plain value fails with a `WRONGTYPE` error (and so does a plain command on a hash key), so neither side can overwrite the other's data.
 | `hash_get(key, field)` | The field's value, or `None` when the key or field is missing |
 | `hash_delete(key, *fields)` | Delete fields, returning how many existed; the key disappears with its last field |
 | `hash_all(key)` | Every field and value as a dict; empty when the key is missing |

@@ -41,6 +41,6 @@ result = client.call_tool("search", {"query": "hello"})
 
 ## See Also
 
-- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/./ai.md) - AI and agent libraries that consume MCP tools
+- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/ai.md) - AI and agent libraries that consume MCP tools
 - [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Full library reference index
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#network-security) - Network-enabled libraries risk breakdown

@@ -57,6 +57,8 @@ scriptling --server :8000 --json-rpc --mcp-tools ./tools setup.py
 `--json-rpc` selects one transport. Without `--server` it uses stdio; with
 `--server` it mounts HTTP JSON-RPC at `/json-rpc`.
 
+> **Security:** Use `--disable-lib subprocess` to remove shell access. `--allowed-paths` limits participating library filesystem APIs; it does not constrain enabled subprocesses or host-side loading.
+
 Over HTTP, the script middleware registered with
 `runtime.http.middleware(...)` guards `/json-rpc` the same as HTTP routes —
 use it for token or per-user key authentication (see

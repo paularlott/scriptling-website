@@ -89,7 +89,13 @@ echo 'print("Hello")' | scriptling
 
 ## HTTP Server
 
-Run Scriptling as an HTTP server:
+Server modes evaluate a startup script before accepting requests. Create `setup.py` for any one-time initialization:
+
+```python
+print("Server initialized")
+```
+
+Then run Scriptling as an HTTP server:
 
 ```bash
 scriptling --server :8000 setup.py
@@ -97,7 +103,7 @@ scriptling --server :8000 setup.py
 
 ## MCP Server
 
-Run Scriptling as a Model Context Protocol server for AI integration:
+The same startup script can initialize a Model Context Protocol server; tools are loaded from the directory passed to `--mcp-tools`:
 
 ```bash
 scriptling --server :8000 --mcp-tools ./tools setup.py

@@ -456,5 +456,5 @@ This is an extended library, requiring registration in Go, see [Library Registra
 ## See Also
 
 - [scriptling.mcp](https://scriptling.dev/okf/scriptling-libraries/mcp/client.md): MCP client for connecting to MCP servers
-- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/./ai.md): AI client and completion functions
+- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/ai.md): AI client and completion functions
 - [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/ai/agent.md): Building AI agents with automatic tool execution

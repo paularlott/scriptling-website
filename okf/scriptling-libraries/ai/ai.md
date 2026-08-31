@@ -296,4 +296,4 @@ This is an extended library, requiring registration in Go, see [Library Registra
 - [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/ai/agent.md): Agentic AI loop with automatic tool execution
 - [scriptling.ai.memory](https://scriptling.dev/okf/scriptling-libraries/ai/memory.md): Long-term memory store for AI agents
 - [scriptling.ai.tools](https://scriptling.dev/okf/scriptling-libraries/ai/tools.md): Tool schema builder (`Registry` / `ai.ToolRegistry`)
-- [scriptling.mcp](https://scriptling.dev/okf/scriptling-libraries/./mcp.md): MCP client for connecting to MCP servers
+- [scriptling.mcp](https://scriptling.dev/okf/scriptling-libraries/mcp.md): MCP client for connecting to MCP servers

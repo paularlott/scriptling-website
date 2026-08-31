@@ -5,16 +5,16 @@ tags: [cli]
 weight: 8
 ---
 
-Packages are ZIP archives containing Scriptling libraries that can be loaded from local files or URLs. They enable easy distribution and reuse of code.
+Packages are ZIP archives or directories containing Scriptling libraries or applications. They enable easy distribution and reuse of code.
 
 ## Overview
 
-A package is a ZIP file containing:
+Every package requires `manifest.toml`. The default import directory is `lib/`, but that directory is not required for a main-only application. Directories named explicitly in the manifest's `libs` field are required.
 
 ```
 mylib.zip
 ├── manifest.toml    # Required - package metadata
-├── lib/             # Required - Python modules
+├── lib/             # Conventional/default location for importable modules
 │   ├── __init__.py
 │   └── utils.py
 └── docs/            # Optional - documentation
@@ -87,13 +87,7 @@ scriptling --package https://example.com/lib.zip#sha256=abc123... script.py
 
 ### Plugin Fetcher Schemes
 
-A fetcher plugin serves its library itself: loading the
-plugin attaches it automatically, so no `--package` is involved. `--package`
-takes only ordinary packages — a `.zip`, a directory, or a URL — and rejects a
-plugin `scheme://` source.
-
-A scheme source does work as the script itself, fetched from the plugin and
-refetched on every run:
+Loading a fetcher plugin automatically attaches its declared library, so you normally should not add its `scheme://libs` source with `--package`. Explicit plugin-scheme package sources are supported after the serving plugin is loaded, and a scheme source can also be the positional script:
 
 ```bash
 scriptling --plugin /usr/local/bin/knot --plugin-arg scriptling-server \
@@ -102,9 +96,7 @@ scriptling --plugin /usr/local/bin/knot --plugin-arg scriptling-server \
 
 If no loaded plugin serves the scheme, the error names the scheme and points at
 `--plugin`, rather than reporting a missing file. See
-[Plugin Fetchers](/docs/plugins/fetchers/) for the full picture.
-
-See [Plugin Fetchers](/docs/plugins/fetchers/) for details.
+[Plugin Fetchers](/docs/plugins/fetchers/) for details.
 
 **How it works:**
 - Append `#sha256=<hash>` to the package path or URL
@@ -423,7 +415,7 @@ scriptling --server :8000 --package ./myapp          # HTTP (all serve protocols
 scriptling --package ./myapp                           # stdio (MCP or JSON-RPC)
 
 # Production — run from a zip
-scriptling pack ./myapp myapp.zip
+scriptling pack ./myapp -o myapp.zip
 scriptling --server :8000 --package myapp.zip
 scriptling --server :8000 --package https://host/myapp.zip#sha256=...
 ```

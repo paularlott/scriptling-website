@@ -34,7 +34,7 @@ json_str = json.dumps(obj)
 ```python
 import re
 
-# Match - returns boolean (matches at start of string only)
+# Match - returns a Match object or None (matches at start only)
 if re.match("[0-9]+", "123abc"):
     print("Starts with digits")
 
@@ -229,12 +229,12 @@ ts = datetime.timestamp(dt)     # Convert to timestamp
 import base64
 
 # Encode
-encoded = base64.encode("Hello, World!")
+encoded = base64.b64encode("Hello, World!")
 print(encoded)  # "SGVsbG8sIFdvcmxkIQ=="
 
-# Decode
-decoded = base64.decode("SGVsbG8sIFdvcmxkIQ==")
-print(decoded)  # "Hello, World!"
+# Decode (returns bytes)
+decoded = base64.b64decode("SGVsbG8sIFdvcmxkIQ==")
+print(decoded.decode())  # "Hello, World!"
 ```
 
 ## Hash Functions
@@ -360,7 +360,7 @@ url = "https://api.example.com/data"
 try:
     response = requests.get(url, timeout=10)
     if response.status_code == 200:
-        data = json.loads(response.body)
+        data = json.loads(response.text)
         print("Success:", len(data))
     else:
         print("HTTP Error:", response.status_code)
@@ -378,7 +378,7 @@ def fetch_with_retry(url, max_retries=3):
     for i in range(max_retries):
         response = requests.get(url, timeout=5)
         if response.status_code == 200:
-            return response.body
+            return response.text
         time.sleep(1)
     return None
 ```
@@ -393,7 +393,7 @@ import requests
 response = requests.get("https://api.example.com/items", timeout=10)
 
 # Parse
-data = json.loads(response.body)
+data = json.loads(response.text)
 
 # Filter
 filtered = [item for item in data if item["active"]]
@@ -417,7 +417,7 @@ def process_batch(items):
 
 # Fetch items
 response = requests.get("https://api.example.com/items")
-items = json.loads(response.body)
+items = json.loads(response.text)
 
 # Process in batches of 100
 for batch in itertools.batched(items, 100):

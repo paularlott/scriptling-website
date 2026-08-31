@@ -387,7 +387,7 @@ caps = slack.capabilities(bot)
 
 This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-This library sends and receives messages via the Slack API using the bot and app tokens supplied to `client()`. The tokens are held by the embedder: typically passed in via `Register(p, logger)` when embedding in Go: and are not directly exposed to scripts; scripts can send and receive messages on the bot's behalf but cannot read the tokens back out. Treat both tokens as secrets: anyone who obtains them can act as your bot in your Slack workspace. See [Security Considerations](/docs/security/#network-security) for a full breakdown of network-enabled libraries.
+This library sends and receives messages via the Slack API using the bot and app tokens that the script passes to `client()`. Go registration is `Register(p, logger)`: it supplies logging only and does not supply or retain credentials. The script, its configuration source, and anyone able to inspect that execution context may therefore have access to both tokens. Keep them out of source control and logs, inject them from an appropriate secret source, and restrict who can run or modify the script. An omitted or empty `allowed_users` list installs no default user restriction; provide an allowlist or a custom `auth()` handler for exposed bots. The Slack client is a separate networking surface and is not governed by the `requests` URL policy. Treat both tokens as secrets because anyone who obtains them can act as the bot in the workspace. See [Security Considerations](/docs/security/#network-security) for broader network guidance.
 
 ## See Also
 

@@ -272,6 +272,6 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## See Also
 
-- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/./runtime.md): background tasks that often coordinate through `kv`
+- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/runtime.md): background tasks that often coordinate through `kv`
 - [scriptling.runtime.sync](https://scriptling.dev/okf/scriptling-libraries/runtime/sync.md): concurrency primitives for coordinating tasks beyond simple key-value state
 - [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/runtime/http.md): HTTP handlers commonly read/write `kv.default`

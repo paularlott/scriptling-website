@@ -15,7 +15,11 @@ type: API Reference
 ---
 # scriptling.ai.tools
 
-Builds OpenAI-compatible tool schemas from Scriptling functions, so an AI agent can discover and call them. The library exposes the `Registry` class: construct one with `tools.Registry()` (or `ai.ToolRegistry()`, the re-export most scripts use, see [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/./ai.md)), then register tools and build schemas to pass to a completion request or an `Agent`.
+Builds OpenAI-compatible tool schemas from Scriptling functions, so an AI agent can discover and call them. The library exposes the `Registry` class: construct one with `tools.Registry()` (or `ai.ToolRegistry()`, the re-export most scripts use, see [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/ai.md)), then register tools and build schemas to pass to a completion request or an `Agent`.
+
+## Availability
+
+The standalone `scriptling.ai.tools` import is conditionally registered and is not added by normal CLI setup. When `scriptling.ai` is available, prefer its `ai.ToolRegistry()` re-export, which provides the same class without requiring the standalone namespace. Embedders that need `import scriptling.ai.tools` must register that library explicitly.
 
 ## Available Functions
 
@@ -109,6 +113,6 @@ result = handler({"path": "/etc/hostname"})
 
 ## See Also
 
-- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/./ai.md): re-exports the class as `ai.ToolRegistry`, plus completion helpers and `execute_tool_calls`.
+- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/ai.md): re-exports the class as `ai.ToolRegistry`, plus completion helpers and `execute_tool_calls`.
 - [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/ai/agent.md): the `Agent` class consumes a `Registry` via its `tools=` argument.
 - [scriptling.mcp.tool](https://scriptling.dev/okf/scriptling-libraries/mcp/tool.md): building tools for the MCP protocol instead of direct LLM APIs.

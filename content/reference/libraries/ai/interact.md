@@ -11,6 +11,10 @@ aliases:
 
 Interactive terminal interface for AI agents. This library extends the `Agent` class with an `interact()` method that provides a REPL-like interface for conversing with AI agents using the TUI console.
 
+## Availability
+
+CLI registration is mode-dependent: the ordinary non-server CLI execution path adds `scriptling.ai.agent.interact`, while evaluator factories and server-style execution do not add it automatically. Embedders must register it explicitly, together with `scriptling.console`. Importing `scriptling.ai.agent` alone does not provide `interact()`.
+
 ## Available Functions
 
 | Function | Description |

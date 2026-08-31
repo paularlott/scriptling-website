@@ -354,7 +354,7 @@ caps = telegram.capabilities(bot)
 
 This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-This library sends and receives messages via the Telegram Bot API using the bot token supplied to `client()`. The token is held by the embedder: typically passed in via `Register(p, logger)` when embedding in Go: and is not directly exposed to scripts; scripts can send and receive messages on the bot's behalf but cannot read the token back out. Treat the bot token as a secret: anyone who obtains it can act as your bot. See [Security Considerations](/docs/security/#network-security) for a full breakdown of network-enabled libraries.
+This library sends and receives messages via the Telegram Bot API using the bot token that the script passes to `client()`. Go registration is `Register(p, logger)`: it supplies logging only and does not supply or retain credentials. The script, its configuration source, and anyone able to inspect that execution context may therefore have access to the token. Keep it out of source control and logs, inject it from an appropriate secret source, and restrict who can run or modify the script. An omitted or empty `allowed_users` list installs no default user restriction; provide an allowlist or a custom `auth()` handler for exposed bots. The Telegram client is a separate networking surface and is not governed by the `requests` URL policy. Treat the token as a secret because anyone who obtains it can act as the bot. See [Security Considerations](/docs/security/#network-security) for broader network guidance.
 
 ## See Also
 

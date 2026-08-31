@@ -570,14 +570,16 @@ print("Inventory:", status["inventory"])
 
 | Factor | Native API | Builder API |
 |--------|------------|-------------|
-| **Performance** | Faster (no reflection overhead) | Slight overhead |
+| **Performance** | Predictable direct object handling | Cached signature analysis; conversion overhead varies by method signature |
 | **Type Safety** | Manual checking | Automatic conversion |
 | **Control** | Full control over method logic | Convention-based |
 | **Help Text** | Manual `HelpText` field | Chainable `MethodWithHelp()` |
-| **Best For** | Complex inheritance, performance | Type-safe methods, rapid development |
+| **Best For** | Complex inheritance, measured hot paths | Type-safe methods, rapid development |
+
+Class builders cache signature analysis. Common method shapes can use fast wrappers, while unsupported shapes fall back to per-call conversion and `reflect.Call`; benchmark the actual class methods when the distinction matters.
 
 ## See Also
 
 - [Builder Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-functions.md) - Type-safe function builder
 - [Builder Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md) - Type-safe library builder
-- [Native Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes.md) - Direct control with maximum performance
+- [Native Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes.md) - Direct object-level class control

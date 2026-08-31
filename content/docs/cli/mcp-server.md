@@ -11,11 +11,15 @@ Scriptling can run as an MCP (Model Context Protocol) server, enabling AI assist
 
 When running in MCP server mode, Scriptling provides:
 
-1. **Custom MCP Tools**: Your own tools defined in `--mcp-tools` directory
+1. **Custom MCP Tools**: Root-level legacy `.toml` + `.py` tools or decorated `.py` tools from `--mcp-tools`
 2. **Script Execution Tool**: Allow AI to execute Scriptling code directly (`--mcp-exec-script`)
-3. **Resources**: Files served by URI from `--mcp-resources` (a `{var}` + `.py` path is a template), plus built-in server/script resources
-4. **Prompts**: Static `.md` or dynamic `.toml` + `.py` prompts from `--mcp-prompts`, plus a built-in `write_script` prompt
-5. **Live reload & notifications**: All three folders hot-reload on change and push `listChanged` notifications so clients refresh automatically
+3. **Resources**: Recursively scanned files served by URI from `--mcp-resources`; a path containing `{var}` is a template only when it ends in `.py`
+4. **Prompts**: Root-level static `.md`/`.txt` or dynamic `.toml` + `.py` prompts from `--mcp-prompts`
+5. **HTTP reload notifications**: Supported file-change and signal reloads mutate the live HTTP server and emit `listChanged` notifications, subject to the limitations below
+
+`--mcp-tools`, `--mcp-exec-script`, or an app bundle with `serve = ["mcp"]` activates MCP. Resource and prompt directories are additive; `--mcp-resources` or `--mcp-prompts` alone does not mount a working MCP endpoint.
+
+> **Security:** Use `--disable-lib subprocess` to remove shell access. `--allowed-paths` restricts participating library filesystem APIs; it is not a complete sandbox.
 
 ## Starting an MCP Server
 
@@ -99,15 +103,14 @@ printf '%s\n' \
 
 ## MCP Options
 
-| Flag                | Environment Variable       | Description                              | Default    |
-| ------------------- | -------------------------- | ---------------------------------------- | ---------- |
-| `--mcp-tools`       | `SCRIPTLING_MCP_TOOLS`     | Directory of MCP tools (`name.toml` + `name.py`) | (disabled) |
-| `--mcp-resources`   | `SCRIPTLING_MCP_RESOURCES` | Directory of MCP resources (files served verbatim; `{var}` + `.py` = template, optional `.toml` metadata) | (disabled) |
-| `--mcp-prompts`     | `SCRIPTLING_MCP_PROMPTS`   | Directory of MCP prompts (`name.md` static, or `name.toml` + `name.py` dynamic) | (disabled) |
-| `--mcp-exec-script` | -                          | Enable MCP script execution tool         | false      |
+| Flag                | Environment Variable          | Description                              | Default    |
+| ------------------- | ----------------------------- | ---------------------------------------- | ---------- |
+| `--mcp-tools`       | `SCRIPTLING_MCP_TOOLS`        | Root directory of legacy or decorated MCP tools | (disabled) |
+| `--mcp-resources`   | `SCRIPTLING_MCP_RESOURCES`    | Recursive resource tree; optional `_stem.toml` metadata | (disabled) |
+| `--mcp-prompts`     | `SCRIPTLING_MCP_PROMPTS`      | Root-level static or dynamic prompts     | (disabled) |
+| `--mcp-exec-script` | `SCRIPTLING_MCP_EXEC_SCRIPT`  | Enable MCP script execution tool         | false      |
 
-Any of these flags enables the MCP server. Add `--server <addr>` to serve over
-HTTP at `/mcp`; without it, the server runs over stdio.
+Tools, the execution tool, or an app bundle declaring MCP activates the server. Resource and prompt flags only add content to an activated MCP server. Add `--server <addr>` to serve over HTTP at `/mcp`; without it, the activated server runs over stdio.
 
 ## Script Execution Tool
 
@@ -202,19 +205,18 @@ help('json')
 
 ## Custom MCP Tools
 
-Custom tools are loaded from the directory specified by `--mcp-tools`. Each tool consists of two files:
+Custom tools are loaded from the directory specified by `--mcp-tools`. Two formats are supported:
 
-- `toolname.toml`: Metadata (description, parameters)
-- `toolname.py`: Implementation script
+- Legacy pair: `toolname.toml` metadata plus `toolname.py` implementation
+- Decorated tool: a `.py` file whose evaluated `@mcp.tool` decorators provide registration and metadata
 
 ### Directory Structure
 
 ```
 ./tools/
-  hello.toml      # Metadata for "hello" tool
-  hello.py        # Implementation for "hello" tool
-  add.toml        # Metadata for "add" tool
-  add.py          # Implementation for "add" tool
+  hello.toml      # Legacy metadata for "hello"
+  hello.py        # Legacy implementation
+  decorated.py    # One or more @mcp.tool-decorated functions
 ```
 
 ### Starting with Custom Tools
@@ -267,6 +269,8 @@ The same pattern works in app bundles:
 ```sh
 scriptling --package . -- --allow-write
 ```
+
+The same CLI library setup is available while evaluating tool, resource, and prompt scripts. In particular, `os.getenv()` reads the live process environment and `os.environ()` is the snapshot captured when the library was registered; `.env` is loaded before command setup. These are host-process values, not an MCP sandbox.
 
 `sys.argv` is set once at startup and is the same at scan time and request
 time, so the condition is consistent across all tool invocations.
@@ -374,21 +378,9 @@ server in a script, see the [scriptling.mcp client](../../../reference/libraries
 
 ## Live Reload and Change Notifications
 
-When `--mcp-tools`, `--mcp-resources`, or `--mcp-prompts` point at folders,
-Scriptling watches them for changes. Adding, editing, or removing a file reloads
-that primitive automatically (debounced); `SIGHUP`/`SIGUSR1` force an immediate
-reload of all three.
+HTTP MCP watches only each configured root directory, not nested directories. A root-level `.toml` or `.py` change triggers a debounced in-place reload and emits `notifications/tools/listChanged`, `notifications/resources/listChanged`, and `notifications/prompts/listChanged`. Static resource changes such as `.md` or `.txt` do not trigger reload automatically.
 
-Reloads mutate the live server in place and emit `notifications/tools/listChanged`,
-`notifications/resources/listChanged`, and `notifications/prompts/listChanged` so
-connected clients drop their cached list and re-fetch — over both HTTP
-(Server-Sent Events) and stdio. The server advertises `listChanged` support for
-all three primitives in its capabilities.
-
-```bash
-# Force a reload
-kill -HUP $(pidof scriptling)
-```
+Stdio MCP does not currently consume watcher events or send reload notifications. Signal-triggered reload is also limited: `SIGHUP`/`SIGUSR1` is handled only when `--mcp-tools` is set, and only one reload signal is consumed before shutdown. Restart the process when those limits matter.
 
 ## Security Considerations
 
@@ -396,17 +388,26 @@ kill -HUP $(pidof scriptling)
 
 The `--mcp-exec-script` flag allows AI assistants to execute arbitrary code. Consider:
 
-- Use `--allowed-paths` to restrict filesystem access
-- Use `--bearer-token` to require authentication, or register a script
-  middleware for per-user keys — it guards `/mcp` the same as HTTP routes
-  (see [Per-User Keys](../http-server/#per-user-keys))
+- Use `--allowed-paths` to restrict participating library filesystem I/O; it is not a complete sandbox
+- Use `--disable-lib subprocess` to remove shell access
+- Use `--bearer-token` to require authentication, or register script middleware for per-user keys (see [Per-User Keys](../http-server/#per-user-keys)). Middleware guards `/mcp`, but disables the global bearer wrapper and does not cover health or static routes.
 - Run in a sandboxed environment for untrusted AI systems
 
 ```bash
-# Secure configuration for script execution
+# Restricted configuration for script execution
 scriptling --server :8000 --mcp-exec-script \
   --allowed-paths "/tmp/sandbox" \
+  --disable-lib subprocess \
   --bearer-token secure-token setup.py
+```
+
+Clients of this authenticated endpoint must send the bearer header:
+
+```bash
+curl -X POST http://127.0.0.1:8000/mcp \
+  -H "Authorization: Bearer secure-token" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
 
 ### Custom Tools
@@ -424,6 +425,7 @@ scriptling --server :8000 \
   --mcp-exec-script \
   --bearer-token my-secret-token \
   --allowed-paths "/tmp/sandbox,./data" \
+  --disable-lib subprocess \
   setup.py
 ```
 
@@ -431,7 +433,8 @@ This configuration:
 - Loads custom tools from `./tools/`
 - Enables the script execution tool
 - Requires bearer token authentication
-- Restricts file operations to `/tmp/sandbox` and `./data`
+- Restricts participating library file operations to `/tmp/sandbox` and `./data`
+- Disables the subprocess library
 
 ## See Also
 

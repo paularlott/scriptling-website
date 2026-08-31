@@ -709,6 +709,6 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## See Also
 
-- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/./ai.md): AI namespace overview, response helpers, and tool registry
+- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/ai.md): AI namespace overview, response helpers, and tool registry
 - [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/ai/agent.md): Agentic AI loop with automatic tool execution
 - [scriptling.ai.memory](https://scriptling.dev/okf/scriptling-libraries/ai/memory.md): Long-term memory store for AI agents

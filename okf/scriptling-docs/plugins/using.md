@@ -45,23 +45,22 @@ handshake however they are loaded.
 
 Configuration options:
 
-| Source | Key |
-| --- | --- |
-| CLI | `--plugin-dir ./plugins` |
-| Environment | `SCRIPTLING_PLUGIN_DIR=./plugins` |
-| Config file | `plugins.dirs = ["./plugins"]` |
-| CLI | `--plugin ./plugins/hello` |
-| Environment | `SCRIPTLING_PLUGIN=./plugins/hello` |
-| Config file | `plugins.paths = ["./plugins/hello"]` |
-| CLI | `--plugin-arg scriptling-server` |
-| Environment | `SCRIPTLING_PLUGIN_ARG=scriptling-server` |
-| Config file | `plugins.args = ["scriptling-server"]` |
+| Capability | CLI | Environment | Config file |
+| --- | --- | --- | --- |
+| Scan directories | `--plugin-dir ./plugins` | `SCRIPTLING_PLUGIN_DIR=./plugins` | `plugins.dirs = ["./plugins"]` |
+| Load paths/URLs | `--plugin ./plugins/hello` | `SCRIPTLING_PLUGIN=./plugins/hello` | `plugins.paths = ["./plugins/hello"]` |
+| Executable arguments | `--plugin-arg scriptling-server` | `SCRIPTLING_PLUGIN_ARG=scriptling-server` | `plugins.args = ["scriptling-server"]` |
+| Executable environment | `--plugin-env KEY=VALUE` | `SCRIPTLING_PLUGIN_ENV=KEY=VALUE` | `plugins.env = ["KEY=VALUE"]` |
+| HTTP headers | `--plugin-header 'Authorization=Bearer token'` | `SCRIPTLING_PLUGIN_HEADER='Authorization=Bearer token'` | `plugins.headers = ["Authorization=Bearer token"]` |
+| Skip TLS verification for one URL | `--plugin-insecure https://host/rpc` | `SCRIPTLING_PLUGIN_INSECURE=https://host/rpc` | `plugins.insecure = ["https://host/rpc"]` |
 
 Plugin loading is eager. Startup failures are reported as warnings. A loaded plugin that fails while a script is running produces an execution error. Commands that never evaluate a script (`--lint`, `--list-libs`, and the `pack`, `unpack` and `cache` subcommands) skip plugin loading entirely.
 
 Plugins that serve [fetcher](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md) schemes are loaded the
-same way; their sources then work as packages and scripts (`--package
-knot://libs`).
+same way. Their declared library bundles attach automatically, so normally no
+explicit `--package` is needed. Plugin-scheme package sources remain supported
+after the serving plugin is loaded; a `scheme://` source can also be the
+positional script argument.
 
 ## Importing Plugin Libraries
 

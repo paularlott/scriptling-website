@@ -35,7 +35,7 @@ response = requests.get("https://jsonplaceholder.typicode.com/users")
 if response.status_code != 200:
     print("Failed to fetch data:", response.status_code)
 else:
-    users = json.loads(response.body)
+    users = response.json()
     print(f"Found {len(users)} users")
 ```
 
@@ -60,7 +60,7 @@ import requests
 import json
 
 response = requests.get("https://jsonplaceholder.typicode.com/users")
-users = json.loads(response.body)
+users = response.json()
 
 for user in users:
     name = user["name"]
@@ -89,7 +89,7 @@ def fetch_users():
     if response.status_code != 200:
         print("Error:", response.status_code)
         return []
-    return json.loads(response.body)
+    return response.json()
 
 def filter_by_domain(users, domain):
     """Filter users by email domain."""
@@ -141,7 +141,7 @@ def fetch_users():
             timeout=10
         )
         response.raise_for_status()
-        return json.loads(response.body)
+        return response.json()
     except Exception as e:
         print(f"API request failed: {e}")
         return []
@@ -175,12 +175,13 @@ Export the processed data as JSON:
 ```python
 import requests
 import json
+import os
 
 def fetch_users():
     try:
         response = requests.get("https://jsonplaceholder.typicode.com/users")
         response.raise_for_status()
-        return json.loads(response.body)
+        return json.loads(response.text)
     except Exception as e:
         print(f"Error: {e}")
         return []
@@ -201,15 +202,12 @@ for user in users:
 # Save to file
 output = json.dumps(summary, indent="  ")
 print(output)
-
-# Write to file (requires os library registration when embedding)
-with open("users_export.json", "w") as f:
-    f.write(output)
+os.write_file("users_export.json", output)
 
 print(f"\nExported {len(summary)} users to users_export.json")
 ```
 
-> **Note:** File system access (`open()`) works in the CLI. When embedding in Go, the `os` library requires explicit registration. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md).
+> **Note:** Scriptling has no built-in `open()` function. The CLI registers the `os` library used above. When embedding in Go, register the `os` library with the paths scripts may access; see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md).
 
 ## Complete Script
 
@@ -226,7 +224,7 @@ def fetch_users():
     try:
         response = requests.get(API_URL, timeout=10)
         response.raise_for_status()
-        return json.loads(response.body)
+        return response.json()
     except Exception as e:
         print(f"API request failed: {e}")
         return []
@@ -309,7 +307,7 @@ if resp.status_code == 204:
 - Working with lists, dictionaries, and loops
 - Defining and calling functions
 - Error handling with try/except
-- File I/O with `open()` and `with` statements
+- File output with `os.write_file()`
 
 ## Best Practices
 
@@ -323,4 +321,4 @@ if resp.status_code == 204:
 - [Requests Library](https://scriptling.dev/okf/scriptling-libraries/http-process/requests.md) - Full HTTP client documentation
 - [JSON Library](https://scriptling.dev/okf/scriptling-libraries/data-formats/json.md) - JSON parsing reference
 - [Reference](https://scriptling.dev/okf/scriptling-reference/scriptling-reference.md) - Complete language reference
-- [CLI Guide](https://scriptling.dev/okf/scriptling-docs/./cli.md) - Command-line options
+- [CLI Guide](https://scriptling.dev/okf/scriptling-docs/cli.md) - Command-line options

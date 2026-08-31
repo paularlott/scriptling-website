@@ -82,6 +82,8 @@ def out_base(path):  # output dir for a source file or directory
 
 
 def out_dir_for(name, rel):  # output dir for a bundle + rel-from-source
+    if rel == ".":
+        rel = ""
     return OUT + "/" + name + ("/" + rel if rel else "")
 
 
@@ -149,9 +151,47 @@ def prepend_title(title, body):
     return "# " + title + "\n\n" + body.lstrip("\n")
 
 
-# --- shortcode conversion ----------------------------------------------------
+# --- presentation and shortcode conversion ----------------------------------
+
+def clean_presentation_text(value):
+    # Presentation cards may contain icons and styled wrapper elements. Keep
+    # their readable text without teaching OKF consumers about the site layout.
+    value = re.sub(r"(?si)<svg\b.*?</svg>", "", value)
+    value = re.sub(r"<[^>]+>", "", value)
+    for old, new in [("&amp;", "&"), ("&lt;", "<"), ("&gt;", ">"), ("&quot;", '"'), ("&#39;", "'"), ("&rarr;", "→")]:
+        value = value.replace(old, new)
+    return re.sub(r"\s+", " ", value).strip()
+
+
+def convert_presentation_html(body):
+    # Convert visual card grids marked `not-prose` into semantic Markdown.
+    # Scriptling's RE2 wrapper uses inline flags for multiline matching.
+    pattern = r'(?si)<div[^>]*class="[^"]*not-prose[^"]*"[^>]*>\s*(.*)\n</div>'
+
+    def grid_repl(m):
+        cards = re.findall(r'(?si)<a\s+[^>]*href="([^"]+)"[^>]*>(.*?)</a>', m.group(1))
+        if not cards:
+            return m.group(0)
+        lines = []
+        for href, card in cards:
+            title_match = re.search(r"(?si)<h[1-6]\b[^>]*>(.*?)</h[1-6]>", card)
+            if title_match is None:
+                return m.group(0)
+            title = clean_presentation_text(title_match.group(1))
+            description_match = re.search(r"(?si)<p\b[^>]*>(.*?)</p>", card)
+            description = clean_presentation_text(description_match.group(1)) if description_match else ""
+            lines.append("- [" + title + "](" + href + ")" + (" — " + description if description else ""))
+            for item in re.findall(r"(?si)<li\b[^>]*>(.*?)</li>", card):
+                text = clean_presentation_text(item)
+                if text:
+                    lines.append("  - " + text)
+        return "\n".join(lines)
+
+    return re.sub(pattern, grid_repl, body)
+
 
 def convert_shortcodes(body):
+    body = convert_presentation_html(body)
     body = re.sub(r"\{\{<?\s*/?cards\s*>?\}\}\n?", "", body)
 
     def card_repl(m):

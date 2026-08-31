@@ -230,5 +230,5 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## See Also
 
-- [Plugins](https://scriptling.dev/okf/scriptling-docs/./plugins.md) - Loading and writing executable plugins
+- [Plugins](https://scriptling.dev/okf/scriptling-docs/plugins.md) - Loading and writing executable plugins
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security guidance for host-provided libraries

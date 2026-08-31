@@ -231,6 +231,6 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## See Also
 
-- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/./runtime.md): background tasks, which share the same sandbox factory
-- [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/./plugin.md): expose registered functions instead of executing arbitrary code
+- [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/runtime.md): background tasks, which share the same sandbox factory
+- [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/plugin.md): expose registered functions instead of executing arbitrary code
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#code-injection-prevention)

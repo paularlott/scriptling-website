@@ -26,7 +26,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Generators with `yield` | Generator functions are not supported |
 | Type annotations | Type hints like `def func(x: int) -> str:` are not parsed |
 | Walrus operator (`:=`) | Assignment expressions are not supported |
-| Parameter separators (`/` and `*`) | Positional-only and keyword-only parameter syntax |
+| Positional-only separator (`/`) | Positional-only parameter syntax is not supported; bare `*` keyword-only parameters are supported |
 | Multiple inheritance | Only single inheritance is supported |
 | Nested classes | Classes cannot be defined inside other classes/functions |
 | Metaclasses | Custom metaclasses are not supported |
@@ -90,7 +90,8 @@ Scriptling **does support**:
 - ✅ Classes with single inheritance and `super()`
 - ✅ Dunder methods: `__str__`, `__repr__`, `__len__`, `__bool__`, `__eq__`, `__lt__`, `__gt__`, `__le__`, `__ge__`, `__ne__`, `__contains__`, `__iter__`, `__next__`, `__enter__`, `__exit__`
 - ✅ Lambda functions and closures
-- ✅ List comprehensions, dict comprehensions, set comprehensions, and generator expressions
+- ✅ List comprehensions, dict comprehensions, and set comprehensions
+- ✅ Generator-expression syntax, evaluated eagerly and materialized rather than returned as a lazy generator object
 - ✅ Multiple `for` clauses in comprehensions (`[x for x in a for y in b]`)
 - ✅ Iterators (`range`, `map`, `filter`, `enumerate`, `zip`)
 - ✅ Dictionary views (`keys()`, `values()`, `items()`)
@@ -140,7 +141,7 @@ response.text    # Attribute
 # Scriptling
 response.json()            # Method call
 response.text              # Attribute
-response.body              # Alias for response.text
+response.body              # Legacy alias for response.text; prefer text
 response.status_code       # Attribute
 ```
 
@@ -196,9 +197,9 @@ import os
 content = os.read_file("/etc/passwd")
 ```
 
-### Errors and Exceptions Are Both Catchable
+### Errors and Exceptions Are Catchable, Except SystemExit
 
-`try`/`except` catches both runtime Errors (type errors, name errors, and so on) and explicitly raised Exceptions. When an Error is caught, Scriptling infers the exception type from the error message:
+`try`/`except` catches runtime Errors (type errors, name errors, and so on) and ordinary explicitly raised Exceptions. When an Error is caught, Scriptling infers the exception type from the error message. `SystemExit` is the exception: it bypasses script `except` handlers, runs `finally` blocks, and returns to the Go host.
 
 ```python
 # A runtime Error is caught, with its type inferred
@@ -229,14 +230,10 @@ except Exception:
    content = os.read_file("file.txt")
    ```
 
-2. **Use explicit JSON handling**:
+2. **Use the response JSON helper**:
    ```python
-   # Python
+   # Python and Scriptling
    data = response.json()
-
-   # Scriptling
-   import json
-   data = json.loads(response.body)
    ```
 
 3. **Avoid async/await**:

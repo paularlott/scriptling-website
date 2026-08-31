@@ -27,7 +27,7 @@ Agentic AI loop for building AI agents with automatic tool execution. The `Agent
 | `agent.get_messages()` | Get conversation history |
 | `agent.set_messages(messages)` | Set conversation history |
 
-For tool registry documentation, see [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/./ai.md).
+For tool registry documentation, see [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/ai.md).
 
 ## Quick Start
 
@@ -344,6 +344,6 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## See Also
 
-- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/./ai.md): AI client and completion functions
+- [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/ai.md): AI client and completion functions
 - [scriptling.ai.agent.interact](https://scriptling.dev/okf/scriptling-libraries/ai/interact.md): Interactive terminal session
 - [scriptling.ai.memory](https://scriptling.dev/okf/scriptling-libraries/ai/memory.md): Long-term memory store
