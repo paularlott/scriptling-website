@@ -2,7 +2,7 @@
 title: toml
 description: Parse and generate TOML (Tom's Obvious Minimal Language) data.
 tags: [libraries, data-formats]
-weight: 1
+weight: 5
 
 aliases:
   - /reference/libraries/extlib/toml/
@@ -145,5 +145,5 @@ Compared to Python's `tomllib`/`tomli-w`:
 
 - [json](../json/): parse and generate JSON data.
 - [yaml](../yaml/): parse and generate YAML data.
-- [scriptling.csv](../../scriptling/utilities/csv/): parse and generate CSV data.
-- [scriptling.xml](../../scriptling/utilities/xml/): parse and generate XML data.
+- [scriptling.csv](../../utilities/csv/): parse and generate CSV data.
+- [scriptling.xml](../../utilities/xml/): parse and generate XML data.

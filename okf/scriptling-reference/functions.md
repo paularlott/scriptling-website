@@ -269,9 +269,9 @@ def fn(): ...
 # equivalent to: fn = outer(inner(fn))
 ```
 
-For full coverage including decorators with arguments, the registration pattern, class decorators, and limitations, see the dedicated [Decorators](decorators.md) page.
+For full coverage including decorators with arguments, the registration pattern, class decorators, and limitations, see the dedicated [Decorators](https://scriptling.dev/okf/scriptling-reference/decorators.md) page.
 
-See also [Classes](classes.md#decorators) for `@property`, `@<name>.setter`, `@staticmethod`, and `@classmethod`.
+See also [Classes](https://scriptling.dev/okf/scriptling-reference/classes.md#decorators) for `@property`, `@<name>.setter`, `@staticmethod`, and `@classmethod`.
 
 ## Lambda Functions
 
@@ -376,6 +376,6 @@ for first, *rest in [[1,2,3], [4,5,6,7]]:
 
 ## See Also
 
-- [Control Flow](control-flow.md) - Loops and conditionals
-- [Error Handling](error-handling.md) - Try/except in functions
-- [Classes](classes.md) - Methods and class functions
+- [Control Flow](https://scriptling.dev/okf/scriptling-reference/control-flow.md) - Loops and conditionals
+- [Error Handling](https://scriptling.dev/okf/scriptling-reference/error-handling.md) - Try/except in functions
+- [Classes](https://scriptling.dev/okf/scriptling-reference/classes.md) - Methods and class functions

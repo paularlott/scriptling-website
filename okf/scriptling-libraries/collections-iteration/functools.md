@@ -137,5 +137,5 @@ This library implements a subset of Python's `functools` module:
 
 ## See Also
 
-- [itertools](itertools.md): iteration and combinatorics utilities, including `accumulate()` for running totals.
-- [contextlib](contextlib.md): context manager utilities.
+- [itertools](https://scriptling.dev/okf/scriptling-libraries/collections-iteration/itertools.md): iteration and combinatorics utilities, including `accumulate()` for running totals.
+- [contextlib](https://scriptling.dev/okf/scriptling-libraries/collections-iteration/contextlib.md): context manager utilities.

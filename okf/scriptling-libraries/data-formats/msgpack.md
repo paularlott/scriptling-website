@@ -14,9 +14,9 @@ type: API Reference
 ---
 # msgpack
 
-The `msgpack` library serialises Scriptling values to [MessagePack](https://msgpack.org/) binary form and parses MessagePack payloads back into Scriptling values. It is the binary counterpart to [`json`](json.md) — more compact and faster, at the cost of human readability.
+The `msgpack` library serialises Scriptling values to [MessagePack](https://msgpack.org/) binary form and parses MessagePack payloads back into Scriptling values. It is the binary counterpart to [`json`](https://scriptling.dev/okf/scriptling-libraries/data-formats/json.md) — more compact and faster, at the cost of human readability.
 
-`packb` returns a [`bytes`](bytes.md) value; `unpackb` takes one.
+`packb` returns a [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) value; `unpackb` takes one.
 
 ## Available Functions
 
@@ -36,7 +36,7 @@ Converts a Scriptling value (`dict`, `list`, `tuple`, `str`, `int`, `float`, `bo
 **Parameters:**
 - `obj`: Value to serialise. `bytes` round-trips as msgpack `bin`; `str` as msgpack `str`; tuples and lists both encode as msgpack arrays.
 
-**Returns:** [`bytes`](bytes.md): the MessagePack-encoded payload.
+**Returns:** [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md): the MessagePack-encoded payload.
 
 ```python
 import msgpack
@@ -47,7 +47,7 @@ payload = msgpack.packb({"user": "alice", "id": 42})
 
 ### `unpackb(packed)`
 
-Parses MessagePack bytes back into a Scriptling value. msgpack `bin` decodes to [`bytes`](bytes.md); msgpack `str` decodes to `str`; integers are clamped to Scriptling's int64.
+Parses MessagePack bytes back into a Scriptling value. msgpack `bin` decodes to [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md); msgpack `str` decodes to `str`; integers are clamped to Scriptling's int64.
 
 **Parameters:**
 - `packed` (`bytes`): A `bytes` value containing a MessagePack payload.
@@ -98,7 +98,7 @@ assert msgpack.unpackb(msgpack.packb(binary)) == binary
 
 - **`ext` types** (msgpack timestamp, application-defined extensions) are not supported.
 - **Streaming `Packer` / `Unpacker` classes** are intentionally omitted — `packb` / `unpackb` cover the one-shot use case.
-- **Large integers** clamp to Scriptling's int64 range, matching [`json`](json.md)'s behaviour.
+- **Large integers** clamp to Scriptling's int64 range, matching [`json`](https://scriptling.dev/okf/scriptling-libraries/data-formats/json.md)'s behaviour.
 
 ## Choosing a backing codec (Go embedders)
 
@@ -140,6 +140,6 @@ stdlib.RegisterAll(p)
 
 ## See Also
 
-- [json](json.md): the text counterpart — human-readable, larger payloads.
-- [bytes](bytes.md): the binary type returned by `packb()`.
-- [toml](toml.md) / [yaml](yaml.md): other structured data formats.
+- [json](https://scriptling.dev/okf/scriptling-libraries/data-formats/json.md): the text counterpart — human-readable, larger payloads.
+- [bytes](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md): the binary type returned by `packb()`.
+- [toml](https://scriptling.dev/okf/scriptling-libraries/data-formats/toml.md) / [yaml](https://scriptling.dev/okf/scriptling-libraries/data-formats/yaml.md): other structured data formats.

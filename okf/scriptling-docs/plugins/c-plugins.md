@@ -206,7 +206,45 @@ sl_wrapper(srv, "greet",
 );
 ```
 
-See [Client Wrappers](go-plugins/client-wrappers.md) for details on wrapper source conventions.
+See [Client Wrappers](https://scriptling.dev/okf/scriptling-docs/plugins/go-plugins/client-wrappers.md) for details on wrapper source conventions.
+
+## Fetchers
+
+Serve `scheme://` package and script sources on demand. Register a scheme
+with a read handler and a list handler before `sl_server_run()`:
+
+```c
+static sl_fetch_result *my_read(const char *source, const char *path, void *ctx) {
+    /* path == "" means the source itself is a single script file. */
+    return sl_fetch_data("# content\n", 10);  /* copies the bytes; host does not cache */
+}
+
+static sl_fetch_entry *my_glob(const char *source, const char *path,
+                               size_t *count, void *ctx) {
+    /* names must stay valid until the handler returns; the SDK frees only
+       the array itself. */
+    static sl_fetch_entry entries[] = { { "lib", true } };
+    sl_fetch_entry *out = malloc(sizeof(entries));
+    memcpy(out, entries, sizeof(entries));
+    *count = 2;
+    return out;
+}
+
+sl_register_fetcher(srv, "mylib", my_read, my_glob);
+```
+
+Read handler results:
+
+- `sl_fetch_data(ptr, len)`: the file's content (the bytes are copied).
+- `sl_fetch_not_found()`: a miss, reported to the host as JSON-RPC code
+  `-32001` so a failed module probe is not an error.
+
+The host attaches the plugin's library automatically (the standard `lib/`
+layout is synthesized host-side) and asks for individual files as imports
+resolve; there is no manifest to serve. It keeps none of them, so every read
+reaches your `Read` handler; cache inside the handler if your backend needs
+it. The `hello-c` example implements a complete `cdemo://` fetcher. See
+[Plugin Fetchers](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md) for the host-side behavior.
 
 ## Compilation
 
@@ -230,4 +268,4 @@ your-plugin/
 
 Each incoming request is handled in its own pthread. The object store uses a read-write lock for the instance array and a per-object mutex for method serialization. Stdout writes are mutex-protected. The SDK manages all synchronization internally: handler functions do not need their own locking unless they access shared global state outside the object store.
 
-See [JSON-RPC Protocol](protocol.md) for the complete wire format reference.
+See [JSON-RPC Protocol](https://scriptling.dev/okf/scriptling-docs/plugins/protocol.md) for the complete wire format reference.

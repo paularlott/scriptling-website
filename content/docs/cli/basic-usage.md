@@ -86,6 +86,9 @@ SCRIPTLING_LIBPATH=/shared/libs
 # Server configuration
 SCRIPTLING_SERVER=:8000
 SCRIPTLING_MCP_TOOLS=./tools
+SCRIPTLING_MCP_EXEC_SCRIPT=false
+SCRIPTLING_MCP_RESOURCES=./resources
+SCRIPTLING_MCP_PROMPTS=./prompts
 SCRIPTLING_BEARER_TOKEN=your-secret-token
 
 # Filesystem restrictions
@@ -116,4 +119,4 @@ print(f"Path: {env['PATH']}")
 - [Libraries](../libraries/) - Loading, disabling, and access modes
 - [HTTP Server Mode](../http-server/) - Running Scriptling as an HTTP server
 - [MCP Server Mode](../mcp-server/) - Model Context Protocol integration
-- [Writing MCP Tools](../../../reference/libraries/scriptling/mcp/writing-mcp-tools/) - Creating custom MCP tools
+- [Writing MCP Tools](../../../reference/libraries/mcp/writing-mcp-tools/) - Creating custom MCP tools

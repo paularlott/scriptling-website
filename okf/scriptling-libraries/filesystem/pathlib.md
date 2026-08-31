@@ -223,7 +223,7 @@ p.write_text("Hello, World!")
 
 Read the contents of the file as bytes.
 
-**Returns:** [`bytes`](../data-formats/bytes.md): the file's raw bytes.
+**Returns:** [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md): the file's raw bytes.
 
 **Raises:** `Error`: if the path is outside the allowed paths, or the file cannot be read.
 
@@ -237,7 +237,7 @@ data = p.read_bytes()
 Write bytes to the file, creating or overwriting it.
 
 **Parameters:**
-- `data` ([`bytes`](../data-formats/bytes.md) or `str`): Raw bytes to write. Strings are UTF-8 encoded.
+- `data` ([`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) or `str`): Raw bytes to write. Strings are UTF-8 encoded.
 
 **Returns:** `None`
 
@@ -397,12 +397,12 @@ all_py = p.glob("**/*.py")
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`pathlib` provides read/write access to the host filesystem. When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterPathlibLibrary(p, allowedPaths)`: path traversal (`../`) is blocked automatically. See [Library Registration](../../scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](../../scriptling-docs/security.md#file-system-security).
+`pathlib` provides read/write access to the host filesystem. When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterPathlibLibrary(p, allowedPaths)`: path traversal (`../`) is blocked automatically. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
 
 ## See Also
 
-- [os](os.md): Operating system interfaces and file operations
-- [os.path](os.path.md): Path manipulation functions
-- [glob](glob.md): Standalone shell-style wildcard matching
+- [os](https://scriptling.dev/okf/scriptling-libraries/filesystem/os.md): Operating system interfaces and file operations
+- [os.path](https://scriptling.dev/okf/scriptling-libraries/filesystem/os.path.md): Path manipulation functions
+- [glob](https://scriptling.dev/okf/scriptling-libraries/filesystem/glob.md): Standalone shell-style wildcard matching

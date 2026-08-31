@@ -194,7 +194,7 @@ This module provides the same constants as Python's `string` module.
 
 ## See Also
 
-- [textwrap](textwrap.md) - Text wrapping and filling utilities
-- [regex](regex.md) - Regular expressions for pattern matching
-- [difflib](difflib.md) - Sequence comparison and diffing utilities
-- [html](html.md) - HTML escaping and unescaping
+- [textwrap](https://scriptling.dev/okf/scriptling-libraries/text-processing/textwrap.md) - Text wrapping and filling utilities
+- [regex](https://scriptling.dev/okf/scriptling-libraries/text-processing/regex.md) - Regular expressions for pattern matching
+- [difflib](https://scriptling.dev/okf/scriptling-libraries/text-processing/difflib.md) - Sequence comparison and diffing utilities
+- [html](https://scriptling.dev/okf/scriptling-libraries/text-processing/html.md) - HTML escaping and unescaping

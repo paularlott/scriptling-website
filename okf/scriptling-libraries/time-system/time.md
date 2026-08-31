@@ -285,6 +285,6 @@ Time tuples are 9-element lists with the following structure:
 
 ## See Also
 
-- [datetime](datetime.md) - Higher-level date/time objects with arithmetic and comparison
-- [platform](platform.md) - Platform identifying data
-- [io](io.md) - In-memory I/O streams
+- [datetime](https://scriptling.dev/okf/scriptling-libraries/time-system/datetime.md) - Higher-level date/time objects with arithmetic and comparison
+- [platform](https://scriptling.dev/okf/scriptling-libraries/time-system/platform.md) - Platform identifying data
+- [io](https://scriptling.dev/okf/scriptling-libraries/time-system/io.md) - In-memory I/O streams

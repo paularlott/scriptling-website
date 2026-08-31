@@ -304,9 +304,9 @@ if os.path.islink("node_modules/.bin/eslint"):
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go (registered together with the `os` library by `RegisterOSLibrary`, see [Library Registration](../../scriptling-docs/go-integration/library-registration.md#filesystem-libraries)).
+This is an extended library, requiring registration in Go (registered together with the `os` library by `RegisterOSLibrary`, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries)).
 
-`os.path` provides read access to filesystem metadata (`exists`, `isfile`, `isdir`, `getsize`, `getmtime`). Access is restricted to the `allowedPaths` passed to `RegisterOSLibrary(p, allowedPaths)`, path traversal (`../`) is blocked automatically. See the [Security Guide](../../scriptling-docs/security.md#file-system-security).
+`os.path` provides read access to filesystem metadata (`exists`, `isfile`, `isdir`, `getsize`, `getmtime`). Access is restricted to the `allowedPaths` passed to `RegisterOSLibrary(p, allowedPaths)`, path traversal (`../`) is blocked automatically. See the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
 
 ## Python Compatibility
 
@@ -336,5 +336,5 @@ This library implements a subset of Python's `os.path` module:
 
 ## See Also
 
-- [os](os.md): Operating system interfaces and file operations
-- [pathlib](pathlib.md): Object-oriented filesystem paths (recommended for new code)
+- [os](https://scriptling.dev/okf/scriptling-libraries/filesystem/os.md): Operating system interfaces and file operations
+- [pathlib](https://scriptling.dev/okf/scriptling-libraries/filesystem/pathlib.md): Object-oriented filesystem paths (recommended for new code)

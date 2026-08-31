@@ -40,9 +40,16 @@ class SiteSearch {
 
       this.documents = data;
 
-      // Index all documents
+      // Index discovery metadata as well as the full page text.
       data.forEach((doc, i) => {
-        const content = `${doc.title} ${doc.content} ${doc.section || ''}`;
+        const content = [
+          doc.title,
+          doc.description,
+          doc.content,
+          doc.section,
+          ...(doc.tags || []),
+          ...(doc.aliases || [])
+        ].filter(Boolean).join(' ');
         this.index.add(i, content);
       });
     } catch (error) {
@@ -116,7 +123,7 @@ class SiteSearch {
       return;
     }
 
-    const searchResults = this.index.search(query, { limit: 8 });
+    const searchResults = this.index.search(query, { limit: 12 });
     this.results = searchResults.map(id => ({ item: this.documents[id] }));
     this.selectedIndex = -1;
 
@@ -130,17 +137,15 @@ class SiteSearch {
   renderResults(query) {
     this.searchResultsList.innerHTML = this.results.map((result, index) => {
       const item = result.item;
+      const snippet = item.description || item.content || '';
+      const label = [item.section, item.kind].filter(Boolean).join(' · ') || 'Page';
       return `
         <a href="${item.href}" class="search-result block p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600 ${index === this.selectedIndex ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700' : ''}" data-index="${index}">
           <div class="flex items-start space-x-3">
             <div class="flex-1 min-w-0">
               <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">${this.highlightText(item.title, query)}</h4>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">${this.highlightText(item.content, query)}</p>
-              <div class="flex items-center mt-2 text-xs text-gray-400 dark:text-gray-500">
-                <span class="capitalize">${item.section || 'Page'}</span>
-                <span class="mx-1">•</span>
-                <span>${item.date}</span>
-              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">${this.highlightText(snippet, query)}</p>
+              <div class="mt-2 text-xs capitalize text-gray-400 dark:text-gray-500">${label}</div>
             </div>
           </div>
         </a>

@@ -69,9 +69,9 @@ Two differences matter a lot:
 
 ## Libraries
 
-Standard libraries are always available. Extended libraries are available in the CLI by default but require registration when embedding in Go. Prefer standard libraries for general scripting; use `scriptling.*` libraries only when the task depends on host runtime features such as MCP, AI agents, HTTP routes, or networking. When unsure what a host provides, use `help("modules")` or `help("library_name")` from inside a script.
+Built-in functions are intrinsic, but importable library modules depend on the runtime. The CLI registers its documented default libraries. When embedding in Go, the host must register the libraries scripts may import—for example, `stdlib.RegisterAll(p)` registers the standard library set, while extended libraries require their own registration. Prefer standard libraries for general scripting; use `scriptling.*` libraries only when the task depends on host runtime features such as MCP, AI agents, HTTP routes, or networking. When unsure what a host provides, use `help("modules")` or `help("library_name")` from inside a script.
 
-For the full `scriptling` and standard library API, see the markdown bundle: https://scriptling.dev/okf/scriptling-libraries/index.md
+For the complete standard, Scriptling, and extended library API, see the markdown bundle: https://scriptling.dev/okf/scriptling-libraries/index.md
 
 ## HTTP and JSON
 
@@ -122,7 +122,7 @@ Scriptling supports Python-style `del` in the common cases: `del items[2]`, `del
 3. Use dictionary methods like `.items()` and keyword arguments naturally.
 4. Use `del` for list indexes, list slices, dict keys, and object attributes when removing data.
 5. For HTTP, always set an explicit timeout and check or raise on status.
-6. For JSON APIs, prefer `response.json()` or `json.loads(response.body)`.
+6. For JSON APIs, prefer `response.json()` or `json.loads(response.text)`.
 7. For string accumulation in loops, prefer `"".join(parts)` over repeated concatenation.
 8. Keep code synchronous, explicit, and small rather than clever.
 
@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
 - Validate generated scripts with the linter when available: `scriptling --lint script.py`.
 - Inspect available libraries from inside a script with `help("modules")`, `help("builtins")`, or `help("library.function")`.
-- Full documentation is published as fetchable markdown bundles. Each bundle's `index.md` lists its concepts; follow the relative links from there:
+- Full documentation is published as fetchable markdown bundles. Each hosted bundle's `index.md` lists its concepts with absolute `https://scriptling.dev/okf/...` links that can be fetched directly. Downloaded release bundles contain the same concepts but use relative links so they remain portable:
   - For every library's API, see the markdown bundle: https://scriptling.dev/okf/scriptling-libraries/index.md
   - For the language reference (syntax, types, operators, control flow), see the markdown bundle: https://scriptling.dev/okf/scriptling-reference/index.md
   - For guides (CLI, Go integration, security, tutorials), see the markdown bundle: https://scriptling.dev/okf/scriptling-docs/index.md
@@ -160,7 +160,10 @@ if __name__ == "__main__":
 
 ## Fetching the Docs
 
-The complete documentation is published as [OKF](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) 0.2 bundles — plain markdown with YAML frontmatter and relative links — at stable URLs an agent can fetch directly:
+The complete documentation is published as [OKF](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) 0.2 bundles—plain markdown with YAML frontmatter—at stable URLs an agent can fetch directly. The two distributions intentionally use different internal links:
+
+- **Hosted at `scriptling.dev`:** internal links are absolute `https://scriptling.dev/okf/...` URLs so fetch-only agents such as Claude Code can follow them reliably.
+- **Downloadable release archive:** internal links are relative so the unzipped bundles remain portable wherever they are served or indexed.
 
 | Bundle | Contents | URL |
 |--------|----------|-----|
@@ -168,4 +171,4 @@ The complete documentation is published as [OKF](https://github.com/GoogleCloudP
 | `scriptling-reference` | Language reference: syntax, types, operators, control flow | `https://scriptling.dev/okf/scriptling-reference/index.md` |
 | `scriptling-docs` | Guides: CLI, Go integration, security, tutorials | `https://scriptling.dev/okf/scriptling-docs/index.md` |
 
-Each bundle's `index.md` lists its concepts; follow the relative links from there. To give an agent search as well as reads, serve the bundles through an MCP server instead — see the [Documentation MCP Server](quick-start/documentation-mcp.md) guide.
+Each hosted bundle's `index.md` lists its concepts with absolute links; follow those URLs directly. In a downloaded release bundle, follow the relative links from the local `index.md` instead. To give an agent search as well as reads, serve the bundles through an MCP server — see the [Documentation MCP Server](https://scriptling.dev/okf/scriptling-docs/quick-start/documentation-mcp.md) guide.

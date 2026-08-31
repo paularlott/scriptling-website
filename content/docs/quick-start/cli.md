@@ -17,6 +17,18 @@ Get up and running with the Scriptling command-line interface.
 brew install paularlott/tap/scriptling
 ```
 
+Database support is optional. The plugin binaries live in their own formula:
+
+```bash
+brew install paularlott/tap/scriptling-plugins
+export SCRIPTLING_PLUGIN_DIR="$(brew --prefix)/opt/scriptling-plugins/libexec/plugins"
+```
+
+Or use `scriptling-full` — the same CLI with all database plugins compiled
+in (mutually exclusive with `scriptling`): `brew install paularlott/tap/scriptling-full`.
+
+See [Plugins](../../plugins/) for how plugins load and the [database reference](../../../reference/libraries/databases/) for the APIs.
+
 ### GitHub Releases
 
 Download pre-built binaries from [GitHub Releases](https://github.com/paularlott/scriptling/releases):
@@ -77,7 +89,13 @@ echo 'print("Hello")' | scriptling
 
 ## HTTP Server
 
-Run Scriptling as an HTTP server:
+Server modes evaluate a startup script before accepting requests. Create `setup.py` for any one-time initialization:
+
+```python
+print("Server initialized")
+```
+
+Then run Scriptling as an HTTP server:
 
 ```bash
 scriptling --server :8000 setup.py
@@ -85,7 +103,7 @@ scriptling --server :8000 setup.py
 
 ## MCP Server
 
-Run Scriptling as a Model Context Protocol server for AI integration:
+The same startup script can initialize a Model Context Protocol server; tools are loaded from the directory passed to `--mcp-tools`:
 
 ```bash
 scriptling --server :8000 --mcp-tools ./tools setup.py
@@ -95,5 +113,5 @@ scriptling --server :8000 --mcp-tools ./tools setup.py
 
 - [Language Guide](../../../reference/) - Learn the complete language syntax
 - [Libraries](../../../reference/libraries/) - Explore available libraries and APIs
-- [CLI Reference](../../cli/) - Full command-line interface documentation
+- [CLI Guide](../../cli/) - Full command-line interface documentation
 - [Security Guide](../../security/) - Security best practices

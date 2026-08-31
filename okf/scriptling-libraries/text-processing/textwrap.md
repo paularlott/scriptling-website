@@ -204,6 +204,6 @@ This library implements a subset of Python's `textwrap` module:
 
 ## See Also
 
-- [string](string.md) - String constants for character classification
-- [regex](regex.md) - Regular expressions for pattern matching
-- [difflib](difflib.md) - Sequence comparison and diffing utilities
+- [string](https://scriptling.dev/okf/scriptling-libraries/text-processing/string.md) - String constants for character classification
+- [regex](https://scriptling.dev/okf/scriptling-libraries/text-processing/regex.md) - Regular expressions for pattern matching
+- [difflib](https://scriptling.dev/okf/scriptling-libraries/text-processing/difflib.md) - Sequence comparison and diffing utilities

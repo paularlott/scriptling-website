@@ -284,7 +284,7 @@ HelpText: `fetch(url, timeout=30) - Fetch data from a URL
     timeout - Request timeout in seconds (default: 30)
 
   Returns:
-    Response object with status_code, body, and headers
+    Response object with status_code, text, and headers
 
   Raises:
     Error if the request times out or fails
@@ -292,7 +292,7 @@ HelpText: `fetch(url, timeout=30) - Fetch data from a URL
   Examples:
     response = fetch("https://api.example.com/data")
     if response.status_code == 200:
-        print(response.body)
+        print(response.text)
 `,
 ```
 
@@ -316,8 +316,8 @@ HelpText: `fetch(url, timeout=30) - Fetch data from a URL
 
 ## See Also
 
-- [Native Functions](native-functions.md) - Registering Go functions
-- [Native Libraries](native-libraries.md) - Creating Go libraries
-- [Builder Functions](builder-functions.md) - Type-safe function builder
-- [Builder Libraries](builder-libraries.md) - Type-safe library builder
-- [Script Extensions](scripts.md) - Script-based extensions
+- [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md) - Registering Go functions
+- [Native Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md) - Creating Go libraries
+- [Builder Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-functions.md) - Type-safe function builder
+- [Builder Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md) - Type-safe library builder
+- [Script Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md) - Script-based extensions

@@ -337,7 +337,7 @@ func main() {
     }, "check_stock(sku) - Check stock level for a product SKU")
 
     lib.FunctionWithHelp("calculate_shipping", func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
-        weight, _ := args[0].(*object.Float).FloatValue()
+        weight := args[0].(*object.Float).FloatValue()
         zone, _ := args[1].AsString()
         rates := map[string]float64{
             "domestic":     5.99,

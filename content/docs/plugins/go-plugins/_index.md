@@ -120,6 +120,13 @@ but the server cannot initiate callbacks back to the client. Host callbacks and
 `examples/plugins/http-go` example for a complete
 server and client script.
 
+The mounted handler ships no authentication of its own — it answers whoever
+reaches it. Protect the endpoint at whatever fronts it: a bearer-token check
+in wrapping middleware, TLS plus credentials at a reverse proxy, or binding
+to an interface only the trusted host can reach. The
+[PHP example](../php-plugins/) shows the token check written server-side,
+which works the same way in Go.
+
 ### Advanced FunctionBuilder Callback
 
 For full control over argument conversion, pass a raw `BuiltinFunction`-style callback to the same `FunctionBuilder`:

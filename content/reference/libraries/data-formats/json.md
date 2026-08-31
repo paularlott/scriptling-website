@@ -2,7 +2,7 @@
 title: json
 description: Parse and generate JSON data.
 tags: [libraries, data-formats]
-weight: 1
+weight: 2
 
 aliases:
   - /reference/libraries/stdlib/json/
@@ -115,5 +115,5 @@ except Exception as e:
 - [bytes](../bytes/): Scriptling's binary data type.
 - [toml](../toml/): parse and generate TOML configuration data.
 - [yaml](../yaml/): parse and generate YAML data.
-- [scriptling.csv](../../scriptling/utilities/csv/): parse and generate CSV data.
-- [scriptling.xml](../../scriptling/utilities/xml/): parse and generate XML data.
+- [scriptling.csv](../../utilities/csv/): parse and generate CSV data.
+- [scriptling.xml](../../utilities/xml/): parse and generate XML data.

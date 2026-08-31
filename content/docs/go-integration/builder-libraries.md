@@ -221,4 +221,4 @@ Returns:
 
 - [Builder Functions](../builder-functions/) - Type-safe function builder
 - [Builder Classes](../builder-classes/) - Type-safe class builder
-- [Native Libraries](../native-libraries/) - Direct control with maximum performance
+- [Native Libraries](../native-libraries/) - Direct object-level library control

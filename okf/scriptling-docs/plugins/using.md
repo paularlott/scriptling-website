@@ -15,34 +15,82 @@ type: Guide
 
 ## CLI Loading
 
-Use `--plugin-dir` to load executable plugins from a directory:
+Use `--plugin-dir` to load executable plugins from a directory, or `--plugin`
+to load a single executable directly:
 
 ```bash
 scriptling --plugin-dir ./plugins script.py
 scriptling --plugin-dir ./plugins --plugin-dir ./more-plugins -c 'import plugin.hello; print(plugin.hello.greet("Ada"))'
+scriptling --plugin ./plugins/hello script.py
 ```
 
-The flag can be repeated. Scriptling scans executable files directly inside each directory. Subdirectories are ignored.
+Both flags can be repeated. Scriptling scans executable files directly inside each `--plugin-dir` directory; subdirectories are ignored. A `--plugin` value is an executable path, used literally, so paths containing spaces need nothing special — or the `http://`/`https://` URL of a plugin server, which speaks the same protocol over JSON-RPC POST instead of stdio (`--plugin-insecure <url>` marks which URLs may use a self-signed certificate). Arguments come from `--plugin-arg`, environment entries for an executable plugin from `--plugin-env KEY=VALUE`, and HTTP headers for a plugin server from `--plugin-header KEY=VALUE` (bearer-token authentication, and `user:pass@` in the URL is Basic auth); all three bind the same way, bare with one plugin or `<plugin>=` qualified with several:
+
+```bash
+scriptling --plugin /usr/local/bin/knot \
+           --plugin-arg scriptling-server --plugin-arg=--alias=testing \
+           script.py
+```
+
+Values that begin with `-` need the `--plugin-arg=value` form. With one
+`--plugin`, every `--plugin-arg` belongs to it; with several, qualify each as
+`<plugin>=<arg>`. See
+[loading plugins](https://scriptling.dev/okf/scriptling-docs/cli/command-line-options.md#loading-plugins) for the full
+rules.
+
+Explicit `--plugin` entries load before `--plugin-dir` scans, and the same
+executable discovered in a directory loses to the explicit entry and its
+arguments. Plugins register under the library name they declare in their
+handshake however they are loaded.
 
 Configuration options:
 
-| Source | Key |
-| --- | --- |
-| CLI | `--plugin-dir ./plugins` |
-| Environment | `SCRIPTLING_PLUGIN_DIR=./plugins` |
-| Config file | `plugins.dirs = ["./plugins"]` |
+| Capability | CLI | Environment | Config file |
+| --- | --- | --- | --- |
+| Scan directories | `--plugin-dir ./plugins` | `SCRIPTLING_PLUGIN_DIR=./plugins` | `plugins.dirs = ["./plugins"]` |
+| Load paths/URLs | `--plugin ./plugins/hello` | `SCRIPTLING_PLUGIN=./plugins/hello` | `plugins.paths = ["./plugins/hello"]` |
+| Executable arguments | `--plugin-arg scriptling-server` | `SCRIPTLING_PLUGIN_ARG=scriptling-server` | `plugins.args = ["scriptling-server"]` |
+| Executable environment | `--plugin-env KEY=VALUE` | `SCRIPTLING_PLUGIN_ENV=KEY=VALUE` | `plugins.env = ["KEY=VALUE"]` |
+| HTTP headers | `--plugin-header 'Authorization=Bearer token'` | `SCRIPTLING_PLUGIN_HEADER='Authorization=Bearer token'` | `plugins.headers = ["Authorization=Bearer token"]` |
+| Skip TLS verification for one URL | `--plugin-insecure https://host/rpc` | `SCRIPTLING_PLUGIN_INSECURE=https://host/rpc` | `plugins.insecure = ["https://host/rpc"]` |
 
-Plugin loading is eager. Startup failures are reported as warnings. A loaded plugin that fails while a script is running produces an execution error.
+Plugin loading is eager. Startup failures are reported as warnings. A loaded plugin that fails while a script is running produces an execution error. Commands that never evaluate a script (`--lint`, `--list-libs`, and the `pack`, `unpack` and `cache` subcommands) skip plugin loading entirely.
+
+Plugins that serve [fetcher](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md) schemes are loaded the
+same way. Their declared library bundles attach automatically, so normally no
+explicit `--package` is needed. Plugin-scheme package sources remain supported
+after the serving plugin is loaded; a `scheme://` source can also be the
+positional script argument.
 
 ## Importing Plugin Libraries
 
-A plugin declares a short name, for example `hello`, and Scriptling exposes it as `plugin.hello`:
+A plugin declares a name in its handshake, and the name decides where the
+library lands:
+
+- A **bare name** registers in the plugin namespace. A plugin declaring
+  `hello` becomes `plugin.hello`; one declaring `knot` becomes `plugin.knot`.
+  Every function and class is a member of that module: `plugin.hello.greet()`,
+  `plugin.hello.Config(...)`.
+- A **name containing a dot** is the author's namespace and is used verbatim.
+  A plugin declaring `myplugin.hello` imports as `myplugin.hello`, and the first-party
+  database plugins declare `scriptling.sqlite`, `scriptling.sql`,
+  `scriptling.valkey` and `scriptling.badgerdb` so their imports match
+  compiled-in builds exactly.
 
 ```python
 import plugin.hello
-
 print(plugin.hello.greet("Ada"))
+
+import scriptling.sqlite as sqlite
+conn = sqlite.connect()
 ```
+
+Because verbatim names can collide, registration guards them: a plugin whose
+dotted name matches a library the host already has (a built-in, a stdlib
+library, or a compiled-in driver) is skipped with a warning at load instead
+of shadowing it. A plugin can never take over `json`, `scriptling.runtime`,
+or a compiled-in driver's name. Bare names cannot collide with built-ins by
+construction, since built-in names are single words.
 
 ## Inspecting Plugins
 
@@ -73,7 +121,7 @@ print(cfg.get("name"))
 scriptling.plugin.release(cfg)
 ```
 
-Prefer explicit `release()` for deterministic cleanup. Embedded Go applications can call `plugin.ReleaseWithContext(ctx, obj)` when release should follow a request context. The contextless `plugin.Release(obj)` and GC finalizer fallback use `plugin.DefaultReleaseTimeout`. All class instances with `__del__` get a GC finalizer installed automatically: both in-process and plugin objects: as a best-effort fallback.
+Prefer explicit `release()` for deterministic cleanup. Embedded Go applications can call `plugin.ReleaseWithContext(ctx, obj)` when release should follow a request context. The contextless `plugin.Release(obj)` and GC finalizer fallback use `plugin.DefaultReleaseTimeout`. All class instances with `__del__` get a GC finalizer installed automatically, both in-process and plugin objects, as a best-effort fallback.
 
 ## Loading JSON-RPC Peers at Runtime
 
@@ -205,8 +253,11 @@ callbacks back to the client. Use stdio plugins when host callbacks or
   on the second call).
 - Loading an already-loaded path or URL under a **different** name raises an error.
 - Loading a **new** path or URL under a name already in use raises an error. The
-  name must not collide with any existing plugin library: including ones
+  name must not collide with any existing plugin library, including ones
   discovered via `--plugin-dir`.
+- A dotted (verbatim) name that matches a library already registered on the
+  interpreter is refused at registration with a warning, so plugins cannot
+  shadow built-in or compiled-in libraries.
 - `unload(name)` sends a best-effort shutdown, closes the process, removes the
   client, and removes any dynamic `plugin.*` proxy registered for that peer.
   The same name+path can be `load()`-ed again afterwards.

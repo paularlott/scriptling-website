@@ -80,4 +80,4 @@ tf.close()
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go. Both the archive path and extraction destination must be within `allowedPaths`. Tar-slip (path traversal via crafted entry names) is blocked automatically. See [Library Registration](../../scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](../../scriptling-docs/security.md#file-system-security).
+This is an extended library, requiring registration in Go. Both the archive path and extraction destination must be within `allowedPaths`. Tar-slip (path traversal via crafted entry names) is blocked automatically. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).

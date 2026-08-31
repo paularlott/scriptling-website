@@ -8,10 +8,10 @@ sources:
 status: stable
 tags:
     - cli
-title: CLI Reference
+title: CLI Guide
 type: Guide
 ---
-# CLI Reference
+# CLI Guide
 
 Scriptling includes a command-line interface for running scripts, interactive mode, and HTTP/MCP/JSON-RPC servers.
 
@@ -39,39 +39,39 @@ scriptling --server :8000 --json-rpc setup.py
 
 ## Documentation
 
-### [Basic Usage](cli/basic-usage.md)
+### [Basic Usage](https://scriptling.dev/okf/scriptling-docs/cli/basic-usage.md)
 
 Running scripts, interactive mode, lint mode, and environment configuration.
 
-### [Command Line Options](cli/command-line-options.md)
+### [Command Line Options](https://scriptling.dev/okf/scriptling-docs/cli/command-line-options.md)
 
 Every CLI flag, environment variable, and configuration file setting, plus container endpoints.
 
-### [Network Policy](cli/network-policy.md)
+### [Network Policy](https://scriptling.dev/okf/scriptling-docs/cli/network-policy.md)
 
 Restricting script outbound network access with a policy file.
 
-### [Libraries](cli/libraries.md)
+### [CLI Libraries](https://scriptling.dev/okf/scriptling-docs/cli/libraries.md)
 
 Loading, disabling, and controlling library and filesystem access.
 
-### [HTTP Server Mode](cli/http-server.md)
+### [HTTP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md)
 
 Running Scriptling as an HTTP server with custom routes, TLS, and authentication.
 
-### [JSON-RPC Server Mode](cli/jsonrpc-server.md)
+### [JSON-RPC Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/jsonrpc-server.md)
 
 Running Scriptling as a concurrent JSON-RPC 2.0 server over stdio or HTTP.
 
-### [Plugin Server Mode](cli/plugin-server.md)
+### [Plugin Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/plugin-server.md)
 
-Running a Scriptling script as a first-class plugin peer with full handshake support (agent variant only).
+Running a Scriptling script as a first-class plugin peer with full handshake support.
 
-### [MCP Server Mode](cli/mcp-server.md)
+### [MCP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md)
 
 Running Scriptling as a Model Context Protocol server for AI integration, including the script execution tool.
 
-### [Packages](cli/packages.md)
+### [Packages](https://scriptling.dev/okf/scriptling-docs/cli/packages.md)
 
 Create, distribute, and load Scriptling packages from local files or URLs.
 
@@ -83,7 +83,7 @@ Create, distribute, and load Scriptling packages from local files or URLs.
 - **Lint mode**: Check scripts for syntax errors without execution
 - **HTTP Server**: Start HTTP server with custom routes via `--server`
 - **JSON-RPC Server**: Serve concurrent JSON-RPC 2.0 over stdio, or over HTTP `/json-rpc` with `--server --json-rpc`
-- **Plugin Server**: Expose a script as a first-class plugin peer (agent variant only) with `runtime.plugin.serve()` + `runtime.plugin.register_function()`
+- **Plugin Server**: Expose a script as a first-class plugin peer with `runtime.plugin.serve()` + `runtime.plugin.register_function()`
 - **MCP Server**: Serve tools via Model Context Protocol with `--mcp-tools`
 - **MCP Script Execution**: Allow LLMs to execute Scriptling code via `--mcp-exec-script`
 - **Packages**: Load libraries from local or remote ZIP packages with `--package`

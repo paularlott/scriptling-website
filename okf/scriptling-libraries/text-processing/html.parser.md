@@ -381,6 +381,6 @@ for link in parser.links:
 
 ## See Also
 
-- [html](html.md): HTML escaping and unescaping utilities
-- [re](regex.md): Regular expressions for text processing
-- [difflib](difflib.md): Sequence comparison and diff generation
+- [html](https://scriptling.dev/okf/scriptling-libraries/text-processing/html.md): HTML escaping and unescaping utilities
+- [re](https://scriptling.dev/okf/scriptling-libraries/text-processing/regex.md): Regular expressions for text processing
+- [difflib](https://scriptling.dev/okf/scriptling-libraries/text-processing/difflib.md): Sequence comparison and diff generation

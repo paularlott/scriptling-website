@@ -86,5 +86,5 @@ print(result)  # 42
 
 ## See Also
 
-- [functools](functools.md): higher-order functions like `reduce()` and `partial()`.
-- [itertools](itertools.md): iteration and combinatorics utilities.
+- [functools](https://scriptling.dev/okf/scriptling-libraries/collections-iteration/functools.md): higher-order functions like `reduce()` and `partial()`.
+- [itertools](https://scriptling.dev/okf/scriptling-libraries/collections-iteration/itertools.md): iteration and combinatorics utilities.

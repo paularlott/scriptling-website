@@ -497,12 +497,14 @@ flat = {k: v for row in rows for k, v in row.items()}
 # Set: unique pairs
 unique = {(x, y) for x in [1, 2] for y in [2, 3]}
 
-# Generator expression
+# Generator-expression syntax
 total = sum(x * y for x in range(4) for y in range(4))
 ```
 
+Generator expressions use Python-like syntax, but Scriptling evaluates and materializes them eagerly before passing the result to the surrounding call. They are not lazy, single-use generator objects; generator functions with `yield` are not supported.
+
 ## See Also
 
-- [Functions](functions.md) - Function definitions and parameters
-- [Operators](operators.md) - Comparison and boolean operators
-- [Error Handling](error-handling.md) - Try/except and raise
+- [Functions](https://scriptling.dev/okf/scriptling-reference/functions.md) - Function definitions and parameters
+- [Operators](https://scriptling.dev/okf/scriptling-reference/operators.md) - Comparison and boolean operators
+- [Error Handling](https://scriptling.dev/okf/scriptling-reference/error-handling.md) - Try/except and raise

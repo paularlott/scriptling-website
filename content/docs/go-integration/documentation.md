@@ -2,7 +2,7 @@
 title: Documenting Extensions
 description: Add help text to functions, libraries, and classes for discoverability.
 tags: [go-integration, embedding, go]
-weight: 13
+weight: 14
 ---
 
 Scriptling includes a built-in `help()` function that provides Python-like help for functions and libraries. This guide shows how to document your Go extensions.
@@ -274,7 +274,7 @@ HelpText: `fetch(url, timeout=30) - Fetch data from a URL
     timeout - Request timeout in seconds (default: 30)
 
   Returns:
-    Response object with status_code, body, and headers
+    Response object with status_code, text, and headers
 
   Raises:
     Error if the request times out or fails
@@ -282,7 +282,7 @@ HelpText: `fetch(url, timeout=30) - Fetch data from a URL
   Examples:
     response = fetch("https://api.example.com/data")
     if response.status_code == 200:
-        print(response.body)
+        print(response.text)
 `,
 ```
 

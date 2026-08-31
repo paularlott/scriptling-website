@@ -83,7 +83,7 @@ Returns the default prefix used for temporary names.
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
 Temporary files and directories are subject to the same `allowedPaths` restrictions as other filesystem libraries. When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterTempfileLibrary(p, allowedPaths)`:
 
@@ -91,10 +91,10 @@ Temporary files and directories are subject to the same `allowedPaths` restricti
 - If `dir` is omitted and the system temp directory is outside `allowedPaths`, the library falls back to the first allowed path.
 - The created path is verified against `allowedPaths` after creation; if it somehow resolves outside the allowed set, it is immediately removed and an error is raised.
 
-See [Library Registration](../../scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](../../scriptling-docs/security.md#file-system-security).
+See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
 
 ## See Also
 
-- [shutil](shutil.md): High-level file operations (including `rmtree` for cleanup)
-- [os](os.md): Operating system interfaces
-- [pathlib](pathlib.md): Object-oriented filesystem paths
+- [shutil](https://scriptling.dev/okf/scriptling-libraries/filesystem/shutil.md): High-level file operations (including `rmtree` for cleanup)
+- [os](https://scriptling.dev/okf/scriptling-libraries/filesystem/os.md): Operating system interfaces
+- [pathlib](https://scriptling.dev/okf/scriptling-libraries/filesystem/pathlib.md): Object-oriented filesystem paths

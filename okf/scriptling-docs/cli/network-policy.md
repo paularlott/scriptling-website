@@ -17,10 +17,10 @@ type: Guide
 `--network-policy` restricts where the `requests`, `scriptling.wait_for`, and `scriptling.net.websocket` libraries may connect — the tool for letting scripts reach the internet without letting them reach your private network or cloud metadata endpoints. Enforcement happens at connect time: hostnames are resolved through the configured DNS servers, every resolved address is checked, and the connection is made to the validated address — so DNS rebinding, redirects, and IP-notation tricks don't get through.
 
 ```bash
-scriptling --network-policy=policy.toml --no-subprocess script.py
+scriptling --network-policy=policy.toml --disable-lib subprocess script.py
 ```
 
-A missing or invalid policy file aborts startup rather than running scripts unrestricted. Combine with `--no-subprocess` so scripts can't bypass the policy by shelling out to `curl`.
+A missing or invalid policy file aborts startup rather than running scripts unrestricted. Combine the policy with `--disable-lib subprocess` in any mode so code cannot bypass it by shelling out to `curl`. A network policy constrains only the libraries wired to it; it is not a process-level network sandbox.
 
 With a policy active, these address categories are blocked by default:
 
@@ -39,7 +39,8 @@ A TOML file; every key is optional.
 https_only = false
 
 # Permit URLs that name an IP directly (http://1.2.3.4/). Blocked by
-# default; granted addresses still face the address rules above.
+# default unless the address is already granted by allow_cidrs; every
+# literal still faces the address-category and deny_cidrs rules.
 allow_ip_literals = false
 
 # Permit loopback addresses (e.g. for local testing)
@@ -80,11 +81,12 @@ allow_hosts = ["api.example.com"]
 ```
 
 ```toml
-# One slice of the LAN granted, https only
+# One slice of the LAN granted, https only. IP-literal URLs inside this
+# range are accepted without setting allow_ip_literals.
 https_only = true
 allow_cidrs = ["10.1.0.0/16"]
 ```
 
-Note that in the CLI, custom DNS always comes with the policy's address checks — a policy file cannot turn them off. Embedding hosts that want nameservers without any blocking can construct a resolver-only configuration in Go (see `AllowAll` in the [library registration guide](../go-integration/library-registration.md#network-policy)).
+Note that in the CLI, custom DNS always comes with the policy's address checks — a policy file cannot turn them off. Embedding hosts that want nameservers without any blocking can construct a resolver-only configuration in Go (see `AllowAll` in the [library registration guide](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#network-policy)).
 
-Go hosts configure the same policy in code — see the [library registration guide](../go-integration/library-registration.md) for the `netsecurity.Config` reference, and the [security guide](../security.md) for the broader sandboxing model.
+Go hosts configure the same policy in code — see the [library registration guide](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) for the `netsecurity.Config` reference, and the [security guide](https://scriptling.dev/okf/scriptling-docs/security.md) for the broader sandboxing model.

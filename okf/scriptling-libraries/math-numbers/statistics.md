@@ -276,5 +276,5 @@ This library implements a subset of Python's `statistics` module:
 
 ## See Also
 
-- [math](math.md): mathematical functions and constants.
-- [random](random.md): random number generation, including Gaussian and other distributions.
+- [math](https://scriptling.dev/okf/scriptling-libraries/math-numbers/math.md): mathematical functions and constants.
+- [random](https://scriptling.dev/okf/scriptling-libraries/math-numbers/random.md): random number generation, including Gaussian and other distributions.

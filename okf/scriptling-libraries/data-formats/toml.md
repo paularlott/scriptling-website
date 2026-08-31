@@ -148,7 +148,7 @@ Compared to Python's `tomllib`/`tomli-w`:
 
 ## See Also
 
-- [json](json.md): parse and generate JSON data.
-- [yaml](yaml.md): parse and generate YAML data.
-- [scriptling.csv](../scriptling/utilities/csv.md): parse and generate CSV data.
-- [scriptling.xml](../scriptling/utilities/xml.md): parse and generate XML data.
+- [json](https://scriptling.dev/okf/scriptling-libraries/data-formats/json.md): parse and generate JSON data.
+- [yaml](https://scriptling.dev/okf/scriptling-libraries/data-formats/yaml.md): parse and generate YAML data.
+- [scriptling.csv](https://scriptling.dev/okf/scriptling-libraries/utilities/csv.md): parse and generate CSV data.
+- [scriptling.xml](https://scriptling.dev/okf/scriptling-libraries/utilities/xml.md): parse and generate XML data.

@@ -32,7 +32,7 @@ Find all pathnames matching a pattern. Pattern syntax: `*` matches everything ex
 
 By default entries whose name starts with `.` (dot-files and dot-directories) are skipped. Pass `include_hidden=True` to match them.
 
-When `recursive=True`, the directory walk runs as a bounded parallel search using the same worker model as [`scriptling.grep`](../scriptling/utilities/grep.md), so deep trees are scanned concurrently.
+When `recursive=True`, the directory walk runs as a bounded parallel search using the same worker model as [`scriptling.grep`](https://scriptling.dev/okf/scriptling-libraries/utilities/grep.md), so deep trees are scanned concurrently.
 
 **Parameters:**
 - `pattern` (`str`): Shell-style wildcard pattern to match.
@@ -108,12 +108,12 @@ pattern = glob.escape("file*.txt")
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`glob` provides read access to the host filesystem (directory listings and path matching). When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterGlobLibrary(p, allowedPaths)`: path traversal (`../`) is blocked automatically. See [Library Registration](../../scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](../../scriptling-docs/security.md#file-system-security).
+`glob` provides read access to the host filesystem (directory listings and path matching). When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterGlobLibrary(p, allowedPaths)`: path traversal (`../`) is blocked automatically. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
 
 ## See Also
 
-- [os](os.md): Operating system interfaces
-- [pathlib](pathlib.md): Object-oriented filesystem paths, including a `Path.glob()` method
-- [fs](fs.md): Binary file I/O
+- [os](https://scriptling.dev/okf/scriptling-libraries/filesystem/os.md): Operating system interfaces
+- [pathlib](https://scriptling.dev/okf/scriptling-libraries/filesystem/pathlib.md): Object-oriented filesystem paths, including a `Path.glob()` method
+- [fs](https://scriptling.dev/okf/scriptling-libraries/filesystem/fs.md): Binary file I/O

@@ -15,6 +15,13 @@ type: Reference
 
 Scriptling is a dynamically-typed, interpreted language with Python-inspired syntax designed for embedding in Go applications.
 
+## Choose a reference path
+
+- **Learning Scriptling:** Read the quick reference below, then follow the detailed language topics in order as needed.
+- **Looking up an API:** Go directly to [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md) or the [Library Reference](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md).
+- **Adding database access:** Browse the [Database Libraries](https://scriptling.dev/okf/scriptling-libraries/databases.md) for drivers and the ORM.
+- **Using a runtime or host feature:** See the [CLI Guide](https://scriptling.dev/okf/scriptling-docs/cli.md), [Go Integration](https://scriptling.dev/okf/scriptling-docs/go-integration.md), or [Plugins](https://scriptling.dev/okf/scriptling-docs/plugins.md) rather than treating it as language syntax.
+
 ## Quick Reference
 
 ### Variables and Types
@@ -156,29 +163,31 @@ if __name__ == "__main__":
 
 ## Detailed Topics
 
-- [Syntax Rules](syntax.md) - Indentation, comments, case sensitivity, multiline syntax
+- [Syntax Rules](https://scriptling.dev/okf/scriptling-reference/syntax.md) - Indentation, comments, case sensitivity, multiline syntax
 
-- [Data Types](types.md) - Integers, floats, strings, booleans, lists, dicts, sets
+- [Data Types](https://scriptling.dev/okf/scriptling-reference/types.md) - Integers, floats, strings, booleans, lists, dicts, sets
 
-- [Operators](operators.md) - Arithmetic, comparison, boolean, bitwise, precedence
+- [Operators](https://scriptling.dev/okf/scriptling-reference/operators.md) - Arithmetic, comparison, boolean, bitwise, precedence
 
-- [Control Flow](control-flow.md) - Conditionals, loops, match statements, break/continue
+- [Control Flow](https://scriptling.dev/okf/scriptling-reference/control-flow.md) - Conditionals, loops, match statements, break/continue
 
-- [Functions](functions.md) - Definition, parameters, *args, **kwargs, lambdas
+- [Functions](https://scriptling.dev/okf/scriptling-reference/functions.md) - Definition, parameters, *args, **kwargs, lambdas
 
-- [Error Handling](error-handling.md) - try/except/finally, raise, assert, exception types
+- [Error Handling](https://scriptling.dev/okf/scriptling-reference/error-handling.md) - try/except/finally, raise, assert, exception types
 
-- [Classes](classes.md) - Class definition, inheritance, super()
+- [Decorators](https://scriptling.dev/okf/scriptling-reference/decorators.md) - Wrapping functions and classes, factories with arguments, stacking
 
-- [Built-in Functions](builtins.md) - Type conversions, math, string, list, dict functions
+- [Classes](https://scriptling.dev/okf/scriptling-reference/classes.md) - Class definition, inheritance, super()
 
-- [Indexing & Slicing](slicing.md) - Single index, slice notation, slice() builtin
+- [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md) - Type conversions, math, string, list, dict functions
 
-- [Libraries](../scriptling-libraries/scriptling-libraries.md) - 60+ built-in and extended libraries reference
+- [Indexing & Slicing](https://scriptling.dev/okf/scriptling-reference/slicing.md) - Single index, slice notation, slice() builtin
 
-- [Python Differences](python-differences.md) - What's NOT supported, key differences from Python
+- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Standard, Scriptling, and extended library reference
 
-- [Performance Guide](performance.md) - String concatenation, recursion vs iteration, benchmarking
+- [Python Differences](https://scriptling.dev/okf/scriptling-reference/python-differences.md) - What's NOT supported, key differences from Python
+
+- [Performance Guide](https://scriptling.dev/okf/scriptling-reference/performance.md) - String concatenation, recursion vs iteration, benchmarking
 
 
 ## Key Differences from Python
@@ -189,7 +198,7 @@ if __name__ == "__main__":
 
 ## See Also
 
-- [Quick Start](../scriptling-docs/quick-start.md) - Get started with CLI or embedding
-- [Go Integration](../scriptling-docs/go-integration.md) - Embedding Scriptling in Go
-- [CLI Reference](../scriptling-docs/cli.md) - Command-line interface documentation
-- [Security Guide](../scriptling-docs/security.md) - Security best practices
+- [Quick Start](https://scriptling.dev/okf/scriptling-docs/quick-start.md) - Get started with CLI or embedding
+- [Go Integration](https://scriptling.dev/okf/scriptling-docs/go-integration.md) - Embedding Scriptling in Go
+- [CLI Guide](https://scriptling.dev/okf/scriptling-docs/cli.md) - Command-line interface documentation
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security best practices

@@ -19,11 +19,11 @@ Scriptling's documentation can be published as [OKF](https://github.com/GoogleCl
 
 The MCP server is a separate, generic project — [okf-server](https://github.com/paularlott/okf-server) — that works with any OKF bundles. Scriptling ships prebuilt bundles, so there is no need to clone or build anything.
 
-The same bundles are also hosted as plain markdown at [scriptling.dev/okf/](https://scriptling.dev/okf/) — if your agent can fetch URLs it can read the docs directly (each bundle's `index.md` lists its concepts), and the MCP server is only needed for search and write access.
+The same bundles are also hosted as plain markdown at [scriptling.dev/okf/](https://scriptling.dev/okf/) — if your agent can fetch URLs, it can read the docs directly. Each hosted bundle's `index.md` lists its concepts with absolute `https://scriptling.dev/okf/...` links. The downloadable release archive instead uses portable relative links. The MCP server is only needed for search or write access.
 
 ## Prerequisites
 
-- **Scriptling 0.18.0 or later** installed and on your `PATH` (`scriptling --version`). See [CLI Getting Started](cli.md) to install.
+- **Scriptling 0.18.0 or later** installed and on your `PATH` (`scriptling --version`). See [CLI Getting Started](https://scriptling.dev/okf/scriptling-docs/quick-start/cli.md) to install.
 
 ## 1. Download the bundles
 
@@ -39,9 +39,9 @@ This gives three bundles under `bundles/`:
 
 | Bundle | Contents |
 |--------|----------|
-| `bundles/scriptling-docs/` | Guides and tutorials. |
-| `bundles/scriptling-reference/` | CLI and language reference. |
-| `bundles/scriptling-libraries/` | Standard library API reference. |
+| `bundles/scriptling-docs/` | Guides and tutorials, including CLI use and Go integration. |
+| `bundles/scriptling-reference/` | Language syntax, types, operators, control flow, functions, and classes. |
+| `bundles/scriptling-libraries/` | Standard, Scriptling, and extended library API reference. |
 
 The `latest/download` URL always fetches the newest release. To pin a specific version, replace it with `releases/download/v0.18.0/scriptling-okf-bundles.zip`.
 

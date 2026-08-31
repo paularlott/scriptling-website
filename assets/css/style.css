@@ -108,10 +108,12 @@ h5, h6 {
 /* Wide tables (the CLI flag reference, Config option tables) must not blow
    out the content column. Long code tokens inside cells (env var names,
    flags) may wrap; below tablet width a table becomes its own horizontal
-   scroll container. */
+   scroll container. break-word (not anywhere) so a column can never shrink
+   below the width of its own word: field names like `policy` must not wrap
+   mid-word when another column hogs the table. */
 td code,
 th code {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 @media (max-width: 767px) {

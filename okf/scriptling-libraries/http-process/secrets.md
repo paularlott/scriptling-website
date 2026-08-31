@@ -175,5 +175,5 @@ This library implements Python's `secrets` module:
 
 ## See Also
 
-- [requests](requests.md): Use generated tokens for API authentication
-- [subprocess](subprocess.md): Run external commands
+- [requests](https://scriptling.dev/okf/scriptling-libraries/http-process/requests.md): Use generated tokens for API authentication
+- [subprocess](https://scriptling.dev/okf/scriptling-libraries/http-process/subprocess.md): Run external commands

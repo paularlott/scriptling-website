@@ -15,14 +15,14 @@ type: API Reference
 ---
 # hmac
 
-The `hmac` library computes and verifies message authentication codes, most commonly to verify webhook signatures. Keys and messages may be passed as strings (UTF-8 encoded), [`bytes`](../data-formats/bytes.md) values, or lists of byte values (as returned by `str.encode()`).
+The `hmac` library computes and verifies message authentication codes, most commonly to verify webhook signatures. Keys and messages may be passed as strings (UTF-8 encoded), [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) values, or lists of byte values (as returned by `str.encode()`).
 
 ## Available Functions
 
 | Function | Description |
 |----------|-------------|
 | `new(key, msg=None, digestmod=None)` | Create an HMAC object. |
-| `digest(key, msg, digestmod)` | One-shot HMAC, returning the raw digest as a [`bytes`](../data-formats/bytes.md) value. |
+| `digest(key, msg, digestmod)` | One-shot HMAC, returning the raw digest as a [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) value. |
 | `compare_digest(a, b)` | Constant-time string comparison (timing-safe). |
 
 ## Functions
@@ -54,7 +54,7 @@ One-shot HMAC, computing the digest directly without creating a reusable object.
 - `msg` (`str`, `bytes`, or `list`): Message data.
 - `digestmod` (`str` or callable): `"sha256"`, `"sha1"`, `"md5"`, or a `hashlib` constructor.
 
-**Returns:** [`bytes`](../data-formats/bytes.md): the raw digest.
+**Returns:** [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md): the raw digest.
 
 ```python
 import hmac
@@ -86,7 +86,7 @@ Objects returned by `new()` support:
 |----------------|-------------|
 | `.update(data)` | Feed more data into the message. Returns `None`. |
 | `.hexdigest()` | Return the MAC as a lowercase hex string. |
-| `.digest()` | Return the MAC as a [`bytes`](../data-formats/bytes.md) value. |
+| `.digest()` | Return the MAC as a [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) value. |
 | `.copy()` | Return an independent copy of the HMAC object. |
 | `.name` | Algorithm name, e.g. `"hmac-sha256"`. |
 | `.digest_size` | Digest size in bytes. |
@@ -120,7 +120,7 @@ print(verify(body, "sha256=tampered", secret))  # False
 
 ## See Also
 
-- [hashlib](hashlib.md): cryptographic hash functions, including the constructors accepted as `digestmod`.
-- [secrets](../http-process/secrets.md): `token_hex()` for generating a new random secret key.
-- [base64](base64.md): Base64 encoding and decoding.
-- [bytes](../data-formats/bytes.md): the binary type returned by `.digest()` and `digest()`.
+- [hashlib](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hashlib.md): cryptographic hash functions, including the constructors accepted as `digestmod`.
+- [secrets](https://scriptling.dev/okf/scriptling-libraries/http-process/secrets.md): `token_hex()` for generating a new random secret key.
+- [base64](https://scriptling.dev/okf/scriptling-libraries/math-numbers/base64.md): Base64 encoding and decoding.
+- [bytes](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md): the binary type returned by `.digest()` and `digest()`.

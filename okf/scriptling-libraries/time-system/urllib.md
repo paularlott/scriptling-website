@@ -286,6 +286,6 @@ query = urllib.parse.urlencode({"tags": ["python", "go"]}, True)
 
 ## See Also
 
-- [requests](../http-process/requests.md) - Make actual HTTP requests (GET/POST/etc.); use it together with `urllib.parse` for building and parsing URLs.
-- [datetime](datetime.md) - Date and time types.
-- [io](io.md) - In-memory I/O streams.
+- [requests](https://scriptling.dev/okf/scriptling-libraries/http-process/requests.md) - Make actual HTTP requests (GET/POST/etc.); use it together with `urllib.parse` for building and parsing URLs.
+- [datetime](https://scriptling.dev/okf/scriptling-libraries/time-system/datetime.md) - Date and time types.
+- [io](https://scriptling.dev/okf/scriptling-libraries/time-system/io.md) - In-memory I/O streams.

@@ -29,7 +29,7 @@ for i in range(1000):
     result += str(i)  # Each += creates a new string
 ```
 
-**Performance**: 3.45 ms, 25.9 MB for 10,000 iterations
+The exact cost depends on the Scriptling version, Go version, platform, and input size. Compare alternatives with the same input and iteration count rather than relying on fixed timings.
 
 ### Solution: Use join()
 
@@ -41,9 +41,7 @@ for i in range(1000):
 result = "".join(parts)
 ```
 
-**Performance**: ~36 μs for 1000 iterations (70x faster!)
-
-**Why it's fast**: `join()` pre-allocates the exact amount of memory needed and copies all strings once.
+**Why it's usually faster**: `join()` can allocate the result once and copy the strings in one pass. Verify the benefit for your workload with the benchmark helper below.
 
 ### When += is OK
 
@@ -128,8 +126,10 @@ def fib(n):
         return n
     return fib(n-1) + fib(n-2)
 
-result = fib(10)  # 114 μs, 376 KB, 3,983 allocations
+result = fib(10)
 ```
+
+Exact timing and allocation counts vary by release and platform; compare recursive and iterative versions with the same input using the helper below.
 
 ### Solution: Use Iteration
 
@@ -246,19 +246,24 @@ print("Took " + str((end - start) * 1000) + " ms")
 ### Benchmark Function
 
 ```python
-def benchmark(name, func, iterations=1000):
+def benchmark(name, func, iterations=1000, warmups=3):
     import time
+
+    for _ in range(warmups):
+        func()
+
     start = time.time()
     for _ in range(iterations):
         func()
-    end = time.time()
-    ms = (end - start) * 1000
-    print(name + ": " + str(ms) + " ms (" + str(ms/iterations) + " ms/iter)")
+    elapsed_ms = (time.time() - start) * 1000
+    print(name + ": " + str(elapsed_ms / iterations) + " ms/iter")
 
-# Usage
-benchmark("string += ", func=lambda: slow_concat(), iterations=100)
-benchmark("join()    ", func=lambda: fast_concat(), iterations=100)
+# Compare the same workload with the same measured iteration count.
+benchmark("string += ", func=lambda: slow_concat(), iterations=1000)
+benchmark("join()    ", func=lambda: fast_concat(), iterations=1000)
 ```
+
+Treat these measurements as local results, not portable constants. Record the Scriptling version, Go version, operating system/architecture, input size, warmup count, and measured iteration count when publishing figures.
 
 ## Summary
 
@@ -272,4 +277,4 @@ benchmark("join()    ", func=lambda: fast_concat(), iterations=100)
 
 ## See Also
 
-- [Built-in Functions](builtins.md) - String and list functions
+- [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md) - String and list functions

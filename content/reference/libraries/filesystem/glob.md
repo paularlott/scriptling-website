@@ -2,7 +2,7 @@
 title: glob
 description: Unix shell-style wildcard matching for filenames, similar to Python's glob module.
 tags: [libraries, filesystem]
-weight: 1
+weight: 5
 aliases:
   - /reference/libraries/extlib/glob/
   - /reference/libraries/glob/
@@ -26,7 +26,7 @@ Find all pathnames matching a pattern. Pattern syntax: `*` matches everything ex
 
 By default entries whose name starts with `.` (dot-files and dot-directories) are skipped. Pass `include_hidden=True` to match them.
 
-When `recursive=True`, the directory walk runs as a bounded parallel search using the same worker model as [`scriptling.grep`](../../scriptling/utilities/grep/), so deep trees are scanned concurrently.
+When `recursive=True`, the directory walk runs as a bounded parallel search using the same worker model as [`scriptling.grep`](../../utilities/grep/), so deep trees are scanned concurrently.
 
 **Parameters:**
 - `pattern` (`str`): Shell-style wildcard pattern to match.

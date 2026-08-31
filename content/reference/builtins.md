@@ -2,7 +2,7 @@
 title: Built-in Functions
 description: Type conversions, math, string, list, and dictionary built-in functions in Scriptling.
 tags: [reference, builtins]
-weight: 8
+weight: 9
 ---
 
 Scriptling provides many built-in functions that are always available without importing.
@@ -584,7 +584,7 @@ copy(42)          # 42
 
 ### yield_now()
 
-Briefly release the interpreter lock and yield the thread, letting other goroutines run before continuing. Use it inside a long, purely CPU-bound loop that never hits a naturally-blocking call, so shared-environment threads ([`runtime.background(..., shared=True)`](../libraries/scriptling/runtime/)) and registered handlers can make progress.
+Briefly release the interpreter lock and yield the thread, letting other goroutines run before continuing. Use it inside a long, purely CPU-bound loop that never hits a naturally-blocking call, so shared-environment threads ([`runtime.background(..., shared=True)`](../libraries/runtime/)) and registered handlers can make progress.
 
 Blocking builtins: `time.sleep`, `input()`, file reads/writes, socket send/receive/accept, WebSocket send/receive, subprocess, HTTP requests, AI completions/streaming, all container daemon calls, plugin calls, file provisioning, `wait_for` polling, `grep`/`sed` scans, messaging sends/downloads, `Queue` operations, `WaitGroup.wait()`, `Promise.wait()`/`get()`, `gossip send_request()`: already release the lock while they block, so you only need `yield_now()` for tight compute loops.
 

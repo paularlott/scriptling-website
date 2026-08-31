@@ -9,8 +9,9 @@ architecture: asset-src/distributed-architecture.d2 asset-src/architecture-singl
 	d2 --sketch --bundle --layout elk asset-src/multi-server-cluster.d2 content/docs/quick-start/local-containers/multi-server-cluster.svg
 	d2 --sketch --bundle --layout elk asset-src/multi-server-load-balancer.d2 content/docs/quick-start/local-containers/multi-server-load-balancer.svg
 
-## Generate OKF 0.2 knowledge bundles into okf/ (committed: Cloudflare runs Hugo, not scripts;
-## mounted into the site at /okf/ via hugo.toml)
+## Generate OKF 0.2 knowledge bundles: okf/ (hosted copy with absolute links, committed —
+## Cloudflare runs Hugo, not scripts; mounted into the site at /okf/) and dist/okf/
+## (zip copy with portable relative links, not committed)
 okf:
 	scriptling scripts/okf.py
 
@@ -18,7 +19,7 @@ okf:
 bundle-pack: okf
 	@rm -f dist/scriptling-okf-bundles.zip
 	@mkdir -p dist
-	cd okf && zip -qr ../dist/scriptling-okf-bundles.zip scriptling-docs scriptling-reference scriptling-libraries
+	cd dist/okf && zip -qr ../../dist/scriptling-okf-bundles.zip scriptling-docs scriptling-reference scriptling-libraries
 	@echo "Built dist/scriptling-okf-bundles.zip"
 
 ## Regenerate OKF bundles; commit them if anything changed (no push)

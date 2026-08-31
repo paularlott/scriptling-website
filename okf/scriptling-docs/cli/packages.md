@@ -13,16 +13,16 @@ type: Guide
 ---
 # Packages
 
-Packages are ZIP archives containing Scriptling libraries that can be loaded from local files or URLs. They enable easy distribution and reuse of code.
+Packages are ZIP archives or directories containing Scriptling libraries or applications. They enable easy distribution and reuse of code.
 
 ## Overview
 
-A package is a ZIP file containing:
+Every package requires `manifest.toml`. The default import directory is `lib/`, but that directory is not required for a main-only application. Directories named explicitly in the manifest's `libs` field are required.
 
 ```
 mylib.zip
 ├── manifest.toml    # Required - package metadata
-├── lib/             # Required - Python modules
+├── lib/             # Conventional/default location for importable modules
 │   ├── __init__.py
 │   └── utils.py
 └── docs/            # Optional - documentation
@@ -92,6 +92,19 @@ scriptling --package mylib.zip#sha256=abc123... script.py
 # With URL (download and verify)
 scriptling --package https://example.com/lib.zip#sha256=abc123... script.py
 ```
+
+### Plugin Fetcher Schemes
+
+Loading a fetcher plugin automatically attaches its declared library, so you normally should not add its `scheme://libs` source with `--package`. Explicit plugin-scheme package sources are supported after the serving plugin is loaded, and a scheme source can also be the positional script:
+
+```bash
+scriptling --plugin /usr/local/bin/knot --plugin-arg scriptling-server \
+           knot://scripts/hello
+```
+
+If no loaded plugin serves the scheme, the error names the scheme and points at
+`--plugin`, rather than reporting a missing file. See
+[Plugin Fetchers](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md) for details.
 
 **How it works:**
 - Append `#sha256=<hash>` to the package path or URL
@@ -390,6 +403,15 @@ its first argument, so there's no ambiguity when multiple packages are loaded.
 Use `package.exists("name")` to check if a package is loaded, and
 `package.file_exists("name", "path")` to check for a specific file.
 
+A fetcher plugin's attached library is a package here too, named after the
+plugin — `package.read_file("knot", "...")` reads a served file with the same
+functions. See [Plugin Fetchers](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md) for the serving
+side.
+
+`glob` speaks the same pattern language as the fetcher protocol: `*` and `?`
+stay within a path segment, `**` crosses any number of segments (including
+none, so `**/*.md` also matches a file at the package root).
+
 Note: `os.read_file` reads from the real filesystem only — it cannot read
 files inside a zip package. Use `scriptling.package` for that.
 
@@ -401,7 +423,7 @@ scriptling --server :8000 --package ./myapp          # HTTP (all serve protocols
 scriptling --package ./myapp                           # stdio (MCP or JSON-RPC)
 
 # Production — run from a zip
-scriptling pack ./myapp myapp.zip
+scriptling pack ./myapp -o myapp.zip
 scriptling --server :8000 --package myapp.zip
 scriptling --server :8000 --package https://host/myapp.zip#sha256=...
 ```
@@ -414,7 +436,7 @@ In app-bundle mode the CLI rejects path/registration flags (`-L`, `--script`,
 Extra positional arguments after `--` are available to tools and handlers
 via `sys.argv` — useful for conditional tool registration (e.g. gating
 write tools behind `-- --allow-write`). See
-[Conditional Tool Registration](mcp-server.md#conditional-tool-registration)
+[Conditional Tool Registration](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md#conditional-tool-registration)
 for details.
 
 ### main Resolution
@@ -470,6 +492,6 @@ scriptling --package https://yourserver.com/libs/mylib.zip app.py
 
 ## See Also
 
-- [Basic Usage](basic-usage.md) - Running scripts and interactive mode
-- [HTTP Server Mode](http-server.md) - Running as an HTTP server
-- [MCP Server Mode](mcp-server.md) - Model Context Protocol integration
+- [Basic Usage](https://scriptling.dev/okf/scriptling-docs/cli/basic-usage.md) - Running scripts and interactive mode
+- [HTTP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md) - Running as an HTTP server
+- [MCP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md) - Model Context Protocol integration

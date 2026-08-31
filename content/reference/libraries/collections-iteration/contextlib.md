@@ -2,7 +2,7 @@
 title: contextlib
 description: Utilities for common tasks involving the with statement.
 tags: [libraries, collections]
-weight: 2
+weight: 4
 
 aliases:
   - /reference/libraries/stdlib/contextlib/

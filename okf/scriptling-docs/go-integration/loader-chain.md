@@ -236,6 +236,6 @@ import knot.groups   # Uses loader chain
 
 ## See Also
 
-- [Script Libraries](scripts.md) - Write libraries in Scriptling
-- [Native Libraries](native-libraries.md) - Create Go libraries
-- [CLI Library Loading](../cli/libraries.md#library-loading) - Automatic script-dir loading and `--libpath`
+- [Script Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md) - Write libraries in Scriptling
+- [Native Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md) - Create Go libraries
+- [CLI Library Loading](https://scriptling.dev/okf/scriptling-docs/cli/libraries.md#library-loading) - Automatic script-dir loading and `--libpath`

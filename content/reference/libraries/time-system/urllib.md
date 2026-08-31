@@ -2,7 +2,7 @@
 title: urllib.parse
 description: Parse, split, join, and percent-encode/decode URLs and query strings without network access.
 tags: [libraries, http]
-weight: 1
+weight: 5
 
 aliases:
   - /reference/libraries/stdlib/urllib/

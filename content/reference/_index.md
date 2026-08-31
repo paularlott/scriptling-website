@@ -7,6 +7,13 @@ weight: 4
 
 Scriptling is a dynamically-typed, interpreted language with Python-inspired syntax designed for embedding in Go applications.
 
+## Choose a reference path
+
+- **Learning Scriptling:** Read the quick reference below, then follow the detailed language topics in order as needed.
+- **Looking up an API:** Go directly to [Built-in Functions](builtins/) or the [Library Reference](libraries/).
+- **Adding database access:** Browse the [Database Libraries](libraries/databases/) for drivers and the ORM.
+- **Using a runtime or host feature:** See the [CLI Guide](/docs/cli/), [Go Integration](/docs/go-integration/), or [Plugins](/docs/plugins/) rather than treating it as language syntax.
+
 ## Quick Reference
 
 ### Variables and Types
@@ -155,10 +162,11 @@ if __name__ == "__main__":
 {{< card link="control-flow" title="Control Flow" description="Conditionals, loops, match statements, break/continue" >}}
 {{< card link="functions" title="Functions" description="Definition, parameters, *args, **kwargs, lambdas" >}}
 {{< card link="error-handling" title="Error Handling" description="try/except/finally, raise, assert, exception types" >}}
+{{< card link="decorators" title="Decorators" description="Wrapping functions and classes, factories with arguments, stacking" >}}
 {{< card link="classes" title="Classes" description="Class definition, inheritance, super()" >}}
 {{< card link="builtins" title="Built-in Functions" description="Type conversions, math, string, list, dict functions" >}}
 {{< card link="slicing" title="Indexing & Slicing" description="Single index, slice notation, slice() builtin" >}}
-{{< card link="libraries/" title="Libraries" description="60+ built-in and extended libraries reference" >}}
+{{< card link="libraries/" title="Libraries" description="Standard, Scriptling, and extended library reference" >}}
 {{< card link="python-differences" title="Python Differences" description="What's NOT supported, key differences from Python" >}}
 {{< card link="performance" title="Performance Guide" description="String concatenation, recursion vs iteration, benchmarking" >}}
 {{< /cards >}}
@@ -173,5 +181,5 @@ if __name__ == "__main__":
 
 - [Quick Start](/docs/quick-start/) - Get started with CLI or embedding
 - [Go Integration](/docs/go-integration/) - Embedding Scriptling in Go
-- [CLI Reference](/docs/cli/) - Command-line interface documentation
+- [CLI Guide](/docs/cli/) - Command-line interface documentation
 - [Security Guide](/docs/security/) - Security best practices

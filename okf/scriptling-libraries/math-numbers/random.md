@@ -371,6 +371,6 @@ print("Shuffled deck:", deck[:5], "...")
 
 ## See Also
 
-- [math](math.md): mathematical functions and constants.
-- [statistics](statistics.md): mean, median, variance, and other statistical functions.
-- [uuid](uuid.md): UUID generation.
+- [math](https://scriptling.dev/okf/scriptling-libraries/math-numbers/math.md): mathematical functions and constants.
+- [statistics](https://scriptling.dev/okf/scriptling-libraries/math-numbers/statistics.md): mean, median, variance, and other statistical functions.
+- [uuid](https://scriptling.dev/okf/scriptling-libraries/math-numbers/uuid.md): UUID generation.

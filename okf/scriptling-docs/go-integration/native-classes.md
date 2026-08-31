@@ -521,8 +521,8 @@ var HTTPClientClass = &object.Class{
                     Timeout: time.Duration(timeoutSec) * time.Second,
                 }
 
-                // Create request
-                req, err := http.NewRequest("GET", url, nil)
+                // Create request tied to the Scriptling call context.
+                req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
                 if err != nil {
                     return &object.Error{Message: err.Error()}
                 }
@@ -535,14 +535,23 @@ var HTTPClientClass = &object.Class{
                     req.Header.Set(key, valStr)
                 }
 
-                // Execute
-                resp, err := client.Do(req)
+                // Execute network I/O without holding the environment lock.
+                var resp *http.Response
+                object.RunBlocking(ctx, func() {
+                    resp, err = client.Do(req)
+                })
                 if err != nil {
                     return &object.Error{Message: err.Error()}
                 }
                 defer resp.Body.Close()
 
-                body, _ := io.ReadAll(resp.Body)
+                var body []byte
+                object.RunBlocking(ctx, func() {
+                    body, err = io.ReadAll(resp.Body)
+                })
+                if err != nil {
+                    return &object.Error{Message: err.Error()}
+                }
 
                 return object.NewStringDict(map[string]object.Object{
                     "status":  object.NewInteger(int64(resp.StatusCode)),
@@ -557,9 +566,12 @@ var HTTPClientClass = &object.Class{
 
 func main() {
     p := scriptling.New()
-    p.SetVar("HTTPClient", HTTPClientClass)
+    if err := p.SetObjectVar("HTTPClient", HTTPClientClass); err != nil {
+        fmt.Println("Register class:", err)
+        return
+    }
 
-    p.Eval(`
+    _, err := p.Eval(`
 client = HTTPClient(base_url="https://api.example.com", timeout=10)
 client.set_header("Authorization", "Bearer token123")
 client.set_header("Content-Type", "application/json")
@@ -571,6 +583,9 @@ if response["status"] == 200:
 else:
     print("Error:", response["status"])
 `)
+    if err != nil {
+        fmt.Println("Script error:", err)
+    }
 }
 ```
 
@@ -722,6 +737,6 @@ result = c.increment()
 
 ## See Also
 
-- [Native Functions](native-functions.md) - Register individual functions
-- [Native Libraries](native-libraries.md) - Create libraries with functions and constants
-- [Builder Classes](builder-classes.md) - Type-safe class builder
+- [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md) - Register individual functions
+- [Native Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md) - Create libraries with functions and constants
+- [Builder Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-classes.md) - Type-safe class builder

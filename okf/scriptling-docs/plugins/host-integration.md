@@ -222,6 +222,143 @@ peer under a name already in use, returns an error.
 
 The CLI always constructs a manager (even without `--plugin-dir`) so that
 `scriptling.plugin.load` / `unload` / `call` are available to scripts in run,
-server, and `--json-rpc` modes. Embedded applications get the same behaviour
-as long as they construct a manager and call `plugin.RegisterLibraries` on
-each environment.
+server, and `--json-rpc` modes. Constructing a manager starts no processes; it
+only becomes expensive when directories are scanned or executables launched, so
+the CLI skips that work for `--lint`, `--list-libs` and the package
+subcommands. Embedded applications get the same behaviour as long as they
+construct a manager and call `plugin.RegisterLibraries` on each environment.
+
+## Fetcher Plugins
+
+Plugins that own a URI scheme (see [plugin fetchers](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md))
+serve scripts and libraries on demand. A host opts in by bridging its manager
+into a package scheme registry with `pluginpack`. After that, `knot://libs`
+resolves like any other package source and `knot://scripts/hello` can be
+fetched and run.
+
+```go
+import (
+    "github.com/paularlott/scriptling/scriptling-cli/bootstrap"
+    "github.com/paularlott/scriptling/scriptling-cli/pack"
+    "github.com/paularlott/scriptling/scriptling-cli/pluginpack"
+)
+
+// After manager.Load(ctx), and before opening any scheme:// source.
+bridge := pluginpack.New(pluginpack.Options{
+    Manager: manager,
+    Context: ctx,      // cancelling this aborts in-flight fetches
+})
+if err := bridge.Register(); err != nil {
+    log.Fatal(err)
+}
+defer bridge.Close() // releases the schemes this bridge claimed
+
+// The library bundle of every fetcher plugin, for automatic attachment.
+bundles, err := bridge.Bundles()
+if err != nil {
+    log.Fatal(err)
+}
+
+loader := pack.NewLoader()
+for _, b := range bundles {
+    if err := loader.AddBundle(b); err != nil {
+        log.Fatal(err)
+    }
+}
+
+p := scriptling.New()
+stdlib.RegisterAll(p)
+plugin.RegisterLibraries(p, manager)
+bootstrap.ApplyPackLoader(p, loader)
+
+// Modules now import straight out of the plugin.
+p.EvalWithContext(ctx, "import mylib")
+```
+
+`Register` must run before any scheme source is opened, because it is what
+makes the scheme resolvable. A partial failure (two plugins claiming one
+scheme) rolls back, so the bridge is left owning nothing.
+
+A source whose scheme no loaded plugin serves fails with an error wrapping
+`pack.ErrUnknownScheme`, so a host can tell "the plugin was never loaded" apart
+from any other failure and add advice that fits its own configuration:
+
+```go
+if errors.Is(err, pack.ErrUnknownScheme) {
+    return fmt.Errorf("%w; add it to plugins.d and restart", err)
+}
+```
+
+The library message ends with "load the plugin that serves it" for exactly this
+reason: it stays true whether plugins arrive from a CLI flag, a config file, or
+a desktop integration. The CLI extends the same sentence with
+`with --plugin or --plugin-dir`.
+
+To run a script that lives in the plugin, fetch it as source text. Scripts are
+never cached and never staged to a file:
+
+```go
+source, err := bridge.FetchScript(ctx, "knot://scripts/hello")
+if err != nil {
+    log.Fatal(err)
+}
+p.SetSourceFile("knot://scripts/hello")
+p.EvalWithContext(ctx, string(source))
+```
+
+Server hosts pass the same bytes through `ServerConfig.ScriptSource` (with
+`ScriptName` for error messages) instead of `ScriptFile`.
+
+### Reloading Plugins
+
+`Close` releases the schemes the bridge registered, which is what makes runtime
+plugin reloads possible: close the old bridge, load the new plugins, register a
+new bridge over them. Bundles opened through a closed bridge stop working.
+
+```go
+bridge.Close()
+manager.Close()
+
+manager = plugin.NewManager(appLogger, crashHandler)
+manager.AddDir("./plugins")
+manager.Load(ctx)
+
+bridge = pluginpack.New(pluginpack.Options{Manager: manager, Context: ctx})
+bridge.Register()
+```
+
+### Isolated Scheme Registries
+
+By default a bridge registers into the process-wide registry, so one scheme has
+one owner per process. Multi-tenant hosts that need independent routing tables
+pass their own:
+
+```go
+registry := pack.NewSchemeRegistry()
+bridge := pluginpack.New(pluginpack.Options{
+    Manager:  manager,
+    Context:  ctx,
+    Registry: registry,
+})
+bridge.Register()
+
+// Resolve through the private registry rather than pack.FetchBundle.
+b, err := registry.FetchBundle("knot://libs", false, cacheDir)
+```
+
+Two tenants can then each own a `knot` scheme pointing at different plugins.
+
+### Caching and Freshness
+
+Plugin-served content is not cached, not on disk and not in memory between
+reads. See [caching](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md#caching): the compile is already
+cached upstream by source text, and the plugin is the only side that knows its
+backend's freshness rules, so any persistence belongs behind its own `Read`.
+
+Directory listings are reused for `Options.DirTTL` (30 seconds by default),
+because resolving a path consults its parent's listing and walking an app bundle
+would otherwise re-list a directory per entry. Set a negative `DirTTL` to fetch
+every listing fresh.
+
+A complete runnable host lives at `examples/embed-fetcher-plugin` in the
+repository.

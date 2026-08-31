@@ -5,7 +5,9 @@ tags: [tutorials]
 weight: 8
 ---
 
-Hands-on tutorials that walk through real-world scenarios from start to finish.
+Hands-on tutorials that walk through real-world scenarios from start to finish. Choose the section for your role: CLI user, plugin author, Go embedder, or AI/server integrator.
+
+These are project walkthroughs, not exhaustive reference pages. For language learning, library lookup, or database APIs, use the [Language Guide](/reference/), [Library Reference](/reference/libraries/), or [Database Libraries](/reference/libraries/databases/).
 
 ## CLI Tutorials
 
@@ -18,6 +20,10 @@ Write a CLI script that fetches data from a public API, processes it with JSON, 
 ### [Writing a Go Plugin](go-plugin/)
 
 Build a Go executable plugin that exposes functions and classes under `plugin.*`.
+
+### [Writing a Fetcher Plugin](fetcher-plugin/)
+
+Serve libraries in any namespace, static assets, and script sources from a plugin-owned scheme such as `demo://`.
 
 ### [Writing a Bash Plugin](bash-plugin/)
 
@@ -42,3 +48,7 @@ Embed Scriptling in a Go application to evaluate business rules at runtime. Cove
 ### [Building an MCP Tool Server](mcp-tool-server/)
 
 Create a Model Context Protocol server with custom tools that AI assistants can call. Covers tool definition, script implementation, and server startup.
+
+### [Building an MCP Resources & Prompts Server](mcp-resources-prompts/)
+
+Expose MCP resources and prompts as files, alongside tools.

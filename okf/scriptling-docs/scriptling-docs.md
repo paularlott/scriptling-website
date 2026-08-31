@@ -15,25 +15,39 @@ type: Guide
 
 Scriptling is a minimal, sandboxed interpreter for Python-like scripting designed for embedding in Go applications. Use the sections below to get started, integrate with Go, or explore tutorials.
 
+## Choose by task
+
+- **Learn the language:** Start with the [Language Guide](https://scriptling.dev/okf/scriptling-reference/scriptling-reference.md), then use its syntax, types, control-flow, function, and class references.
+- **Use the command line:** Follow the [CLI Guide](https://scriptling.dev/okf/scriptling-docs/cli.md) for scripts, packages, policies, and runtime options.
+- **Embed Scriptling in Go:** Use [Go Integration](https://scriptling.dev/okf/scriptling-docs/go-integration.md) to create an interpreter and expose host functions, classes, and libraries.
+- **Run a server:** Choose the CLI guide for [HTTP](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md), [JSON-RPC](https://scriptling.dev/okf/scriptling-docs/cli/jsonrpc-server.md), [MCP](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md), or [plugin](https://scriptling.dev/okf/scriptling-docs/cli/plugin-server.md) server modes.
+- **Find a library:** Browse the [Library Reference](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) by capability and check registration requirements for your runtime.
+- **Build or use plugins:** Start with the [Plugins Guide](https://scriptling.dev/okf/scriptling-docs/plugins.md) for supported plugin models and host integration.
+- **Connect to a database:** Choose a driver or ORM from the [Database Libraries](https://scriptling.dev/okf/scriptling-libraries/databases.md).
+
 ## Guides
 
-- [Getting Started](quick-start.md) - Install the CLI or embed Scriptling in Go
+- [Getting Started](https://scriptling.dev/okf/scriptling-docs/quick-start.md) - Install the CLI or embed Scriptling in Go
 
-- [CLI Reference](cli.md) - Running scripts, HTTP server mode, MCP server mode, and packages
+- [CLI Guide](https://scriptling.dev/okf/scriptling-docs/cli.md) - Running scripts, HTTP server mode, MCP server mode, and packages
 
-- [Go Integration](go-integration.md) - Embed the interpreter, register functions, and create custom libraries
+- [Go Integration](https://scriptling.dev/okf/scriptling-docs/go-integration.md) - Embed the interpreter, register functions, and create custom libraries
 
-- [Security Guide](security.md) - Sandbox configuration, path restrictions, and network access control
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Sandbox configuration, path restrictions, and network access control
+
+- [Plugins](https://scriptling.dev/okf/scriptling-docs/plugins.md) - Extend Scriptling with Go, C, PHP, or any JSON-RPC language
+
+- [LLM Script Generation Guide](https://scriptling.dev/okf/scriptling-docs/llm-guide.md) - Guidance for generating accurate Scriptling code with LLMs
 
 
 ## Tutorials
 
 Step-by-step guides for real-world scenarios:
 
-- [Fetching and Processing API Data](tutorials/api-data-fetching.md): HTTP requests, JSON processing, and file output
-- [Embedding a Rules Engine](tutorials/embedding-rules-engine.md): Go integration with custom functions
-- [Building an MCP Tool Server](tutorials/mcp-tool-server.md): Custom tools for AI assistants
+- [Fetching and Processing API Data](https://scriptling.dev/okf/scriptling-docs/tutorials/api-data-fetching.md): HTTP requests, JSON processing, and file output
+- [Embedding a Rules Engine](https://scriptling.dev/okf/scriptling-docs/tutorials/embedding-rules-engine.md): Go integration with custom functions
+- [Building an MCP Tool Server](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-tool-server.md): Custom tools for AI assistants
 
 ## Reference
 
-For language syntax, built-in functions, and library APIs, see the [Reference](../scriptling-reference/scriptling-reference.md) section.
+For language syntax, built-in functions, and library APIs, see the [Reference](https://scriptling.dev/okf/scriptling-reference/scriptling-reference.md) section.

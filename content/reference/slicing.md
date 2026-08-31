@@ -2,7 +2,7 @@
 title: Indexing & Slicing
 description: Single index access, slice notation, and the slice() builtin in Scriptling.
 tags: [reference, syntax]
-weight: 9
+weight: 10
 ---
 
 Scriptling supports indexing and slicing for accessing elements of sequences like strings, lists, and tuples.

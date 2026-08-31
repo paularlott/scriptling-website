@@ -11,10 +11,10 @@ tags:
     - embedding
     - go
     - plugins
-title: Plugins
+title: Embedding Plugins
 type: Guide
 ---
-# Plugins
+# Embedding Plugins
 
 Applications that embed Scriptling can use the same executable plugin system as the CLI. Create one `plugin.Manager` for the application, load plugin directories during startup, and register plugin libraries with each Scriptling environment you create.
 
@@ -101,7 +101,7 @@ Key properties:
 - All scopes derived from the same root manager share the same pooled `*http.Transport` instances (TLS-verified and TLS-skip-verify). Connections established in one request are reused in subsequent requests even though each request uses its own scope.
 - Scopes can be nested. `NewScope` on a scope creates a grandchild; lookup and transport inheritance propagate correctly through the full chain.
 
-See [Plugin Manager](../plugins/host-integration.md) for the full scoping reference including `WithTransport` and nested scopes.
+See [Plugin Manager](https://scriptling.dev/okf/scriptling-docs/plugins/host-integration.md) for the full scoping reference including `WithTransport` and nested scopes.
 
 
 ## Plugin Logs
@@ -132,6 +132,6 @@ Plugins are loaded eagerly. Missing or invalid executables become manager warnin
 
 ## More Detail
 
-- [Plugin Manager](../plugins/host-integration.md) covers the same pattern from the plugin documentation section.
-- [Go Plugins](../plugins/go-plugins.md) explains how to write a plugin executable in Go.
-- [JSON-RPC Protocol](../plugins/protocol.md) documents the stdio protocol for non-Go plugins.
+- [Plugin Manager](https://scriptling.dev/okf/scriptling-docs/plugins/host-integration.md) covers the same pattern from the plugin documentation section.
+- [Go Plugins](https://scriptling.dev/okf/scriptling-docs/plugins/go-plugins.md) explains how to write a plugin executable in Go.
+- [JSON-RPC Protocol](https://scriptling.dev/okf/scriptling-docs/plugins/protocol.md) documents the stdio protocol for non-Go plugins.

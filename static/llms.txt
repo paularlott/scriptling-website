@@ -12,6 +12,7 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [scriptling-reference](https://scriptling.dev/okf/scriptling-reference/index.md): Language reference — syntax, types, operators, control flow, functions, classes, error handling
 - [scriptling-docs](https://scriptling.dev/okf/scriptling-docs/index.md): Guides — quick start, CLI usage, Go integration, security, tutorials
 - [OKF catalog](https://scriptling.dev/okf/index.md): Markdown index of all bundles
+- [All OKF pages](https://scriptling.dev/okf/llms.txt): Every concept in every bundle, one absolute link per line
 
 ## Essential
 

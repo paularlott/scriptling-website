@@ -8,6 +8,14 @@ stream: embedding
 
 Complete guide for embedding Scriptling in Go applications.
 
+## Choose by integration goal
+
+- **Evaluate scripts and exchange values:** Start with [Basics](basics/).
+- **Expose Go functions or classes quickly:** Use the type-safe [Builder API](builder/).
+- **Control conversion and performance directly:** Use the [Native API](native/).
+- **Control which modules scripts can import:** Read [Library Registration](library-registration/) and the [Library Loader Chain](loader-chain/).
+- **Extend the host out of process:** See [Embedding Plugins](plugins/). If you want to run Scriptling itself as a server, use the [CLI server guides](/docs/cli/) instead.
+
 ## Installation
 
 ```bash
@@ -33,17 +41,19 @@ func main() {
     stdlib.RegisterAll(p)
 
     // Execute Scriptling code
-    result, err := p.Eval(`x = 5 + 3`)
+    _, err := p.Eval(`x = 5 + 3`)
     if err != nil {
         fmt.Println("Error:", err)
     }
 }
 ```
 
+Focused examples on the pages below generally assume `p` has been initialized as shown here. Setup is repeated only when a registration or interpreter-lifecycle choice is part of the example.
+
 ## Topics
 
 - [Basics](basics/) - Creating interpreters, variable exchange, calling functions
-- [Native API](native/) - Direct control with maximum performance
+- [Native API](native/) - Direct object-level control
 - [Native Functions](native-functions/) - Register individual Go functions
 - [Native Classes](native-classes/) - Create custom classes with full control
 - [Native Libraries](native-libraries/) - Create libraries with functions and constants
@@ -53,16 +63,18 @@ func main() {
 - [Builder Classes](builder-classes/) - Type-safe class builder
 - [Builder Instantiation](builder-instantiation/) - Library templates with per-instance config
 - [Script Extensions](scripts/) - Extend using Scriptling code
-- [Plugins](plugins/) - Enable executable plugins in embedded applications
+- [Embedding Plugins](plugins/) - Enable executable plugins in embedded applications
 - [Library Loader Chain](loader-chain/) - Flexible library loading from multiple sources
 - [Documenting Extensions](documentation/) - Add help text to functions and libraries
+- [Library Registration](library-registration/) - Register built-in libraries when embedding
 - [Linting](lint/) - Code analysis for detecting syntax errors without execution
+- [GC Release Hooks](gc-release-hooks/) - Best-effort cleanup hooks for Go-owned objects
 
 ## Two Integration Approaches
 
 ### Native API
 
-Direct control with maximum performance:
+Direct object-level control with predictable overhead:
 
 ```go
 p.RegisterFunc("add", func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
@@ -86,19 +98,26 @@ p.RegisterFunc("add", fb.Build())
 
 ## Performance Tips
 
-1. **Reuse Interpreters** - Create once, use multiple times
+1. **Choose a lifecycle deliberately** - Reuse as-is only for one persistent script session; call `Reset()` between unrelated jobs or `Clone()` for isolated interpreters
 2. **Load Only Needed Libraries** - Don't load JSON/HTTP if not needed
 3. **Batch Operations** - Execute larger scripts rather than many small ones
 4. **Pre-register Functions** - Register all Go functions before execution
-5. **Use Native API for Hot Paths** - Avoid reflection overhead in tight loops
+5. **Measure Hot Paths** - Builder signatures are cached and common shapes use fast wrappers; compare Native and Builder APIs with your workload
 
 ```go
-// Good: Reuse interpreter
+// Reuse registrations while clearing script globals between unrelated jobs.
 p := scriptling.New()
-for _, script := range scripts {
-    p.Eval(script)
+stdlib.RegisterAll(p)
+for _, source := range scripts {
+    _, err := p.Eval(source)
+    p.Reset()
+    if err != nil {
+        return err
+    }
 }
 ```
+
+For a stateful session, omit `Reset()` so globals and imports persist. See [Interpreter lifecycle](basics/#interpreter-lifecycle) for `ResetEnv` and `Clone` choices.
 
 ## Choosing Your Approach
 

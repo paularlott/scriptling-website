@@ -397,6 +397,6 @@ set([1, 2, 2, 3])  # {1, 2, 3}
 
 ## See Also
 
-- [Operators](operators.md) - Operations on different types
-- [Built-in Functions](builtins.md) - Type conversion and checking functions
-- [Slicing](slicing.md) - Indexing and slicing operations
+- [Operators](https://scriptling.dev/okf/scriptling-reference/operators.md) - Operations on different types
+- [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md) - Type conversion and checking functions
+- [Slicing](https://scriptling.dev/okf/scriptling-reference/slicing.md) - Indexing and slicing operations

@@ -406,6 +406,8 @@ fh.__del__()  # "closing /tmp/data": runs again
 
 GC finalizers are not prompt and may not run before process exit. Prefer explicit cleanup (calling `__del__` directly or using a `with` statement / context manager) for critical resources.
 
+A destructor collected by the garbage collector runs on the runtime's finalizer goroutine with a hard five-second budget: past it, the destructor is abandoned mid-run. It also runs holding the environment's interpreter lock, serialized against every other goroutine evaluating in the same environment, so a slow `__del__` stalls them all. Keep it short, and do blocking work (IO, RPC, locks) through an explicit cleanup call instead. A destructor that raises or panics cannot crash the host: the error is contained.
+
 `__del__` is inherited like other methods:
 
 ```python
@@ -774,6 +776,6 @@ print(account.get_statement())
 
 ## See Also
 
-- [Functions](functions.md) - Function definitions
-- [Error Handling](error-handling.md) - Using raise in classes
-- [Python Differences](python-differences.md) - Class limitations
+- [Functions](https://scriptling.dev/okf/scriptling-reference/functions.md) - Function definitions
+- [Error Handling](https://scriptling.dev/okf/scriptling-reference/error-handling.md) - Using raise in classes
+- [Python Differences](https://scriptling.dev/okf/scriptling-reference/python-differences.md) - Class limitations

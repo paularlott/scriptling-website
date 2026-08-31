@@ -2,7 +2,7 @@
 title: msgpack
 description: Parse and generate MessagePack binary data.
 tags: [libraries, data-formats]
-weight: 2
+weight: 3
 
 aliases:
   - /reference/libraries/stdlib/msgpack/

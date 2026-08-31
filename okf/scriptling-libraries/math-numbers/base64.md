@@ -14,7 +14,7 @@ type: API Reference
 ---
 # base64
 
-The `base64` library encodes and decodes data using standard Base64, with Python-compatible function names. Inputs may be a [`bytes`](../data-formats/bytes.md) value or a string (UTF-8 encoded); decoding always returns a [`bytes`](../data-formats/bytes.md) value, so call `.decode()` on the result if you need a string.
+The `base64` library encodes and decodes data using standard Base64, with Python-compatible function names. Inputs may be a [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) value or a string (UTF-8 encoded); decoding always returns a [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) value, so call `.decode()` on the result if you need a string.
 
 ## Available Functions
 
@@ -51,7 +51,7 @@ Decodes a standard Base64 string.
 **Parameters:**
 - `s` (`str`): Base64-encoded string to decode.
 
-**Returns:** [`bytes`](../data-formats/bytes.md): the decoded binary data. Call `.decode()` to convert to a string when the underlying data is text.
+**Returns:** [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md): the decoded binary data. Call `.decode()` to convert to a string when the underlying data is text.
 
 **Raises:** `Error`: if `s` is not valid Base64.
 
@@ -64,6 +64,6 @@ print(decoded.decode())  # "hello world"
 
 ## See Also
 
-- [hashlib](hashlib.md): cryptographic hash functions.
-- [hmac](hmac.md): message authentication codes.
-- [bytes](../data-formats/bytes.md): the binary type returned by `b64decode()`.
+- [hashlib](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hashlib.md): cryptographic hash functions.
+- [hmac](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hmac.md): message authentication codes.
+- [bytes](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md): the binary type returned by `b64decode()`.

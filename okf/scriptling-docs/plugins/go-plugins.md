@@ -129,6 +129,13 @@ but the server cannot initiate callbacks back to the client. Host callbacks and
 `examples/plugins/http-go` example for a complete
 server and client script.
 
+The mounted handler ships no authentication of its own — it answers whoever
+reaches it. Protect the endpoint at whatever fronts it: a bearer-token check
+in wrapping middleware, TLS plus credentials at a reverse proxy, or binding
+to an interface only the trusted host can reach. The
+[PHP example](https://scriptling.dev/okf/scriptling-docs/plugins/php-plugins.md) shows the token check written server-side,
+which works the same way in Go.
+
 ### Advanced FunctionBuilder Callback
 
 For full control over argument conversion, pass a raw `BuiltinFunction`-style callback to the same `FunctionBuilder`:
@@ -256,7 +263,7 @@ func main() {
 
 The constructor function can accept typed parameters (with optional `context.Context` and `object.Kwargs`) and must return a pointer type. The return type becomes the **receiver type**: all methods whose first parameter matches it receive the unwrapped struct directly.
 
-Methods registered with `Method()` are exposed to Scriptling. Go struct fields are **not**: they are private to the Go side. Use `Property()` or `PropertyWithSetter()` on the builder to expose them (see [Builder Classes: Properties](../go-integration/builder-classes.md#exposing-struct-fields-with-properties)).
+Methods registered with `Method()` are exposed to Scriptling. Go struct fields are **not**: they are private to the Go side. Use `Property()` or `PropertyWithSetter()` on the builder to expose them (see [Builder Classes: Properties](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-classes.md#exposing-struct-fields-with-properties)).
 
 Constructors can also return an error as a second value:
 
@@ -432,5 +439,5 @@ server.Constant("max_retries", 3)
 
 ## Further Reading
 
-- [Client Wrappers](go-plugins/client-wrappers.md): How the host wraps plugin functions and classes, and how to customise the wrapper source.
-- [Host-Side Scripting](go-plugins/host-side-scripting.md): Register pure Scriptling functions and classes that run on the host with no RPC.
+- [Client Wrappers](https://scriptling.dev/okf/scriptling-docs/plugins/go-plugins/client-wrappers.md): How the host wraps plugin functions and classes, and how to customise the wrapper source.
+- [Host-Side Scripting](https://scriptling.dev/okf/scriptling-docs/plugins/go-plugins/host-side-scripting.md): Register pure Scriptling functions and classes that run on the host with no RPC.

@@ -2,7 +2,7 @@
 title: Library Registration
 description: How to register built-in libraries when embedding Scriptling in Go.
 tags: [go-integration, embedding, go]
-weight: 14
+weight: 15
 ---
 
 When embedding Scriptling in a Go application, you control which libraries are available to scripts. Libraries are not loaded unless you explicitly register them.
@@ -152,13 +152,14 @@ extlibs.RegisterTemplateTextLibrary(p)
 Background tasks, HTTP routing, JSON-RPC, key-value store, concurrency, and sandboxing.
 
 ```go
-// Register http, kv, sync, sandbox, and jsonrpc at once (not plugin, see below)
+// Register http, kv, sync, sandbox, jsonrpc, and mcp at once (not plugin, see below)
 extlibs.RegisterRuntimeLibraryAll(p, []string{"/tmp"})
 
 // Or register individually
 extlibs.RegisterRuntimeLibrary(p)          // scriptling.runtime (background tasks)
 extlibs.RegisterRuntimeHTTPLibrary(p)      // scriptling.runtime.http
 extlibs.RegisterRuntimeJSONRPCLibrary(p)   // scriptling.runtime.jsonrpc
+extlibs.RegisterRuntimeMCPLibrary(p)       // scriptling.runtime.mcp
 extlibs.RegisterRuntimeKVLibrary(p)        // scriptling.runtime.kv
 extlibs.RegisterRuntimeSyncLibrary(p)      // scriptling.runtime.sync
 extlibs.RegisterRuntimeSandboxLibrary(p, []string{"/tmp"})  // scriptling.runtime.sandbox
@@ -167,14 +168,15 @@ extlibs.RegisterRuntimeSandboxLibrary(p, []string{"/tmp"})  // scriptling.runtim
 | Namespace | Function |
 |-----------|----------|
 | `scriptling.runtime` | `RegisterRuntimeLibrary(p)` |
-| `scriptling.runtime.http`, `.kv`, `.sync`, `.sandbox`, `.jsonrpc` | `RegisterRuntimeLibraryAll(p, allowedPaths)` |
+| `scriptling.runtime.http`, `.kv`, `.sync`, `.sandbox`, `.jsonrpc`, `.mcp` | `RegisterRuntimeLibraryAll(p, allowedPaths)` |
 | `scriptling.runtime.http` | `RegisterRuntimeHTTPLibrary(p)` |
 | `scriptling.runtime.jsonrpc` | `RegisterRuntimeJSONRPCLibrary(p)` |
+| `scriptling.runtime.mcp` | `RegisterRuntimeMCPLibrary(p)` |
 | `scriptling.runtime.kv` | `RegisterRuntimeKVLibrary(p)` or `RegisterRuntimeKVLibraryWithSecurity(p, allowedPaths)` |
 | `scriptling.runtime.sync` | `RegisterRuntimeSyncLibrary(p)` |
 | `scriptling.runtime.sandbox` | `RegisterRuntimeSandboxLibrary(p, allowedPaths)` |
 
-`scriptling.runtime.plugin` is registered separately, it is not included in `RegisterRuntimeLibraryAll` and is only meaningful in the **agent variant** of Scriptling, alongside `scriptling.ai.agent`:
+`scriptling.runtime.plugin` is registered separately and is not included in `RegisterRuntimeLibraryAll`. Register it when the embedded application needs to expose a Scriptling script as a plugin server:
 
 ```go
 extlibs.RegisterRuntimePluginLibrary(p)  // scriptling.runtime.plugin
@@ -390,3 +392,22 @@ When embedding Scriptling, you have full control over what scripts can access. S
 - [Basics](../basics/): creating interpreters and exchanging variables
 - [Security Guide](../../security/): security best practices for embedding
 - [Libraries](../../../reference/libraries/): usage reference for all libraries
+
+## Database Drivers in Embedded Hosts
+
+Scriptling is the library; your application is the host, and the database drivers are optional at every level — you may compile them in, load them as external plugin binaries, or have neither. One call covers all three cases:
+
+```go
+import scriptlingplugin "github.com/paularlott/scriptling/plugin"
+
+// On every interpreter your host spins up — main instances, HTTP request
+// environments, MCP sessions, sandbox/background factories:
+scriptlingplugin.RegisterLibraries(p, pluginManager, scriptlingplugin.PolicyFromSecurity(netPolicy, allowedPaths))
+```
+
+- **Compiled in** (build tags `plugin_sqlite` / `plugin_sql` / `plugin_valkey` / `plugin_badgerdb`, or import the plugin packages and call `sqlite.RegisterInProcess(p, policy)`): registers regardless of the manager — a nil `pluginManager` is fine.
+- **External plugin binaries**: pass your `*plugin.Manager` (see [Plugin Manager](../../plugins/host-integration/)) and the proxy libraries register per instance.
+- **Neither**: nothing registers; scripts importing `scriptling.sqlite` fail with a named `unknown library` error.
+
+The CLI is exactly this pattern — its `--plugin-dir` handling, exe-relative discovery and per-mode wiring are host choices, not library behaviour. Inside handler scripts, open a connection per run and let the environment's teardown collect it (`Connection` closes itself when instances are collected; explicit `conn.close()` is still good manners).
+

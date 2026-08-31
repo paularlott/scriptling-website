@@ -27,7 +27,7 @@ scriptling --server :8000 setup.py
 
 The setup script is executed when the server starts and typically registers route handlers.
 
-> **Keeping the setup script alive:** By default the setup script exits after registering handlers and the server runs until shutdown. To keep the script running alongside the server: e.g. to maintain gossip state, run a polling loop, or share objects with handlers via `runtime.sync`: call [`runtime.start_server()`](../../scriptling-libraries/scriptling/runtime.md) instead of exiting. See the [runtime reference](../../scriptling-libraries/scriptling/runtime.md) for details.
+> **Keeping the setup script alive:** By default the setup script exits after registering handlers and the server runs until shutdown. To keep the script running alongside the server: e.g. to maintain gossip state, run a polling loop, or share objects with handlers via `runtime.sync`: call [`runtime.start_server()`](https://scriptling.dev/okf/scriptling-libraries/runtime.md) instead of exiting. See the [runtime reference](https://scriptling.dev/okf/scriptling-libraries/runtime.md) for details.
 
 ## Server Options
 
@@ -37,7 +37,8 @@ The setup script is executed when the server starts and typically registers rout
 | `--json-rpc`        | `SCRIPTLING_JSONRPC`      | Mount JSON-RPC at `/json-rpc`    | false      |
 | `--web-root`        | `SCRIPTLING_WEB_ROOT`     | Directory or zip to serve static files from | none       |
 | `--bearer-token`    | `SCRIPTLING_BEARER_TOKEN` | Bearer token for authentication  | none       |
-| `--allowed-paths`   | `SCRIPTLING_ALLOWED_PATHS`| Allowed filesystem paths         | (none)     |
+| `--allowed-paths`   | `SCRIPTLING_ALLOWED_PATHS`| Restrict participating library filesystem I/O; `-` denies it | (none)     |
+| `--disable-lib`     | `SCRIPTLING_DISABLE_LIB`  | Disable a built-in library by name (repeatable) | (none) |
 | `--tls-cert`        | `SCRIPTLING_TLS_CERT`     | TLS certificate file             | none       |
 | `--tls-key`         | `SCRIPTLING_TLS_KEY`      | TLS key file                     | none       |
 | `--tls-generate`    | -                         | Generate self-signed certificate | false      |
@@ -91,10 +92,12 @@ scriptling --server :8000 --json-rpc setup.py
 ```
 
 This can run alongside normal HTTP routes, static files, MCP tools, and the MCP
-script execution tool. See [JSON-RPC Server Mode](jsonrpc-server.md) for
+script execution tool. See [JSON-RPC Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/jsonrpc-server.md) for
 single request, batch, and notification examples.
 
 ## TLS/HTTPS
+
+Provide both `--tls-cert` and `--tls-key`, or use `--tls-generate`. If only one of the certificate/key flags is set, Scriptling does not enable TLS and starts the server over plaintext HTTP.
 
 ### Self-Signed Certificate
 
@@ -136,9 +139,10 @@ curl -H "Authorization: Bearer my-secret-token" http://localhost:8000/api/hello
 
 For more than one key, skip the static token and register a script middleware
 that checks the `Authorization` header itself — a dict lookup, the KV store,
-or an API call all work. The middleware guards every HTTP route and, when
-enabled, the `/mcp` and `/json-rpc` endpoints too, so one handler
-authenticates API clients, MCP clients, and JSON-RPC callers alike:
+or an API call all work. The middleware covers script routes, WebSocket
+handlers, and the `/mcp` and `/json-rpc` endpoints. It does **not** cover the
+built-in `/health` endpoint, registered static routes, or `--web-root` fallback
+files:
 
 ```python
 # auth.py
@@ -162,18 +166,25 @@ import scriptling.runtime as runtime
 runtime.http.middleware("auth.check")
 ```
 
-When a middleware is registered it replaces static `--bearer-token` checking
-on the protocol endpoints; without one, the static token guards everything
-as before.
+WebSocket upgrades are same-origin by default, so a hostile page cannot open a WebSocket to your server from a browser on another site (non-browser clients send no origin and pass). Pass `--websocket-origin` to allowlist specific origins, or `--websocket-origin '*'` behind a trusted proxy to allow any.
+
+Request bodies are capped at 32 MiB by default (`--max-request-body` to change, negative to disable) and the server enforces header, read, write and idle timeouts; an oversized body receives a deterministic `413 Request Entity Too Large` rather than reaching a handler truncated. MCP's SSE streams are exempt from the write timeout.
+
+A configured `--bearer-token` wraps every endpoint, middleware or not: the middleware guards script routes, WebSocket handlers, `/mcp`, and `/json-rpc`, while the token also covers what the middleware never sees — `/health`, registered static routes, and `--web-root` fallback files. With both configured the token applies first and the middleware layers on top, so the middleware sees only token-bearing requests.
 
 ## Filesystem Restrictions
 
-Restrict which paths scripts can access:
+`--allowed-paths` restricts filesystem operations made through participating Scriptling libraries; it does not constrain subprocesses, plugins, module/package loading, static assets, or other host-side I/O.
 
 ```bash
-# Restrict to specific directories
+# Restrict participating libraries to specific directories
 scriptling --server :8000 --allowed-paths "/var/www,./uploads" setup.py
+
+# Deny all participating library filesystem I/O
+scriptling --server :8000 --allowed-paths - setup.py
 ```
+
+For server modes, use `--disable-lib subprocess` when subprocess access must be removed.
 
 ## Defining Routes
 
@@ -411,20 +422,23 @@ def create_user(request):
 
 ```bash
 # List users
-curl http://localhost:8000/api/users
+curl -H "Authorization: Bearer secret123" \
+  http://localhost:8000/api/users
 
 # Get specific user
-curl http://localhost:8000/api/users/1
+curl -H "Authorization: Bearer secret123" \
+  http://localhost:8000/api/users/1
 
 # Create user
 curl -X POST http://localhost:8000/api/users \
+  -H "Authorization: Bearer secret123" \
   -H "Content-Type: application/json" \
   -d '{"name": "Charlie"}'
 ```
 
 ## See Also
 
-- [Basic Usage](basic-usage.md) - Running scripts, interactive mode, and lint mode
-- [Command Line Options](command-line-options.md) - Every flag and configuration file setting
-- [MCP Server Mode](mcp-server.md) - Model Context Protocol integration
-- [Runtime HTTP Library](../../scriptling-libraries/scriptling/runtime/http.md) - HTTP server API reference
+- [Basic Usage](https://scriptling.dev/okf/scriptling-docs/cli/basic-usage.md) - Running scripts, interactive mode, and lint mode
+- [Command Line Options](https://scriptling.dev/okf/scriptling-docs/cli/command-line-options.md) - Every flag and configuration file setting
+- [MCP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md) - Model Context Protocol integration
+- [Runtime HTTP Library](https://scriptling.dev/okf/scriptling-libraries/runtime/http.md) - HTTP server API reference

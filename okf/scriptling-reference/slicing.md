@@ -234,5 +234,5 @@ is_palindrome = seq == seq[::-1]
 
 ## See Also
 
-- [Data Types](types.md) - Lists, strings, and tuples
-- [Built-in Functions](builtins.md) - len(), reversed(), enumerate()
+- [Data Types](https://scriptling.dev/okf/scriptling-reference/types.md) - Lists, strings, and tuples
+- [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md) - len(), reversed(), enumerate()

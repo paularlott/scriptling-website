@@ -250,7 +250,7 @@ chain := libloader.NewChain(
 p.SetLibraryLoader(chain)
 ```
 
-See [Library Loader Chain](loader-chain.md) for full documentation.
+See [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md) for full documentation.
 
 ## Complete Library Example
 
@@ -479,6 +479,6 @@ result = testlib.add(10, 20)
 
 ## See Also
 
-- [Native Functions](native-functions.md) - Register individual functions
-- [Native Classes](native-classes.md) - Define custom classes
-- [Builder Libraries](builder-libraries.md) - Type-safe library builder
+- [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md) - Register individual functions
+- [Native Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes.md) - Define custom classes
+- [Builder Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md) - Type-safe library builder

@@ -24,16 +24,16 @@ The Builder API provides a type-safe, clean way to create functions, classes, an
 | Type safety | Manual checking | Automatic |
 | Code clarity | Verbose | Clean |
 | Error handling | Manual | Automatic |
-| Performance | Maximum | Slight overhead at registration |
+| Performance | Direct object handling | Cached signature analysis plus type conversion |
 
-Use the **Builder API** for cleaner code and type safety. Use the **Native API** only for performance-critical code.
+Use the **Builder API** for cleaner code and type safety. For measured hot paths where conversion overhead matters, compare it with the **Native API** using your real signatures and workload.
 
 ## Topics
 
-- [Functions](builder-functions.md) - Type-safe function builder
-- [Libraries](builder-libraries.md) - Type-safe library builder
-- [Classes](builder-classes.md) - Type-safe class builder
-- [Instantiation](builder-instantiation.md) - Library templates with per-instance configuration
+- [Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-functions.md) - Type-safe function builder
+- [Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md) - Type-safe library builder
+- [Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-classes.md) - Type-safe class builder
+- [Instantiation](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-instantiation.md) - Library templates with per-instance configuration
 
 ## Supported Types
 
@@ -96,8 +96,8 @@ p.RegisterFunc("fast_add", func(ctx context.Context, kwargs object.Kwargs, args 
 
 ### Optimization Tips
 
-1. **Register once** - Builders have overhead at registration, not execution
-2. **Pre-build classes** - Create class instances before scripts run
+1. **Register once** - Signature inspection is cached when wrappers are built; argument conversion and fallback `reflect.Call` may still occur per invocation
+2. **Pre-build classes** - Create class definitions before scripts run
 3. **Cache built objects** - Reuse built libraries across interpreters
 
 ```go
@@ -116,9 +116,9 @@ func main() {
 
 ### Blocking operations
 
-Builder and native functions both run holding the environment's interpreter lock (GIL). If a function does blocking I/O (HTTP, files, database, network, subprocess), wrap the blocking call in `object.RunBlocking(ctx, fn)` to release the lock so other shared-environment threads and handlers keep running while yours is blocked. See [Blocking operations and the interpreter lock](native.md) in the Native API guide for a full example: it applies to any function that receives a `ctx`.
+Builder and native functions both run holding the environment's interpreter lock (GIL). If a function does blocking I/O (HTTP, files, database, network, subprocess), wrap the blocking call in `object.RunBlocking(ctx, fn)` to release the lock so other shared-environment threads and handlers keep running while yours is blocked. See [Blocking operations and the interpreter lock](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md) in the Native API guide for a full example: it applies to any function that receives a `ctx`.
 
 ## See Also
 
-- [Native API](native.md) - Direct control with maximum performance
-- [Script Extensions](scripts.md) - Extend using Scriptling code
+- [Native API](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md) - Direct object-level control
+- [Script Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md) - Extend using Scriptling code

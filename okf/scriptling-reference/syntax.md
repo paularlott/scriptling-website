@@ -66,6 +66,20 @@ import re
 pattern = r"\d+\.\d+"  # Matches decimal numbers
 ```
 
+### Adjacent String Literals
+
+String literals next to each other in the same expression are concatenated at parse time. This works with ordinary strings and f-strings, including across lines inside parentheses:
+
+```python
+message = "hello " "world"                 # "hello world"
+name = "Alice"
+greeting = ("Hello, "
+            f"{name}!")                     # "Hello, Alice!"
+parts = ["one" "two", "three"]             # ["onetwo", "three"]
+```
+
+Only literal tokens concatenate this way. Variables do not concatenate implicitly, and a statement boundary such as a semicolon or an ungrouped newline ends the expression.
+
 ### Raw F-Strings
 
 Combine `r` and `f` prefixes (in either order) to create raw f-strings that preserve backslashes while supporting expression interpolation:
@@ -357,6 +371,6 @@ while      with
 
 ## See Also
 
-- [Data Types](types.md) - Available data types in Scriptling
-- [Functions](functions.md) - Function definition and parameters
-- [Python Differences](python-differences.md) - Differences from Python
+- [Data Types](https://scriptling.dev/okf/scriptling-reference/types.md) - Available data types in Scriptling
+- [Functions](https://scriptling.dev/okf/scriptling-reference/functions.md) - Function definition and parameters
+- [Python Differences](https://scriptling.dev/okf/scriptling-reference/python-differences.md) - Differences from Python

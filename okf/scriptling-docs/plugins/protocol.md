@@ -57,7 +57,15 @@ Error codes:
 
 | Code | Meaning |
 | --- | --- |
-| `-32000` | Application error (function not found, bad arguments, unknown method, etc.) |
+| `-32700` | Parse error: malformed JSON |
+| `-32600` | Invalid JSON-RPC request |
+| `-32601` | Method not found |
+| `-32602` | Invalid method parameters |
+| `-32603` | Internal JSON-RPC error |
+| `-32000` | Generic application/server error |
+| `-32001` | Fetch source or path not found; not retried |
+| `-32002` | Fetch access denied; not retried |
+| `-32003` | Fetch backend temporarily unavailable; retried with a bounded backoff |
 
 ## Transport Values
 
@@ -144,6 +152,7 @@ Remote objects are passed by reference:
 | `host_version` | string | Host version string |
 | `transports` | [string] | Always `["json"]` |
 | `capabilities` | [string] | Host capabilities |
+| `policy` | object | Optional host security context, see below |
 
 **Response result:**
 
@@ -153,7 +162,34 @@ Remote objects are passed by reference:
 | `transport` | string | Must be `"json"` |
 | `library` | object | `name`, `version`, `description` |
 | `capabilities` | [string] | Plugin capabilities |
+| `scheme` | string | The source scheme this plugin's fetcher serves (with the `fetch` capability); one scheme per plugin |
 | `schema` | object | Functions, classes, and constants |
+
+Known capabilities: `remote_objects` (remote object references in results) and `policy` (the plugin reads and enforces the handshake policy).
+
+The optional `policy` object is the host's security context for this plugin
+session, so trusted plugins can enforce it themselves. `allowed_paths`
+restricts filesystem locations (database files, storage directories) and
+`network` carries the outbound network policy (host allow/deny lists, CIDR
+rules, category flags). Omitted or nil means the host imposes no
+restrictions. Plugins that predate the field ignore it; plugins that enforce
+it advertise the `policy` capability. The first-party database plugins are
+the reference implementation.
+
+The policy is advisory, and that is a property of the protocol, not an
+oversight: it is delivered to the plugin, and the plugin enforces it. The
+host does not sandbox the plugin process, so the policy bounds what a
+cooperative plugin does, not what a malicious one could. Treat plugins like
+any other executable you choose to run: the policy protects scripts from
+mistakes and misconfiguration inside a plugin you trust, and it is no
+substitute for trusting the plugin binary itself. Over the HTTP transport
+the distance is one step larger: the host hands the policy across the
+network to a server it does not control, and only that server's own
+enforcement stands behind it.
+
+A plugin with a fetcher is identified by its `scheme`, whose presence is the
+whole advertisement (see [Plugin Fetchers](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md)). Unknown
+capabilities are ignored, so newer plugins still load on older hosts.
 
 The `schema` object:
 
@@ -186,7 +222,7 @@ The `schema` object:
 
 If the plugin returns any other protocol version, the host refuses to load it and records a manager warning. Breaking protocol changes require a new protocol version and older hosts will reject the plugin during handshake.
 
-When `source` is empty or absent the host auto-generates an RPC proxy. When `source` is provided the host uses it directly: either as a wrapper around RPC calls or as pure host-side Scriptling code.
+When `source` is empty or absent the host auto-generates an RPC proxy: every call is a JSON-RPC round trip. When `source` is provided the host compiles and runs that Scriptling code itself, so it executes entirely host-side; it becomes a wrapper around RPC calls (using `scriptling.plugin.call_method` / `call_function` to reach the plugin) or pure host-side logic. If any entry carries a source the whole module registers as script: entries without sources get their auto-generated shims emitted alongside. See [Host-Side Scripting](https://scriptling.dev/okf/scriptling-docs/plugins/go-plugins/host-side-scripting.md) for the authoring side.
 
 Class `properties` are auto-generated as Scriptling @property descriptors. `settable: true` means the host also generates a setter. Getter-only properties are read-only from Scriptling.
 
@@ -240,7 +276,7 @@ Example:
 
 ### `callback.call`
 
-**Direction:** Plugin -> Host  
+**Direction:** Plugin -> Host
 **When:** A plugin invokes a callback argument before the outer function, constructor, or method call has returned.
 
 Callback calls are ordinary JSON-RPC requests sent over the same stdio stream while another host -> plugin request is still pending. The host executes the Scriptling callback synchronously on the same environment call stack and responds before the plugin continues.
@@ -269,7 +305,7 @@ If the callback raises an error, the host returns a JSON-RPC error and the plugi
 
 ### `host.log`
 
-**Direction:** Plugin -> Host  
+**Direction:** Plugin -> Host
 **When:** A Go plugin writes through `plugin.Logger(ctx)` during an active function, constructor, or method call.
 
 **Request params:**
@@ -347,6 +383,80 @@ Class properties also use `object.call_method`. A getter call sends the property
 
 The plugin removes the instance and calls `__del__` if defined. Destroy is idempotent: destroying an already-destroyed ID succeeds silently.
 
+### `fetch.read`
+
+**Direction:** Host → Plugin
+**When:** The host needs one file from a plugin-served `scheme://` source. This includes a directly executed scheme script and the library bundle attached automatically for the plugin; only files an import or package read actually touches are fetched.
+
+**Request params:**
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `source` | string | No | Full source string, e.g. `knot://libs` |
+| `path` | string | Yes | Slash path within the source; empty means the source itself is a single script file |
+
+**Response result:**
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `data` | string | Yes | File content, base64-encoded |
+
+Fetch errors are typed, so the host can tell a miss from a refusal from a
+flaky backend without parsing messages:
+
+| Code | Sentinel | Meaning | Host behaviour |
+| --- | --- | --- | --- |
+| `-32001` | `ErrFetchNotFound` | source or path missing | plain not-found (a failed module probe) |
+| `-32002` | `ErrFetchDenied` | access refused (credentials, permissions) | surfaced as a permission error; never retried |
+| `-32003` | `ErrFetchUnavailable` | backend could not answer right now | retried a bounded number of times |
+
+Fetch operations are idempotent reads, so the host retries `-32003` (and
+transport-level failures) up to three attempts with a short backoff; coded
+answers are final. Any other error aborts package loading with the source
+named, because hosts deliberately distinguish "module is not there" from
+"plugin could not be asked". The host caches nothing it fetches, so every
+read reaches the plugin and returns content; there is no conditional-read
+form. `data` is base64-encoded, which is what lets binary assets travel
+intact.
+
+```json
+→ {"jsonrpc":"2.0","id":7,"method":"fetch.read","params":{"source":"knot://libs","path":"lib/greet.py"}}
+← {"jsonrpc":"2.0","id":7,"result":{"data":"ZGVmIGdyZWV0aW5nKG5hbWUpOg=="}}
+```
+
+### `fetch.glob`
+
+**Direction:** Host → Plugin
+**When:** The host resolves a path, lists a directory, or matches a pattern over a source (existence checks, listings, globbing, subtree walks).
+
+**Request params:**
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `source` | string | No | Full source string |
+| `pattern` | string | Yes | Glob pattern; empty means the root |
+
+**Response result:**
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `entries` | [{name, is_dir}] | No | Every match, in one answer |
+
+The pattern language: slash-separated paths relative to the source root;
+`*` matches within one segment (never `/`), `?` one character, `[class]` a
+character class, and a `**` segment matches any number of segments including
+none. A wildcard-free pattern is legal and answers at most one entry, which
+is how existence and directory-ness are probed: a matched directory carries
+`is_dir: true`, so an empty directory is distinguishable from a missing one.
+Entry names are full paths relative to the source root.
+
+No match is an empty `entries` list, never an error: errors mean the fetcher
+could not answer (the codes above). The whole point is one round trip: a
+listing is `<dir>/*`, a subtree is `<dir>/**`, and the plugin (which knows
+its backend) does the matching instead of the host walking level by level.
+Errors are retried per the fetch retry policy above. The host memoizes
+directory listings for its listing TTL; content is never held.
+
 ## Lifecycle
 
 1. Host starts the plugin executable.
@@ -357,6 +467,17 @@ The plugin removes the instance and calls `__del__` if defined. Destroy is idemp
 `environment.open` and `environment.close` are reserved for future use. The
 host does not currently send them, but plugins must accept them as no-ops if
 they arrive.
+
+## Peer Environment
+
+Executables spawned as stdio peers receive `SCRIPTLING_PLUGIN_PEER=<version>`
+environment, on top of the host's environment. Multi-role executables check it
+to divert a bare invocation into plugin mode: an executable that is also a
+general CLI can serve the protocol when scriptling spawns it with no
+arguments, without dedicating a subcommand to it. The value is the scriptling
+version (e.g. `0.23.0`), so a peer can check compatibility and refuse to
+serve a version it does not support. Only scriptling sets it, and a peer
+that spawns children should unset it so the trigger does not propagate.
 
 ## Skipping the handshake
 

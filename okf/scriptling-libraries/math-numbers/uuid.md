@@ -119,5 +119,5 @@ print(record["id"])
 
 ## See Also
 
-- [random](random.md): random number generation.
-- [hashlib](hashlib.md): cryptographic hash functions.
+- [random](https://scriptling.dev/okf/scriptling-libraries/math-numbers/random.md): random number generation.
+- [hashlib](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hashlib.md): cryptographic hash functions.

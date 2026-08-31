@@ -2,7 +2,7 @@
 title: bytes
 description: Binary data type and constructor.
 tags: [libraries, data-formats]
-weight: 0
+weight: 1
 
 aliases:
   - /reference/types/bytes/

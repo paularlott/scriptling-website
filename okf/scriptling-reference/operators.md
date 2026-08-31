@@ -310,5 +310,5 @@ result = 2 ** 3 + 4 * 5 - 6 / 2
 
 ## See Also
 
-- [Data Types](types.md) - Available data types
-- [Control Flow](control-flow.md) - Using operators in conditions
+- [Data Types](https://scriptling.dev/okf/scriptling-reference/types.md) - Available data types
+- [Control Flow](https://scriptling.dev/okf/scriptling-reference/control-flow.md) - Using operators in conditions

@@ -161,7 +161,7 @@ def greet(name):
 `)
 ```
 
-The host uses the supplied source instead of the auto-generated proxy. See [Client Wrappers](../plugins/go-plugins/client-wrappers.md) for details.
+The host uses the supplied source instead of the auto-generated proxy. See [Client Wrappers](https://scriptling.dev/okf/scriptling-docs/plugins/go-plugins/client-wrappers.md) for details.
 
 ## Pure Host-Side Code
 
@@ -174,4 +174,4 @@ def slug(text):
 `)
 ```
 
-See [Host-Side Scripting](../plugins/go-plugins/host-side-scripting.md) for `RegisterScriptFunc` and `RegisterScriptClass`.
+See [Host-Side Scripting](https://scriptling.dev/okf/scriptling-docs/plugins/go-plugins/host-side-scripting.md) for `RegisterScriptFunc` and `RegisterScriptClass`.

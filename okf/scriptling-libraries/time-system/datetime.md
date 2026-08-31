@@ -611,6 +611,6 @@ This library implements a Python-like `datetime` API:
 
 ## See Also
 
-- [time](time.md) - Lower-level timestamp and time tuple functions, including `sleep()`
-- [platform](platform.md) - Platform identifying data
-- [io](io.md) - In-memory I/O streams
+- [time](https://scriptling.dev/okf/scriptling-libraries/time-system/time.md) - Lower-level timestamp and time tuple functions, including `sleep()`
+- [platform](https://scriptling.dev/okf/scriptling-libraries/time-system/platform.md) - Platform identifying data
+- [io](https://scriptling.dev/okf/scriptling-libraries/time-system/io.md) - In-memory I/O streams

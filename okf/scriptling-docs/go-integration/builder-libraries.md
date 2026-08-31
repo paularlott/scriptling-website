@@ -148,7 +148,7 @@ database.transaction.commit(tx)
 
 ## Library with Classes
 
-Classes cannot be attached via `LibraryBuilder`. To expose classes from a library, build the `*object.Library` directly and put them in the `constants` map, as documented under [Native Classes](native-classes.md).
+Classes cannot be attached via `LibraryBuilder`. To expose classes from a library, build the `*object.Library` directly and put them in the `constants` map, as documented under [Native Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes.md).
 
 ```go
 myLib := object.NewLibrary("http",
@@ -227,6 +227,6 @@ Returns:
 
 ## See Also
 
-- [Builder Functions](builder-functions.md) - Type-safe function builder
-- [Builder Classes](builder-classes.md) - Type-safe class builder
-- [Native Libraries](native-libraries.md) - Direct control with maximum performance
+- [Builder Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-functions.md) - Type-safe function builder
+- [Builder Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-classes.md) - Type-safe class builder
+- [Native Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md) - Direct object-level library control

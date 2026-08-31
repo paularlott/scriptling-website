@@ -14,7 +14,7 @@ type: API Reference
 ---
 # shutil
 
-The `shutil` library provides high-level file and directory operations, similar to Python's `shutil` module. It complements [`os`](os.md) and [`pathlib`](pathlib.md) with operations like recursive tree deletion (`rmtree`), directory copying (`copytree`), and disk usage queries that are awkward to implement by hand.
+The `shutil` library provides high-level file and directory operations, similar to Python's `shutil` module. It complements [`os`](https://scriptling.dev/okf/scriptling-libraries/filesystem/os.md) and [`pathlib`](https://scriptling.dev/okf/scriptling-libraries/filesystem/pathlib.md) with operations like recursive tree deletion (`rmtree`), directory copying (`copytree`), and disk usage queries that are awkward to implement by hand.
 
 ## Available Functions
 
@@ -70,7 +70,7 @@ shutil.copytree("templates/", "templates-backup/")
 
 ### `rmtree(path)`
 
-Recursively deletes the directory at `path` and all of its contents (files, subdirectories, symlinks). Unlike [`os.removedirs`](os.md), the directory does not need to be empty.
+Recursively deletes the directory at `path` and all of its contents (files, subdirectories, symlinks). Unlike [`os.removedirs`](https://scriptling.dev/okf/scriptling-libraries/filesystem/os.md), the directory does not need to be empty.
 
 **Parameters:** `path` (`str`): Directory to remove.
 
@@ -121,12 +121,12 @@ print(f"{du['used'] / du['total'] * 100:.1f}% used")
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](../../scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-All operations are subject to the `allowedPaths` passed to `RegisterShutilLibrary(p, allowedPaths)`. Both `src` and `dst` (or `path`) must be within the allowed directories; path traversal (`../`) is blocked automatically and symlinks resolving outside the allowed set are rejected. See [Library Registration](../../scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](../../scriptling-docs/security.md#file-system-security).
+All operations are subject to the `allowedPaths` passed to `RegisterShutilLibrary(p, allowedPaths)`. Both `src` and `dst` (or `path`) must be within the allowed directories; path traversal (`../`) is blocked automatically and symlinks resolving outside the allowed set are rejected. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
 
 ## See Also
 
-- [tempfile](tempfile.md): Temporary file and directory creation
-- [os](os.md): Operating system interfaces
-- [pathlib](pathlib.md): Object-oriented filesystem paths
+- [tempfile](https://scriptling.dev/okf/scriptling-libraries/filesystem/tempfile.md): Temporary file and directory creation
+- [os](https://scriptling.dev/okf/scriptling-libraries/filesystem/os.md): Operating system interfaces
+- [pathlib](https://scriptling.dev/okf/scriptling-libraries/filesystem/pathlib.md): Object-oriented filesystem paths

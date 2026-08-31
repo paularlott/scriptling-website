@@ -116,9 +116,9 @@ except Exception as e:
 
 ## See Also
 
-- [msgpack](msgpack.md): binary serialisation — more compact, not human-readable.
-- [bytes](bytes.md): Scriptling's binary data type.
-- [toml](toml.md): parse and generate TOML configuration data.
-- [yaml](yaml.md): parse and generate YAML data.
-- [scriptling.csv](../scriptling/utilities/csv.md): parse and generate CSV data.
-- [scriptling.xml](../scriptling/utilities/xml.md): parse and generate XML data.
+- [msgpack](https://scriptling.dev/okf/scriptling-libraries/data-formats/msgpack.md): binary serialisation — more compact, not human-readable.
+- [bytes](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md): Scriptling's binary data type.
+- [toml](https://scriptling.dev/okf/scriptling-libraries/data-formats/toml.md): parse and generate TOML configuration data.
+- [yaml](https://scriptling.dev/okf/scriptling-libraries/data-formats/yaml.md): parse and generate YAML data.
+- [scriptling.csv](https://scriptling.dev/okf/scriptling-libraries/utilities/csv.md): parse and generate CSV data.
+- [scriptling.xml](https://scriptling.dev/okf/scriptling-libraries/utilities/xml.md): parse and generate XML data.

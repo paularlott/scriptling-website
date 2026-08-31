@@ -347,7 +347,7 @@ func main() {
     }, "check_stock(sku) - Check stock level for a product SKU")
 
     lib.FunctionWithHelp("calculate_shipping", func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
-        weight, _ := args[0].(*object.Float).FloatValue()
+        weight := args[0].(*object.Float).FloatValue()
         zone, _ := args[1].AsString()
         rates := map[string]float64{
             "domestic":     5.99,
@@ -388,8 +388,8 @@ print(f"Shipping: ${shipping:.2f}")
 
 ## See Also
 
-- [Go Integration Basics](../go-integration/basics.md) - Complete interpreter setup guide
-- [Native Functions](../go-integration/native-functions.md) - Direct function registration
-- [Builder Functions](../go-integration/builder-functions.md) - Type-safe builder API
-- [Library Registration](../go-integration/library-registration.md) - Registering libraries
-- [Security Guide](../security.md) - Sandboxing and security best practices
+- [Go Integration Basics](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md) - Complete interpreter setup guide
+- [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md) - Direct function registration
+- [Builder Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-functions.md) - Type-safe builder API
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - Registering libraries
+- [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Sandboxing and security best practices

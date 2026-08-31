@@ -255,6 +255,6 @@ print(buf.getvalue())  # a,b,c!
 
 ## See Also
 
-- [datetime](datetime.md) - Date and time types
-- [time](time.md) - Time access and conversions
-- [urllib](urllib.md) - URL parsing and encoding
+- [datetime](https://scriptling.dev/okf/scriptling-libraries/time-system/datetime.md) - Date and time types
+- [time](https://scriptling.dev/okf/scriptling-libraries/time-system/time.md) - Time access and conversions
+- [urllib](https://scriptling.dev/okf/scriptling-libraries/time-system/urllib.md) - URL parsing and encoding

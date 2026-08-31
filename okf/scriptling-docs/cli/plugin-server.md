@@ -20,8 +20,7 @@ peer**: one that implements the full plugin handshake protocol. When loaded by
 another Scriptling process with `scriptling=True`, the host generates proxy
 libraries automatically, just as if you had built a Go or C plugin executable.
 
-This is available in the **agent variant** of Scriptling only (registered
-alongside `scriptling.ai.agent`).
+This mode uses the standard `scriptling` CLI and its existing JSON-RPC transports; there is no `plugin-server` subcommand.
 
 ## How It Works
 
@@ -71,18 +70,13 @@ class Config:
         return self.prefix + name
 ```
 
-Run it as a stdio plugin server:
-
-```bash
-scriptling --json-rpc setup.py
-```
-
-Load it from another Scriptling process:
+Run and load it over stdio from another Scriptling process:
 
 ```python
 import scriptling.plugin as plugin
 
-plugin.load("calculator", "http://127.0.0.1:8000/json-rpc", scriptling=True)
+plugin.load("calculator", "scriptling", scriptling=True,
+            args=["--json-rpc", "setup.py"])
 import plugin.calculator
 print(plugin.calculator.VERSION)           # "1.0.0"
 print(plugin.calculator.add(3, 4))         # 7
@@ -90,12 +84,18 @@ cfg = plugin.calculator.Config("Hello, ")
 print(cfg.greeting("world"))               # "Hello, world"
 ```
 
-Or as a subprocess over stdio:
+For HTTP, start an HTTP server explicitly:
+
+```bash
+scriptling --server :8000 --json-rpc setup.py
+```
+
+Then load that endpoint:
 
 ```python
 import scriptling.plugin as plugin
 
-plugin.load("calculator", "scriptling", scriptling=True, args=["--json-rpc", "setup.py"])
+plugin.load("calculator", "http://127.0.0.1:8000/json-rpc", scriptling=True)
 import plugin.calculator
 print(plugin.calculator.add(3, 4))
 ```
@@ -291,6 +291,6 @@ while runtime.server_running():
 
 ## See Also
 
-- [`scriptling.plugin.load()`](../plugins/using.md): Load a plugin peer.
-- [JSON-RPC Server Mode](jsonrpc-server.md): Plain JSON-RPC without the plugin handshake.
-- [Go Plugins](../plugins/go-plugins.md): Compiled plugin executables with full class and callback support.
+- [`scriptling.plugin.load()`](https://scriptling.dev/okf/scriptling-docs/plugins/using.md): Load a plugin peer.
+- [JSON-RPC Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/jsonrpc-server.md): Plain JSON-RPC without the plugin handshake.
+- [Go Plugins](https://scriptling.dev/okf/scriptling-docs/plugins/go-plugins.md): Compiled plugin executables with full class and callback support.

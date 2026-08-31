@@ -1,13 +1,13 @@
 {{- $.Scratch.Add "index" slice -}}
 
-{{- /* Index all regular pages (excluding section index pages) */ -}}
+{{- /* Index complete page text plus discovery metadata. */ -}}
 {{- range .Site.RegularPages -}}
-  {{- $.Scratch.Add "index" (dict "title" .Title "href" .Permalink "content" (.Plain | truncate 1000) "section" .Section "date" (.Date.Format "2006-01-02") "type" "page") -}}
+  {{- $.Scratch.Add "index" (dict "title" .Title "href" .Permalink "description" .Description "content" .Plain "section" .Section "kind" .Kind "tags" (.Params.tags | default slice) "aliases" (.Aliases | default slice)) -}}
 {{- end -}}
 
-{{- /* Index section index pages */ -}}
+{{- /* Include section landing pages so task and persona entry points are searchable. */ -}}
 {{- range where .Site.Pages "Kind" "section" -}}
-  {{- $.Scratch.Add "index" (dict "title" .Title "href" .Permalink "content" (.Plain | truncate 1000) "section" .Section "date" (.Date.Format "2006-01-02") "type" "section") -}}
+  {{- $.Scratch.Add "index" (dict "title" .Title "href" .Permalink "description" .Description "content" .Plain "section" .Section "kind" .Kind "tags" (.Params.tags | default slice) "aliases" (.Aliases | default slice)) -}}
 {{- end -}}
 
 {{- $.Scratch.Get "index" | jsonify -}}

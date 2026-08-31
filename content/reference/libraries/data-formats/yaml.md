@@ -2,7 +2,7 @@
 title: yaml
 description: Parse and generate YAML (YAML Ain't Markup Language) data.
 tags: [libraries, data-formats]
-weight: 1
+weight: 4
 
 aliases:
   - /reference/libraries/extlib/yaml/
@@ -169,5 +169,5 @@ print(updated_yaml)
 
 - [json](../json/): parse and generate JSON data.
 - [toml](../toml/): parse and generate TOML configuration data.
-- [scriptling.csv](../../scriptling/utilities/csv/): parse and generate CSV data.
-- [scriptling.xml](../../scriptling/utilities/xml/): parse and generate XML data.
+- [scriptling.csv](../../utilities/csv/): parse and generate CSV data.
+- [scriptling.xml](../../utilities/xml/): parse and generate XML data.

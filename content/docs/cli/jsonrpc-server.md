@@ -22,7 +22,7 @@ handlers via `scriptling.runtime.jsonrpc`. The server then reads newline-
 delimited JSON-RPC 2.0 requests from stdin and writes one response per line to
 stdout.
 
-> **Keeping the setup script alive:** As with the HTTP server, the setup script can call [`runtime.start_server()`](../../../reference/libraries/scriptling/runtime/) to stay alive alongside the stdio server instead of exiting after registration: useful for sharing state or running background work while serving requests.
+> **Keeping the setup script alive:** As with the HTTP server, the setup script can call [`runtime.start_server()`](../../../reference/libraries/runtime/) to stay alive alongside the stdio server instead of exiting after registration: useful for sharing state or running background work while serving requests.
 
 > **Logging goes to stderr.** In `--json-rpc` mode, all log output is
 > automatically redirected to **stderr** so it never corrupts the JSON-RPC
@@ -56,6 +56,8 @@ scriptling --server :8000 --json-rpc --mcp-tools ./tools setup.py
 
 `--json-rpc` selects one transport. Without `--server` it uses stdio; with
 `--server` it mounts HTTP JSON-RPC at `/json-rpc`.
+
+> **Security:** Use `--disable-lib subprocess` to remove shell access. `--allowed-paths` limits participating library filesystem APIs; it does not constrain enabled subprocesses or host-side loading.
 
 Over HTTP, the script middleware registered with
 `runtime.http.middleware(...)` guards `/json-rpc` the same as HTTP routes —
@@ -96,7 +98,7 @@ def on_progress(params):
     pass
 ```
 
-See the [scriptling.runtime.jsonrpc reference](../../../reference/libraries/scriptling/runtime/jsonrpc/)
+See the [scriptling.runtime.jsonrpc reference](../../../reference/libraries/runtime/jsonrpc/)
 for the full API.
 
 ### Decorator Syntax
@@ -203,5 +205,5 @@ a response with a custom error code and optional structured `data`.
 
 ## See Also
 
-- [scriptling.runtime.jsonrpc reference](../../../reference/libraries/scriptling/runtime/jsonrpc/)
+- [scriptling.runtime.jsonrpc reference](../../../reference/libraries/runtime/jsonrpc/)
 - [HTTP Server Mode](../http-server/) for the equivalent HTTP concurrency model

@@ -431,6 +431,6 @@ p.RegisterFunc("connect", func(ctx context.Context, kwargs object.Kwargs, args .
 
 ## See Also
 
-- [Native Libraries](native-libraries.md) - Create libraries with functions and constants
-- [Native Classes](native-classes.md) - Define custom classes
-- [Builder Functions](builder-functions.md) - Type-safe function builder
+- [Native Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md) - Create libraries with functions and constants
+- [Native Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes.md) - Define custom classes
+- [Builder Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-functions.md) - Type-safe function builder

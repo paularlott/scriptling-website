@@ -2,7 +2,7 @@
 title: hmac
 description: Keyed-hashing for message authentication (HMAC).
 tags: [libraries, math, security]
-weight: 2
+weight: 5
 
 aliases:
   - /reference/libraries/stdlib/hmac/

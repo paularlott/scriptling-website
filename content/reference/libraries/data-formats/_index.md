@@ -12,5 +12,5 @@ weight: 2
 | [msgpack](msgpack/) | Parse and generate MessagePack binary data |
 | [yaml](yaml/) | YAML parsing and generation |
 | [toml](toml/) | TOML parsing and generation |
-| [scriptling.csv](../scriptling/utilities/csv/) | CSV parsing and formatting (string-based) |
-| [scriptling.xml](../scriptling/utilities/xml/) | XML parsing and formatting (dict-based) |
+| [scriptling.csv](../utilities/csv/) | CSV parsing and formatting (string-based) |
+| [scriptling.xml](../utilities/xml/) | XML parsing and formatting (dict-based) |
