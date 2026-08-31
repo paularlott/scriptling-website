@@ -53,5 +53,6 @@ Go finalizers are not deterministic:
 - They must not be the only cleanup path for important resources.
 - The hook must not capture the target object, or the object will remain reachable.
 - The hook should avoid blocking work directly. Queue cleanup work elsewhere when cleanup may need IO, locks, or RPC.
+- A script-defined `__del__` collected by the finalizer runs with a five-second budget (past it the destructor is abandoned), under the environment's interpreter lock (serialized against concurrent evaluation in that environment), and inside a panic boundary that contains failures without crashing the host.
 
 Prefer explicit cleanup first, and use GC release hooks as a fallback.
