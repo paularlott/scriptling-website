@@ -6,6 +6,20 @@ layout: changelog
 nav-skip: true
 ---
 
+## September 2026
+
+{{< version "v0.24.0" >}}
+
+{{< changelog-item "added" >}}
+**Scripts can declare their requirements.** A PEP 723-style inline metadata block (`# /// script`) lets a script state a minimum scriptling version, the libraries it imports, and the plugins it expects to be connected, with optional version constraints. The CLI verifies the block before the code runs — one-shot scripts and `--code`, server setup scripts once at startup before anything binds, and package main entries — reporting every unmet requirement in one error with the remedy: load a plugin, use a build with it compiled in, or upgrade the host. `--lint` validates the block itself, and embedding hosts can run the same check through the `metadata` package. See [Script Metadata](/docs/script-metadata/).
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**Database drivers are built in by default.** `scriptling` now ships with the SQLite, SQL, Valkey and BadgerDB plugins compiled in, so database support needs no extra setup. `scriptling-full` is replaced by `scriptling-slim`, the lean build without the compiled-in drivers, which can still load them at runtime via `scriptling-plugins` or `--plugin-dir`. Homebrew users of the old full formula should run `brew uninstall scriptling-full && brew install scriptling`.
+{{< /changelog-item >}}
+
+---
+
 ## August 2026
 
 {{< version "v0.23.0" >}}

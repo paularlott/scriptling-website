@@ -1,6 +1,6 @@
 # Scriptling OKF bundles
 
-> All 181 OKF 0.2 concepts, plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
+> All 183 OKF 0.2 concepts, plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
 
 ## scriptling-docs
 
@@ -33,6 +33,7 @@
 - [Native Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md): Create libraries with functions, constants, and sub-libraries.
 - [Native API](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md): Direct object-level control for extending Scriptling.
 - [Embedding Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md): Enable executable plugins when embedding Scriptling in Go.
+- [Checking Script Requirements](https://scriptling.dev/okf/scriptling-docs/go-integration/script-metadata.md): Verify a script's inline metadata block — version, libraries, plugins — before running it in an embedded host.
 - [Script Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md): Extend Scriptling using Scriptling code itself.
 - [Go Integration](https://scriptling.dev/okf/scriptling-docs/go-integration.md): Embed Scriptling in your Go application.
 - [LLM Script Generation Guide](https://scriptling.dev/okf/scriptling-docs/llm-guide.md): Guidance for generating accurate Scriptling code with LLMs — copy it into your agent's instructions or fetch the hosted docs.
@@ -52,6 +53,7 @@
 - [Embedding](https://scriptling.dev/okf/scriptling-docs/quick-start/embedding.md): Embed Scriptling in a Go application.
 - [VSCode Extension](https://scriptling.dev/okf/scriptling-docs/quick-start/vscode.md): Get syntax highlighting and language support for Scriptling in Visual Studio Code.
 - [Getting Started](https://scriptling.dev/okf/scriptling-docs/quick-start.md): Get up and running with Scriptling.
+- [Script Metadata](https://scriptling.dev/okf/scriptling-docs/script-metadata.md): Declare script requirements — scriptling version, libraries, plugins — in an inline metadata block.
 - [Documentation](https://scriptling.dev/okf/scriptling-docs/scriptling-docs.md): Complete documentation for Scriptling - a minimal, sandboxed Python-like scripting language for Go applications.
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md): Security best practices for embedding and running Scriptling in your applications.
 - [Fetching and Processing API Data](https://scriptling.dev/okf/scriptling-docs/tutorials/api-data-fetching.md): Write a CLI script that fetches data from a public API and processes the results.

@@ -14,5 +14,6 @@ Guides: quick start, CLI usage, Go integration, plugins, security, and tutorials
 - [LLM Script Generation Guide](https://scriptling.dev/okf/scriptling-docs/llm-guide.md)
 - [Plugins](https://scriptling.dev/okf/scriptling-docs/plugins.md)
 - [Getting Started](https://scriptling.dev/okf/scriptling-docs/quick-start.md)
+- [Script Metadata](https://scriptling.dev/okf/scriptling-docs/script-metadata.md)
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md)
 - [Tutorials](https://scriptling.dev/okf/scriptling-docs/tutorials.md)

@@ -54,7 +54,7 @@ A bare `scriptling.New()` environment has no libraries; embedders register every
 | Core extended and `scriptling.*` libraries | Registered unless disabled; the exact set varies by mode | Register each required library explicitly |
 | `scriptling.ai.tools` | The standalone namespace is not registered by normal setup; use `scriptling.ai.ToolRegistry` when `scriptling.ai` is present | Register the standalone tools library explicitly if needed |
 | `scriptling.ai.agent.interact` | Added on the ordinary non-server CLI execution path; evaluator factories and server modes omit it | Register it explicitly together with its console dependency |
-| Database libraries | Supplied by `scriptling-full`, matching custom build tags, or discovered external database plugins | Register compiled plugins or load external plugins; see [Database availability](https://scriptling.dev/okf/scriptling-libraries/databases.md#availability) |
+| Database libraries | Compiled into the default `scriptling` build, matching custom build tags, or discovered external database plugins | Register compiled plugins or load external plugins; see [Database availability](https://scriptling.dev/okf/scriptling-libraries/databases.md#availability) |
 | `scriptling.package` | Present only when a non-nil app/plugin bundle loader is available, including ordinary CLI or server execution | Register it with a non-nil package loader |
 | `scriptling.runtime.mcp` | Included wherever CLI setup registers the runtime aggregate, in ordinary CLI and server modes, unless disabled | `RegisterRuntimeLibraryAll(...)` includes it; `RegisterRuntimeMCPLibrary(p)` registers only this sub-library |
 

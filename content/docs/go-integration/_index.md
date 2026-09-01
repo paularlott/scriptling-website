@@ -14,6 +14,7 @@ Complete guide for embedding Scriptling in Go applications.
 - **Expose Go functions or classes quickly:** Use the type-safe [Builder API](builder/).
 - **Control conversion and performance directly:** Use the [Native API](native/).
 - **Control which modules scripts can import:** Read [Library Registration](library-registration/) and the [Library Loader Chain](loader-chain/).
+- **Run scripts that declare their requirements:** Check their [Script Metadata](script-metadata/) blocks before executing them.
 - **Extend the host out of process:** See [Embedding Plugins](plugins/). If you want to run Scriptling itself as a server, use the [CLI server guides](/docs/cli/) instead.
 
 ## Installation
@@ -65,6 +66,7 @@ Focused examples on the pages below generally assume `p` has been initialized as
 - [Script Extensions](scripts/) - Extend using Scriptling code
 - [Embedding Plugins](plugins/) - Enable executable plugins in embedded applications
 - [Library Loader Chain](loader-chain/) - Flexible library loading from multiple sources
+- [Checking Script Requirements](script-metadata/) - Verify scripts' inline metadata blocks before running them
 - [Documenting Extensions](documentation/) - Add help text to functions and libraries
 - [Library Registration](library-registration/) - Register built-in libraries when embedding
 - [Linting](lint/) - Code analysis for detecting syntax errors without execution
