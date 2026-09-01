@@ -18,7 +18,7 @@ type: API Reference
 
 Database libraries are plugins, not an unconditional part of every Scriptling binary. First choose how they are deployed, then choose a backend and API:
 
-1. Use `scriptling-full` for all four compiled in, add only the matching build tags to a custom binary, or load external plugin executables.
+1. Use the default `scriptling` build with all four compiled in, add only the matching build tags to a custom binary, or load external plugin executables.
 2. Before connecting, ensure the host policy permits the storage or endpoint: SQLite file paths and BadgerDB directories must be allowed, while SQLite `":memory:"` needs no path permission; SQL and Valkey endpoints must pass the host network policy.
 3. Choose [SQLite](https://scriptling.dev/okf/scriptling-libraries/databases/sqlite.md) for an embedded relational file or private in-memory database; choose [SQL](https://scriptling.dev/okf/scriptling-libraries/databases/sql.md) for MySQL, MariaDB, or PostgreSQL over the network.
 4. Use direct SQL for exact backend statements, or call `conn.get_orm()` for the dialect-aware common subset documented by the [Relational ORM](https://scriptling.dev/okf/scriptling-libraries/databases/orm.md).
@@ -60,7 +60,7 @@ The script-level relational API is autocommit: each connection or ORM terminal c
 
 ## Availability
 
-- **Compiled in:** `scriptling-full` includes SQLite, SQL, Valkey, and BadgerDB. Custom builds select them with `plugin_sqlite`, `plugin_sql`, `plugin_valkey`, and `plugin_badgerdb` build tags.
+- **Compiled in:** the default `scriptling` build includes SQLite, SQL, Valkey, and BadgerDB; `scriptling-slim` omits them. Custom builds select them with `plugin_sqlite`, `plugin_sql`, `plugin_valkey`, and `plugin_badgerdb` build tags.
 - **External plugins:** matching `sqlite`, `sql`, `valkey`, and `badgerdb` executables can be discovered or loaded through the host's plugin manager. This keeps the core binary lean but adds a separate plugin process and protocol boundary.
 
 The script APIs are aligned across compiled and external forms, including streaming `query_iter()` and ORM `iterate()`.

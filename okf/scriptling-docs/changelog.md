@@ -14,6 +14,15 @@ type: Guide
 ---
 # Changelog
 
+## September 2026
+
+### v0.24.0
+
+
+
+**Database drivers are built in by default.** `scriptling` now ships with the SQLite, SQL, Valkey and BadgerDB plugins compiled in, so database support needs no extra setup. `scriptling-full` is replaced by `scriptling-slim`, the lean build without the compiled-in drivers, which can still load them at runtime via `scriptling-plugins` or `--plugin-dir`. Homebrew users of the old full formula should run `brew uninstall scriptling-full && brew install scriptling`.
+
+
 ## August 2026
 
 ### v0.23.0

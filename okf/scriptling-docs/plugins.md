@@ -32,7 +32,7 @@ A plugin declares a name. A bare name such as `hello` registers in the plugin na
 
 ## First-Party Plugins
 
-The database plugins ship with Scriptling in every release form: compiled into `scriptling-full`, selectable individually with build tags, or as external plugin binaries from the release page (one `plugins-<os>-<arch>.zip` per platform, containing all four binaries named plainly; unzip it and point `--plugin-dir` at the folder). See the [database libraries reference](https://scriptling.dev/okf/scriptling-libraries/databases.md) for the full APIs.
+The database plugins ship with Scriptling in every release form: compiled into the default `scriptling` build, omitted from `scriptling-slim`, selectable individually with build tags, or as external plugin binaries from the release page (one `plugins-<os>-<arch>.zip` per platform, containing all four binaries named plainly; unzip it and point `--plugin-dir` at the folder). See the [database libraries reference](https://scriptling.dev/okf/scriptling-libraries/databases.md) for the full APIs.
 
 | Plugin | Import | Description |
 |--------|--------|-------------|
