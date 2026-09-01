@@ -22,6 +22,7 @@ Complete guide for embedding Scriptling in Go applications.
 - **Expose Go functions or classes quickly:** Use the type-safe [Builder API](https://scriptling.dev/okf/scriptling-docs/go-integration/builder.md).
 - **Control conversion and performance directly:** Use the [Native API](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md).
 - **Control which modules scripts can import:** Read [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) and the [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md).
+- **Run scripts that declare their requirements:** Check their [Script Metadata](https://scriptling.dev/okf/scriptling-docs/go-integration/script-metadata.md) blocks before executing them.
 - **Extend the host out of process:** See [Embedding Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md). If you want to run Scriptling itself as a server, use the [CLI server guides](https://scriptling.dev/okf/scriptling-docs/cli.md) instead.
 
 ## Installation
@@ -73,6 +74,7 @@ Focused examples on the pages below generally assume `p` has been initialized as
 - [Script Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md) - Extend using Scriptling code
 - [Embedding Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md) - Enable executable plugins in embedded applications
 - [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md) - Flexible library loading from multiple sources
+- [Checking Script Requirements](https://scriptling.dev/okf/scriptling-docs/go-integration/script-metadata.md) - Verify scripts' inline metadata blocks before running them
 - [Documenting Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/documentation.md) - Add help text to functions and libraries
 - [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - Register built-in libraries when embedding
 - [Linting](https://scriptling.dev/okf/scriptling-docs/go-integration/lint.md) - Code analysis for detecting syntax errors without execution
