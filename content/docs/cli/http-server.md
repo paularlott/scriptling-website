@@ -86,6 +86,43 @@ This can run alongside normal HTTP routes, static files, MCP tools, and the MCP
 script execution tool. See [JSON-RPC Server Mode](../jsonrpc-server/) for
 single request, batch, and notification examples.
 
+## Health Checks
+
+Every server (`--server` with HTTP routes, `--json-rpc`, or `--mcp-tools`)
+answers `GET /health` with `200 OK` by default — a plain liveness probe with
+no dependencies.
+
+To report your own readiness instead, register a handler for the path: a
+route claiming `GET /health` replaces the built-in responder, in HTTP-server
+mode and MCP/JSON-RPC server mode alike:
+
+```python
+# setup.py
+import scriptling.runtime.http as http
+
+@http.get("/health")
+def health(request):
+    # a health check that reflects real readiness
+    try:
+        conn = sql.connect("mariadb://user:pass@db:3306/app")
+        conn.query("select 1")
+        conn.close()
+    except Exception:
+        return http.json(503, {"status": "unhealthy", "db": "down"})
+    return http.json(200, {"status": "ok"})
+```
+
+Two things to know before claiming the path:
+
+- A claimed `/health` is a script route like any other, so script middleware
+  runs for it. If your middleware rejects unauthenticated requests, health
+  probes (which usually send no credentials) will be rejected too — allow
+  `/health` through in the middleware, or keep the built-in and expose
+  dependency status on a separate authenticated route. The built-in `/health`
+  itself never runs middleware.
+- `--bearer-token` wraps `/health` whichever responder is active (see
+  [Authentication](#authentication)); probes must carry the token.
+
 ## TLS/HTTPS
 
 Provide both `--tls-cert` and `--tls-key`, or use `--tls-generate`. If only one of the certificate/key flags is set, Scriptling does not enable TLS and starts the server over plaintext HTTP.

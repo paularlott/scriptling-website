@@ -390,7 +390,7 @@ The `--mcp-exec-script` flag allows AI assistants to execute arbitrary code. Con
 
 - Use `--allowed-paths` to restrict participating library filesystem I/O; it is not a complete sandbox
 - Use `--disable-lib subprocess` to remove shell access
-- Use `--bearer-token` to require authentication, or register script middleware for per-user keys (see [Per-User Keys](../http-server/#per-user-keys)). Middleware guards `/mcp`, but disables the global bearer wrapper and does not cover health or static routes.
+- Use `--bearer-token` to require authentication, or register script middleware for per-user keys (see [Per-User Keys](../http-server/#per-user-keys)). The token wraps every endpoint including `/mcp` and the built-in `/health`; middleware guards `/mcp` and script routes but not the built-in `/health` or static routes (a route claiming `GET /health` replaces the built-in — see [Health Checks](../http-server/#health-checks)).
 - Run in a sandboxed environment for untrusted AI systems
 
 ```bash
