@@ -34,9 +34,28 @@ A script without a block runs exactly as before; the block is opt-in.
 | `requires-scriptling` | Version constraint matched against the running scriptling version, e.g. `">=0.24"`. Operators: `>=`, `<=`, `>`, `<`, `==`, `!=`. |
 | `dependencies` | Libraries the script imports. Each entry is a library name, optionally followed by `via` and the plugin that provides it — `"scriptling.sql via sql >= 0.23"` — using the same optional version constraint as the `plugins` list. |
 | `plugins` | External plugin processes that must be loaded, each `"name"` with an optional version constraint: `"knot >= 1.2.3"`. Constraints are matched against the version each plugin declared in its handshake. |
-| `[tool.<name>]` | Reserved for tool and host configuration. Accepted and ignored by scriptling. |
+| `[tool.<name>]` | Reserved for tool and host configuration. Scriptling ignores the contents; the parsed tables are surfaced to embedding hosts (see [Tool tables](#tool-tables)). |
 
-Unknown keys are errors, not warnings — a typo like `dependencys` should fail loudly. Versions and constraints are dotted numeric (`0.24`, `1.2.3`).
+Unknown keys — outside the reserved `[tool.*]` tables — are errors, not warnings: a typo like `dependencys` should fail loudly. Versions and constraints are dotted numeric (`0.24`, `1.2.3`).
+
+## Tool tables
+
+Tables under `[tool.<name>]` are yours: scriptling never interprets their contents and the CLI never checks them — they exist so a script can carry configuration for the tool or host that runs it. An embedding host reads them from `Metadata.Tools` after parsing:
+
+```python
+# /// script
+# requires-scriptling = ">=0.24"
+#
+# [tool.knot]
+# version = "1.0.0"
+#
+# [[tool.knot.menus]]
+# label = "Metrics"
+# url = "https://grafana.internal"
+# ///
+```
+
+Any shape inside `[tool.*]` is accepted — scalars, nested tables, arrays of tables — and unknown keys are not errors there, unlike the block's own keys. A host that gives the tables meaning defines their schema and validates it itself; see [Checking Script Requirements](/docs/go-integration/script-metadata/) for the embedding side.
 
 **Plugin names** match the name a plugin declared in its handshake, and a bare name additionally matches the same name under scriptling's host-owned namespaces: `sql` finds the first-party plugin that declares `scriptling.sql`, and `hello` finds a plugin that declared the bare name `hello` (registered as `plugin.hello`). `knot` matches only `knot` — bare names never match third-party dotted namespaces like `knot.space`. The first-party database plugins declare scriptling's build version, so a constraint like `sql >= 0.23.0` pins the scriptling release the plugin was built with.
 

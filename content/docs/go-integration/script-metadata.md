@@ -66,6 +66,27 @@ pluginVersion := func(name string) (string, bool) {
 
 A nil `PluginVersion` (or one that always reports not-loaded) simply means every `plugins` entry and every unresolved `via` clause fails as "not loaded" — correct for hosts that embed no plugins.
 
+## Reading host configuration from `[tool.*]`
+
+The block can also carry your own tables. Scriptling ignores their contents, but `Parse` surfaces them: `Metadata.Tools` maps each `[tool.<name>]` table to its decoded value, and `Tool(name)` returns one table with its shape normalised — every nested table is `map[string]any` and every array is `[]any`, whichever of the decoder's two array shapes it produced.
+
+```go
+m, ok, err := metadata.Parse(source)
+if err != nil {
+	return err
+}
+if ok {
+	if knot, found := m.Tool("knot"); found {
+		// knot["version"], knot["menus"].([]any), ... — your schema, your validation
+	}
+	if err := m.Verify(metadata.Env{/* ... */}); err != nil {
+		return err
+	}
+}
+```
+
+Everything inside `[tool.*]` is accepted by scriptling — unknown keys are not errors there — so a host reading its own tables validates them itself and fails loudly on a malformed declaration. `Verify` never inspects `Tools`: requirements and host configuration are separate concerns sharing one block.
+
 ## Reporting failures your way
 
 `Verify` returns one aggregated `*metadata.CheckError` whose `Failures` carry a `Kind` — `FailureVersion`, `FailureLibrary`, `FailurePluginMissing`, `FailurePluginVersion` — with the rendered message for each. Hosts attach their own remedies the way the CLI appends how to load plugins:

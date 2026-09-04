@@ -8,6 +8,12 @@ nav-skip: true
 
 ## September 2026
 
+{{< version "v0.24.1" >}}
+
+{{< changelog-item "added" >}}
+**`[tool.*]` metadata tables are surfaced to embedding hosts.** `metadata.Parse` now returns the `[tool.<name>]` tables via `Metadata.Tools` and `Tool(name)`, so hosts can carry their own declarations in the block; scriptling still ignores their contents. See [Tool tables](/docs/script-metadata/#tool-tables).
+{{< /changelog-item >}}
+
 {{< version "v0.24.0" >}}
 
 {{< changelog-item "added" >}}
