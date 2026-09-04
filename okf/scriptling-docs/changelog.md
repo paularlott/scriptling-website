@@ -16,6 +16,13 @@ type: Guide
 
 ## September 2026
 
+### v0.24.1
+
+
+
+**`[tool.*]` metadata tables are surfaced to embedding hosts.** `metadata.Parse` now returns the `[tool.<name>]` tables via `Metadata.Tools` and `Tool(name)`, so hosts can carry their own declarations in the block; scriptling still ignores their contents. See [Tool tables](https://scriptling.dev/okf/scriptling-docs/script-metadata.md#tool-tables).
+
+
 ### v0.24.0
 
 

@@ -12,8 +12,9 @@
 #              stay relative per OKF §5.2, so the bundle never depends on a
 #              hosting path.
 #
-# okf/index.md, okf/index.html and okf/llms.txt are site-only catalogs outside
-# the bundles; the zip packs the three bundle directories only.
+# okf/index.md and okf/index.html are site-only catalogs outside the bundles;
+# the zip packs the three bundle directories only. The site llms.txt is written
+# to static/llms.txt (Hugo serves static/ at the site root, i.e. /llms.txt).
 import os
 import os.path
 import shutil
@@ -22,9 +23,26 @@ import re
 
 OUT = "okf"            # hosted tree: absolute links, committed, served at /okf/
 ZIP_OUT = "dist/okf"   # zip tree: relative links, packed into the release bundle
+LLMS_OUT = "static/llms.txt"  # site llms.txt: static/ is served at the site root
 OKF_VERSION = "0.2"
 GENERATED_BY = "scriptling-website/okf.py"
 BASE_URL = "https://scriptling.dev"
+
+SITE_SUMMARY = ("Scriptling is a sandbox-safe, Python-like scripting language for Go applications: "
+                "embed the interpreter, register only the libraries your host allows, and generate "
+                "normal Python 3 style code.")
+
+# Curated entry points listed ahead of the full concept catalog in llms.txt.
+ESSENTIAL_LINKS = [
+    ("LLM Script Generation Guide", "/docs/llm-guide/",
+     "Guidance for generating Scriptling code — includes a copyable AGENTS.md block"),
+    ("Quick Start", "/docs/quick-start/", "Install the CLI or embed in Go"),
+    ("Command Line Options", "/docs/cli/command-line-options/",
+     "Every flag, environment variable, and config file setting"),
+    ("Security Guide", "/docs/security/", "Sandboxing, filesystem restrictions, and network policies"),
+    ("Documentation MCP Server", "/docs/quick-start/documentation-mcp/",
+     "Serve the docs to agents over MCP with search"),
+]
 
 # (name, source_dir, default_type, excluded_subdirs)
 BUNDLES = [
@@ -420,9 +438,9 @@ def concept_description(out_file):
 
 
 def emit_llms_txt():
-    # Site-only llms.txt at /okf/llms.txt: every concept in every bundle as an
-    # absolute link, so an agent lists the whole corpus in one fetch. Never
-    # packed into the release zip.
+    # Site llms.txt at /llms.txt (static/ is served at the site root): curated
+    # essentials plus every concept in every bundle as an absolute link, so an
+    # agent lists the whole corpus in one fetch. Never packed into the zip.
     sections = []
     total = 0
     for name, _, _, _ in BUNDLES:
@@ -438,10 +456,21 @@ def emit_llms_txt():
             else:
                 lines.append("- [" + concept_title(f) + "](" + url + "): " + d)
         sections.append("\n".join(lines))
-    header = ["# Scriptling OKF bundles", "",
-              "> All " + str(total) + " OKF " + OKF_VERSION + " concepts, plain markdown served from "
-              + BASE_URL + "/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.", ""]
-    os.write_file(OUT + "/llms.txt", "\n".join(header + sections) + "\n")
+    header = ["# Scriptling", "",
+              "> " + SITE_SUMMARY, "",
+              "Docs: " + BASE_URL + "/docs/", "",
+              "All " + str(total) + " OKF " + OKF_VERSION + " concepts below are plain markdown served from "
+              + BASE_URL + "/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.", "",
+              "## Essential", ""]
+    for title, path, desc in ESSENTIAL_LINKS:
+        header.append("- [" + title + "](" + BASE_URL + path + "): " + desc)
+    bundles = ["## OKF bundles", "",
+               "Fetchable markdown (OKF " + OKF_VERSION + ") — each bundle's index.md lists its concepts:", ""]
+    for name, _, _, _ in BUNDLES:
+        bundles.append("- [" + name + "](" + BASE_URL + "/okf/" + name + "/index.md): " + BUNDLE_DESCRIPTIONS[name])
+    bundles.append("- [OKF catalog](" + BASE_URL + "/okf/index.md): Markdown index of all bundles")
+    os.write_file(LLMS_OUT,
+                  "\n".join(header) + "\n\n" + "\n".join(bundles) + "\n\n" + "\n\n".join(sections) + "\n")
 
 
 def emit_site_catalog():
@@ -455,7 +484,7 @@ def emit_site_catalog():
             "OKF " + OKF_VERSION + " knowledge bundles generated from the [Scriptling documentation](" + BASE_URL + "/docs/). "
             "Fetch these URLs directly: every document is plain markdown with YAML frontmatter, and every link is an absolute "
             + BASE_URL + "/okf/ URL, so no relative-path resolution is ever needed. "
-            "[llms.txt](" + BASE_URL + "/" + OUT + "/llms.txt) lists every page in one fetch. "
+            "[llms.txt](" + BASE_URL + "/llms.txt) lists every page in one fetch. "
             "The release zip keeps portable relative links per OKF §5.2.\n\n## Bundles\n\n" + "\n".join(entries) + "\n")
     os.write_file(OUT + "/index.md", body)
 
@@ -471,7 +500,7 @@ def emit_site_catalog():
             "<p>OKF " + OKF_VERSION + " knowledge bundles generated from the <a href=\"" + BASE_URL + "/docs/\">Scriptling documentation</a>. "
             "Every document is plain markdown with YAML frontmatter and absolute links — fetch these URLs directly, "
             "start from <a href=\"" + BASE_URL + "/" + OUT + "/index.md\">index.md</a>, or fetch "
-            "<a href=\"" + BASE_URL + "/" + OUT + "/llms.txt\">llms.txt</a> for every page in one list.</p>\n"
+            "<a href=\"" + BASE_URL + "/llms.txt\">llms.txt</a> for every page in one list.</p>\n"
             "<ul>\n" + "\n".join(rows) + "\n</ul>\n</body>\n</html>\n")
     os.write_file(OUT + "/index.html", html)
 

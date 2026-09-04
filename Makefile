@@ -11,7 +11,8 @@ architecture: asset-src/distributed-architecture.d2 asset-src/architecture-singl
 
 ## Generate OKF 0.2 knowledge bundles: okf/ (hosted copy with absolute links, committed —
 ## Cloudflare runs Hugo, not scripts; mounted into the site at /okf/) and dist/okf/
-## (zip copy with portable relative links, not committed)
+## (zip copy with portable relative links, not committed). Also regenerates the
+## site llms.txt at static/llms.txt, served at /llms.txt.
 okf:
 	scriptling scripts/okf.py
 
@@ -24,9 +25,9 @@ bundle-pack: okf
 
 ## Regenerate OKF bundles; commit them if anything changed (no push)
 okf-sync: okf
-	@if ! git diff --quiet -- okf/; then \
+	@if ! git diff --quiet -- okf/ static/llms.txt; then \
 		echo "OKF bundles changed; committing"; \
-		git add okf/ && git commit -m "Regenerate OKF bundles"; \
+		git add okf/ static/llms.txt && git commit -m "Regenerate OKF bundles"; \
 	else \
 		echo "OKF bundles up to date"; \
 	fi
