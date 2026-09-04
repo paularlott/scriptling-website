@@ -8,6 +8,12 @@ nav-skip: true
 
 ## September 2026
 
+{{< version "v0.24.2" >}}
+
+{{< changelog-item "added" >}}
+**Relational transactions with commit and rollback.** `conn.begin()` on `scriptling.sqlite` and `scriptling.sql` returns a Transaction whose `query()`, `query_iter()` and `execute()` run inside one atomic unit, ended by `commit()` (keep) or `rollback()` (discard). `tx.get_orm()` binds the ORM to the open transaction so builder chains and model gateways join it, `?` placeholders keep working on PostgreSQL, and an abandoned transaction rolls back automatically once collected (compiled-in builds previously never ran the cleanup for objects created inside plugin methods — abandoned cursors leaked their connection too, and both now release at the next collection cycle). See the [SQLite](/reference/libraries/databases/sqlite/#transactions) and [SQL](/reference/libraries/databases/sql/#transactions) transaction sections.
+{{< /changelog-item >}}
+
 {{< version "v0.24.1" >}}
 
 {{< changelog-item "added" >}}

@@ -51,7 +51,7 @@ The same `query()` and `execute()` shape applies to `scriptling.sql`; change the
 
 Use connection methods when you need backend-specific SQL, joins, DDL, or exact query plans. Use the [Relational ORM](orm/) for generated selects, criteria, inserts, guarded updates/deletes, dialect-aware table creation for its documented common subset, and model gateways. Both operate through the same connection.
 
-The script-level relational API is autocommit: each connection or ORM terminal call executes independently. It exposes no transaction handle, `begin()`, `commit()`, or `rollback()`, so it cannot group multiple script calls into one atomic transaction.
+Both plugins provide transactions: `conn.begin()` returns a handle whose `query()`/`execute()` run inside one atomic unit, ended by `commit()` or `rollback()`, and `tx.get_orm()` binds the ORM to the open transaction. Outside a transaction the API is autocommit. See the [SQLite](sqlite/#transactions) and [SQL](sql/#transactions) transaction sections.
 
 ## Availability
 

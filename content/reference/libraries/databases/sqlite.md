@@ -51,6 +51,7 @@ Rows are dicts keyed by column name; values are ints, floats, bools, strings or 
 | `query(sql, *params)` | Run a SELECT-style statement, returning a list of row dicts |
 | `query_iter(sql, *params)` | Same statement, streamed: a `Cursor` whose `next()` yields one row dict at a time (`None` at the end) instead of materialising the whole result |
 | `execute(sql, *params)` | Run a row-changing statement (INSERT/UPDATE/DELETE/DDL), returning `{"last_insert_id": int, "rows_affected": int}` |
+| `begin()` | Start a [`Transaction`](#transactions) |
 | `get_orm()` | Return the [ORM](../orm/) bound to this connection |
 | `close()` | Close the connection and release the database handle |
 
@@ -58,7 +59,32 @@ The class can also be constructed directly: `sqlite.Connection(path, timeout_ms=
 
 ## Transactions
 
-The script-facing relational API is autocommit: each `query()`, `execute()`, or ORM terminal call runs independently. It exposes no transaction handle and no `begin()`, `commit()`, or `rollback()` methods, so multiple calls cannot be grouped into one atomic transaction through this API.
+`conn.begin()` starts a transaction and returns a `Transaction` handle. Statements run through the handle — its `query()`, `query_iter()` and `execute()` — form one atomic unit: `commit()` makes them permanent, `rollback()` discards them. The handle's statement surface matches the connection's, `?` placeholders included.
+
+```python
+tx = conn.begin()
+tx.execute("update accounts set balance = balance - 25 where name = ?", "ada")
+tx.execute("update accounts set balance = balance + 25 where name = ?", "grace")
+tx.commit()          # or tx.rollback() to undo both
+```
+
+| Method | Description |
+|--------|-------------|
+| `query(sql, *params)` | Run a SELECT-style statement inside the transaction |
+| `query_iter(sql, *params)` | Same statement, streamed as a `Cursor`; drain or close it before commit or rollback |
+| `execute(sql, *params)` | Run a row-changing statement inside the transaction |
+| `commit()` | Make the transaction's changes permanent and end it |
+| `rollback()` | Discard the transaction's changes and end it |
+| `get_orm()` | Return the [ORM](../orm/) bound to this transaction, so its calls join it |
+
+Every operation on a finished transaction fails with `transaction is already committed or rolled back`, whichever way it ended. A transaction abandoned without either call is rolled back automatically once the runtime collects it, so an error path that simply returns leaves no half-applied work behind — do not rely on the timing: end transactions explicitly (`try`/`except` with `rollback()` in the handler), because until collection runs the connection stays held.
+
+Outside a transaction the API is autocommit. Two SQLite-specific notes for a private in-memory database (`":memory:"`), which runs on a single connection:
+
+- While a transaction is open, the connection's own calls fail fast with `connection is held by an open transaction` — use the transaction's methods until it ends.
+- An open `query_iter()` cursor holds the connection the same way (`connection is held by an open cursor`); drain it or call `close()`. A cursor abandoned mid-iteration releases its rows automatically once collected.
+
+A file database serves the transaction, the cursor and the connection from separate pooled connections, so connection-level reads keep working and see the committed view.
 
 ## Streaming Large Results
 

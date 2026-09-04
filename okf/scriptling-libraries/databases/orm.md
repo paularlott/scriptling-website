@@ -50,7 +50,15 @@ The table builder renders the auto-increment primary key per backend, so the fun
 
 ## Transactions
 
-ORM terminal operations use the connection's autocommit API. Each `fetch()`, `count()`, `insert()`, `execute()`, `save()`, or `delete()` call is independent, and the ORM exposes no transaction handle. It cannot group several calls into one atomic transaction.
+Through a connection's ORM the terminal operations are autocommit: each `fetch()`, `count()`, `insert()`, `execute()`, `save()`, or `delete()` call runs as its own statement. To group several calls into one atomic unit, start a transaction with `conn.begin()` and take the ORM from the handle: `tx.get_orm()` returns a kit whose every call — queries, builders, model gateways — runs inside the transaction until `tx.commit()` or `tx.rollback()`.
+
+```python
+tx = conn.begin()
+torm = tx.get_orm()
+torm.insert("people", {"name": "ada", "score": 9.5})
+torm.update("people", {"score": 9.9}).where("name", "=", "ada").execute()
+tx.rollback()        # both changes disappear
+```
 
 ## Query Builders
 

@@ -59,6 +59,7 @@ Rows are dicts keyed by column name; values are ints, floats, bools, strings or 
 | `query(sql, *params)` | Run a SELECT-style statement, returning a list of row dicts |
 | `query_iter(sql, *params)` | Stream a statement as a `Cursor` in compiled-in and external SQL deployments |
 | `execute(sql, *params)` | Run a row-changing statement, returning `{"last_insert_id": int, "rows_affected": int}` |
+| `begin()` | Start a [`Transaction`](#transactions) |
 | `get_orm()` | Return the [ORM](https://scriptling.dev/okf/scriptling-libraries/databases/orm.md) bound to this connection |
 | `close()` | Close the connection |
 
@@ -71,7 +72,39 @@ print(rows[0]["id"])
 
 ## Transactions
 
-The script-facing API is autocommit: each `query()`, `execute()`, or ORM terminal call runs independently. It exposes no transaction handle and no `begin()`, `commit()`, or `rollback()` methods, so multiple calls cannot be grouped into one atomic transaction through this API.
+`conn.begin()` starts a transaction and returns a `Transaction` handle. Statements run through the handle — its `query()`, `query_iter()` and `execute()` — form one atomic unit: `commit()` makes them permanent, `rollback()` discards them. The handle's statement surface matches the connection's, `?` placeholders included.
+
+```python
+tx = conn.begin()
+tx.execute("update accounts set balance = balance - 25 where name = ?", "ada")
+tx.execute("update accounts set balance = balance + 25 where name = ?", "grace")
+tx.commit()          # or tx.rollback() to undo both
+
+tx = conn.begin()
+tx.execute("insert into people (name) values (?)", "temporary")
+tx.rollback()        # the row is gone
+```
+
+| Method | Description |
+|--------|-------------|
+| `query(sql, *params)` | Run a SELECT-style statement inside the transaction |
+| `query_iter(sql, *params)` | Same statement, streamed as a `Cursor`; drain or close it before commit or rollback |
+| `execute(sql, *params)` | Run a row-changing statement inside the transaction |
+| `commit()` | Make the transaction's changes permanent and end it |
+| `rollback()` | Discard the transaction's changes and end it |
+| `get_orm()` | Return the [ORM](https://scriptling.dev/okf/scriptling-libraries/databases/orm.md) bound to this transaction, so its calls join it |
+
+Every operation on a finished transaction fails with `transaction is already committed or rolled back`, whichever way it ended. A transaction abandoned without either call is rolled back automatically once the runtime collects it, so an error path that simply returns leaves no half-applied work behind — end transactions explicitly (`try`/`except` with `rollback()` in the handler) rather than relying on collection timing. On pooled server backends an abandoned transaction holds one pooled connection until then; the connection's other calls are unaffected.
+
+Outside a transaction the API is autocommit: each connection-level `query()`, `execute()` or ORM terminal call runs independently. Connection-level calls while a transaction is open run on separate pooled connections and do not see its uncommitted changes until commit.
+
+```python
+tx = conn.begin()
+tx.execute("insert into people (name) values (?)", "pending")
+len(conn.query("select 1 from people where name = 'pending'"))   # 0 — not committed
+tx.commit()
+len(conn.query("select 1 from people where name = 'pending'"))   # 1
+```
 
 ## Streaming Large Results
 
