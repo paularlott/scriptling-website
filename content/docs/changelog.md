@@ -8,6 +8,12 @@ nav-skip: true
 
 ## September 2026
 
+{{< version "v0.24.3" >}}
+
+{{< changelog-item "fixed" >}}
+**Multiline conditional expressions and parser robustness.** `x if cond else y` written across lines inside brackets now parses (newlines are whitespace there, as in Python), and a malformed `if` no longer crashes the parser with a nil dereference — it reports ordinary parser errors.
+{{< /changelog-item >}}
+
 {{< version "v0.24.2" >}}
 
 {{< changelog-item "added" >}}
