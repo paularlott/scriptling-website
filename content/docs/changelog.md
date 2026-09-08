@@ -8,6 +8,12 @@ nav-skip: true
 
 ## September 2026
 
+{{< version "v0.24.4" >}}
+
+{{< changelog-item "added" >}}
+**Plugins can declare opaque manifest data in the handshake.** A plugin may attach a host-defined data map that travels verbatim in the plugin handshake — Go peers via `Server.SetMetadata(map[string]any)`, Scriptling-authored peers via `runtime.plugin.serve(name, ..., metadata={...})` — and the host reads it back with `Client.Metadata().Custom`. Scriptling never interprets the data; it is the channel for a host to learn plugin-specific declarations from the manifest without running any plugin code. Backward compatible: plugins that declare none send nothing, and older hosts ignore the field. See [Plugin protocol](/docs/plugins/protocol/#custom-manifest-data).
+{{< /changelog-item >}}
+
 {{< version "v0.24.3" >}}
 
 {{< changelog-item "fixed" >}}

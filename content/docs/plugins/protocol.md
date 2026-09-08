@@ -151,7 +151,7 @@ Remote objects are passed by reference:
 | --- | --- | --- |
 | `protocol` | string | Must exactly match the host protocol version, currently `"1.0"` |
 | `transport` | string | Must be `"json"` |
-| `library` | object | `name`, `version`, `description` |
+| `library` | object | `name`, `version`, `description`, and optional `custom` (see [Custom manifest data](#custom-manifest-data)) |
 | `capabilities` | [string] | Plugin capabilities |
 | `scheme` | string | The source scheme this plugin's fetcher serves (with the `fetch` capability); one scheme per plugin |
 | `schema` | object | Functions, classes, and constants |
@@ -216,6 +216,61 @@ If the plugin returns any other protocol version, the host refuses to load it an
 When `source` is empty or absent the host auto-generates an RPC proxy: every call is a JSON-RPC round trip. When `source` is provided the host compiles and runs that Scriptling code itself, so it executes entirely host-side; it becomes a wrapper around RPC calls (using `scriptling.plugin.call_method` / `call_function` to reach the plugin) or pure host-side logic. If any entry carries a source the whole module registers as script: entries without sources get their auto-generated shims emitted alongside. See [Host-Side Scripting](../go-plugins/host-side-scripting/) for the authoring side.
 
 Class `properties` are auto-generated as Scriptling @property descriptors. `settable: true` means the host also generates a setter. Getter-only properties are read-only from Scriptling.
+
+#### Custom manifest data
+
+The `library` object may carry an optional `custom` field — an arbitrary,
+host-defined data map that scriptling transports verbatim and never interprets.
+It is the channel for a host to learn plugin-specific declarations from the
+manifest **without running any plugin code**: the data rides in the handshake,
+so the host reads it the moment the plugin connects.
+
+```json
+{
+  "library": {
+    "name": "metrics",
+    "version": "1.0.0",
+    "description": "Metrics plugin",
+    "custom": { "manifest": "…host-specific declaration text…" }
+  }
+}
+```
+
+The data must be **static** — the same value on every run — so a host loading
+the plugin on different machines sees an identical manifest. Older plugins that
+declare none simply omit the field, and older hosts ignore it, so it is fully
+backward compatible.
+
+**Declaring it — Go peer:**
+
+```go
+srv := plugin.NewServer("metrics", "1.0.0", "Metrics plugin")
+srv.SetMetadata(map[string]any{
+    "manifest": "…host-specific declaration text…",
+})
+// … register functions/classes …
+srv.Run()
+```
+
+**Declaring it — Scriptling-authored peer:**
+
+```python
+import scriptling.runtime as rt
+
+rt.plugin.serve("metrics", "1.0.0", "Metrics plugin", metadata={
+    "manifest": "…host-specific declaration text…",
+})
+# … register functions …
+rt.start_server()
+```
+
+**Reading it — host side (Go):**
+
+```go
+client, _ := manager.LoadPath(ctx, "metrics", path, true, nil)
+custom := client.Metadata().Custom // map[string]any, nil if the plugin declared none
+manifest, _ := custom["manifest"].(string)
+```
 
 ### `environment.open`
 
