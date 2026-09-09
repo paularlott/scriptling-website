@@ -8,6 +8,12 @@ nav-skip: true
 
 ## September 2026
 
+{{< version "v0.24.5" >}}
+
+{{< changelog-item "added" >}}
+**Script peers can serve sources from the script itself.** `runtime.plugin.register_fetcher(scheme, read_handler, glob_handler=None)` registers a fetcher backed by script handlers: the host asks for files on demand and the read handler answers from strings or bytes inside the script (`None` is a miss). This is how a script peer carries a host's declared assets — an icon, a logo — without any files on disk, the scriptling equivalent of a Go peer's embedded assets. knot reads declared plugin assets peer-first, disk second, so a scriptling peer can now be a single-file plugin. See [Plugin server](/docs/cli/plugin-server/#runtime-plugin-register-fetcher-scheme-read-handler-glob-handler-none).
+{{< /changelog-item >}}
+
 {{< version "v0.24.4" >}}
 
 {{< changelog-item "added" >}}

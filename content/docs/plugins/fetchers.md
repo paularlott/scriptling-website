@@ -227,6 +227,45 @@ A complete example lives at `examples/plugins/fetcher-go` in the repository;
 the [fetcher plugin tutorial](../tutorials/fetcher-plugin/) walks through it,
 including the function and class halves of the same plugin.
 
+## Scriptling Plugins
+
+A script peer registers a fetcher the same way it registers functions — the
+handlers are `"library.function"` refs, and the conventions map onto the same
+contract: return the contents (string or bytes), `None` is a miss, any other
+error fails the read:
+
+```python
+import scriptling.runtime.plugin as plugin_srv
+import scriptling.runtime as runtime
+
+plugin_srv.serve("myfetcher", "1.0")
+plugin_srv.register_fetcher("mylib", "impl.fetch_read", "impl.fetch_glob")
+runtime.start_server()
+```
+
+```python
+# impl.py
+ASSETS = {
+    "assets/icon.svg": "<svg xmlns=\"http://www.w3.org/2000/svg\">...</svg>",
+    "lib/greet.py": "def greet(name):\n    return \"hello \" + name\n",
+}
+
+def fetch_read(source, path):
+    return ASSETS.get(path)   # None is a miss (ErrFetchNotFound)
+
+def fetch_glob(source, pattern):
+    # Match however suits your tree; this one treats the pattern as a prefix.
+    return [{"name": name, "is_dir": False}
+            for name in ASSETS if name.startswith(pattern.rstrip("*"))]
+```
+
+Bytes returned from a handler travel base64-encoded, so binary assets arrive
+intact. A glob handler is optional — without one the fetcher answers no
+matches, which is valid (hosts that only read declared assets never glob).
+The full handler-writing guide — including a disk-backed fetcher with root
+containment — is in [Plugin Server: serving
+sources](/docs/cli/plugin-server/#serving-sources-fetchers).
+
 ## C Plugins
 
 The C SDK exposes the same feature:
