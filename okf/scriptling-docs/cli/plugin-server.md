@@ -30,7 +30,9 @@ setup script:
 1. The setup script calls `runtime.plugin.serve(name, version, description)` to
    declare a plugin identity.
 2. It registers functions, constants, and classes with `runtime.plugin.register_function`,
-   `runtime.plugin.register_constant`, and `runtime.plugin.register_class`.
+   `runtime.plugin.register_constant`, and `runtime.plugin.register_class` — and may
+   register a fetcher with `runtime.plugin.register_fetcher` to serve sources
+   (a host's declared assets) from the script itself.
 3. It calls `runtime.start_server()`: the CLI switches from the plain JSON-RPC
    loop to the full plugin protocol, serving `scriptling.handshake`,
    `function.call`, `object.*`, and constants over stdio or HTTP.
@@ -149,7 +151,7 @@ decorators.
 
 ## API
 
-### `runtime.plugin.serve(name, version="", description="")`
+### `runtime.plugin.serve(name, version="", description="", *, metadata=None)`
 
 Declare this script as a Scriptling plugin server.
 
@@ -158,6 +160,7 @@ Declare this script as a Scriptling plugin server.
 | `name` | str | Library name. Clients import it as `plugin.<name>`. |
 | `version` | str | Optional version string (e.g. `"1.0.0"`). |
 | `description` | str | Optional human-readable description. |
+| `metadata` | dict | Optional opaque, host-defined manifest data carried verbatim in the handshake — the channel for a host to learn plugin-specific declarations without running plugin code. Keep it static. |
 
 Must be called before `runtime.start_server()`. A warning is printed to stderr
 if called after the server has started.
@@ -203,6 +206,33 @@ supported over the **stdio transport**. HTTP connections are request/response
 only and cannot carry server→client callback calls.
 
 Must be called before `runtime.start_server()`.
+
+### `runtime.plugin.register_fetcher(scheme, read_handler, glob_handler=None)`
+
+Register a fetcher so the host can ask this peer for files on demand — how a script peer serves a host's declared assets (an icon, a logo) from strings or bytes inside the script itself, with no asset files on disk. The scriptling equivalent of a Go peer's embedded assets.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `scheme` | str | The source scheme to serve, e.g. `"notes"` (the host asks for `notes://<path>`). Not `http`, `https` or `file`. |
+| `read_handler` | str | Handler ref called as `fn(source, path)`. Return the contents (string or bytes); `None` is a miss (not found); any other error fails the read. |
+| `glob_handler` | str | Optional ref called as `fn(source, pattern)`, returning a list of `{name, is_dir}` dicts. Without it the fetcher reports no glob matches. |
+
+```python
+# setup script
+import scriptling.runtime.plugin as plugin_srv
+
+plugin_srv.register_fetcher("notes", "impl.fetch_read")
+
+# impl.py
+ASSETS = {
+    "assets/icon.svg": "<svg ...>",
+}
+
+def fetch_read(source, path):
+    return ASSETS.get(path)   # None answers a miss
+```
+
+A host reads declared assets peer-first and falls back to disk on a miss, so a scriptling peer can be a single-file plugin. Must be called before `runtime.start_server()`.
 
 ### `runtime.plugin.register_constant(name, value)`
 
@@ -255,6 +285,68 @@ print(cfg.greeting("world"))   # "Hello, world"
 
 The class and its method closures are resolved once at server startup and held
 for the lifetime of the server. Must be called before `runtime.start_server()`.
+
+## Serving sources (fetchers)
+
+`register_fetcher` turns the peer into an on-demand source server: the host asks for files as it needs them, and your handlers answer from anywhere a script can read — strings in the script, bytes, or files on disk. The common use is serving a host's declared assets (an icon, a logo) so the peer needs no asset files beside it. The fetcher contract itself — schemes, the glob language, error kinds — is [Plugin Fetchers](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md); this section is how to write the handlers in scriptling.
+
+Both handlers are ordinary plugin handlers: `"library.function"` refs, run on a fresh evaluator per call, receiving the full source string and a slash path relative to it.
+
+| Handler | Called as | Returns |
+|---------|-----------|---------|
+| `read_handler` | `fn(source, path)` | The file's contents — a string or `bytes`. `None` is a **miss** (the host falls back or reports not found); any other error fails the read. |
+| `glob_handler` | `fn(source, pattern)` | A list of `{name, is_dir}` dicts. No matches is an empty list. |
+
+### Inlined assets
+
+The single-file pattern — the scriptling equivalent of a Go peer's `go:embed`:
+
+```python
+# impl.py
+ASSETS = {
+    "assets/icon.svg": "<svg xmlns=\"http://www.w3.org/2000/svg\">...</svg>",
+    "assets/logo.png": bytes([0x89, 0x50, 0x4e, 0x47]),  # binary survives the wire (base64)
+}
+
+def fetch_read(source, path):
+    return ASSETS.get(path)   # None answers a miss
+
+def fetch_glob(source, pattern):
+    # Simplest useful matcher: treat the pattern as a prefix. Hosts that
+    # only read declared assets never call this; match however suits you.
+    return [{"name": name, "is_dir": False}
+            for name in ASSETS if name.startswith(pattern.rstrip("*"))]
+```
+
+```python
+# setup script
+plugin_srv.register_fetcher("notes", "impl.fetch_read", "impl.fetch_glob")
+```
+
+### Serving files from disk
+
+A fetcher may also front real files — here a `files/` folder beside the peer, with the path shape checked so a request can never escape the root:
+
+```python
+# impl.py
+import os
+import os.path
+import sys
+import pathlib
+
+ROOT = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "files")
+
+def fetch_read(source, path):
+    # A miss, not an error, for anything that is not a file inside ROOT.
+    if path == "" or path.startswith("/") or path.startswith(".."):
+        return None
+    full = os.path.join(ROOT, path)
+    if not os.path.isfile(full):
+        return None
+    return pathlib.Path(full).read_text()
+```
+
+Return `None` for anything the peer does not serve — the host treats it as not-found exactly like a missing file, and a host such as knot falls back to the plugin folder on disk. Raise (or return an error) only when the peer genuinely failed: hosts retry or degrade, they do not treat it as a miss.
 
 ## Keeping the Setup Script Alive
 
