@@ -82,6 +82,9 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 |---------|-------|
 | Module `__all__` | Export lists are not used |
 | `__future__` imports | Not applicable |
+| `__next__` returning a `StopIteration()` *value* | Ends iteration without yielding it — only *raising* `StopIteration` signals end-of-iteration |
+| Default argument evaluation | Defaults are evaluated on each call (Python evaluates once, at `def` time) |
+| Lazy iteration | `any`/`all`/`sorted`/`min`/`max`/`map`/`filter` materialize their iterable eagerly; `any([True, boom()])` raises where Python short-circuits |
 
 ## Supported Python 3 Features
 
@@ -89,6 +92,7 @@ Scriptling **does support**:
 
 - ✅ Classes with single inheritance and `super()`
 - ✅ Dunder methods: `__str__`, `__repr__`, `__len__`, `__bool__`, `__eq__`, `__lt__`, `__gt__`, `__le__`, `__ge__`, `__ne__`, `__contains__`, `__iter__`, `__next__`, `__enter__`, `__exit__`
+- ✅ Dunders honored everywhere: container membership/lookup use `__eq__`/`__hash__`, and comparisons reflect (`b.__gt__(a)` when `a` defines no `__lt__`)
 - ✅ Lambda functions and closures
 - ✅ List comprehensions, dict comprehensions, and set comprehensions
 - ✅ Generator-expression syntax, evaluated eagerly and materialized rather than returned as a lazy generator object

@@ -16,6 +16,35 @@ type: Guide
 
 ## September 2026
 
+### v0.25.0
+
+
+
+**Reading a missing dict key or an out-of-range index now raises `KeyError` / `IndexError`, matching Python.** Scripts that relied on getting `None` back should use `key in d`, `d.get(key, default)`, or a bounds check instead.
+
+
+
+**Exceptions behave like Python everywhere.** A `raise` inside a call argument, comprehension, condition, f-string, `with`, `match`, user iterator, or dunder method now reaches the nearest `except` instead of being swallowed, silently converted to a value, or reported as a confusing type error. Constructing an exception (`e = ValueError("x")`) remains a harmless value, exactly as in Python.
+
+
+
+**Classes now work where they used to be quietly ignored.** Class bodies run every statement, so attribute assignments like `x = 5` become class attributes. `sorted()`, `min()`/`max()`, membership tests, `.index()`, and dict keys all honor `__lt__`, `__eq__` and `__hash__`, comparisons try the reflected operator (`b.__gt__(a)` when `a` defines no `__lt__`), and `str()`, `%s`, f-strings and `join()` convert instances through `__str__` (falling back to `__repr__`).
+
+
+
+**Anything iterable works anywhere a list does.** `list()`, `sorted()`, `map()`, `filter()`, `sum()`, `zip()`, `enumerate()`, `join()` and tuple unpacking now accept classes with `__iter__`/`__next__` (previously rejected with a type error), a raising iterator surfaces its error instead of hanging, and infinite iterators stay cancellable by timeout.
+
+
+
+**Formatting is up to Python spec.** `str.format` supports named fields, indexes, escapes and format specs (`"{name:>10}".format(name=…)`), f-strings gained `!r`/`!s` conversions and nested spec fields (`f"{x:>{w}}"`), and bare `raise ValueError` (no parentheses) instantiates the class — so `raise StopIteration` works inside iterators.
+
+
+
+**Smaller fixes:** using the default `scriptling.runtime.kv` store before it's open raises a catchable error instead of crashing the host; importing a module whose top level raises re-raises the original exception instead of flattening to `ImportError`; a `re.sub()` callback's raise surfaces instead of being spliced into the result; `itertools` accepts script-defined functions; out-of-range subscript *writes* raise `IndexError`; `functools.reduce` accepts lambdas.
+
+
+---
+
 ### v0.24.6
 
 
