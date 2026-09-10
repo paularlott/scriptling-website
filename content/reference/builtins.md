@@ -248,6 +248,9 @@ s.count("o")                       # 2 (count occurrences)
 # String formatting
 "Hello, {}!".format("World")       # "Hello, World!"
 "{} + {} = {}".format(1, 2, 3)     # "1 + 2 = 3"
+"{name} is {age}".format(name="Ada", age=36)   # "Ada is 36" (named fields)
+"{:>6.2f}".format(3.14159)         # "  3.14" (format specs)
+"{{literal}}".format()             # "{literal}" (escaped braces)
 
 # Character type checks
 "123".isdigit()                    # True
