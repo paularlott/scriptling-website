@@ -16,12 +16,22 @@ type: Guide
 
 ## September 2026
 
+### v0.24.6
+
+
+
+**Reduce log noise during plugin load.** Plugin initialization messages are now less verbose, focusing only on essential information.
+
+
+---
+
 ### v0.24.5
 
 
 
 **Script peers can serve sources from the script itself.** `runtime.plugin.register_fetcher(scheme, read_handler, glob_handler=None)` registers a fetcher backed by script handlers: the host asks for files on demand and the read handler answers from strings or bytes inside the script (`None` is a miss). This is how a script peer carries a host's declared assets — an icon, a logo — without any files on disk, the scriptling equivalent of a Go peer's embedded assets. knot reads declared plugin assets peer-first, disk second, so a scriptling peer can now be a single-file plugin. See [Plugin server](https://scriptling.dev/okf/scriptling-docs/cli/plugin-server.md#runtime-plugin-register-fetcher-scheme-read-handler-glob-handler-none).
 
+---
 
 ### v0.24.4
 
@@ -30,12 +40,16 @@ type: Guide
 **Plugins can declare opaque manifest data in the handshake.** A plugin may attach a host-defined data map that travels verbatim in the plugin handshake — Go peers via `Server.SetMetadata(map[string]any)`, Scriptling-authored peers via `runtime.plugin.serve(name, ..., metadata={...})` — and the host reads it back with `Client.Metadata().Custom`. Scriptling never interprets the data; it is the channel for a host to learn plugin-specific declarations from the manifest without running any plugin code. Backward compatible: plugins that declare none send nothing, and older hosts ignore the field. See [Plugin protocol](https://scriptling.dev/okf/scriptling-docs/plugins/protocol.md#custom-manifest-data).
 
 
+---
+
 ### v0.24.3
 
 
 
 **Multiline conditional expressions and parser robustness.** `x if cond else y` written across lines inside brackets now parses (newlines are whitespace there, as in Python), and a malformed `if` no longer crashes the parser with a nil dereference — it reports ordinary parser errors.
 
+
+---
 
 ### v0.24.2
 
@@ -44,12 +58,16 @@ type: Guide
 **Relational transactions with commit and rollback.** `conn.begin()` on `scriptling.sqlite` and `scriptling.sql` returns a Transaction whose `query()`, `query_iter()` and `execute()` run inside one atomic unit, ended by `commit()` (keep) or `rollback()` (discard). `tx.get_orm()` binds the ORM to the open transaction so builder chains and model gateways join it, `?` placeholders keep working on PostgreSQL, and an abandoned transaction rolls back automatically once collected (compiled-in builds previously never ran the cleanup for objects created inside plugin methods — abandoned cursors leaked their connection too, and both now release at the next collection cycle). See the [SQLite](https://scriptling.dev/okf/scriptling-libraries/databases/sqlite.md#transactions) and [SQL](https://scriptling.dev/okf/scriptling-libraries/databases/sql.md#transactions) transaction sections.
 
 
+---
+
 ### v0.24.1
 
 
 
 **`[tool.*]` metadata tables are surfaced to embedding hosts.** `metadata.Parse` now returns the `[tool.<name>]` tables via `Metadata.Tools` and `Tool(name)`, so hosts can carry their own declarations in the block; scriptling still ignores their contents. See [Tool tables](https://scriptling.dev/okf/scriptling-docs/script-metadata.md#tool-tables).
 
+
+---
 
 ### v0.24.0
 
