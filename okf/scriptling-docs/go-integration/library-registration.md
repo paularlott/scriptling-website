@@ -301,6 +301,7 @@ if err != nil {
 | `DeniedCIDRs` | `[]string` | `nil` | Address ranges blocked explicitly; wins over everything, including `AllowedCIDRs` |
 | `DNSServers` | `[]string` | `nil` | Resolve through these servers (`"1.1.1.1"` or `"8.8.8.8:53"`, plain DNS) instead of the host resolver; the same resolver then serves `scriptling.net.resolve` too |
 | `AllowAll` | `bool` | `false` | Host-use only (not settable from policy files): disable every address and host check, leaving only the shared DNS resolver — the way to configure nameservers without imposing a policy |
+| `ClientTimeout` | `time.Duration` | `0` | Optional end-to-end cap on each HTTP request — dial, TLS, redirects, reading the body — for the client the guard hands to script libraries. `0` enforces no cap: requests run as long as their own per-request timeout allows, which long-running calls such as LLM APIs need. Policy files set it as `client_timeout = "45s"` |
 
 An invalid config (bad CIDR, malformed DNS server) fails `netsecurity.NewGuard` / `LoadConfig` with an error — treat it as a startup failure. `netsecurity.FailClosed(err)` returns a guard that rejects every request if you need to keep serving after a config error.
 

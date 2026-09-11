@@ -67,6 +67,12 @@ deny_cidrs  = ["10.66.0.0/16"]
 # (plain DNS, port 53). One resolver then serves every script network path,
 # including scriptling.net.resolve, so lookups and connections always agree.
 dns_servers = ["1.1.1.1", "8.8.8.8:53"]
+
+# Cap each HTTP request end to end - dial, TLS, redirects, reading the
+# body - e.g. "30s" or "2m". Off by default: requests run as long as
+# their own per-request timeout allows, which long-running calls such as
+# LLM APIs need.
+client_timeout = "30s"
 ```
 
 Common recipes:
