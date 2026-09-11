@@ -8,6 +8,14 @@ nav-skip: true
 
 ## September 2026
 
+{{< version "v0.25.1" >}}
+
+{{< changelog-item "changed" >}}
+**The guarded HTTP client no longer enforces a fixed 30-second cap.** `requests` and `scriptling.wait_for` under a network policy now run as long as their own per-request timeout allows, so long-running calls such as LLM APIs are no longer cut off. Hosts that want a cap can set `ClientTimeout` on `netsecurity.Config`, or `client_timeout = "30s"` in a `--network-policy` file.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.25.0" >}}
 
 {{< changelog-item "changed" >}}
