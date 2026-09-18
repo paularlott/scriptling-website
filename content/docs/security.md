@@ -189,7 +189,7 @@ extlibs.RegisterRequestsLibrary(p)
 
 ### Network Policies
 
-For scripts that *should* reach the internet but must never reach your private network, register a network policy. A policy governs the `requests`, `scriptling.wait_for`, and `scriptling.net.websocket` libraries and is enforced at connect time: the hostname is resolved through the configured DNS servers, every resolved address is checked against the policy, and the connection is made to the validated address directly. That closes the usual bypasses — DNS rebinding (the answer changing between check and connect), redirects to internal hosts, and IP-notation tricks.
+For scripts that *should* reach the internet but must never reach your private network, register a network policy. A policy governs the `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.ai`, and `scriptling.mcp` libraries and is enforced at connect time: the hostname is resolved through the configured DNS servers, every resolved address is checked against the policy, and the connection is made to the validated address directly. That closes the usual bypasses — DNS rebinding (the answer changing between check and connect), redirects to internal hosts, and IP-notation tricks.
 
 With a policy active, loopback, link-local (including cloud metadata endpoints like `169.254.169.254`), private, unspecified, and multicast addresses are all blocked by default, as are URLs that name an IP directly. Host allow/deny lists, CIDR exceptions, https-only, and custom DNS servers grant exactly the access you intend — allowlisted hosts are trusted to resolve internally, and deny rules always win.
 
@@ -204,9 +204,11 @@ if err != nil {
 extlibs.RegisterRequestsLibrary(p, policy)
 extlibs.RegisterWaitForLibrary(p, policy)
 extlibs.RegisterWebSocketLibrary(p, policy)
+ai.Register(p, policy)
+scriptlingmcp.Register(p, policy)
 ```
 
-The policy governs the three libraries above. `scriptling.ai`, `scriptling.mcp`, and `scriptling.provision.fetch` make network calls too, but to endpoints configured by the host rather than chosen by the script; if scripts can configure those endpoints in your integration, keep them unregistered in untrusted environments.
+The policy governs the five libraries above, including `ai.Client()`'s `remote_servers` (the MCP servers it can attach for tool use) and `mcp.Client()`'s HTTP transport — a script cannot bypass the policy by reaching a blocked endpoint through the AI or MCP client instead of `requests`. Stdio-transport `mcp.Client()` instances (a local subprocess) are unaffected, since the policy only governs network access. `scriptling.provision.fetch` makes network calls too, but to endpoints configured by the host rather than chosen by the script; if scripts can configure those endpoints in your integration, keep it unregistered in untrusted environments.
 
 ## Database Drivers
 

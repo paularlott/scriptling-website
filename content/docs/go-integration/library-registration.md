@@ -256,10 +256,14 @@ gossip.Register(p, nil)     // scriptling.net.gossip (nil = null logger)
 
 ### Network Policy
 
-The outbound networking libraries — `requests`, `scriptling.wait_for`, and `scriptling.net.websocket` — accept an optional `*netsecurity.Config` that restricts where scripts may connect. Pass `nil` (or omit the argument) for no restrictions; a non-nil policy blocks loopback, link-local (cloud metadata), private, unspecified, and multicast addresses, and IP-literal URLs, by default.
+The outbound networking libraries — `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.ai`, and `scriptling.mcp` — accept an optional `*netsecurity.Config` that restricts where scripts may connect. Pass `nil` (or omit the argument) for no restrictions; a non-nil policy blocks loopback, link-local (cloud metadata), private, unspecified, and multicast addresses, and IP-literal URLs, by default.
 
 ```go
-import "github.com/paularlott/scriptling/extlibs/netsecurity"
+import (
+    "github.com/paularlott/scriptling/extlibs/ai"
+    scriptlingmcp "github.com/paularlott/scriptling/extlibs/mcp"
+    "github.com/paularlott/scriptling/extlibs/netsecurity"
+)
 
 policy := &netsecurity.Config{
     RequireHTTPS: true,
@@ -269,6 +273,8 @@ policy := &netsecurity.Config{
 extlibs.RegisterRequestsLibrary(p, policy)
 extlibs.RegisterWaitForLibrary(p, policy)
 extlibs.RegisterWebSocketLibrary(p, policy)
+ai.Register(p, policy)
+scriptlingmcp.Register(p, policy)
 
 // Or load the same TOML file the CLI's --network-policy flag uses
 policy, err := netsecurity.LoadConfig("policy.toml")
@@ -276,6 +282,8 @@ if err != nil {
     return err // invalid policies are an error, never an open policy
 }
 ```
+
+`ai.Register`'s policy also guards `remote_servers` — the MCP servers an `ai.Client()` instance can attach for tool use — so a script cannot reach a policy-blocked endpoint by routing through `ai.Client(..., remote_servers=[...])` instead of `mcp.Client(...)` directly. Stdio-transport `mcp.Client()` instances (a local subprocess) are unaffected — the policy only governs network access.
 
 `Config` options (all optional — the zero value plus a non-nil pointer is a safe default policy):
 

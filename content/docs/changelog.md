@@ -8,6 +8,14 @@ nav-skip: true
 
 ## September 2026
 
+{{< version "v0.25.2" >}}
+
+{{< changelog-item "security" >}}
+**The network policy now also covers `scriptling.ai` and `scriptling.mcp`.** Previously a `--network-policy` (or embedded `*netsecurity.Config`) only governed `requests`, `scriptling.wait_for`, and `scriptling.net.websocket` — a script could reach an arbitrary IP or bypass the configured DNS servers simply by using `ai.Client(...)` or `mcp.Client(...)` instead. Both HTTP-transport clients are now built through the same guard: `ai.Register(p, policy)` and `mcp.Register(p, policy)` restrict the main client and, for `scriptling.ai`, every `remote_servers` entry too. Stdio-transport `mcp.Client()` instances (a local subprocess) are unaffected, since the policy only governs network access. Omitting the policy argument (or calling `Register(p)` with none) keeps the previous, unrestricted behaviour — no action needed for existing scripts or hosts that don't use a network policy.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.25.1" >}}
 
 {{< changelog-item "changed" >}}
