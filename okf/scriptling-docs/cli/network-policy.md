@@ -14,7 +14,9 @@ type: Guide
 ---
 # Network Policy
 
-`--network-policy` restricts where the `requests`, `scriptling.wait_for`, and `scriptling.net.websocket` libraries may connect — the tool for letting scripts reach the internet without letting them reach your private network or cloud metadata endpoints. Enforcement happens at connect time: hostnames are resolved through the configured DNS servers, every resolved address is checked, and the connection is made to the validated address — so DNS rebinding, redirects, and IP-notation tricks don't get through.
+`--network-policy` restricts where the `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.ai`, and `scriptling.mcp` libraries may connect — the tool for letting scripts reach the internet without letting them reach your private network or cloud metadata endpoints. Enforcement happens at connect time: hostnames are resolved through the configured DNS servers, every resolved address is checked, and the connection is made to the validated address — so DNS rebinding, redirects, and IP-notation tricks don't get through.
+
+For `scriptling.ai`, the policy also covers `remote_servers` — the MCP servers an AI client can attach for tool use — so a script cannot reach an internal MCP endpoint by routing through `ai.Client(..., remote_servers=[...])` instead of `mcp.Client(...)` directly.
 
 ```bash
 scriptling --network-policy=policy.toml --disable-lib subprocess script.py
