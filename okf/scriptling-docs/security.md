@@ -249,6 +249,18 @@ allow_private_ips = true
 allow_hosts = ["db.internal.corp"]
 ```
 
+## Plugin Loading
+
+Registering `scriptling.plugin` against an unrestricted manager gives scripts `load(name, path)` — and `path` is **script-supplied**, not host-supplied: a filesystem path is resolved and executed directly (no `--allowed-paths` check), and an `http(s)://` URL is fetched over a plain transport with no network policy involved. This is a materially bigger capability than either `subprocess` or an unrestricted `requests` alone, since it combines arbitrary local execution with arbitrary outbound fetch in one call. "The host chose which plugins to trust" is only true until the first script calls `load`.
+
+Use [`plugin.WithTransport(plugin.TransportNone)`](https://scriptling.dev/okf/scriptling-docs/plugins/host-integration.md#exposing-admin-trusted-plugins-without-letting-scripts-load-their-own) on the scope you register for scripts to close this off while keeping the host's own pre-loaded plugins fully usable — `list`, `describe`, `call_function`, `batch_call`, and `call_method` all keep working; `load` and `unload` always fail. This is the pattern that actually makes admin-supplied plugins trusted-and-safe to expose.
+
+If scripts genuinely need to load *new* plugins at runtime, restrict that to HTTP(S) endpoints over a policy-enforcing transport instead of opening it up entirely: [`plugin.WithTransport(plugin.TransportHTTP)` combined with `plugin.WithHTTPTransport`](https://scriptling.dev/okf/scriptling-docs/plugins/host-integration.md#allowing-scripts-to-load-new-plugins-only-over-a-policy-enforced-transport) routes every `load()`/`call_function` for that scope through a transport you build from the same network policy that already governs `requests`, `scriptling.ai`, and `scriptling.mcp` — a script can't use plugin loading as a side door around restrictions placed on those libraries.
+
+The same idea applies to stdio/executable loading: [`plugin.WithExecPaths`](https://scriptling.dev/okf/scriptling-docs/plugins/host-integration.md#restricting-which-paths-scripts-may-load-executables-from) lets scripts load new plugin executables, but only from directories you allow, instead of anywhere the host process can reach. It combines with `WithHTTPTransport` on the same scope — one restriction governs which executables may be spawned, the other which HTTP(S) endpoints may be dialed, independently of each other and of `WithTransport`'s all-or-nothing gate on each transport kind.
+
+A scope created with `NewScope` and no explicit `WithTransport`/`WithExecPaths` option inherits both restrictions from its parent scope rather than defaulting to unrestricted — see [Nested Scopes](https://scriptling.dev/okf/scriptling-docs/plugins/host-integration.md#nested-scopes). Only an explicit option on the child overrides what it inherited.
+
 ## Secret Provider Security
 
 Use `scriptling.secret` when scripts need secrets but should not receive provider URLs, tokens, or other private configuration.

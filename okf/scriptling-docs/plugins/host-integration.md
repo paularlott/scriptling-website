@@ -114,7 +114,181 @@ scope := manager.NewScope(plugin.WithTransport(plugin.TransportStdio))
 
 // Default: both types permitted (same as not passing any option).
 scope := manager.NewScope(plugin.WithTransport(plugin.TransportAll))
+
+// Neither: scriptling.plugin.load() and .unload() both always fail.
+scope := manager.NewScope(plugin.WithTransport(plugin.TransportNone))
 ```
+
+A scope created with no `WithTransport` option at all inherits its parent's
+transport mode rather than defaulting to `TransportAll` — see
+[Nested Scopes](#nested-scopes) below. An explicit `WithTransport` on the
+child always overrides whatever the parent has, in either direction: a
+child of a `TransportNone` parent may reopen `TransportHTTP`, and a child of
+a `TransportAll` parent may narrow to `TransportNone`.
+
+### Restricting Which Paths Scripts May Load Executables From
+
+`WithExecPaths` restricts *new* stdio/exec loads a scope may perform to a
+set of allowed directories, independently of transport mode. This is the
+exec-side counterpart to `WithHTTPTransport` below: it doesn't change
+whether stdio loading is permitted at all (that's still `WithTransport`),
+only which paths a permitted stdio load may spawn from.
+
+This matters because a host application's own boot-time preloading and a
+script's later dynamic loading are different trust levels. During startup,
+the host itself may load plugins from anywhere on the filesystem it has
+access to — there's no script involved, so there's nothing to restrict.
+Later, if the host wants to let scripts load *additional* plugins
+dynamically, it may still want to confine those loads to a known-safe
+directory rather than anywhere the process can reach.
+
+```go
+// Startup: the host loads from wherever it trusts, unrestricted — this
+// manager has no exec-path restriction at all.
+manager := plugin.NewManager(appLogger)
+manager.LoadPlugin(ctx, "/opt/vendor/widgets/widget", nil)
+defer manager.Close()
+
+// Script-facing scope: stdio loading is permitted (TransportAll, the
+// default), but only from this one directory. The startup-preloaded
+// plugin above stays fully usable regardless — WithExecPaths only gates
+// where a *new* load may spawn its executable from.
+scope := manager.NewScope(
+    plugin.WithExecPaths(&fssecurity.Config{AllowedPaths: []string{"/etc/myapp/scoped-plugins"}}),
+)
+defer scope.Close()
+
+p := scriptling.New()
+plugin.RegisterLibraries(p, scope)
+p.Eval(`
+import scriptling.plugin as plugin
+plugin.call_function("widgets", "build", ["chair"])                       # preloaded, always works
+plugin.load("extra", "/etc/myapp/scoped-plugins/extra")                   # allowed: inside the allowlist
+plugin.load("evil", "/usr/bin/whoami")                                    # error: not in the allowed paths
+`)
+```
+
+An `fssecurity.Config` with a `nil` `AllowedPaths` is unrestricted (the
+default when `WithExecPaths` isn't used at all); an explicit empty slice
+denies every stdio load. `WithExecPaths` combines freely with
+`WithHTTPTransport` on the same scope — one governs which executables may
+be spawned, the other which HTTP(S) endpoints may be dialed, and neither
+affects the other.
+
+Like transport mode, `execPaths` is inherited by a child scope created with
+no explicit `WithExecPaths` option, and an explicit option on the child
+always overrides the inherited value.
+
+### Exposing Admin-Trusted Plugins Without Letting Scripts Load Their Own
+
+A host that pre-loads specific plugins and wants scripts to use them — but
+never to load a *different* plugin the host didn't choose — should register
+`scriptling.plugin` against a `TransportNone` scope. `list`, `describe`,
+`call_function`, `batch_call`, and `call_method` all keep working against
+whatever the parent manager already loaded (scopes chain to their parent for
+lookups, as above); `load` and `unload` return an error unconditionally.
+This is the safe way to hand scripts a plugin control library at all —
+registering `scriptling.plugin` against an unrestricted manager gives any
+script `load(name, path)`, and `path` is *script-supplied*: for a filesystem
+path that's an arbitrary local executable, for an `http(s)://` URL that's an
+arbitrary outbound fetch, neither checked against anything. `TransportNone`
+is what makes "plugins are admin-supplied and therefore trusted" actually
+true, rather than true only until the first script calls `load`.
+
+```go
+// Startup: admin loads whatever this host trusts, on an unrestricted
+// manager — a directory of stdio executables and/or specific plugins by
+// path or URL, exactly like the CLI's --plugin-dir and --plugin.
+manager := plugin.NewManager(appLogger)
+manager.AddDir("/etc/myapp/plugins")           // stdio executables in this dir
+manager.Load(ctx)
+manager.LoadPlugin(ctx, "/opt/widgets/widget", nil)              // one specific executable
+manager.LoadURL(ctx, "billing", "https://billing.internal/rpc", false, false) // one specific https endpoint
+defer manager.Close()
+
+// Every script environment gets a TransportNone scope: full use of every
+// plugin loaded above, however it was loaded, no ability to load or unload
+// anything new.
+scope := manager.NewScope(plugin.WithTransport(plugin.TransportNone))
+defer scope.Close()
+
+p := scriptling.New()
+plugin.RegisterLibraries(p, scope)
+p.Eval(`
+import scriptling.plugin as plugin
+print(plugin.list())          # shows the admin-loaded plugins
+plugin.call_function("widgets", "build", ["chair"])  # works
+plugin.load("evil", "/bin/sh")  # error: plugin loading is disabled in this scope
+`)
+```
+
+If a plugin registered a generated script proxy (a `scriptling=True`
+handshake peer whose schema declares script-language sources for its
+functions/classes), that proxy's own source does `import scriptling.plugin`
+internally — so registering only the individual client library via
+`plugin.RegisterClientLibrary` (skipping the control library entirely) is
+*not* a substitute for this pattern unless every loaded plugin is a plain
+`scriptling=False` JSON-RPC peer. `TransportNone` works uniformly for both.
+
+### Allowing Scripts to Load New Plugins Only Over a Policy-Enforced Transport
+
+`WithHTTPTransport` overrides the `http.RoundTripper` a scope uses for every
+HTTP(S) plugin call — the `LoadURL` handshake and every later
+`call_function`/`batch_call`/`call_method` RPC alike, since both draw from
+the same pooled transport. Combine it with `TransportHTTP` to let scripts
+load *new* plugins, but only over a transport you control — for example one
+that enforces a network allow/deny list, so a script can't use
+`scriptling.plugin.load()` as a way around restrictions you've placed on
+`requests` or other network-facing libraries.
+
+Pass the guard's own `HTTPClient().Transport`, not a bare dial-level
+transport: `HTTPClient()` wraps every request in `CheckURL` (scheme, host
+allow/deny lists, IP-literal handling) *and* validates every dialed address,
+which is the same two-layer enforcement `requests`/`scriptling.ai`/
+`scriptling.mcp` get. A dial-only transport alone would silently skip the
+allow_hosts/deny_hosts checks — connections to plain public hosts would go
+through unchecked, and only the loopback/private/link-local categories
+would still be caught at dial time.
+
+This combines with startup preloading exactly the same way `TransportNone`
+does above — the parent manager can still `AddDir`/`Load`/`LoadPlugin`/
+`LoadURL` whatever it trusts before the scope is ever created, and every one
+of those stays fully usable through the scope regardless of the scope's own
+transport mode; the mode only governs *new* loads scripts attempt through
+the scope itself:
+
+```go
+manager := plugin.NewManager(appLogger)
+manager.LoadPlugin(ctx, "/opt/widgets/widget", nil) // trusted, preloaded at startup
+defer manager.Close()
+
+guard, err := netsecurity.NewGuard(myNetworkPolicy) // *netsecurity.Config
+if err != nil {
+    log.Fatal(err)
+}
+
+scope := manager.NewScope(
+    plugin.WithTransport(plugin.TransportHTTP),
+    plugin.WithHTTPTransport(guard.HTTPClient().Transport),
+)
+defer scope.Close()
+
+p := scriptling.New()
+plugin.RegisterLibraries(p, scope)
+p.Eval(`
+import scriptling.plugin as plugin
+plugin.call_function("widgets", "build", ["chair"])         # the startup-preloaded plugin, always available
+plugin.load("remote", "https://plugins.example.com/rpc")   # a *new* load — allowed if the policy allows this host
+plugin.load("evil", "http://169.254.169.254/")              # fails: blocked by the policy's own checks
+plugin.load("evil", "/usr/bin/whoami")                       # fails: stdio still isn't permitted, preloaded or not
+`)
+```
+
+The same transport governs a request regardless of `insecure_skip_tls`: a
+script asking to skip TLS verification still goes through the transport you
+supplied, not the manager's own separate skip-verify transport. This is a
+one-way ratchet — `WithHTTPTransport` can only make a scope's HTTP plugin
+traffic more constrained than the default, never less.
 
 ### Visibility and Name Isolation
 
@@ -148,6 +322,12 @@ When a scope is closed, its `http.Client` instances are dropped, but the connect
 
 Scopes can themselves be scoped. The same rules apply at every level: lookup chains to the immediate parent, close affects only the local level, and all levels share the root manager's transports.
 
+A child scope created with no options inherits its parent's transport mode
+and `execPaths` — it is never more permissive than its parent by default.
+An explicit `WithTransport`/`WithExecPaths` on the child overrides the
+inherited value for that scope (and everything scoped from it, unless they
+override it again).
+
 ```go
 tenantScope := manager.NewScope(plugin.WithTransport(plugin.TransportHTTP))
 defer tenantScope.Close()
@@ -155,6 +335,9 @@ defer tenantScope.Close()
 
 requestScope := tenantScope.NewScope()
 defer requestScope.Close()
+// requestScope has no explicit WithTransport, so it inherits tenantScope's
+// TransportHTTP — stdio loading stays refused, it does not silently widen
+// to TransportAll.
 // requestScope sees its own plugins + tenantScope's + manager's.
 // requestScope.Close() leaves tenantScope fully intact.
 ```
