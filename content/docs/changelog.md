@@ -8,6 +8,22 @@ nav-skip: true
 
 ## September 2026
 
+{{< version "v0.25.3" >}}
+
+{{< changelog-item "security" >}}
+**Scripts could load or unload plugins you never intended them to touch.** If your host registered `scriptling.plugin`, scripts got the same `load()`/`unload()` power as the host itself, with no way to say "just use what I already loaded." You can now hand scripts a plugin scope that's read-only (they use your pre-loaded plugins but can't load or unload anything), or one that can load new plugins only over an HTTP endpoint you control. See [Plugin Manager](/docs/plugins/host-integration/#restricting-transport-type) for how to set it up. Nothing changes unless you already register `scriptling.plugin`.
+{{< /changelog-item >}}
+
+{{< changelog-item "security" >}}
+**A nested plugin scope could quietly lose its parent's restrictions.** If you locked a scope down and then created a scope from it without repeating the same options, the new scope came back fully open. Restrictions now carry through by default, and you can still loosen or tighten them on the child if you want to.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**You can now limit which folders scripts are allowed to load new plugins from.** This is the same idea as restricting plugin loading to an approved network policy, but for local executables — scripts can use a plugin folder you approve, not any executable on the machine. See [Restricting Which Paths Scripts May Load Executables From](/docs/plugins/host-integration/#restricting-which-paths-scripts-may-load-executables-from).
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.25.2" >}}
 
 {{< changelog-item "security" >}}
