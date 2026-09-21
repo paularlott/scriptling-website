@@ -189,9 +189,12 @@ When you need to return JSON instead of text:
 ```python
 import scriptling.mcp.tool as tool
 
-# Return JSON object
+# Return JSON object as text content
 data = {"users": ["Alice", "Bob"], "count": 2}
 tool.return_object(data)
+
+# Return a dict as the MCP result's structuredContent field instead
+tool.return_structured(data)
 
 # Or return text
 tool.return_string("Operation completed successfully")
@@ -377,8 +380,10 @@ as tools.
   plus an array of tables — but `[[arguments]]` instead of `[[parameters]]`,
   and prompt arguments are string-only (no `type`).
 
-A built-in `scriptling://script/{name}` resource template (tool source code,
-when `--mcp-tools` is set) and a `write_script` prompt are always available.
+There's no built-in resource or prompt bundled in automatically — if you want
+a tool-source resource or a "write me a script" prompt, define it yourself
+using the file-based model above; see the [changelog](https://scriptling.dev/okf/scriptling-docs/changelog.md) for
+the `write_script`/`scriptling://script/{name}` removal.
 
 **For a walkthrough of creating resources and prompts** — including the shared
 `.toml` format — see the [Building an MCP Resources & Prompts Server tutorial](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-resources-prompts.md).
@@ -452,5 +457,6 @@ This configuration:
 - [Command Line Options](https://scriptling.dev/okf/scriptling-docs/cli/command-line-options.md) - Every flag and configuration file setting
 - [HTTP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md) - HTTP server without MCP
 - [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/mcp/writing-mcp-tools.md) - Creating custom MCP tools
+- [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md) - Linking a tool to an interactive UI resource
 - [MCP Library](https://scriptling.dev/okf/scriptling-libraries/mcp.md) - MCP library reference
 - [MCP Tool Library](https://scriptling.dev/okf/scriptling-libraries/mcp/tool.md) - Tool implementation API

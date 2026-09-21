@@ -59,6 +59,8 @@ description = "Number of times to repeat the greeting"
 | `description` | Yes      | Tool description shown to the AI                          |
 | `keywords`    | No       | Keywords for search (array of strings)                    |
 | `discoverable`| No       | Registration mode (default: `false`)                      |
+| `[ui]`        | No       | Links a companion UI resource ([MCP Apps](#linking-a-ui-resource-ui)) |
+| `[[icons]]`   | No       | Visual identifiers shown on the tool's `tools/list` descriptor ([Icons](/reference/libraries/mcp/mcp-apps/#icons)) |
 
 ### Parameter Types
 
@@ -91,6 +93,27 @@ a clear error message.
 
 - **Native mode** (default, `discoverable = false`): Tool appears in `tools/list` and can be called directly
 - **Discovery mode** (`discoverable = true`): Tool is hidden from `tools/list`, searchable via `tool_search`, and callable via `execute_tool`
+
+### Linking a UI Resource (`[ui]`)
+
+A tool can link to a companion interactive HTML UI, which a compliant
+[MCP Apps](https://github.com/modelcontextprotocol/ext-apps) host renders in
+a sandboxed iframe instead of (or alongside) the tool's text result. Add a
+`[ui]` table with a `resourceUri`:
+
+```toml
+description = "Get the sales report"
+
+[ui]
+resourceUri = "ui://sales-dashboard/dashboard.html"
+visibility = ["model", "app"]
+```
+
+Decorated and dynamically-registered tools link the same way, with a `ui=`
+keyword argument instead of a TOML table — see the dedicated
+**[MCP Apps](../mcp-apps/)** page for the full field reference, the paired
+`ui://` resource's own `[ui]` metadata (CSP, permissions), and
+`tool.return_structured()` for returning the data such a UI expects.
 
 ## Script File (`.py`)
 
@@ -137,9 +160,13 @@ import scriptling.mcp.tool as tool
 # Return text
 tool.return_string("Operation completed")
 
-# Return JSON object
+# Return JSON object as text content
 data = {"users": ["Alice", "Bob"], "count": 2}
 tool.return_object(data)
+
+# Return a dict as the MCP result's structuredContent field (plus the same
+# JSON as a text fallback, for clients that don't read structuredContent)
+tool.return_structured(data)
 
 # Return object as TOON format
 tool.return_toon(data)
@@ -147,6 +174,14 @@ tool.return_toon(data)
 # Return error
 tool.return_error("Something went wrong")
 ```
+
+`return_object` and `return_structured` both accept a dict, but only
+`return_structured` sets the MCP result's `structuredContent` field — the
+field a client can read without having to parse JSON out of the text
+content, and what a [`[ui]`-linked](#linking-a-ui-resource-ui) MCP Apps view
+typically expects. `return_structured` requires its argument to be a dict
+(structuredContent must be a JSON object per the MCP spec); use
+`return_object` for a list, string, or other non-object value.
 
 ## Complete Examples
 
@@ -349,12 +384,13 @@ curl -X POST http://127.0.0.1:8000/mcp \
 
 ### Returning Results
 
-| Function                  | Description                      |
-| ------------------------- | -------------------------------- |
-| `tool.return_string(text)`| Return text result               |
-| `tool.return_object(obj)` | Return object as JSON            |
-| `tool.return_toon(obj)`   | Return object as TOON format     |
-| `tool.return_error(msg)`  | Return error message             |
+| Function                     | Description                                          |
+| ---------------------------- | ----------------------------------------------------- |
+| `tool.return_string(text)`   | Return text result                                    |
+| `tool.return_object(obj)`    | Return object as JSON text content                    |
+| `tool.return_structured(obj)`| Return a dict as `structuredContent` (+ text fallback) |
+| `tool.return_toon(obj)`      | Return object as TOON format                          |
+| `tool.return_error(msg)`     | Return error message                                  |
 
 ## See Also
 

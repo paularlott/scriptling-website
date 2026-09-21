@@ -287,8 +287,8 @@ client = mcp.Client("https://api.example.com/mcp")
 for t in client.list_resource_templates():
     print(t.uriTemplate, t.name)
 
-# Expand a template and read it
-data = client.read_resource("scriptling://script/greet")  # from scriptling://script/{name}
+# Expand a template (e.g. "user://docs/{path}") and read it
+data = client.read_resource("user://docs/getting-started")
 ```
 
 ### `client.read_resource(uri)`
@@ -343,7 +343,7 @@ Prompt arguments are always strings; non-string values are coerced.
 ```python
 client = mcp.Client("https://api.example.com/mcp")
 
-out = client.get_prompt("write_script", {"task": "greet a user by name"})
+out = client.get_prompt("review", {"code": "print(1)", "language": "python"})
 for m in out.messages:
     print(m.role, m.content)
 ```

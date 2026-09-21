@@ -23,6 +23,7 @@ MCP (Model Context Protocol) is a protocol for AI models to interact with extern
 | [scriptling.mcp](https://scriptling.dev/okf/scriptling-libraries/mcp/client.md) | MCP client for connecting to MCP servers |
 | [scriptling.mcp.tool](https://scriptling.dev/okf/scriptling-libraries/mcp/tool.md) | Helper library for authoring MCP tools |
 | [Writing MCP Tools Guide](https://scriptling.dev/okf/scriptling-libraries/mcp/writing-mcp-tools.md) | Guide for creating MCP tools |
+| [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md) | Linking a tool to an interactive UI resource |
 
 ## Quick Start
 

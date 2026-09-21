@@ -8,6 +8,34 @@ nav-skip: true
 
 ## September 2026
 
+{{< version "v0.26.0" >}}
+
+{{< changelog-item "added" >}}
+**Tools can link to an interactive UI resource (MCP Apps).** A tool's `.toml` can now declare a `[ui]` table with a `resourceUri` pointing at a `ui://` resource, per the [MCP Apps](https://github.com/modelcontextprotocol/ext-apps) extension — a compliant host renders it in a sandboxed iframe instead of plain text; everyone else just ignores it. `resourceUri` is optional for an `"app"`-only *action* tool (one only ever called by a view that's already open, like a form submission) — declaring `visibility = ["app"]` alone is enough, and at least one of `resourceUri` or `visibility` is required. Values are validated at registration in every registration style: a misspelled `visibility` value or a `resourceUri` with no scheme fails tool registration as an ordinary error. HTML files under a `resources/ui/` directory are served as `ui://` resources, with optional sidecar `[ui]` metadata (CSP domains, permissions, border preference) and the extension's MIME type applied automatically. See [Linking a UI Resource](/reference/libraries/mcp/writing-mcp-tools/#linking-a-ui-resource-ui) and [MCP Apps](/reference/libraries/mcp/mcp-apps/).
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**`tool.return_structured(obj)` sets the MCP result's `structuredContent` field.** Previously the only way to return a dict was `tool.return_object()`, which always serializes to JSON text content — readable, but not what a client (or an `outputSchema`, or an MCP Apps view) looking for `structuredContent` expects. `return_structured` sets that field directly, and — per the MCP spec's backwards-compatibility guidance — still includes the same JSON as a text block, so nothing that only reads text content breaks. It requires a dict; use `return_object` for a list or other non-object value. See [Returning Results](/reference/libraries/mcp/writing-mcp-tools/#returning-results).
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Decorated and per-request tools can link to a UI resource too.** `@mcp.tool(...)` and `mcp.register_request_tool(...)` accept the same `[ui]` shape as a `.toml`-defined tool, via a `ui=` keyword argument — a tool defined without any `.toml` file at all, including one registered dynamically per request, can still open an MCP Apps view. The UI-linkage docs live on their own page: see [MCP Apps](/reference/libraries/mcp/mcp-apps/).
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Tools can carry icons.** All three registration styles (`.toml`, `@mcp.tool(...)`, `register_request_tool(...)`) accept an `icons` list — visual identifiers shown on the tool's `tools/list` descriptor, per the MCP icons convention. Not required on every tool. See [Icons](/reference/libraries/mcp/mcp-apps/#icons).
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**The MCP endpoint now also speaks the 2026-07-28 protocol revision.** Every revision from 2024-11-05 through 2025-11-25 keeps working exactly as before; the server detects which one each client speaks per request, so there's nothing to configure. Newer clients get the stateless request model (`server/discover`), and `DELETE /mcp` is now routed for session termination.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Cross-origin browser access to the MCP endpoint is now supported — and off by default.** Previously a cross-origin browser client couldn't connect at all: the endpoint didn't answer CORS preflights, so the browser blocked the request before it was sent. The `/mcp` endpoint now answers preflights, governed by a new `--mcp-cors-origin` setting (`SCRIPTLING_MCP_CORS_ORIGIN` env, `server.mcp_cors_origins` config — same shape as the WebSocket origin setting): unset allows same-origin requests only; list specific origins for an allowlist, or `["*"]` to allow any origin, e.g. for testing against a page on another origin like the reference host-simulator.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.25.3" >}}
 
 {{< changelog-item "security" >}}

@@ -4,7 +4,7 @@
 
 Docs: https://scriptling.dev/docs/
 
-All 183 OKF 0.2 concepts below are plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
+All 184 OKF 0.2 concepts below are plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
 
 ## Essential
 
@@ -160,6 +160,7 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [uuid](https://scriptling.dev/okf/scriptling-libraries/math-numbers/uuid.md): UUID generation, matching Python's uuid module.
 - [Math & Numbers](https://scriptling.dev/okf/scriptling-libraries/math-numbers.md): Mathematical functions, hashing, and random number generation.
 - [scriptling.mcp](https://scriptling.dev/okf/scriptling-libraries/mcp/client.md): MCP client library for connecting to MCP servers and invoking the tools they expose.
+- [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md): Linking a tool to an interactive UI resource, from any tool registration style.
 - [scriptling.mcp.tool](https://scriptling.dev/okf/scriptling-libraries/mcp/tool.md): MCP tool helper for authoring MCP tools, with parameter access and result handling.
 - [Writing MCP Tools](https://scriptling.dev/okf/scriptling-libraries/mcp/writing-mcp-tools.md): Creating custom MCP tools with metadata and script files.
 - [MCP Protocol](https://scriptling.dev/okf/scriptling-libraries/mcp.md): MCP (Model Context Protocol) client and tool authoring libraries.

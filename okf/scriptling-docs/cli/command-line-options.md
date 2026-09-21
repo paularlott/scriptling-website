@@ -44,6 +44,7 @@ type: Guide
 | `--bearer-token`      | `SCRIPTLING_BEARER_TOKEN`  | `server.bearer_token`        | Bearer token for authentication                      | none             |
 | `--max-request-body`  | `SCRIPTLING_MAX_REQUEST_BODY` | `server.max_request_body` | Maximum HTTP request body in bytes (0 = 32MiB, negative = unlimited) | 0 (32MiB)        |
 | `--websocket-origin`  | `SCRIPTLING_WEBSOCKET_ORIGIN` | `server.websocket_origins` | Allowed browser origin for WebSocket upgrades (repeatable, `*` for any) | same-origin      |
+| `--mcp-cors-origin`   | `SCRIPTLING_MCP_CORS_ORIGIN` | `server.mcp_cors_origins`  | Allowed browser origin for cross-origin MCP requests on `/mcp` (repeatable, `*` for any) | same-origin      |
 | `--allowed-paths`     | `SCRIPTLING_ALLOWED_PATHS` | `security.allowed_paths`     | Restrict participating library filesystem I/O; `-` denies it entirely | (no restriction) |
 | `--network-policy`    | `SCRIPTLING_NETWORK_POLICY`| `security.network_policy`    | TOML network policy file for script outbound access  | (no restriction) |
 | `--disable-lib`       | `SCRIPTLING_DISABLE_LIB`   | `security.disable_libs`      | Disable a built-in library by name (repeatable)      | (none)           |

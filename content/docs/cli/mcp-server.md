@@ -179,9 +179,12 @@ When you need to return JSON instead of text:
 ```python
 import scriptling.mcp.tool as tool
 
-# Return JSON object
+# Return JSON object as text content
 data = {"users": ["Alice", "Bob"], "count": 2}
 tool.return_object(data)
+
+# Return a dict as the MCP result's structuredContent field instead
+tool.return_structured(data)
 
 # Or return text
 tool.return_string("Operation completed successfully")
@@ -367,8 +370,10 @@ as tools.
   plus an array of tables — but `[[arguments]]` instead of `[[parameters]]`,
   and prompt arguments are string-only (no `type`).
 
-A built-in `scriptling://script/{name}` resource template (tool source code,
-when `--mcp-tools` is set) and a `write_script` prompt are always available.
+There's no built-in resource or prompt bundled in automatically — if you want
+a tool-source resource or a "write me a script" prompt, define it yourself
+using the file-based model above; see the [changelog](/docs/changelog/) for
+the `write_script`/`scriptling://script/{name}` removal.
 
 **For a walkthrough of creating resources and prompts** — including the shared
 `.toml` format — see the [Building an MCP Resources & Prompts Server tutorial](../../tutorials/mcp-resources-prompts/).
@@ -442,5 +447,6 @@ This configuration:
 - [Command Line Options](../command-line-options/) - Every flag and configuration file setting
 - [HTTP Server Mode](../http-server/) - HTTP server without MCP
 - [Writing MCP Tools](../../../reference/libraries/mcp/writing-mcp-tools/) - Creating custom MCP tools
+- [MCP Apps](../../../reference/libraries/mcp/mcp-apps/) - Linking a tool to an interactive UI resource
 - [MCP Library](../../../reference/libraries/mcp/) - MCP library reference
 - [MCP Tool Library](../../../reference/libraries/mcp/tool/) - Tool implementation API

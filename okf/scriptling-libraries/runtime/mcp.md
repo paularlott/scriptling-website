@@ -39,7 +39,7 @@ Registers a function as an MCP tool. The function's parameters become the tool's
 ### Signature
 
 ```python
-@mcp.tool(description, params=None, keywords=None, discoverable=False)
+@mcp.tool(description, params=None, keywords=None, discoverable=False, ui=None, icons=None)
 def tool_name(param1, param2=default):
     ...
 ```
@@ -52,6 +52,8 @@ def tool_name(param1, param2=default):
 | `params`       | dict   | No       | Parameter metadata keyed by name (see below) |
 | `keywords`     | list   | No       | Keywords for tool search/discovery |
 | `discoverable` | bool   | No       | If `True`, hidden from `tools/list`, searchable via `tool_search` (default: `False`) |
+| `ui`           | dict   | No       | Links this tool to a companion UI resource — see [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md) |
+| `icons`        | list   | No       | Visual identifiers shown on the tool's `tools/list` descriptor — see [Icons](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md#icons) |
 
 ### Parameter Metadata (`params`)
 
@@ -144,11 +146,11 @@ def auth(request):
     return None
 ```
 
-`handler` is a `"module.function"` reference invoked per call with the tool arguments as keyword parameters — the same conventions as any other handler reference. Inside the handler, `mcp.tool.get_string()` reads the arguments and `mcp.tool.request_context()` reads the middleware's context (who is calling). `params` uses the same metadata vocabulary as `@mcp.tool`: a string per parameter (its description) or a dict with `type`, `description` and `required`. `keywords` and `discoverable` feed tool search.
+`handler` is a `"module.function"` reference invoked per call with the tool arguments as keyword parameters — the same conventions as any other handler reference. Inside the handler, `mcp.tool.get_string()` reads the arguments and `mcp.tool.request_context()` reads the middleware's context (who is calling). `params` uses the same metadata vocabulary as `@mcp.tool`: a string per parameter (its description) or a dict with `type`, `description` and `required`. `keywords` and `discoverable` feed tool search, and `ui` links the tool to a companion UI resource, exactly as on `@mcp.tool` — see [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md).
 
 ### `mcp.register_request_resource(uri, handler, name, ...)`
 
-Exposes a resource (or, with `template=True`, a URI template like `"user://docs/{path}"`). `resources/list` and `resources/templates/list` show it; `resources/read` runs the handler with the template variables as keyword parameters (and `__uri` holding the full URI). A string return is the content; a dict or list is JSON encoded. `mime_type` defaults to `text/plain`, or `application/json` for structured results.
+Exposes a resource (or, with `template=True`, a URI template like `"user://docs/{path}"`). `resources/list` and `resources/templates/list` show it; `resources/read` runs the handler with the template variables as keyword parameters (and `__uri` holding the full URI). A string return is the content; a dict or list is JSON encoded. `mime_type` defaults to `text/plain`, or `application/json` for structured results — except for a `"ui://"` uri, where it's always `text/html;profile=mcp-app` (the [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md) extension MUSTs that exact mimeType), overriding whatever `mime_type` was passed.
 
 ### `mcp.register_request_prompt(name, handler, ...)`
 
@@ -292,6 +294,7 @@ Static decorators expose the registered functions to every client that can reach
 ## See Also
 
 - [Writing MCP Tools (legacy format)](https://scriptling.dev/okf/scriptling-libraries/mcp/writing-mcp-tools.md) — The `.toml` + `.py` format reference
+- [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md) — Linking a tool to an interactive UI resource
 - [Decorators](https://scriptling.dev/okf/scriptling-reference/decorators.md) — General decorator syntax and patterns
 - [MCP Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md) — Running Scriptling as an MCP server
 - [App Bundles](https://scriptling.dev/okf/scriptling-docs/cli/packages.md) — Packaging tools, HTTP routes, and assets together

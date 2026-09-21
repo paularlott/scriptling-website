@@ -50,6 +50,7 @@ MCP tool helpers read and write environment variables set by the MCP tool execut
 | `request_context()` | Get the context dict set by the middleware (empty dict if none) |
 | `return_string(text)` | Return a string result and stop execution |
 | `return_object(obj)` | Return an object as JSON and stop execution |
+| `return_structured(obj)` | Return an object as `structuredContent` (plus the same JSON as text) and stop execution |
 | `return_toon(obj)` | Return an object as TOON and stop execution |
 | `return_error(message)` | Return an error message and stop execution |
 
@@ -283,6 +284,23 @@ Returns an object as JSON and stops execution.
 import scriptling.mcp.tool as tool
 
 tool.return_object({"status": "success", "count": 42})
+# Code here will not execute
+```
+
+### `mcp.tool.return_structured(obj)`
+
+Returns an object as the tool result's `structuredContent` field and stops execution. The same JSON is also attached as a text content block, so clients that don't read `structuredContent` still see the data — this is the return to use for [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md) views, which read `structuredContent` to render themselves. The argument must be a `dict`; anything else is an error.
+
+**Parameters:**
+
+- `obj` (`dict`): The structured result object.
+
+**Returns:** `None`: execution stops before returning to caller.
+
+```python
+import scriptling.mcp.tool as tool
+
+tool.return_structured({"records": records, "total": len(records)})
 # Code here will not execute
 ```
 
