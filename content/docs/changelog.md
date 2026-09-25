@@ -8,6 +8,18 @@ nav-skip: true
 
 ## September 2026
 
+{{< version "v0.27.0" >}}
+
+{{< changelog-item "added" >}}
+**The MCP server can serve skills (SEP-2640).** `--mcp-skills` (env `SCRIPTLING_MCP_SKILLS`) points at a directory of skills: one skill per subdirectory containing a `SKILL.md` in the Agent Skills format, plus any supporting files. Every skill is served per the MCP skills extension: `skills/list` and `skills/get`, with each file readable as a `skill://` resource carrying a sha256 digest and size, and the listing's frontmatter served verbatim from the `SKILL.md` itself (exactly what conformance checkers such as MCP Inspector compare). The extension capability is declared automatically, and the `mcp-app-dashboard` example demonstrates a skills directory alongside its tools, resources and app view. See [MCP Server](/docs/cli/mcp-server/).
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**`mcp.Client` can consume skills: `skills()` and `get_skill(uri)`.** `skills()` lists the skills a server exposes via the Skills extension, returning entry dicts with the `SKILL.md` URI, the frontmatter (served verbatim from the file: name, description, plus any other author fields) and per-file digests and sizes; `get_skill(uri)` fetches one entry by URI, and the content reads with the existing `read_resource` on any of the entry's resource URIs. Works for HTTP and stdio clients alike. See [MCP Client](/reference/libraries/mcp/client/).
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.26.0" >}}
 
 {{< changelog-item "added" >}}

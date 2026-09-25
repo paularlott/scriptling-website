@@ -109,7 +109,9 @@ When using a namespace, all tool names are prefixed. For example, if the server 
 
 Lists all tools available from this MCP server.
 
-**Returns:** `list`: tool dicts with `name`, `description`, `inputSchema`.
+**Returns:** `list`: tool dicts with `name`, `description`, `inputSchema`, and `is_app`.
+
+`is_app` is `true` when the tool is an [MCP Apps](../mcp-apps/) view — linked to a `ui://` resource via `_meta.ui.resourceUri`, so a host UI renders its view when the tool is called instead of showing plain text. Useful for filtering: an app tool is meant for interactive hosts, not for scripts.
 
 ```python
 client = mcp.Client("https://api.example.com/mcp")
@@ -117,8 +119,37 @@ tools = client.tools()
 
 for tool in tools:
     print(f"{tool.name}: {tool.description}")
+    if tool.is_app:
+        print("  (MCP Apps view — renders a UI when called)")
     if "inputSchema" in tool:
         print(f"  Schema: {tool.inputSchema}")
+```
+
+### `client.skills()`
+
+Lists the skills this MCP server exposes (the Skills extension, `io.modelcontextprotocol/skills`). A skill is a directory of files (minimally a `SKILL.md`); every file is also readable as a plain resource.
+
+**Returns:** `list`: skill entry dicts with `uri` (of the `SKILL.md`), `frontmatter` (served verbatim from the `SKILL.md`: `name`, `description`, plus any other author fields) and `resources` (per-file `uri`, `digest`, `size`).
+
+```python
+client = mcp.Client("https://api.example.com/mcp")
+for skill in client.skills():
+    print(skill["frontmatter"]["name"])
+```
+
+### `client.get_skill(uri)`
+
+Fetches one skill's entry (frontmatter and per-file digests) by URI.
+
+**Parameters:**
+
+- `uri` (`str`): skill URI from `skills()` — the `SKILL.md` URI or the skill's root.
+
+**Returns:** `dict`: the skill entry. Read file content with [`read_resource`](#clientread_resource-uri) on any of the entry's resource URIs.
+
+```python
+entry = client.get_skill("skill://code-review/SKILL.md")
+content = client.read_resource("skill://code-review/SKILL.md")
 ```
 
 ### `client.call_tool(name, arguments)`

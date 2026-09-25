@@ -25,9 +25,10 @@ When running in MCP server mode, Scriptling provides:
 2. **Script Execution Tool**: Allow AI to execute Scriptling code directly (`--mcp-exec-script`)
 3. **Resources**: Recursively scanned files served by URI from `--mcp-resources`; a path containing `{var}` is a template only when it ends in `.py`
 4. **Prompts**: Root-level static `.md`/`.txt` or dynamic `.toml` + `.py` prompts from `--mcp-prompts`
+5. **Skills**: One skill per subdirectory containing a `SKILL.md` (Agent Skills format), served per the Skills extension (SEP-2640) from `--mcp-skills` — every file becomes a `skill://` resource, listed by `skills/list`, entry fetched by `skills/get`, content read with `resources/read`
 5. **HTTP reload notifications**: Supported file-change and signal reloads mutate the live HTTP server and emit `listChanged` notifications, subject to the limitations below
 
-`--mcp-tools`, `--mcp-exec-script`, or an app bundle with `serve = ["mcp"]` activates MCP. Resource and prompt directories are additive; `--mcp-resources` or `--mcp-prompts` alone does not mount a working MCP endpoint.
+`--mcp-tools`, `--mcp-exec-script`, or an app bundle with `serve = ["mcp"]` activates MCP. Resource, prompt and skill directories are additive; `--mcp-resources`, `--mcp-prompts` or `--mcp-skills` alone does not mount a working MCP endpoint.
 
 > **Security:** Use `--disable-lib subprocess` to remove shell access. `--allowed-paths` restricts participating library filesystem APIs; it is not a complete sandbox.
 
@@ -118,6 +119,7 @@ printf '%s\n' \
 | `--mcp-tools`       | `SCRIPTLING_MCP_TOOLS`        | Root directory of legacy or decorated MCP tools | (disabled) |
 | `--mcp-resources`   | `SCRIPTLING_MCP_RESOURCES`    | Recursive resource tree; optional `_stem.toml` metadata | (disabled) |
 | `--mcp-prompts`     | `SCRIPTLING_MCP_PROMPTS`      | Root-level static or dynamic prompts     | (disabled) |
+| `--mcp-skills`       | `SCRIPTLING_MCP_SKILLS`       | One skill per subdirectory with a SKILL.md (SEP-2640) | (disabled) |
 | `--mcp-exec-script` | `SCRIPTLING_MCP_EXEC_SCRIPT`  | Enable MCP script execution tool         | false      |
 
 Tools, the execution tool, or an app bundle declaring MCP activates the server. Resource and prompt flags only add content to an activated MCP server. Add `--server <addr>` to serve over HTTP at `/mcp`; without it, the activated server runs over stdio.
