@@ -10,8 +10,24 @@ nav-skip: true
 
 {{< version "v0.28.0" >}}
 
+{{< changelog-item "fixed" >}}
+**`ToolRegistry.add()` with a duplicate name now replaces the tool.** Previously re-registering a name appended a second identical schema — the model saw two copies of the tool — while silently swapping the handler. `add_schema()` still errors on duplicates.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**The positional-only separator `/` is rejected with a clear parse error.** `def f(a, /, b)` previously parsed with the `/` silently accepted as a parameter named `/`, so every call failed with a confusing argument-count error. The parser now reports `positional-only parameters ('/') are not supported` up front.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**The `@mcp.tool` help example no longer uses `eval()`.** The example used `eval()`, which does not exist in scriptling — copying it produced an error.
+{{< /changelog-item >}}
+
 {{< changelog-item "added" >}}
-**`sys.executable`: the running interpreter's path.** Lets a script relaunch its own binary as a subprocess instead of depending on which `scriptling` resolves to on PATH; the MCP examples now launch their stdio servers this way, so an older install on PATH can no longer break them. See [sys](/reference/libraries/http-process/sys/).
+**`scriptling pack --list <package>`.** Prints what a package contains before you deploy it: the manifest's name, version and protocols, each convention directory with its file count, and the sha256. The [Python differences](/reference/python-differences/) page was also re-verified end to end: nested classes and `bytes()` work and are now listed as supported, and `input()`'s availability and the `type(x).__name__` divergence are documented precisely.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**`sys.executable`: the running interpreter's path.** Lets a script relaunch its own binary as a subprocess instead of depending on which `scriptling` resolves to on PATH; the MCP examples now launch their stdio servers this way. See [sys](/reference/libraries/http-process/sys/).
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}

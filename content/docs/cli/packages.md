@@ -114,6 +114,19 @@ scriptling pack ./mylib -o mylib.zip
 # Output includes: sha256=abc123def456...
 ```
 
+Before deploying, check what actually shipped in the artifact:
+
+```bash
+scriptling pack --list mylib.zip
+# package: mylib 1.0.0
+# serves: mcp,http
+#   tools/       4 file(s)
+#   prompts/     2 file(s)
+#   skills/      3 file(s)
+#   total        11
+# sha256=abc123def456...
+```
+
 Or use the `manifest` command to print a package's metadata:
 
 ```bash

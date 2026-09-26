@@ -17,24 +17,23 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Generators with `yield` | Generator functions are not supported |
 | Type annotations | Type hints like `def func(x: int) -> str:` are not parsed |
 | Walrus operator (`:=`) | Assignment expressions are not supported |
-| Positional-only separator (`/`) | Positional-only parameter syntax is not supported; bare `*` keyword-only parameters are supported |
+| Positional-only separator (`/`) | Rejected with a parse error; bare `*` keyword-only parameters are supported |
 | Multiple inheritance | Only single inheritance is supported |
-| Nested classes | Classes cannot be defined inside other classes/functions |
 | Metaclasses | Custom metaclasses are not supported |
-| Descriptors | The descriptor protocol is not implemented |
+| Descriptors | The descriptor protocol is not implemented: a `__get__` method is never invoked, attribute access returns the object itself |
 | Regex backreferences (`\1`, `\2`) | RE2 engine used; no backreferences, lookaheads, or lookbehinds: see [regex docs](../../reference/libraries/text-processing/regex/) |
 
 ### Built-in Functions NOT Supported
 
 | Function | Alternative |
 |----------|-------------|
-| `input()` | Not available in embedded environments |
+| `input()` | Only registered when a stdin reader is attached (CLI scripts); absent in embedded and server evaluators — see [sys](../libraries/http-process/sys/) |
 | `open()` | Use `os.read_file()` and `os.write_file()` |
 | `compile()`, `eval()`, `exec()` | Dynamic code execution not supported |
 | `globals()`, `locals()` | Scope introspection not available |
 | `vars()` | Variable introspection not supported |
 | `__import__()` | Use `import` statement |
-| `memoryview()`, `bytearray()`, `bytes()` | Advanced byte manipulation not supported |
+| `memoryview()`, `bytearray()`, `bytes()` | Advanced byte manipulation not supported (`bytes()` itself works) |
 | `complex()` | Complex numbers not implemented |
 | `frozenset()` | Use regular `set()` |
 
@@ -75,6 +74,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | `__future__` imports | Not applicable |
 | `__next__` returning a `StopIteration()` *value* | Ends iteration without yielding it — only *raising* `StopIteration` signals end-of-iteration |
 | Default argument evaluation | Defaults are evaluated on each call (Python evaluates once, at `def` time) |
+| `type(x).__name__` | `type(x)` returns the type name directly as a string (`type(42)` is `"INTEGER"`, a custom class instance gives its class name), so there is no type object to hang `.__name__` on — use `type(x)` itself; a raised built-in exception reports the generic `"EXCEPTION"` |
 | Lazy iteration | `any`/`all`/`sorted`/`min`/`max`/`map`/`filter` materialize their iterable eagerly; `any([True, boom()])` raises where Python short-circuits |
 
 ## Supported Python 3 Features
@@ -82,6 +82,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 Scriptling **does support**:
 
 - ✅ Classes with single inheritance and `super()`
+- ✅ Nested classes (a class defined inside a function or another class)
 - ✅ Dunder methods: `__str__`, `__repr__`, `__len__`, `__bool__`, `__eq__`, `__lt__`, `__gt__`, `__le__`, `__ge__`, `__ne__`, `__contains__`, `__iter__`, `__next__`, `__enter__`, `__exit__`
 - ✅ Dunders honored everywhere: container membership/lookup use `__eq__`/`__hash__`, and comparisons reflect (`b.__gt__(a)` when `a` defines no `__lt__`)
 - ✅ Lambda functions and closures
