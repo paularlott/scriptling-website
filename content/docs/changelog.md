@@ -11,6 +11,30 @@ nav-skip: true
 {{< version "v0.28.0" >}}
 
 {{< changelog-item "fixed" >}}
+**`repr` is Python-style everywhere.** The three repr paths disagreed (`repr('hi')` gave single quotes, `%r` and f-string `!r` gave Go-style double quotes, and nothing escaped newlines). One shared implementation now uses Python's rules: single quotes (switching to double when the string contains one), escaped `\n`/`\r`/`\t`, applied consistently across `repr()`, `%r`, `!r`, and the new `=` debug form.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**The f-string `=` debug specifier.** `f"{x=}"` renders `x=7`, preserving source spacing (`f"{x = }"` gives `x = 7`), composing with format specs (`f"{x=:>10}"`) and conversions, exactly like Python 3.8+.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`%`-formatting applies width, precision and flags to strings.** `"%10s"`, `"%-10s"`, and `"%.3s"` were silently ignored for `%s`/`%r`; they now pad, justify, and truncate like Python (zero-padding stays numeric-only).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`del a, b` and friends.** Multi-target deletion was a parse error; `del a, b["k"], l[0]` now deletes all targets.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Numeric underscores.** `1_000_000`, `0xff_f`, `1_000.5`, and `int("1_000")` / `float("1_0.5")` parse with Python's between-digits rule.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`len(range(n))` works, `splitlines(keepends=True)` is honored.** Range is the one lazy iterator with a defined length (as in Python; `len` of map/enumerate still errors), and the `keepends` keyword was silently ignored — only the positional form worked.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
 **Floats display exactly like Python.** `print(2.0)` shows `2.0` (was `2`), and `123456789.123` prints as itself instead of `1.23456789123e+08`; `-0.0` and `inf`/`nan` use Python's spellings. The same repr applies inside containers, f-strings and `json.dumps`, which previously emitted Go's encodings.
 {{< /changelog-item >}}
 
