@@ -11,6 +11,18 @@ nav-skip: true
 {{< version "v0.28.0" >}}
 
 {{< changelog-item "added" >}}
+**Regex named groups.** `(?P<name>...)` captures are reachable as `m.group("name")` and via the new `m.groupdict()`, with Python's catchable `IndexError` for unknown names.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`datetime` attributes and parsing match Python.** `.year`/`.month`/`.day`/`.hour`/`.minute`/`.second`/`.microsecond` are attributes (they were methods, so `dt.year` returned a bound method), `strptime` results work like parsed datetimes, and `fromisoformat` is available on both `date` and `datetime`. `timedelta` is now a real object: `str()` renders Python's format (`1 day, 2:00:00`, including negative-duration day-borrowing), with `total_seconds()` and normalized `days`/`seconds`/`microseconds` fields, and date/datetime arithmetic accepts it directly.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`itertools` accepts iterators everywhere.** `islice`, `chain`, `cycle`, `takewhile`, `dropwhile`, `accumulate`, `product`, `permutations`, `combinations`, and `zip_longest` all rejected the iterators the builtins produce (`islice(range(10), 2, 6, 2)` errored); all verified against CPython. `cycle(iterable)` now returns a lazily infinite iterator like Python's (the finite `cycle(iterable, n)` form still works), `islice` stays lazy so it can bound infinite iterators, and `product` honors `repeat=`.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
 **Multiple `if` clauses in comprehensions.** `[x for x in items if a if b]` was a parse error; conditions now chain (equivalent to `if a and b`) across list, set, and dict comprehensions and generator expressions, including with additional `for` clauses.
 {{< /changelog-item >}}
 

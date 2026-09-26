@@ -120,6 +120,7 @@ Scriptling **does support**:
 - ✅ `str.rsplit` with `maxsplit`
 - ✅ Callable instances (`__call__`), sequence ordering (`[1] < [2]`, tuples element-wise), `str.encode()` returning bytes, and `math.isclose`
 - ✅ Multiple `if` clauses in comprehensions, named `%(key)s` `%`-formatting, in-place set methods (`update` and friends), `dict.fromkeys`, and `SomeClass.__name__`
+- ✅ Regex named groups (`m.group("name")`, `groupdict()`), Python-style datetime attributes and `str(timedelta)`, `fromisoformat`, and iterators accepted throughout `itertools`
 - ✅ Python-shaped errors for the common cases: `unsupported operand type(s) for +: 'int' and 'str'`, `name 'x' is not defined`, quoted `KeyError` messages
 - ✅ Python-style `repr` for strings (single quotes, escapes) across `repr()`, `%r`, `!r` and `f"{x=}"`
 - ✅ `%`-formatting string width/precision/flags, the `f"{x=}"` debug specifier, numeric underscores (`1_000`), `del a, b`, `len(range(n))`, and `splitlines(keepends=True)`
