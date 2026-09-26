@@ -10,6 +10,30 @@ nav-skip: true
 
 {{< version "v0.28.0" >}}
 
+{{< changelog-item "fixed" >}}
+**`os.path` works as an attribute of `os`.** `os.path.exists(...)` after `import os` raised `KeyError: 'path'`; only the standalone `import os.path` form worked. The path module now resolves as an attribute too, exactly like Python (and the attribute form is now covered by tests).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`json.loads` errors are catchable as `ValueError`.** Python's `JSONDecodeError` subclasses `ValueError`; the standard `except ValueError:` guard now catches malformed-JSON errors.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`re.split`/`re.sub` argument handling and `re.subn`.** `maxsplit=`/`count=` keyword forms were ignored, `maxsplit` was off by one (Go counts results, Python counts splits), `re.subn` did not exist, and Python backreferences (`\1`, `\g<name>`) in replacement strings were not expanded.
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**`collections.deque` is a real deque.** `appendleft`, `popleft`, `extend`, `extendleft`, `rotate`, `clear`, `copy`, and `count` methods with `maxlen` enforcement (the old `deque_appendleft`-style module functions are gone); `len()`, indexing, iteration, and truthiness all work, and `str(d)` renders `deque([...])` like Python.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**`Counter` arithmetic and `namedtuple` repr.** Counters support `+`, `-`, `|` (max-union) and `&` (min-intersection) with Python's positive-only results; namedtuples print as `Point(x=1, y=2)`. Instance `|`/`&` operators now dispatch `__or__`/`__and__` generally.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`statistics.median` keeps integer inputs integer** (`median([1, 3, 2])` is `2`, not `2.0`, matching Python).
+{{< /changelog-item >}}
+
 {{< changelog-item "added" >}}
 **Regex named groups.** `(?P<name>...)` captures are reachable as `m.group("name")` and via the new `m.groupdict()`, with Python's catchable `IndexError` for unknown names.
 {{< /changelog-item >}}
