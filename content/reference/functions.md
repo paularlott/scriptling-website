@@ -15,6 +15,23 @@ def function_name(param1, param2):
     return result
 ```
 
+### Type Annotations
+
+Annotations are parsed and ignored, so annotated Python pastes in unchanged. There is no `__annotations__` and no runtime type checking; parameters and return values behave exactly as they would without the annotations. This includes generic and string annotations, and annotated assignments:
+
+```python
+def add(a: int, b: int = 1) -> int:
+    return a + b
+
+def parse(items: dict[str, int], pairs: tuple[int, ...] = ()) -> list[int]:
+    return [items[k] for k in items]
+
+count: int = 0        # same as count = 0
+name: str             # bare annotation: no runtime effect
+```
+
+Lambda parameters cannot be annotated (the colon separates the body), matching Python.
+
 ### Examples
 
 ```python

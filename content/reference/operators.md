@@ -67,6 +67,26 @@ x <<= y  # x = x << y
 x >>= y  # x = x >> y
 ```
 
+## Assignment Expressions (Walrus)
+
+`name := value` assigns and yields the value in one expression, using the same scoping as an assignment statement (including `global`/`nonlocal` directives). Only a plain name is a valid target. `:=` binds looser than every other operator, so the value swallows comparisons and conditional expressions to its right; parenthesize when in doubt:
+
+```python
+while (chunk := read_next()) is not None:
+    process(chunk)
+
+if (n := len(items)) > 10:
+    print("large:", n)
+
+# Looser than comparisons: n receives the boolean, as in Python
+ok := 3 > 2        # ok is True
+
+# Right-associative chaining
+a := b := 5        # both a and b are 5
+```
+
+Inside a comprehension the bound name stays local to the comprehension (it does not leak to the enclosing scope the way Python's does); collect through the comprehension result instead.
+
 ## Comparison Operators
 
 ```python
@@ -217,6 +237,29 @@ set([1, 2, 3]) == set([3, 2, 1])   # True
 set([1, 2]) != set([1, 2, 3])      # True
 ```
 
+## Dict Merge Operators
+
+The `|` operator merges two dicts (matching Python's PEP 584). `d1 | d2` builds a new dict containing all keys from both, with `d2`'s values winning on conflicts; the operands are never modified:
+
+```python
+defaults = {"host": "localhost", "port": 8080, "debug": False}
+override = {"port": 9090, "debug": True}
+
+config = defaults | override
+# {"host": "localhost", "port": 9090, "debug": True}
+```
+
+The augmented form `|=` merges into the left dict **in place**, so other references to it observe the update (exactly like Python):
+
+```python
+config = {"a": 1}
+alias = config
+config |= {"b": 2}
+# both config and alias are now {"a": 1, "b": 2}
+```
+
+Both operands must be dicts; merging a dict with any other type raises a type error. For arbitrary updates use `.update()`.
+
 ## Identity Operators
 
 ```python
@@ -273,7 +316,8 @@ From highest to lowest. Parentheses `()` override precedence and group explicitl
 | 11 | Bitwise XOR: `^` |
 | 12 | Bitwise OR: `\|` |
 | 13 | `or` |
-| 14 (lowest) | Conditional expression: `x if cond else y` |
+| 14 | Conditional expression: `x if cond else y` |
+| 15 (lowest) | Walrus: `x := expr` |
 
 > **Note:** Scriptling's precedence differs from Python in two places. Unary `not` binds tighter than `**` (so `-2 ** 2` evaluates to `4`, not `-4`), and `and`/`or` bind tighter than the bitwise operators `&`, `^`, `|` (so `a & b and c` parses as `a & (b and c)`). Add parentheses when porting Python expressions that mix these.
 

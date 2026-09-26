@@ -10,6 +10,22 @@ nav-skip: true
 
 {{< version "v0.28.0" >}}
 
+{{< changelog-item "added" >}}
+**Type annotations are accepted.** Function signatures (`def f(a: int, b: str = "x") -> bool:`), annotated assignments (`count: int = 5`), and generic/string annotations (`dict[str, int]`, `int | None`) all parse; the annotations are ignored, matching their runtime meaning in Python, so annotated Python pastes in unchanged — including MCP tool functions. See [Functions](/reference/functions/).
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Walrus assignment expressions.** `while (chunk := read()):`, `if (n := len(x)) > 10:`, and walrus in comprehension filters, with Python's precedence. A walrus bound inside a comprehension does not leak to the enclosing scope. See [Operators](/reference/operators/).
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Dict merge operators.** `d1 | d2` builds a new dict with the right operand winning conflicts, and `d |= other` merges in place so aliases observe the update, matching Python (PEP 584). See [Operators](/reference/operators/).
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**The `...` placeholder.** `def stub(): ...` bodies and `tuple[int, ...]` annotations parse; the expression evaluates to `None`.
+{{< /changelog-item >}}
+
 {{< changelog-item "fixed" >}}
 **`json.dumps(data, indent=n)` honors a numeric indent.** The kwarg previously only accepted strings, so `indent=2` silently produced compact output; a number now gives that many spaces and `indent=0` newline-separates. See [json](/reference/libraries/data-formats/json/).
 {{< /changelog-item >}}

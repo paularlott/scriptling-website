@@ -15,8 +15,6 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 |---------|-------|
 | `async`/`await` | Asynchronous programming is not supported |
 | Generators with `yield` | Generator functions are not supported |
-| Type annotations | Type hints like `def func(x: int) -> str:` are not parsed |
-| Walrus operator (`:=`) | Assignment expressions are not supported |
 | Positional-only separator (`/`) | Rejected with a parse error; bare `*` keyword-only parameters are supported |
 | Multiple inheritance | Only single inheritance is supported |
 | Metaclasses | Custom metaclasses are not supported |
@@ -74,6 +72,8 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | `__future__` imports | Not applicable |
 | `__next__` returning a `StopIteration()` *value* | Ends iteration without yielding it — only *raising* `StopIteration` signals end-of-iteration |
 | Default argument evaluation | Defaults are evaluated on each call (Python evaluates once, at `def` time) |
+| Type annotations | Parsed and ignored, including `def f(a: int) -> str`, `x: int = 5`, and `self.n: int = 0`; there is no `__annotations__` and no runtime checking, and comma subscripts parse as tuple indexes (`dict[str, int]`) |
+| Walrus in a comprehension | `y` in `[y for x in a if (y := f(x))]` binds inside the comprehension and does not leak to the enclosing scope, unlike Python (PEP 572); use the collected list instead |
 | `type(x).__name__` | `type(x)` returns the type name directly as a string (`type(42)` is `"INTEGER"`, a custom class instance gives its class name), so there is no type object to hang `.__name__` on — use `type(x)` itself; a raised built-in exception reports the class it was raised as (`"ValueError"`) |
 | Lazy iteration | `any`/`all`/`sorted`/`min`/`max`/`map`/`filter` materialize their iterable eagerly; `any([True, boom()])` raises where Python short-circuits |
 
@@ -107,6 +107,10 @@ Scriptling **does support**:
 - ✅ Keyword arguments (`**kwargs`)
 - ✅ Default parameter values
 - ✅ Conditional expressions (ternary operator)
+- ✅ Walrus assignment expressions (`while (chunk := read()):`)
+- ✅ Type annotations (`def f(a: int) -> str`, `count: int = 5`) parsed and ignored
+- ✅ The `...` (Ellipsis) placeholder, including `def f(): ...` stub bodies
+- ✅ Dict merge operators: `d1 | d2` builds a new dict (right wins), `d |= other` merges in place
 - ✅ Augmented assignment (`+=`, `-=`, `**=`, etc.)
 - ✅ Slice notation with step (`[start:stop:step]`)
 - ✅ `del` for variables, list indexes, list slices, dict keys, and attributes

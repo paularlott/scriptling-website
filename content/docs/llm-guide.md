@@ -31,6 +31,8 @@ Scriptling is a sandboxed, Python-like scripting language for Go applications. G
 - Use `for key, value in data.items():` for dictionary iteration.
 - Use `super().__init__(...)` in subclasses.
 - Use `match` / `case` when it makes the code simpler.
+- Use type annotations on signatures (`def f(a: int) -> str:`) if you like; they are parsed and ignored.
+- Use `while (chunk := read()):` and `d1 | d2` dict merge freely.
 
 ## Supported Language Features
 
@@ -39,6 +41,7 @@ Scriptling is a sandboxed, Python-like scripting language for Go applications. G
 - Lists, dicts, tuples, sets, slicing, `del`, chained comparisons, and augmented assignment.
 - Classes, single inheritance, `super()`, and common dunder methods.
 - `try` / `except` / `else` / `finally`; `with` statements and context managers.
+- Walrus assignment expressions (`while (chunk := read()):`), type annotations (parsed and ignored), `...` placeholder expressions, and dict merge (`d1 | d2`, `d |= other`).
 - `match` / `case`, including guards and structural matching for dicts and sequences.
 - `__name__ == "__main__"` patterns.
 - Builtins such as `len`, `str`, `int`, `float`, `bool`, `list`, `tuple`, `set`, `dict`, `range`, `enumerate`, `zip`, `map`, `filter`, `sorted`, `sum`, `min`, `max`, `isinstance`, and `issubclass`; `sorted`, `min` and `max` accept `key=` (and `default=` for empty iterables on `min`/`max`).
@@ -47,8 +50,7 @@ Scriptling is a sandboxed, Python-like scripting language for Go applications. G
 
 - No `async` / `await`.
 - No `yield`-based generator functions.
-- No type annotations.
-- No walrus operator (`:=`).
+- A walrus bound inside a comprehension does not leak to the enclosing scope; collect through the comprehension result instead.
 - No multiple inheritance (nested classes are supported).
 - No built-in `open()`, `eval()`, `exec()`, `globals()`, or `locals()`.
 - No custom exception classes (`class MyError(Exception)` fails — classes cannot derive from the built-in exception types); raise the built-ins and check `type(e)` in the handler.
