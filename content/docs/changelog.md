@@ -11,6 +11,22 @@ nav-skip: true
 {{< version "v0.28.0" >}}
 
 {{< changelog-item "added" >}}
+**Multiple `if` clauses in comprehensions.** `[x for x in items if a if b]` was a parse error; conditions now chain (equivalent to `if a and b`) across list, set, and dict comprehensions and generator expressions, including with additional `for` clauses.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Named `%`-formatting.** `"%(name)s=%(n)d" % {...}` — the logging/template idiom — reads values from a dict by key, composes with all width/precision/flag/conversion forms, and raises Python's `KeyError`/`TypeError` on a missing key or non-mapping right side.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**In-place set methods.** `update`, `intersection_update`, `difference_update`, and `symmetric_difference_update` accept any number of iterables (not just sets), mutating in place like Python.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**`dict.fromkeys` and `SomeClass.__name__`.** The type-level default-mapping constructor (`dict.fromkeys(keys, value)`), and class name introspection — `cls.__name__` in classmethods and `SomeClass.__name__` generally — returning the name string, consistent with `type(x)`.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
 **Callable instances.** `obj(...)` dispatches `__call__`, so functors, strategies, and partial application work; calling an instance without `__call__` raises a catchable `TypeError` like Python's.
 {{< /changelog-item >}}
 
