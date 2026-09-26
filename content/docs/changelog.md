@@ -10,6 +10,10 @@ nav-skip: true
 
 {{< version "v0.28.0" >}}
 
+{{< changelog-item "added" >}}
+**`sys.executable`: the running interpreter's path.** Lets a script relaunch its own binary as a subprocess instead of depending on which `scriptling` resolves to on PATH; the MCP examples now launch their stdio servers this way, so an older install on PATH can no longer break them. See [sys](/reference/libraries/http-process/sys/).
+{{< /changelog-item >}}
+
 {{< changelog-item "changed" >}}
 **`mcp.Client` HTTP requests time out after 30 seconds by default.** Script-level clients previously inherited the library's 5-minute timeout, so a hung server stalled a script for minutes per call. `mcp.Client(url, timeout=300)` opts a known-slow server back up, and timeouts surface as ordinary catchable exceptions. See [MCP Client](/reference/libraries/mcp/client/).
 {{< /changelog-item >}}
