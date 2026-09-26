@@ -74,7 +74,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | `__future__` imports | Not applicable |
 | `__next__` returning a `StopIteration()` *value* | Ends iteration without yielding it — only *raising* `StopIteration` signals end-of-iteration |
 | Default argument evaluation | Defaults are evaluated on each call (Python evaluates once, at `def` time) |
-| `type(x).__name__` | `type(x)` returns the type name directly as a string (`type(42)` is `"INTEGER"`, a custom class instance gives its class name), so there is no type object to hang `.__name__` on — use `type(x)` itself; a raised built-in exception reports the generic `"EXCEPTION"` |
+| `type(x).__name__` | `type(x)` returns the type name directly as a string (`type(42)` is `"INTEGER"`, a custom class instance gives its class name), so there is no type object to hang `.__name__` on — use `type(x)` itself; a raised built-in exception reports the class it was raised as (`"ValueError"`) |
 | Lazy iteration | `any`/`all`/`sorted`/`min`/`max`/`map`/`filter` materialize their iterable eagerly; `any([True, boom()])` raises where Python short-circuits |
 
 ## Supported Python 3 Features

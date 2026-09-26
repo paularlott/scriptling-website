@@ -41,7 +41,7 @@ Scriptling is a sandboxed, Python-like scripting language for Go applications. G
 - `try` / `except` / `else` / `finally`; `with` statements and context managers.
 - `match` / `case`, including guards and structural matching for dicts and sequences.
 - `__name__ == "__main__"` patterns.
-- Builtins such as `len`, `str`, `int`, `float`, `bool`, `list`, `tuple`, `set`, `dict`, `range`, `enumerate`, `zip`, `map`, `filter`, `sorted`, `sum`, `min`, `max`, `isinstance`, and `issubclass`.
+- Builtins such as `len`, `str`, `int`, `float`, `bool`, `list`, `tuple`, `set`, `dict`, `range`, `enumerate`, `zip`, `map`, `filter`, `sorted`, `sum`, `min`, `max`, `isinstance`, and `issubclass`; `sorted`, `min` and `max` accept `key=` (and `default=` for empty iterables on `min`/`max`).
 
 ## Important Differences from Python
 
@@ -49,10 +49,13 @@ Scriptling is a sandboxed, Python-like scripting language for Go applications. G
 - No `yield`-based generator functions.
 - No type annotations.
 - No walrus operator (`:=`).
-- No multiple inheritance; no nested classes.
+- No multiple inheritance (nested classes are supported).
 - No built-in `open()`, `eval()`, `exec()`, `globals()`, or `locals()`.
+- No positional-only parameters (`def f(a, /, b)`); keyword-only with bare `*` is supported.
+- Default arguments are evaluated on each call, not once at `def` time; bind values with a factory function when that matters.
 - Regex uses RE2 semantics: no backreferences, no lookaround.
 - Booleans display as `True` / `False` (matching Python); machine formats such as `json.dumps` and query parameters stay lowercase.
+- `type(x)` returns the type name as a string (`"INTEGER"`, `"STRING"`, a class instance gives its class name, a raised exception gives the class it was raised as such as `"ValueError"`).
 
 Two differences matter a lot:
 
@@ -91,6 +94,16 @@ for item in data:
 - Response objects expose `status_code`, `text`, `body`, `headers`, and `url`; `body` and `text` are aliases.
 - `response.json()` and `response.raise_for_status()` are supported.
 - Send warnings and errors to stderr so stdout stays clean for the report: `import sys` then `sys.stderr.write("warning\n")` or `print("error", file=sys.stderr)`.
+
+## MCP and AI Agents
+
+When the task involves MCP servers or an agent loop:
+
+- Connect to an MCP server with `mcp.Client(target, namespace="x")`; every client needs a distinct `namespace` (it prefixes tool names like `x__tool` and routes skill URIs). HTTP requests time out after 30 seconds by default; pass `timeout=<seconds>` for a server whose tools are slower. Use `sys.executable` as the target to relaunch the running interpreter as a stdio server.
+- Build agents with `import scriptling.ai.agent as agent`; `Agent(client, tools=..., mcp_servers=[...])` registers every server's tools under their namespaced names and lists the servers' skills in the system prompt, fetched on demand through the agent's `get_skill` tool. A failing tool handler does not kill the turn: the error comes back as a tool result the model can see and retry.
+- `ai.ToolRegistry().add_schema(name, description, schema, handler)` registers a tool with a full JSON Schema (use it for schemas that arrive from MCP servers).
+- When writing an MCP server's decorated `.py` files, `@mcp.tool`, `@mcp.resource` (static or `template=True`), `@mcp.prompt` and `@mcp.skill` all work in one file; `import scriptling.runtime.mcp as mcp` first.
+- Package an MCP app with `scriptling pack -o app.zip <dir>` (tools/, resources/, prompts/, skills/ are served by convention) and check the artifact with `scriptling pack --list app.zip`.
 
 ## Common Exceptions
 

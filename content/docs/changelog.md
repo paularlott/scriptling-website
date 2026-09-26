@@ -10,6 +10,14 @@ nav-skip: true
 
 {{< version "v0.28.0" >}}
 
+{{< changelog-item "changed" >}}
+**`type(e)` reports the exception's class.** `type()` on a caught exception now returns the class it was raised as (`"ValueError"`, `"KeyError"`) instead of the generic `"EXCEPTION"`, so `except` blocks can discriminate without message sniffing. See [Built-in Functions](/reference/builtins/).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**A failing tool no longer kills the agent turn.** A tool handler that raises — or a tool name the model invented — now comes back as an `Error: ...` tool result the model can see and recover from, and the other tools in the same batch still run. See [Agent](/reference/libraries/ai/agent/).
+{{< /changelog-item >}}
+
 {{< changelog-item "fixed" >}}
 **`ToolRegistry.add()` with a duplicate name now replaces the tool.** Previously re-registering a name appended a second identical schema — the model saw two copies of the tool — while silently swapping the handler. `add_schema()` still errors on duplicates.
 {{< /changelog-item >}}
