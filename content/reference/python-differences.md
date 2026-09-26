@@ -118,6 +118,8 @@ Scriptling **does support**:
 - ✅ Slice assignment (`l[1:4] = [...]`, stepped and reversed forms)
 - ✅ Python float repr: `str(2.0)` is `"2.0"`, `str(123456789.123)` is positional, scientific outside `1e-4`–`1e16`, in `json.dumps` too
 - ✅ `str.rsplit` with `maxsplit`
+- ✅ Callable instances (`__call__`), sequence ordering (`[1] < [2]`, tuples element-wise), `str.encode()` returning bytes, and `math.isclose`
+- ✅ Python-shaped errors for the common cases: `unsupported operand type(s) for +: 'int' and 'str'`, `name 'x' is not defined`, quoted `KeyError` messages
 - ✅ Python-style `repr` for strings (single quotes, escapes) across `repr()`, `%r`, `!r` and `f"{x=}"`
 - ✅ `%`-formatting string width/precision/flags, the `f"{x=}"` debug specifier, numeric underscores (`1_000`), `del a, b`, `len(range(n))`, and `splitlines(keepends=True)`
 - ✅ `startswith`/`endswith` with tuples and `start`/`end` offsets, `replace` with a count, and `b"..."` bytes literals

@@ -10,6 +10,26 @@ nav-skip: true
 
 {{< version "v0.28.0" >}}
 
+{{< changelog-item "added" >}}
+**Callable instances.** `obj(...)` dispatches `__call__`, so functors, strategies, and partial application work; calling an instance without `__call__` raises a catchable `TypeError` like Python's.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`str.encode()` returns bytes.** It previously produced a list of ints (an old workaround from before the bytes type existed), so `"héllo".encode().decode()` failed; the round-trip works now, with `utf-8` (default), validated `ascii`, and a `ValueError` for unknown encodings.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**`math.isclose`.** Python's float comparison with `rel_tol`/`abs_tol` kwargs, including the NaN and infinity edge semantics.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**Lists and tuples order-compare.** `[1] < [2]` and `(1, 2) < (1, 3)` raised "type mismatch"; both now compare element-wise like Python, and incomparable elements raise `TypeError: '<' not supported between instances of 'int' and 'str'` instead of silently comparing as equal — which also makes `sorted()` on mixed-type lists honest.
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**Common error messages are Python-shaped.** `1 + "x"` now says `unsupported operand type(s) for +: 'int' and 'str'`, an undefined name says `name 'x' is not defined`, a missing key prints quoted (`'missing'`), and sort comparison errors match CPython's wording — the error text is the only feedback an LLM gets, so it now reads like Python's.
+{{< /changelog-item >}}
+
 {{< changelog-item "fixed" >}}
 **`repr` is Python-style everywhere.** The three repr paths disagreed (`repr('hi')` gave single quotes, `%r` and f-string `!r` gave Go-style double quotes, and nothing escaped newlines). One shared implementation now uses Python's rules: single quotes (switching to double when the string contains one), escaped `\n`/`\r`/`\t`, applied consistently across `repr()`, `%r`, `!r`, and the new `=` debug form.
 {{< /changelog-item >}}
