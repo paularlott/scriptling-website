@@ -51,6 +51,7 @@ Scriptling is a sandboxed, Python-like scripting language for Go applications. G
 - No walrus operator (`:=`).
 - No multiple inheritance (nested classes are supported).
 - No built-in `open()`, `eval()`, `exec()`, `globals()`, or `locals()`.
+- No custom exception classes (`class MyError(Exception)` fails — classes cannot derive from the built-in exception types); raise the built-ins and check `type(e)` in the handler.
 - No positional-only parameters (`def f(a, /, b)`); keyword-only with bare `*` is supported.
 - Default arguments are evaluated on each call, not once at `def` time; bind values with a factory function when that matters.
 - Regex uses RE2 semantics: no backreferences, no lookaround.

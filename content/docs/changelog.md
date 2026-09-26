@@ -10,6 +10,22 @@ nav-skip: true
 
 {{< version "v0.28.0" >}}
 
+{{< changelog-item "fixed" >}}
+**`json.dumps(data, indent=n)` honors a numeric indent.** The kwarg previously only accepted strings, so `indent=2` silently produced compact output; a number now gives that many spaces and `indent=0` newline-separates. See [json](/reference/libraries/data-formats/json/).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`sum()` accepts Python's optional `start` argument.** `sum(iterable, start)` previously failed; it now offsets the total and can seed a float result. See [Built-in Functions](/reference/builtins/).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`list.sort()` is as honest as `sorted()`.** Sorting incomparable elements (dicts without a `key`) silently did nothing where `sorted()` raised; both now use one comparator, so `.sort()` errors the same way and also supports `__lt__` on instances. See [Built-in Functions](/reference/builtins/).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`repr(e)` prints the exception's class.** `ValueError: bad input` instead of the generic `EXCEPTION:` wrapper, matching `type(e)`. The LLM guide also now states that custom exception classes are not supported. See [Built-in Functions](/reference/builtins/).
+{{< /changelog-item >}}
+
 {{< changelog-item "changed" >}}
 **`type(e)` reports the exception's class.** `type()` on a caught exception now returns the class it was raised as (`"ValueError"`, `"KeyError"`) instead of the generic `"EXCEPTION"`, so `except` blocks can discriminate without message sniffing. See [Built-in Functions](/reference/builtins/).
 {{< /changelog-item >}}

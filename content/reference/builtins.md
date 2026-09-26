@@ -198,6 +198,7 @@ pow(2, 10, 1000)          # 24 (modular: 2^10 % 1000)
 divmod(17, 5)             # (3, 2) - returns (quotient, remainder)
 sum([1, 2, 3, 4, 5])      # 15
 sum([1.5, 2.5, 3.0])      # 7.0
+sum([1, 2], 10)           # 13: optional start value, as in Python
 ```
 
 ## Number Formatting
