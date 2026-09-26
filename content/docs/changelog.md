@@ -10,6 +10,26 @@ nav-skip: true
 
 {{< version "v0.28.0" >}}
 
+{{< changelog-item "fixed" >}}
+**Integer `//` and `%` now follow Python exactly.** Floor division floors toward negative infinity (`-7 // 2` is `-4`) and modulo takes the divisor's sign (`-7 % 2` is `1`), including at parse-time constant folding. Float modulo also works now, with the same sign rule (`5.5 % 3` is `2.5`); it previously raised "unknown operator". See [Operators](/reference/operators/).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`enumerate(iterable, start=N)` honors the keyword.** The `start=` form was silently ignored and produced 0-based pairs; only the positional form worked. See [Built-in Functions](/reference/builtins/).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`sorted()` and `.sort()` are stable.** They used an unstable algorithm that could reorder equal keys on larger inputs; Python guarantees stability and so does Scriptling now, including with `reverse=True`. See [Built-in Functions](/reference/builtins/).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`round()` rounds ties to even, like Python.** `round(2.5)` is `2` (was `3`), `round(2.675, 2)` is `2.67` (was `2.68`), and types match Python too: a float stays a float when ndigits is given. See [Built-in Functions](/reference/builtins/).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**List and set augmented assignment mutate in place.** `x = y = [1]; x += [2]` now lets `y` observe the update, as in Python; same for `list *= n` and `|=`, `&=`, `-=` and `^=` on sets. See [Operators](/reference/operators/).
+{{< /changelog-item >}}
+
 {{< changelog-item "added" >}}
 **Type annotations are accepted.** Function signatures (`def f(a: int, b: str = "x") -> bool:`), annotated assignments (`count: int = 5`), and generic/string annotations (`dict[str, int]`, `int | None`) all parse; the annotations are ignored, matching their runtime meaning in Python, so annotated Python pastes in unchanged — including MCP tool functions. See [Functions](/reference/functions/).
 {{< /changelog-item >}}

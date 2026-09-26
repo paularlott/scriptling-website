@@ -192,6 +192,7 @@ max([], default=None)     # None: default is returned for an empty iterable
 min([True, False])        # False: booleans order as 0 and 1 (False < True),
                           # against each other and mixed with numbers, like Python
 round(3.7)                # 4
+round(2.5)                # 2 (ties go to the even digit, like Python)
 round(3.14159, 2)         # 3.14
 pow(2, 10)                # 1024
 pow(2, 10, 1000)          # 24 (modular: 2^10 % 1000)
@@ -307,7 +308,7 @@ list_b = [3, 4]
 list_a.extend(list_b)              # list_a is now [1, 2, 3, 4]
 
 # sorted returns a new sorted list
-sorted([3, 1, 4, 1, 5])            # [1, 1, 3, 4, 5]
+sorted([3, 1, 4, 1, 5])            # [1, 1, 3, 4, 5] (stable: equal keys keep their order)
 sorted(["banana", "apple"])        # ["apple", "banana"]
 sorted([3, 1, 2], reverse=True)    # [3, 2, 1]
 sorted([(2, "b"), (1, "a")])       # [(1, "a"), (2, "b")]  (tuples/lists compare element-by-element)
@@ -420,6 +421,7 @@ d.setdefault("b", 200)             # 200 (sets and returns new value)
 ```python
 # These return iterators (lazy evaluation)
 enumerate(["a", "b"])              # Iterator: (0, "a"), (1, "b")
+enumerate(["a", "b"], start=1)     # Iterator: (1, "a"), (2, "b")
 zip([1, 2], ["a", "b"])            # Iterator: (1, "a"), (2, "b")
 reversed([1, 2, 3])                # Iterator: 3, 2, 1
 map(lambda x: x*2, [1, 2, 3])      # Iterator: 2, 4, 6

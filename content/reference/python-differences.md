@@ -93,6 +93,7 @@ Scriptling **does support**:
 - ✅ Dictionary views (`keys()`, `values()`, `items()`)
 - ✅ F-strings and `.format()`
 - ✅ True division (`/` always returns float)
+- ✅ Python number semantics: `//` floors toward negative infinity, `%` takes the divisor's sign (ints and floats), `round()` ties go to the even digit, `divmod()` agrees, and `sorted()` / `.sort()` are stable
 - ✅ Set literals `{1, 2, 3}` and set operations
 - ✅ Set hashability: `TypeError` raised for unhashable types (lists, dicts, sets, instances without `__hash__`) matching Python semantics
 - ✅ Bool arithmetic: `True + True == 2`, `True == 1`, `False == 0`

@@ -29,6 +29,9 @@ x % y    # Modulo (remainder)
 10 / 4    # 2.5 (always float)
 10 // 3   # 3 (floor division)
 10 % 3    # 1 (remainder)
+-7 // 2   # -4 (floors toward negative infinity, like Python)
+-7 % 2    # 1 (remainder takes the divisor's sign, like Python)
+5.5 % 3   # 2.5 (float modulo follows the same sign rule)
 
 # String operations
 "Hello, " + "World"  # "Hello, World"
@@ -223,7 +226,7 @@ a ^ b   # {1, 4}        symmetric difference — in one set but not both
 
 Both operands must be sets; combining a set with a list, tuple, or other iterable raises a type error. For arbitrary iterables, use the equivalent methods: `.intersection()`, `.union()`, `.difference()`, `.symmetric_difference()`.
 
-The augmented-assignment forms (`&=`, `|=`, `-=`, `^=`) work on sets too — they rebind the name to the resulting set:
+The augmented-assignment forms (`&=`, `|=`, `-=`, `^=`) work on sets too — they update the set in place, so other references to it observe the change (matching Python):
 
 ```python
 tags = set([1, 2, 3])
