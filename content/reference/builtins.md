@@ -184,6 +184,13 @@ callable("hello")         # False
 abs(-5)                   # 5
 min(3, 1, 2)              # 1
 max(3, 1, 2)              # 3
+min(words, key=len)       # shortest word: key computes the comparison value,
+                          # the item whose key wins is returned (ties keep the first)
+max(records, key=lambda r: r["amount"])  # record with the highest amount
+max([], default=None)     # None: default is returned for an empty iterable
+                          # (single iterable only, not multiple arguments)
+min([True, False])        # False: booleans order as 0 and 1 (False < True),
+                          # against each other and mixed with numbers, like Python
 round(3.7)                # 4
 round(3.14159, 2)         # 3.14
 pow(2, 10)                # 1024

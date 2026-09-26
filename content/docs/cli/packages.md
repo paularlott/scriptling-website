@@ -352,9 +352,10 @@ These top-level dirs are auto-discovered when present:
 
 | Dir | Protocol | Contents |
 |-----|----------|----------|
-| `tools/` | mcp | `.py` + `.toml` pairs (MCP tools) |
+| `tools/` | mcp | `.py` + `.toml` pairs, or decorated `.py` files (MCP tools; decorated files may also register resources, prompts and skills) |
 | `resources/` | mcp | Resource tree (static files and `{var}` templates) |
 | `prompts/` | mcp | `.toml` + `.py` pairs or `.md`/`.txt` (MCP prompts) |
+| `skills/` | mcp | One directory per skill, each with a `SKILL.md` (Agent Skills format) |
 | `webroot/` | http | Static assets served at the HTTP root |
 | `docs/` | — | Documentation viewer |
 

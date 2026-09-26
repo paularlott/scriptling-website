@@ -75,6 +75,7 @@ executable that is launched as a **stdio** MCP server subprocess.
 
 - `target` (`str`): HTTP(S) URL of the server, or the path/command of a stdio server.
 - `namespace` (`str`, optional): Namespace for tool names (e.g. `"scriptling"` makes tools available as `"scriptling__tool_name"`). Default: `""`.
+- `timeout` (`number`, optional): Per-request HTTP timeout in seconds. Default: `30`. Raise it for a server whose tools are known to be slow (e.g. LLM-backed tools taking minutes); a server that accepts a connection but never responds fails after this long instead of hanging. The timeout covers the whole request including the response body, so a server streaming a response for longer is cut off: raise the timeout for that server. HTTP only (rejected for stdio clients). It applies to this MCP client's requests and nothing else: LLM completions through `ai.Client` (including long streaming responses) use a separate HTTP path and are never affected.
 - `bearer_token` (`str`, optional): Bearer token for authentication. **HTTP only.** Default: `""`.
 - `args` (`list`, optional): Command-line arguments for the stdio server. **stdio only.**
 - `env` (`list`, optional): Extra `KEY=value` environment variables for the stdio subprocess. **stdio only.** Merged on top of the inherited environment, so `PATH`, `HOME`, etc. are preserved.
@@ -100,6 +101,8 @@ client = mcp.Client("scriptling", args=["--mcp-exec-script"], namespace="local")
 ```
 
 When using a namespace, all tool names are prefixed. For example, if the server has a tool called `execute_code` and you use namespace `scriptling`, the tool is available as `scriptling__execute_code`. The namespace is automatically added to all tool names and stripped when calling tools.
+
+The client exposes its namespace (without the `__` suffix, `""` when created without one) as the readable `client.namespace` attribute. [Agent](../../ai/agent/) uses it to route namespaced tool names and skill URIs back to the owning server, which is why every client passed to `Agent(mcp_servers=[...])` needs a distinct namespace.
 
 > **Close stdio clients.** A stdio client owns a subprocess; call `client.close()` when finished to shut it down. For HTTP clients `close()` is a harmless no-op.
 

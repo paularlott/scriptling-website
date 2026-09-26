@@ -1,7 +1,7 @@
 ---
 title: scriptling.runtime.mcp
 linkTitle: runtime.mcp
-description: Register MCP tools via decorators — metadata and implementation in a single file.
+description: Register MCP tools, resources, prompts and skills via decorators — metadata and implementation in a single file.
 tags: [libraries, runtime, mcp]
 weight: 8
 
@@ -9,9 +9,9 @@ aliases:
   - /reference/libraries/scriptling/runtime/mcp/
 ---
 
-The `scriptling.runtime.mcp` sub-library provides decorator-based registration for MCP (Model Context Protocol) tools. It is the recommended way to define tools when using Scriptling as an MCP server.
+The `scriptling.runtime.mcp` sub-library provides decorator-based registration for MCP (Model Context Protocol) entries: tools with `@mcp.tool`, resources with `@mcp.resource`, prompts with `@mcp.prompt` and skills with `@mcp.skill`. It is the recommended way to define tools when using Scriptling as an MCP server.
 
-Instead of maintaining separate `.toml` metadata and `.py` script files, you define the tool's description, parameters, and implementation in one place.
+Instead of maintaining separate `.toml` metadata and `.py` script files, you define the description, parameters, and implementation in one place — and the same decorated file can mix tools, resources, prompts and skills.
 
 ## Importing
 
@@ -118,6 +118,89 @@ def calc(expr):
     return f"{expr} = {result}"
 ```
 
+## `@mcp.resource()` Decorator
+
+Registers a function as an MCP resource. The first argument is the URI; with `template=True` it is a URI template and the function's parameters are the URI's `{var}` variables.
+
+```python
+import scriptling.runtime.mcp as mcp
+
+@mcp.resource("config://shop", name="Shop configuration", mime_type="application/json")
+def shop_config():
+    return {"currency": "USD", "items": 3}
+
+@mcp.resource("shop://catalog/{category}", template=True, mime_type="text/markdown")
+def catalog(category):
+    return "# Catalog: " + category
+```
+
+**Arguments:**
+
+- `uri` (`str`): Resource URI, or the URI template when `template=True`.
+- `name` (`str`, optional): Human-readable name (defaults to the URI).
+- `description` (`str`, optional): Resource description.
+- `mime_type` (`str`, optional): Content type. Default `text/plain`, or `application/json` for dict/list results. Ignored for a `ui://` URI: the [MCP Apps](/reference/libraries/mcp/mcp-apps/) extension MUSTs that exact mimeType, so it is always set for you.
+- `template` (`bool`, optional): Treat `uri` as a `{var}` URI template. Default: `False`.
+
+The function runs on every `resources/read`, in a fresh interpreter, so its content can change between reads. A string return is the text content; a dict or list return is JSON encoded. Only the template variables are passed as parameters — the function's signature is the contract (there is no `__uri` parameter unless the template itself declares one). `mcp.tool.return_string()` / `return_object()` work too: they set the content the same way a return value does.
+
+The signature is cross-checked against the URI at startup, the same way `@mcp.tool` params are: every template `{var}` must be a function parameter, every required parameter must be a template variable, and a static resource function must not require any parameters. A violation fails the scan instead of every read. A decorated resource colliding with a resource from `--mcp-resources` is last-wins (the resources folder registers after the tools folder, both at startup and on reload).
+
+## `@mcp.prompt()` Decorator
+
+Registers a function as an MCP prompt under the function's own name. The function's parameters become the prompt's arguments and are passed on every `prompts/get`.
+
+```python
+import scriptling.runtime.mcp as mcp
+
+@mcp.prompt(description="Summarise a document")
+def summarise(text, style="brief"):
+    return "Summarise (style=" + style + "): " + text
+
+@mcp.prompt(description="Review code", arguments=[
+    {"name": "language", "description": "Language of the code", "required": True},
+    {"name": "code", "description": "The code"},
+])
+def review(language, code):
+    return {"messages": [
+        {"role": "user", "content": "Review this " + language + " code:"},
+        {"role": "assistant", "content": code},
+    ]}
+```
+
+**Arguments:**
+
+- `description` (`str`, optional): Prompt description.
+- `arguments` (`list`, optional): Argument metadata dicts with `name`, `description` and `required`. When omitted, the arguments are inferred from the function signature (a parameter without a default is required).
+
+A string return is a single user message; a dict with a `"messages"` list of `{"role": "user"|"assistant", "content": "..."}` (or a plain list of them) builds a multi-message prompt. `mcp.tool.return_*()` is honoured like a return value, and explicit `arguments` names are cross-checked against the function signature at startup.
+
+## `@mcp.skill()` Decorator
+
+Registers a function as an MCP skill (the Agent Skills format, served per the Skills extension) under the function's own name. The function takes no parameters and returns the `SKILL.md` content, YAML frontmatter included; the `files` argument supplies supporting files.
+
+```python
+import scriptling.runtime.mcp as mcp
+
+@mcp.skill(files={"regions.md": "eu: Europe\nus: United States\n"})
+def shipping_regions():
+    return """---
+name: shipping_regions
+description: How to pick the right shipping region for an order
+---
+
+# Shipping regions
+
+Read regions.md for the region codes.
+"""
+```
+
+**Arguments:**
+
+- `files` (`dict`, optional): Supporting files mapping file name to content string, served as `skill://<name>/<file>` alongside `SKILL.md`. `SKILL.md` itself must not appear here — it is the function's return value.
+
+The frontmatter's `name` must match the function name and its `description` seeds the skill's listing, exactly as for a `SKILL.md` file in the skills folder. The function runs once when the server starts: skill content is static thereafter, matching the skills folder (which also only registers at startup). A skill that fails validation is skipped with a warning; the rest of the file's registrations are unaffected.
+
 ## Request-Scoped Registration
 
 The `register_request_*` functions expose MCP entries **for the life of a single request**. Call them from [middleware](/reference/libraries/runtime/http/#middlewarehandler): every MCP message over HTTP is its own request and runs the middleware, so the entries each caller sees — and can call — are exactly the ones that caller's middleware registered. That makes per-user tool sets possible, with authorization re-evaluated on every message rather than only at listing time. Static entries always win on a name collision; a malformed registration fails the request with a 500.
@@ -194,9 +277,9 @@ tools/
 
 The server auto-detects the format:
 - `.py` with a sibling `.toml` → legacy format (uses `tool.get_*` / `tool.return_*`)
-- `.py` without a sibling `.toml` → decorator format (scanned for `@mcp.tool`)
+- `.py` without a sibling `.toml` → decorator format (scanned for `@mcp.tool`, `@mcp.resource`, `@mcp.prompt` and `@mcp.skill`; one file may use any mix of them)
 
-Both formats work in the same folder and can coexist indefinitely.
+Both formats work in the same folder and can coexist indefinitely. Registrations from decorated files reload with the tools folder; skills refresh silently (the Skills extension has no listChanged notification).
 
 ## Comparison with Legacy Format
 

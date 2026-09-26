@@ -11,7 +11,7 @@ Scriptling can run as an MCP (Model Context Protocol) server, enabling AI assist
 
 When running in MCP server mode, Scriptling provides:
 
-1. **Custom MCP Tools**: Root-level legacy `.toml` + `.py` tools or decorated `.py` tools from `--mcp-tools`
+1. **Custom MCP Tools**: Root-level legacy `.toml` + `.py` tools or decorated `.py` tools from `--mcp-tools`; a decorated file can also register resources, prompts and skills with `@mcp.resource`, `@mcp.prompt` and `@mcp.skill` (see [runtime.mcp](/reference/libraries/runtime/mcp/))
 2. **Script Execution Tool**: Allow AI to execute Scriptling code directly (`--mcp-exec-script`)
 3. **Resources**: Recursively scanned files served by URI from `--mcp-resources`; a path containing `{var}` is a template only when it ends in `.py`
 4. **Prompts**: Root-level static `.md`/`.txt` or dynamic `.toml` + `.py` prompts from `--mcp-prompts`
