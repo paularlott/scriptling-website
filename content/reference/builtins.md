@@ -236,13 +236,14 @@ String transformation is done with methods on the `str` type, not free functions
 "hello world".capitalize()               # "Hello world"
 "hello world".title()                    # "Hello World"
 "a,b,c".split(",")                       # ["a", "b", "c"]
+"a.b.c".rsplit(".", 1)                   # ["a.b", "c"] (split from the right)
 "-".join(["a", "b", "c"])                # "a-b-c"
 "hello world".replace("world", "python") # "hello python"
 "  hello  ".strip()                      # "hello"
 "??hello??".strip("?")                   # "hello"
 "  hello  ".lstrip()                     # "hello  "
 "  hello  ".rstrip()                     # "  hello"
-"hello".startswith("he")                 # True
+"hello".startswith("he")                 # True (also: tuple prefixes, start/end offsets)
 "hello".endswith("lo")                   # True
 ```
 
@@ -273,6 +274,7 @@ s.count("o")                       # 2 (count occurrences)
 "Hello World".swapcase()           # "hELLO wORLD"
 
 # Splitting and partitioning
+"a.b.c".rsplit(".", 1)             # ["a.b", "c"] (from the right; rsplit(None, 1) splits whitespace)
 "hello\nworld".splitlines()        # ["hello", "world"]
 "hello-world".partition("-")       # ("hello", "-", "world")
 "a-b-c".rpartition("-")            # ("a-b", "-", "c")

@@ -11,6 +11,34 @@ nav-skip: true
 {{< version "v0.28.0" >}}
 
 {{< changelog-item "fixed" >}}
+**Floats display exactly like Python.** `print(2.0)` shows `2.0` (was `2`), and `123456789.123` prints as itself instead of `1.23456789123e+08`; `-0.0` and `inf`/`nan` use Python's spellings. The same repr applies inside containers, f-strings and `json.dumps`, which previously emitted Go's encodings.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**MCP numbers keep their integer typing.** JSON-decoded whole numbers (`{"n": 21}`) reached script tool functions as floats, so `n * 2` returned `42.0`; tool arguments, resource reads and prompt responses now convert the way Python's json module does, nested objects and arrays included.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**Slice assignment works.** `l[0:2] = [9, 8, 7]` raised "cannot assign to expression" although the reference documented it; splicing (any length change), insertion, stepped slices, negative steps, and the `ValueError`/`TypeError` mismatch cases now all match Python. See [Slicing](/reference/slicing/).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`str.startswith` / `str.endswith` accept tuples and offsets.** `"file.py".startswith((".py", ".txt"))` previously raised "prefix: must be a string", and the optional `start`/`end` arguments were rejected; both now match Python, including negative offsets.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`str.replace` accepts the count argument.** `"aaa".replace("a", "b", 2)` previously failed with an argument-count error; the limit is now honored.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Bytes literals `b"..."`.** Previously only the `bytes()` builtin could construct bytes; literals now parse, escapes included, and work with `decode`, `len()` and the rest of the bytes API.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**`str.rsplit`.** Split from the right with `maxsplit`, including the `rsplit(None, n)` whitespace form with Python's exact leading-whitespace behavior. See [String Methods](/reference/types/).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
 **Integer `//` and `%` now follow Python exactly.** Floor division floors toward negative infinity (`-7 // 2` is `-4`) and modulo takes the divisor's sign (`-7 % 2` is `1`), including at parse-time constant folding. Float modulo also works now, with the same sign rule (`5.5 % 3` is `2.5`); it previously raised "unknown operator". See [Operators](/reference/operators/).
 {{< /changelog-item >}}
 

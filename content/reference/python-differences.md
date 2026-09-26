@@ -31,7 +31,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | `globals()`, `locals()` | Scope introspection not available |
 | `vars()` | Variable introspection not supported |
 | `__import__()` | Use `import` statement |
-| `memoryview()`, `bytearray()`, `bytes()` | Advanced byte manipulation not supported (`bytes()` itself works) |
+| `memoryview()`, `bytearray()` | Advanced byte manipulation not supported; `bytes()` and `b"..."` literals work |
 | `complex()` | Complex numbers not implemented |
 | `frozenset()` | Use regular `set()` |
 
@@ -114,6 +114,10 @@ Scriptling **does support**:
 - ✅ Dict merge operators: `d1 | d2` builds a new dict (right wins), `d |= other` merges in place
 - ✅ Augmented assignment (`+=`, `-=`, `**=`, etc.)
 - ✅ Slice notation with step (`[start:stop:step]`)
+- ✅ Slice assignment (`l[1:4] = [...]`, stepped and reversed forms)
+- ✅ Python float repr: `str(2.0)` is `"2.0"`, `str(123456789.123)` is positional, scientific outside `1e-4`–`1e16`, in `json.dumps` too
+- ✅ `str.rsplit` with `maxsplit`
+- ✅ `startswith`/`endswith` with tuples and `start`/`end` offsets, `replace` with a count, and `b"..."` bytes literals
 - ✅ `del` for variables, list indexes, list slices, dict keys, and attributes
 - ✅ `is` and `is not` operators
 - ✅ `in` and `not in` operators
