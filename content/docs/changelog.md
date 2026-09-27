@@ -8,7 +8,7 @@ nav-skip: true
 
 ## September 2026
 
-{{< version "v0.28.0" >}}
+{{< version "v0.27.0" >}}
 
 {{< changelog-item "added" >}}
 **`ai.Client(prompt_caching=...)` controls Claude prompt caching.** The Claude provider sends Anthropic's prompt-caching breakpoints automatically (system prompt, last tool, last message); the new `prompt_caching=False` kwarg turns them off for endpoints that reject `cache_control`. Default stays on. See [AI Client](/reference/libraries/ai/client/).
@@ -248,11 +248,6 @@ nav-skip: true
 
 {{< changelog-item "added" >}}
 **`client.namespace` on an MCP client.** The client's namespace (empty string when created without one) is now readable as an attribute, so scripts can tell which server a namespaced tool name or skill URI belongs to. See [MCP Client](/reference/libraries/mcp/client/).
-{{< /changelog-item >}}
-
----
-
-{{< version "v0.27.0" >}}
 
 {{< changelog-item "added" >}}
 **The MCP server can serve skills (SEP-2640).** `--mcp-skills` (env `SCRIPTLING_MCP_SKILLS`) points at a directory of skills — one per subdirectory containing a `SKILL.md` — served per the MCP skills extension via `skills/list` and `skills/get`, with each file readable as a `skill://` resource. See [MCP Server](/docs/cli/mcp-server/).
