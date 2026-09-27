@@ -10,6 +10,10 @@ nav-skip: true
 
 {{< version "v0.28.0" >}}
 
+{{< changelog-item "added" >}}
+**`ai.Client(prompt_caching=...)` controls Claude prompt caching.** The Claude provider sends Anthropic's prompt-caching breakpoints automatically (system prompt, last tool, last message); the new `prompt_caching=False` kwarg turns them off for endpoints that reject `cache_control`. Default stays on. See [AI Client](/reference/libraries/ai/client/).
+{{< /changelog-item >}}
+
 {{< changelog-item "fixed" >}}
 **`os.path` works as an attribute of `os`.** `os.path.exists(...)` after `import os` raised `KeyError: 'path'`; only the standalone `import os.path` form worked. The path module now resolves as an attribute too, exactly like Python (and the attribute form is now covered by tests).
 {{< /changelog-item >}}

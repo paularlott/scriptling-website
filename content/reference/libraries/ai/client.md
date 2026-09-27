@@ -70,6 +70,7 @@ Creates a new AI client instance for making API calls to a supported provider.
 - `retry_backoff` (`float`, optional): Base backoff in seconds between retries (doubles each attempt). Default: `1.0`.
 - `retry_on_rate_limit` (`bool`, optional): Retry on 429 rate limit errors. Default: `True`.
 - `retry_on_server_error` (`bool`, optional): Retry on 5xx server errors. Default: `True`.
+- `prompt_caching` (`bool`, optional): Claude only — send Anthropic prompt-caching breakpoints (the system prompt, the last tool definition and the last message) so repeated prefixes are served from the cache instead of re-billed. Default: `True`. Turn it off for endpoints that reject the `cache_control` field.
 
 **Returns:** `AIClient`: a client instance with methods for API calls.
 
