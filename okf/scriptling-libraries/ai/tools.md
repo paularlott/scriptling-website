@@ -32,6 +32,7 @@ The standalone `scriptling.ai.tools` import is conditionally registered and is n
 | Method | Description |
 |--------|-------------|
 | `add(name, description, params, handler)` | Register a tool. |
+| `add_schema(name, description, schema, handler)` | Register a tool with a full JSON Schema. |
 | `build()` | Build OpenAI-compatible tool schemas from the registered tools. |
 | `get_handler(name)` | Get the handler function for a registered tool. |
 
@@ -76,9 +77,41 @@ registry.add("read_file", "Read a file", {"path": "string", "limit": "int?"}, re
 registry.add("search", "Search files", {"query": "string", "max_results": "int?"}, search_files)
 ```
 
+### `registry.add_schema(name, description, schema, handler)`
+
+Registers a tool whose parameters are given as a complete JSON Schema `dict`, emitted verbatim in the built tool definition. Use this when the parameter shape is richer than the flat name-to-type map `add()` accepts: nested objects, enums, per-parameter descriptions. The common source is a remote MCP server's `inputSchema`, which is what `Agent(mcp_servers=[...])` uses internally. Unlike `add()`, registering a duplicate name raises an error instead of silently overwriting the previous handler.
+
+**Parameters:**
+- `name` (`str`): Tool name.
+- `description` (`str`): Tool description, shown to the model.
+- `schema` (`dict`): JSON Schema for the tool's parameters. Should describe an object (`"type": "object"` with `"properties"`).
+- `handler` (`callable`): Function executed when the tool is called. It receives the decoded arguments as a `dict`.
+
+**Returns:** `None`.
+
+**Raises:** `Error`: if a tool with the same name is already registered, or the schema is not a dict.
+
+```python
+import scriptling.ai as ai
+
+registry = ai.ToolRegistry()
+
+registry.add_schema("shop__search", "Search products", {
+    "type": "object",
+    "properties": {
+        "query": {"type": "string", "description": "Search terms"},
+        "filters": {
+            "type": "object",
+            "properties": {"tag": {"type": "string", "enum": ["new", "sale"]}},
+        },
+    },
+    "required": ["query"],
+}, search_products)
+```
+
 ### `registry.build()`
 
-Builds OpenAI-compatible tool schemas from the tools registered via `add()`. The result is suitable to pass directly to a client completion request's `tools` argument, or to an `Agent` via its `tools=` argument.
+Builds OpenAI-compatible tool schemas from the tools registered via `add()` and `add_schema()`. The result is suitable to pass directly to a client completion request's `tools` argument, or to an `Agent` via its `tools=` argument.
 
 **Returns:** `list`: a list of tool schema `dict` values, each with `type`, `function.name`, `function.description`, and a JSON-Schema `function.parameters` object (with `required` derived from which parameters were marked optional).
 

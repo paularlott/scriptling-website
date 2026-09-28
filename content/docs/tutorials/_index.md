@@ -52,3 +52,7 @@ Create a Model Context Protocol server with custom tools that AI assistants can 
 ### [Building an MCP Resources & Prompts Server](mcp-resources-prompts/)
 
 Expose MCP resources and prompts as files, alongside tools.
+
+### [Packaging an MCP App](mcp-app-package/)
+
+Build a complete MCP application (app view, plain tools, a prompt with arguments, a skill), package it as one artifact with `pack`, and run it from the package.

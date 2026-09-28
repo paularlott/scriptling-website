@@ -21,7 +21,7 @@ Agentic AI loop for building AI agents with automatic tool execution. The `Agent
 
 | Class/Method | Description |
 |--------------|-------------|
-| `Agent(client, tools, system_prompt, model, memory, max_tokens, compaction_threshold, request_timeout, extra_body)` | Create an AI agent |
+| `Agent(client, tools, system_prompt, model, memory, mcp_servers, max_tokens, compaction_threshold, request_timeout, extra_body)` | Create an AI agent |
 | `agent.trigger(message, max_iterations)` | One-shot trigger with response |
 | `agent.interact(max_iterations)` | Start an interactive session (requires `scriptling.ai.agent.interact`) |
 | `agent.get_messages()` | Get conversation history |
@@ -55,7 +55,7 @@ bot.interact()
 
 ## Functions
 
-### `Agent(client, tools=None, system_prompt="", model="", memory=None, max_tokens=32000, compaction_threshold=80, request_timeout=300, extra_body=None)`
+### `Agent(client, tools=None, system_prompt="", model="", memory=None, mcp_servers=None, max_tokens=32000, compaction_threshold=80, request_timeout=300, extra_body=None)`
 
 Creates an AI agent with automatic tool execution.
 
@@ -66,6 +66,7 @@ Creates an AI agent with automatic tool execution.
 - `system_prompt` (`str`, optional): System prompt for the agent. Default: `""`.
 - `model` (`str`, optional): Model to use. Default: `""`.
 - `memory` (memory object, optional): Memory store from `memory.new()`: see [Memory Integration](#memory-integration). Default: `None`.
+- `mcp_servers` (`list`, optional): MCP clients from `mcp.Client()` whose tools and skills the agent can use: see [MCP Server Integration](#mcp-server-integration). Each must be created with a distinct namespace. Default: `None`.
 - `max_tokens` (`int`, optional): Maximum token budget for the conversation. When estimated token usage reaches the compaction threshold, the conversation history is automatically compacted (summarized). Default: `32000`.
 - `compaction_threshold` (`int`, optional): Percentage of `max_tokens` at which auto-compaction triggers (`0`-`100`). For example, with `max_tokens=32000` and `compaction_threshold=80`, compaction triggers at ~25600 tokens. Default: `80`.
 - `request_timeout` (`int`, optional): Timeout in seconds for each LLM completion request. LLM calls can be slow, especially with tool-calling loops or large contexts. Default: `300`.
@@ -226,6 +227,57 @@ The original `system_prompt` you pass is always preserved: the memory content is
 
 See [scriptling.ai.memory](https://scriptling.dev/okf/scriptling-libraries/ai/memory.md) for full memory store documentation.
 
+## MCP Server Integration
+
+Pass one or more MCP clients to `Agent` via the `mcp_servers=` kwarg and the agent can use everything those servers expose: their tools directly, and their skills on demand. The agent automatically:
+
+1. Registers every server tool under its namespaced name (a `search` tool on a client created with `namespace="shop"` becomes `shop__search`), keeping the server's own input schema verbatim.
+2. Lists the servers' skills in the system prompt with namespace-qualified URIs, for example `- shop/product-copy: How to write product copy (skill://shop/product-copy/SKILL.md)`.
+3. Adds a `get_skill` tool that fetches a skill's SKILL.md content on request: the model calls it with the URI from the listing, the agent routes it to the owning server by the URI's namespace. Supporting files of the same skill route the same way.
+
+```python
+import scriptling.ai as ai
+import scriptling.ai.agent as agent
+import scriptling.mcp as mcp
+
+client = ai.Client("http://127.0.0.1:1234/v1")
+
+# Every server needs its own namespace: it prefixes tool names and routes
+# skill URIs back to the owning server.
+shop = mcp.Client("https://shop.example.com/mcp", namespace="shop")
+docs = mcp.Client("npx", args=["-y", "@example/docs-server"], namespace="docs")
+
+tools = ai.ToolRegistry()
+tools.add("lookup_order", "Look up one of our order IDs", {"order_id": "string"}, lookup)
+
+bot = agent.Agent(
+    client,
+    tools=tools,
+    mcp_servers=[shop, docs],
+    system_prompt="You are a shop assistant.",
+    model="gpt-4"
+)
+
+response = bot.trigger("Find a blue mug, then follow the shop's product-copy skill to describe it", max_iterations=10)
+print(response.content)
+
+# Close stdio clients yourself when done; the agent does not own them.
+docs.close()
+```
+
+Local tools, remote tools and `get_skill` all live in the same registry, so `bot.tool_schemas` contains `lookup_order`, `shop__search`, `docs__fetch_page` and `get_skill` side by side.
+
+**Rules and behaviour:**
+
+- Every client in `mcp_servers` must be created with a distinct `namespace=`: `Agent()` raises a `ValueError` for a missing or duplicated namespace.
+- A server without the Skills extension (or with none) simply contributes no skills; its tools still work and no skills section is added.
+- If you registered your own `get_skill` tool, the agent keeps it and does not add its own.
+- MCP Apps tools (tools linked to a `ui://` resource) come along as ordinary tools: an agent loop has no UI host, so their results are plain text.
+- Creating the agent contacts every server once (`tools/list` plus `skills/list`); an unreachable server raises at `Agent()` construction rather than being silently skipped.
+- The skills listing lives in the system message, so it survives auto-compaction.
+
+A complete runnable example, including a scriptling MCP server with a tool and a skill, is in the scriptling repository at `examples/agent-mcp`.
+
 ## Auto-Compaction
 
 The agent automatically compacts conversation history when it grows too large, preventing context window overflow and reducing API costs.
@@ -340,10 +392,11 @@ bot.interact()
 
 This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.ai.agent` makes outbound HTTP requests to the configured AI provider, and: when tools are registered: lets the model execute multi-step agentic loops by calling those tools automatically. Never register `scriptling.ai.agent` for untrusted code: a malicious script can supply a tool registry whose handlers do anything the host process allows. For a full risk breakdown, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#library-security) and [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#ai--agent).
+`scriptling.ai.agent` makes outbound HTTP requests to the configured AI provider, and: when tools are registered: lets the model execute multi-step agentic loops by calling those tools automatically. Never register `scriptling.ai.agent` for untrusted code: a malicious script can supply a tool registry whose handlers do anything the host process allows. Passing `mcp_servers` extends that reach to the connected MCP servers: the model can call their tools and read their skills for the duration of the loop. For a full risk breakdown, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#library-security) and [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#ai--agent).
 
 ## See Also
 
 - [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/ai.md): AI client and completion functions
 - [scriptling.ai.agent.interact](https://scriptling.dev/okf/scriptling-libraries/ai/interact.md): Interactive terminal session
 - [scriptling.ai.memory](https://scriptling.dev/okf/scriptling-libraries/ai/memory.md): Long-term memory store
+- [scriptling.mcp](https://scriptling.dev/okf/scriptling-libraries/mcp.md): MCP client library

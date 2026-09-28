@@ -24,26 +24,23 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 |---------|-------|
 | `async`/`await` | Asynchronous programming is not supported |
 | Generators with `yield` | Generator functions are not supported |
-| Type annotations | Type hints like `def func(x: int) -> str:` are not parsed |
-| Walrus operator (`:=`) | Assignment expressions are not supported |
-| Positional-only separator (`/`) | Positional-only parameter syntax is not supported; bare `*` keyword-only parameters are supported |
+| Positional-only separator (`/`) | Rejected with a parse error; bare `*` keyword-only parameters are supported |
 | Multiple inheritance | Only single inheritance is supported |
-| Nested classes | Classes cannot be defined inside other classes/functions |
 | Metaclasses | Custom metaclasses are not supported |
-| Descriptors | The descriptor protocol is not implemented |
+| Descriptors | The descriptor protocol is not implemented: a `__get__` method is never invoked, attribute access returns the object itself |
 | Regex backreferences (`\1`, `\2`) | RE2 engine used; no backreferences, lookaheads, or lookbehinds: see [regex docs](https://scriptling.dev/okf/scriptling-libraries/text-processing/regex.md) |
 
 ### Built-in Functions NOT Supported
 
 | Function | Alternative |
 |----------|-------------|
-| `input()` | Not available in embedded environments |
+| `input()` | Only registered when a stdin reader is attached (CLI scripts); absent in embedded and server evaluators — see [sys](https://scriptling.dev/okf/scriptling-libraries/http-process/sys.md) |
 | `open()` | Use `os.read_file()` and `os.write_file()` |
 | `compile()`, `eval()`, `exec()` | Dynamic code execution not supported |
 | `globals()`, `locals()` | Scope introspection not available |
 | `vars()` | Variable introspection not supported |
 | `__import__()` | Use `import` statement |
-| `memoryview()`, `bytearray()`, `bytes()` | Advanced byte manipulation not supported |
+| `memoryview()`, `bytearray()` | Advanced byte manipulation not supported; `bytes()` and `b"..."` literals work |
 | `complex()` | Complex numbers not implemented |
 | `frozenset()` | Use regular `set()` |
 
@@ -84,6 +81,10 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | `__future__` imports | Not applicable |
 | `__next__` returning a `StopIteration()` *value* | Ends iteration without yielding it — only *raising* `StopIteration` signals end-of-iteration |
 | Default argument evaluation | Defaults are evaluated on each call (Python evaluates once, at `def` time) |
+| Type annotations | Parsed and ignored, including `def f(a: int) -> str`, `x: int = 5`, and `self.n: int = 0`; there is no `__annotations__` and no runtime checking, and comma subscripts parse as tuple indexes (`dict[str, int]`) |
+| Dict iteration order | Unspecified and not reproducible run to run (unlike Python 3.7+): `for k in d`, `keys()`/`values()`/`items()`, and printing a dict may come out in any order. Lookups, equality, and `json.dumps` are unaffected (dumps sorts keys). Sort explicitly (`sorted(d)`) when order matters |
+| Walrus in a comprehension | `y` in `[y for x in a if (y := f(x))]` binds inside the comprehension and does not leak to the enclosing scope, unlike Python (PEP 572); use the collected list instead |
+| `type(x).__name__` | `type(x)` returns the type name directly as a string (`type(42)` is `"INTEGER"`, a custom class instance gives its class name), so there is no type object to hang `.__name__` on — use `type(x)` itself; a raised built-in exception reports the class it was raised as (`"ValueError"`) |
 | Lazy iteration | `any`/`all`/`sorted`/`min`/`max`/`map`/`filter` materialize their iterable eagerly; `any([True, boom()])` raises where Python short-circuits |
 
 ## Supported Python 3 Features
@@ -91,6 +92,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 Scriptling **does support**:
 
 - ✅ Classes with single inheritance and `super()`
+- ✅ Nested classes (a class defined inside a function or another class)
 - ✅ Dunder methods: `__str__`, `__repr__`, `__len__`, `__bool__`, `__eq__`, `__lt__`, `__gt__`, `__le__`, `__ge__`, `__ne__`, `__contains__`, `__iter__`, `__next__`, `__enter__`, `__exit__`
 - ✅ Dunders honored everywhere: container membership/lookup use `__eq__`/`__hash__`, and comparisons reflect (`b.__gt__(a)` when `a` defines no `__lt__`)
 - ✅ Lambda functions and closures
@@ -101,6 +103,7 @@ Scriptling **does support**:
 - ✅ Dictionary views (`keys()`, `values()`, `items()`)
 - ✅ F-strings and `.format()`
 - ✅ True division (`/` always returns float)
+- ✅ Python number semantics: `//` floors toward negative infinity, `%` takes the divisor's sign (ints and floats), `round()` ties go to the even digit, `divmod()` agrees, and `sorted()` / `.sort()` are stable
 - ✅ Set literals `{1, 2, 3}` and set operations
 - ✅ Set hashability: `TypeError` raised for unhashable types (lists, dicts, sets, instances without `__hash__`) matching Python semantics
 - ✅ Bool arithmetic: `True + True == 2`, `True == 1`, `False == 0`
@@ -115,8 +118,23 @@ Scriptling **does support**:
 - ✅ Keyword arguments (`**kwargs`)
 - ✅ Default parameter values
 - ✅ Conditional expressions (ternary operator)
+- ✅ Walrus assignment expressions (`while (chunk := read()):`)
+- ✅ Type annotations (`def f(a: int) -> str`, `count: int = 5`) parsed and ignored
+- ✅ The `...` (Ellipsis) placeholder, including `def f(): ...` stub bodies
+- ✅ Dict merge operators: `d1 | d2` builds a new dict (right wins), `d |= other` merges in place
 - ✅ Augmented assignment (`+=`, `-=`, `**=`, etc.)
 - ✅ Slice notation with step (`[start:stop:step]`)
+- ✅ Slice assignment (`l[1:4] = [...]`, stepped and reversed forms)
+- ✅ Python float repr: `str(2.0)` is `"2.0"`, `str(123456789.123)` is positional, scientific outside `1e-4`–`1e16`, in `json.dumps` too
+- ✅ `str.rsplit` with `maxsplit`
+- ✅ Callable instances (`__call__`), sequence ordering (`[1] < [2]`, tuples element-wise), `str.encode()` returning bytes, and `math.isclose`
+- ✅ Multiple `if` clauses in comprehensions, named `%(key)s` `%`-formatting, in-place set methods (`update` and friends), `dict.fromkeys`, and `SomeClass.__name__`
+- ✅ Regex named groups (`m.group("name")`, `groupdict()`), Python-style datetime attributes and `str(timedelta)`, `fromisoformat`, and iterators accepted throughout `itertools`
+- ✅ `os.path` as an attribute of `os`, `except ValueError` for JSON errors, `re.subn` and replacement backreferences, method-based `collections.deque` with `maxlen`, `Counter` arithmetic (`+`, `-`, `|`, `&`), `namedtuple` repr, and int-preserving `statistics.median`
+- ✅ Python-shaped errors for the common cases: `unsupported operand type(s) for +: 'int' and 'str'`, `name 'x' is not defined`, quoted `KeyError` messages
+- ✅ Python-style `repr` for strings (single quotes, escapes) across `repr()`, `%r`, `!r` and `f"{x=}"`
+- ✅ `%`-formatting string width/precision/flags, the `f"{x=}"` debug specifier, numeric underscores (`1_000`), `del a, b`, `len(range(n))`, and `splitlines(keepends=True)`
+- ✅ `startswith`/`endswith` with tuples and `start`/`end` offsets, `replace` with a count, and `b"..."` bytes literals
 - ✅ `del` for variables, list indexes, list slices, dict keys, and attributes
 - ✅ `is` and `is not` operators
 - ✅ `in` and `not in` operators

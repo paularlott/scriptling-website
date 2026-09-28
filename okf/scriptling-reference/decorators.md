@@ -253,7 +253,7 @@ print(Counter.increment())  # 2
 
 - **Function objects don't support attribute assignment.** `fn.tag = "value"` will error. Use a registry dict instead (see the registration pattern above).
 - **Lambdas can't be decorated with `@` syntax** — they have no name or statement form to attach the decorator to. Wrap manually: `my_lambda = decorator(lambda x: x)`.
-- **No type annotations on parameters.** Scriptling doesn't support `def f(x: int)` syntax. Metadata must be passed explicitly (e.g. via decorator arguments).
+- **Type annotations are ignored.** `def f(x: int) -> str:` parses fine, but annotations carry no metadata. Pass descriptions and schemas explicitly via decorator arguments.
 
 ## See Also
 

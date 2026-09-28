@@ -131,6 +131,16 @@ mcp.register_request_tool("weather", handler="weathermod.forecast",
 
 Scriptling only carries this metadata on the wire — it never fetches or renders icon bytes itself. A host that does render icons is responsible for the MCP spec's security precautions (treat `src` and any fetched bytes as untrusted, require an `https://` or `data:` URI, reject unsafe schemes and cross-origin redirects, fetch without credentials, verify content type from magic bytes, and guard against oversized images).
 
+### Generating an icon block
+
+The toolchain ships a helper that turns an image file into the `[[icons]]` TOML block, base64-encoded as a `data:` URI with the mime type inferred from the extension (svg, png, jpg, gif, webp, ico):
+
+```sh
+scriptling tools/make_icon/make_icon.py icon.svg
+```
+
+Prints the block ready to paste (or `>>` append) into the tool's `.toml`. Run it from the scriptling repository, or copy the script anywhere a scriptling CLI can run it — it is itself a scriptling script using the sandboxed `os` library.
+
 ## See Also
 
 - [Writing MCP Tools](../writing-mcp-tools/) — the three registration styles in full

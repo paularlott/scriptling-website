@@ -32,6 +32,7 @@ The `sys` library provides access to system-specific parameters and functions: p
 | `maxsize` | Maximum signed integer value (`9223372036854775807`). |
 | `path_sep` | Path separator for the OS (`"/"` on Unix, `"\"` on Windows). |
 | `argv` | List of command-line arguments passed to the script. |
+| `executable` | Path of the running interpreter. |
 | `stdin` | Standard input stream object, only present when stdin is configured. |
 
 ## Functions
@@ -130,6 +131,19 @@ The maximum value of a signed integer (`int64`).
 ```python
 import sys
 print(sys.maxsize)  # 9223372036854775807
+```
+
+### `executable`
+
+The path of the running interpreter. Use it to relaunch this very binary as a
+subprocess instead of relying on whatever `scriptling` resolves to on PATH —
+the MCP examples use it to launch their stdio server:
+
+```python
+import sys
+import scriptling.mcp as mcp
+
+client = mcp.Client(sys.executable, args=["--mcp-exec-script"], namespace="local")
 ```
 
 ### `path_sep`

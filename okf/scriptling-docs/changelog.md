@@ -16,246 +16,251 @@ type: Guide
 
 ## September 2026
 
-### v0.26.0
+### v0.27.0
 
 
 
-**Tools can link to an interactive UI resource (MCP Apps).** A tool's `.toml` can now declare a `[ui]` table with a `resourceUri` pointing at a `ui://` resource, per the [MCP Apps](https://github.com/modelcontextprotocol/ext-apps) extension — a compliant host renders it in a sandboxed iframe instead of plain text; everyone else just ignores it. `resourceUri` is optional for an `"app"`-only *action* tool (one only ever called by a view that's already open, like a form submission) — declaring `visibility = ["app"]` alone is enough, and at least one of `resourceUri` or `visibility` is required. Values are validated at registration in every registration style: a misspelled `visibility` value or a `resourceUri` with no scheme fails tool registration as an ordinary error. HTML files under a `resources/ui/` directory are served as `ui://` resources, with optional sidecar `[ui]` metadata (CSP domains, permissions, border preference) and the extension's MIME type applied automatically. See [Linking a UI Resource](https://scriptling.dev/okf/scriptling-libraries/mcp/writing-mcp-tools.md#linking-a-ui-resource-ui) and [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md).
+**`ai.Client(prompt_caching=...)` controls Claude prompt caching.** The Claude provider sends Anthropic's prompt-caching breakpoints automatically (system prompt, last tool, last message); the new `prompt_caching=False` kwarg turns them off for endpoints that reject `cache_control`. Default stays on. See [AI Client](https://scriptling.dev/okf/scriptling-libraries/ai/client.md).
 
 
 
-**`tool.return_structured(obj)` sets the MCP result's `structuredContent` field.** Previously the only way to return a dict was `tool.return_object()`, which always serializes to JSON text content — readable, but not what a client (or an `outputSchema`, or an MCP Apps view) looking for `structuredContent` expects. `return_structured` sets that field directly, and — per the MCP spec's backwards-compatibility guidance — still includes the same JSON as a text block, so nothing that only reads text content breaks. It requires a dict; use `return_object` for a list or other non-object value. See [Returning Results](https://scriptling.dev/okf/scriptling-libraries/mcp/writing-mcp-tools.md#returning-results).
+**`os.path` works as an attribute of `os`.** `os.path.exists(...)` after `import os` raised `KeyError: 'path'`; only the standalone `import os.path` form worked. The path module now resolves as an attribute too, exactly like Python (and the attribute form is now covered by tests).
 
 
 
-**Decorated and per-request tools can link to a UI resource too.** `@mcp.tool(...)` and `mcp.register_request_tool(...)` accept the same `[ui]` shape as a `.toml`-defined tool, via a `ui=` keyword argument — a tool defined without any `.toml` file at all, including one registered dynamically per request, can still open an MCP Apps view. The UI-linkage docs live on their own page: see [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md).
+**`json.loads` errors are catchable as `ValueError`.** Python's `JSONDecodeError` subclasses `ValueError`; the standard `except ValueError:` guard now catches malformed-JSON errors.
 
 
 
-**Tools can carry icons.** All three registration styles (`.toml`, `@mcp.tool(...)`, `register_request_tool(...)`) accept an `icons` list — visual identifiers shown on the tool's `tools/list` descriptor, per the MCP icons convention. Not required on every tool. See [Icons](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md#icons).
+**`re.split`/`re.sub` argument handling and `re.subn`.** `maxsplit=`/`count=` keyword forms were ignored, `maxsplit` was off by one (Go counts results, Python counts splits), `re.subn` did not exist, and Python backreferences (`\1`, `\g<name>`) in replacement strings were not expanded.
 
 
 
-**The MCP endpoint now also speaks the 2026-07-28 protocol revision.** Every revision from 2024-11-05 through 2025-11-25 keeps working exactly as before; the server detects which one each client speaks per request, so there's nothing to configure. Newer clients get the stateless request model (`server/discover`), and `DELETE /mcp` is now routed for session termination.
+**`collections.deque` is a real deque.** `appendleft`, `popleft`, `extend`, `extendleft`, `rotate`, `clear`, `copy`, and `count` methods with `maxlen` enforcement (the old `deque_appendleft`-style module functions are gone); `len()`, indexing, iteration, and truthiness all work, and `str(d)` renders `deque([...])` like Python.
 
 
 
-**Cross-origin browser access to the MCP endpoint is now supported — and off by default.** Previously a cross-origin browser client couldn't connect at all: the endpoint didn't answer CORS preflights, so the browser blocked the request before it was sent. The `/mcp` endpoint now answers preflights, governed by a new `--mcp-cors-origin` setting (`SCRIPTLING_MCP_CORS_ORIGIN` env, `server.mcp_cors_origins` config — same shape as the WebSocket origin setting): unset allows same-origin requests only; list specific origins for an allowlist, or `["*"]` to allow any origin, e.g. for testing against a page on another origin like the reference host-simulator.
+**`Counter` arithmetic and `namedtuple` repr.** Counters support `+`, `-`, `|` (max-union) and `&` (min-intersection) with Python's positive-only results; namedtuples print as `Point(x=1, y=2)`. Instance `|`/`&` operators now dispatch `__or__`/`__and__` generally.
 
 
----
 
-### v0.25.3
+**`statistics.median` keeps integer inputs integer** (`median([1, 3, 2])` is `2`, not `2.0`, matching Python).
 
 
 
-**Scripts could load or unload plugins you never intended them to touch.** If your host registered `scriptling.plugin`, scripts got the same `load()`/`unload()` power as the host itself, with no way to say "just use what I already loaded." You can now hand scripts a plugin scope that's read-only (they use your pre-loaded plugins but can't load or unload anything), or one that can load new plugins only over an HTTP endpoint you control. See [Plugin Manager](https://scriptling.dev/okf/scriptling-docs/plugins/host-integration.md#restricting-transport-type) for how to set it up. Nothing changes unless you already register `scriptling.plugin`.
+**Regex named groups.** `(?P<name>...)` captures are reachable as `m.group("name")` and via the new `m.groupdict()`, with Python's catchable `IndexError` for unknown names.
 
 
 
-**A nested plugin scope could quietly lose its parent's restrictions.** If you locked a scope down and then created a scope from it without repeating the same options, the new scope came back fully open. Restrictions now carry through by default, and you can still loosen or tighten them on the child if you want to.
+**`datetime` attributes and parsing match Python.** `.year`/`.month`/`.day`/`.hour`/`.minute`/`.second`/`.microsecond` are attributes (they were methods, so `dt.year` returned a bound method), `strptime` results work like parsed datetimes, and `fromisoformat` is available on both `date` and `datetime`. `timedelta` is now a real object: `str()` renders Python's format (`1 day, 2:00:00`, including negative-duration day-borrowing), with `total_seconds()` and normalized `days`/`seconds`/`microseconds` fields, and date/datetime arithmetic accepts it directly.
 
 
 
-**You can now limit which folders scripts are allowed to load new plugins from.** This is the same idea as restricting plugin loading to an approved network policy, but for local executables — scripts can use a plugin folder you approve, not any executable on the machine. See [Restricting Which Paths Scripts May Load Executables From](https://scriptling.dev/okf/scriptling-docs/plugins/host-integration.md#restricting-which-paths-scripts-may-load-executables-from).
+**`itertools` accepts iterators everywhere.** `islice`, `chain`, `cycle`, `takewhile`, `dropwhile`, `accumulate`, `product`, `permutations`, `combinations`, and `zip_longest` all rejected the iterators the builtins produce (`islice(range(10), 2, 6, 2)` errored); all verified against CPython. `cycle(iterable)` now returns a lazily infinite iterator like Python's (the finite `cycle(iterable, n)` form still works), `islice` stays lazy so it can bound infinite iterators, and `product` honors `repeat=`.
 
 
----
 
-### v0.25.2
+**Multiple `if` clauses in comprehensions.** `[x for x in items if a if b]` was a parse error; conditions now chain (equivalent to `if a and b`) across list, set, and dict comprehensions and generator expressions, including with additional `for` clauses.
 
 
 
-**The network policy now also covers `scriptling.ai` and `scriptling.mcp`.** Previously a `--network-policy` (or embedded `*netsecurity.Config`) only governed `requests`, `scriptling.wait_for`, and `scriptling.net.websocket` — a script could reach an arbitrary IP or bypass the configured DNS servers simply by using `ai.Client(...)` or `mcp.Client(...)` instead. Both HTTP-transport clients are now built through the same guard: `ai.Register(p, policy)` and `mcp.Register(p, policy)` restrict the main client and, for `scriptling.ai`, every `remote_servers` entry too. Stdio-transport `mcp.Client()` instances (a local subprocess) are unaffected, since the policy only governs network access. Omitting the policy argument (or calling `Register(p)` with none) keeps the previous, unrestricted behaviour — no action needed for existing scripts or hosts that don't use a network policy.
+**Named `%`-formatting.** `"%(name)s=%(n)d" % {...}` — the logging/template idiom — reads values from a dict by key, composes with all width/precision/flag/conversion forms, and raises Python's `KeyError`/`TypeError` on a missing key or non-mapping right side.
 
 
----
 
-### v0.25.1
+**In-place set methods.** `update`, `intersection_update`, `difference_update`, and `symmetric_difference_update` accept any number of iterables (not just sets), mutating in place like Python.
 
 
 
-**The guarded HTTP client no longer enforces a fixed 30-second cap.** `requests` and `scriptling.wait_for` under a network policy now run as long as their own per-request timeout allows, so long-running calls such as LLM APIs are no longer cut off. Hosts that want a cap can set `ClientTimeout` on `netsecurity.Config`, or `client_timeout = "30s"` in a `--network-policy` file.
+**`dict.fromkeys` and `SomeClass.__name__`.** The type-level default-mapping constructor (`dict.fromkeys(keys, value)`), and class name introspection — `cls.__name__` in classmethods and `SomeClass.__name__` generally — returning the name string, consistent with `type(x)`.
 
 
----
 
-### v0.25.0
+**Callable instances.** `obj(...)` dispatches `__call__`, so functors, strategies, and partial application work; calling an instance without `__call__` raises a catchable `TypeError` like Python's.
 
 
 
-**Reading a missing dict key or an out-of-range index now raises `KeyError` / `IndexError`, matching Python.** Scripts that relied on getting `None` back should use `key in d`, `d.get(key, default)`, or a bounds check instead.
+**`str.encode()` returns bytes.** It previously produced a list of ints (an old workaround from before the bytes type existed), so `"héllo".encode().decode()` failed; the round-trip works now, with `utf-8` (default), validated `ascii`, and a `ValueError` for unknown encodings.
 
 
 
-**Exceptions behave like Python everywhere.** A `raise` inside a call argument, comprehension, condition, f-string, `with`, `match`, user iterator, or dunder method now reaches the nearest `except` instead of being swallowed, silently converted to a value, or reported as a confusing type error. Constructing an exception (`e = ValueError("x")`) remains a harmless value, exactly as in Python.
+**`math.isclose`.** Python's float comparison with `rel_tol`/`abs_tol` kwargs, including the NaN and infinity edge semantics.
 
 
 
-**Classes now work where they used to be quietly ignored.** Class bodies run every statement, so attribute assignments like `x = 5` become class attributes. `sorted()`, `min()`/`max()`, membership tests, `.index()`, and dict keys all honor `__lt__`, `__eq__` and `__hash__`, comparisons try the reflected operator (`b.__gt__(a)` when `a` defines no `__lt__`), and `str()`, `%s`, f-strings and `join()` convert instances through `__str__` (falling back to `__repr__`).
+**Lists and tuples order-compare.** `[1] < [2]` and `(1, 2) < (1, 3)` raised "type mismatch"; both now compare element-wise like Python, and incomparable elements raise `TypeError: '<' not supported between instances of 'int' and 'str'` instead of silently comparing as equal — which also makes `sorted()` on mixed-type lists honest.
 
 
 
-**Anything iterable works anywhere a list does.** `list()`, `sorted()`, `map()`, `filter()`, `sum()`, `zip()`, `enumerate()`, `join()` and tuple unpacking now accept classes with `__iter__`/`__next__` (previously rejected with a type error), a raising iterator surfaces its error instead of hanging, and infinite iterators stay cancellable by timeout.
+**Common error messages are Python-shaped.** `1 + "x"` now says `unsupported operand type(s) for +: 'int' and 'str'`, an undefined name says `name 'x' is not defined`, a missing key prints quoted (`'missing'`), and sort comparison errors match CPython's wording — the error text is the only feedback an LLM gets, so it now reads like Python's.
 
 
 
-**Formatting is up to Python spec.** `str.format` supports named fields, indexes, escapes and format specs (`"{name:>10}".format(name=…)`), f-strings gained `!r`/`!s` conversions and nested spec fields (`f"{x:>{w}}"`), and bare `raise ValueError` (no parentheses) instantiates the class — so `raise StopIteration` works inside iterators.
+**`repr` is Python-style everywhere.** The three repr paths disagreed (`repr('hi')` gave single quotes, `%r` and f-string `!r` gave Go-style double quotes, and nothing escaped newlines). One shared implementation now uses Python's rules: single quotes (switching to double when the string contains one), escaped `\n`/`\r`/`\t`, applied consistently across `repr()`, `%r`, `!r`, and the new `=` debug form.
 
 
 
-**Smaller fixes:** using the default `scriptling.runtime.kv` store before it's open raises a catchable error instead of crashing the host; importing a module whose top level raises re-raises the original exception instead of flattening to `ImportError`; a `re.sub()` callback's raise surfaces instead of being spliced into the result; `itertools` accepts script-defined functions; out-of-range subscript *writes* raise `IndexError`; `functools.reduce` accepts lambdas.
+**The f-string `=` debug specifier.** `f"{x=}"` renders `x=7`, preserving source spacing (`f"{x = }"` gives `x = 7`), composing with format specs (`f"{x=:>10}"`) and conversions, exactly like Python 3.8+.
 
 
----
 
-### v0.24.6
+**`%`-formatting applies width, precision and flags to strings.** `"%10s"`, `"%-10s"`, and `"%.3s"` were silently ignored for `%s`/`%r`; they now pad, justify, and truncate like Python (zero-padding stays numeric-only).
 
 
 
-**Reduce log noise during plugin load.** Plugin initialization messages are now less verbose, focusing only on essential information.
+**`del a, b` and friends.** Multi-target deletion was a parse error; `del a, b["k"], l[0]` now deletes all targets.
 
 
----
 
-### v0.24.5
+**Numeric underscores.** `1_000_000`, `0xff_f`, `1_000.5`, and `int("1_000")` / `float("1_0.5")` parse with Python's between-digits rule.
 
 
 
-**Script peers can serve sources from the script itself.** `runtime.plugin.register_fetcher(scheme, read_handler, glob_handler=None)` registers a fetcher backed by script handlers: the host asks for files on demand and the read handler answers from strings or bytes inside the script (`None` is a miss). This is how a script peer carries a host's declared assets — an icon, a logo — without any files on disk, the scriptling equivalent of a Go peer's embedded assets. knot reads declared plugin assets peer-first, disk second, so a scriptling peer can now be a single-file plugin. See [Plugin server](https://scriptling.dev/okf/scriptling-docs/cli/plugin-server.md#runtime-plugin-register-fetcher-scheme-read-handler-glob-handler-none).
+**`len(range(n))` works, `splitlines(keepends=True)` is honored.** Range is the one lazy iterator with a defined length (as in Python; `len` of map/enumerate still errors), and the `keepends` keyword was silently ignored — only the positional form worked.
 
----
 
-### v0.24.4
 
+**Floats display exactly like Python.** `print(2.0)` shows `2.0` (was `2`), and `123456789.123` prints as itself instead of `1.23456789123e+08`; `-0.0` and `inf`/`nan` use Python's spellings. The same repr applies inside containers, f-strings and `json.dumps`, which previously emitted Go's encodings.
 
 
-**Plugins can declare opaque manifest data in the handshake.** A plugin may attach a host-defined data map that travels verbatim in the plugin handshake — Go peers via `Server.SetMetadata(map[string]any)`, Scriptling-authored peers via `runtime.plugin.serve(name, ..., metadata={...})` — and the host reads it back with `Client.Metadata().Custom`. Scriptling never interprets the data; it is the channel for a host to learn plugin-specific declarations from the manifest without running any plugin code. Backward compatible: plugins that declare none send nothing, and older hosts ignore the field. See [Plugin protocol](https://scriptling.dev/okf/scriptling-docs/plugins/protocol.md#custom-manifest-data).
 
+**MCP numbers keep their integer typing.** JSON-decoded whole numbers (`{"n": 21}`) reached script tool functions as floats, so `n * 2` returned `42.0`; tool arguments, resource reads and prompt responses now convert the way Python's json module does, nested objects and arrays included.
 
----
 
-### v0.24.3
 
+**Slice assignment works.** `l[0:2] = [9, 8, 7]` raised "cannot assign to expression" although the reference documented it; splicing (any length change), insertion, stepped slices, negative steps, and the `ValueError`/`TypeError` mismatch cases now all match Python. See [Slicing](https://scriptling.dev/okf/scriptling-reference/slicing.md).
 
 
-**Multiline conditional expressions and parser robustness.** `x if cond else y` written across lines inside brackets now parses (newlines are whitespace there, as in Python), and a malformed `if` no longer crashes the parser with a nil dereference — it reports ordinary parser errors.
 
+**`str.startswith` / `str.endswith` accept tuples and offsets.** `"file.py".startswith((".py", ".txt"))` previously raised "prefix: must be a string", and the optional `start`/`end` arguments were rejected; both now match Python, including negative offsets.
 
----
 
-### v0.24.2
 
+**`str.replace` accepts the count argument.** `"aaa".replace("a", "b", 2)` previously failed with an argument-count error; the limit is now honored.
 
 
-**Relational transactions with commit and rollback.** `conn.begin()` on `scriptling.sqlite` and `scriptling.sql` returns a Transaction whose `query()`, `query_iter()` and `execute()` run inside one atomic unit, ended by `commit()` (keep) or `rollback()` (discard). `tx.get_orm()` binds the ORM to the open transaction so builder chains and model gateways join it, `?` placeholders keep working on PostgreSQL, and an abandoned transaction rolls back automatically once collected (compiled-in builds previously never ran the cleanup for objects created inside plugin methods — abandoned cursors leaked their connection too, and both now release at the next collection cycle). See the [SQLite](https://scriptling.dev/okf/scriptling-libraries/databases/sqlite.md#transactions) and [SQL](https://scriptling.dev/okf/scriptling-libraries/databases/sql.md#transactions) transaction sections.
 
+**Bytes literals `b"..."`.** Previously only the `bytes()` builtin could construct bytes; literals now parse, escapes included, and work with `decode`, `len()` and the rest of the bytes API.
 
----
 
-### v0.24.1
 
+**`str.rsplit`.** Split from the right with `maxsplit`, including the `rsplit(None, n)` whitespace form with Python's exact leading-whitespace behavior. See [String Methods](https://scriptling.dev/okf/scriptling-reference/types.md).
 
 
-**`[tool.*]` metadata tables are surfaced to embedding hosts.** `metadata.Parse` now returns the `[tool.<name>]` tables via `Metadata.Tools` and `Tool(name)`, so hosts can carry their own declarations in the block; scriptling still ignores their contents. See [Tool tables](https://scriptling.dev/okf/scriptling-docs/script-metadata.md#tool-tables).
 
+**Integer `//` and `%` now follow Python exactly.** Floor division floors toward negative infinity (`-7 // 2` is `-4`) and modulo takes the divisor's sign (`-7 % 2` is `1`), including at parse-time constant folding. Float modulo also works now, with the same sign rule (`5.5 % 3` is `2.5`); it previously raised "unknown operator". See [Operators](https://scriptling.dev/okf/scriptling-reference/operators.md).
 
----
 
-### v0.24.0
 
+**`enumerate(iterable, start=N)` honors the keyword.** The `start=` form was silently ignored and produced 0-based pairs; only the positional form worked. See [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md).
 
 
-**Scripts can declare their requirements.** A PEP 723-style inline metadata block (`# /// script`) lets a script state a minimum scriptling version, the libraries it imports, and the plugins it expects to be connected, with optional version constraints. The CLI verifies the block before the code runs — one-shot scripts and `--code`, server setup scripts once at startup before anything binds, and package main entries — reporting every unmet requirement in one error with the remedy: load a plugin, use a build with it compiled in, or upgrade the host. `--lint` validates the block itself, and embedding hosts can run the same check through the `metadata` package. See [Script Metadata](https://scriptling.dev/okf/scriptling-docs/script-metadata.md).
 
+**`sorted()` and `.sort()` are stable.** They used an unstable algorithm that could reorder equal keys on larger inputs; Python guarantees stability and so does Scriptling now, including with `reverse=True`. See [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md).
 
 
-**Database drivers are built in by default.** `scriptling` now ships with the SQLite, SQL, Valkey and BadgerDB plugins compiled in, so database support needs no extra setup. `scriptling-full` is replaced by `scriptling-slim`, the lean build without the compiled-in drivers, which can still load them at runtime via `scriptling-plugins` or `--plugin-dir`. Homebrew users of the old full formula should run `brew uninstall scriptling-full && brew install scriptling`.
 
+**`round()` rounds ties to even, like Python.** `round(2.5)` is `2` (was `3`), `round(2.675, 2)` is `2.67` (was `2.68`), and types match Python too: a float stays a float when ndigits is given. See [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md).
 
----
 
-## August 2026
 
-### v0.23.0
+**List and set augmented assignment mutate in place.** `x = y = [1]; x += [2]` now lets `y` observe the update, as in Python; same for `list *= n` and `|=`, `&=`, `-=` and `^=` on sets. See [Operators](https://scriptling.dev/okf/scriptling-reference/operators.md).
 
 
 
-**Database libraries and ORM.** New first-party plugins add SQLite, a multi-driver SQL client for MySQL/MariaDB and PostgreSQL, Valkey/Redis, and BadgerDB. Relational connections share one API and provide `get_orm()` for queries, model gateways, and schema builders; Valkey and BadgerDB share a key/value API. Database support is available in `scriptling-full`, through the platform-specific `plugins-<os>-<arch>.zip` archive, or with Homebrew's `scriptling-plugins` package configured via `--plugin-dir`. See [Database Libraries](https://scriptling.dev/okf/scriptling-libraries/databases.md) and the runnable [database examples](https://github.com/paularlott/scriptling/tree/main/examples/databases).
+**Type annotations are accepted.** Function signatures (`def f(a: int, b: str = "x") -> bool:`), annotated assignments (`count: int = 5`), and generic/string annotations (`dict[str, int]`, `int | None`) all parse; the annotations are ignored, matching their runtime meaning in Python, so annotated Python pastes in unchanged — including MCP tool functions. See [Functions](https://scriptling.dev/okf/scriptling-reference/functions.md).
 
 
 
-**More ways to load and deploy plugins.** The repeatable `--plugin` option loads individual executables or remote HTTP(S) plugin servers, with support for plugin arguments, environment variables, and HTTP authentication. Plugin configuration now reads the documented `plugins.dirs` and `plugins.paths` keys. Dotted names such as `scriptling.sqlite` are supported; conflicting discovered libraries are skipped with a warning and compiled-in plugins take precedence. Executable peers receive the host version, and the handshake carries host filesystem and network policies for compatible plugins to enforce. See [Using Plugins](https://scriptling.dev/okf/scriptling-docs/plugins/using.md) and [PHP Plugins](https://scriptling.dev/okf/scriptling-docs/plugins/php-plugins.md).
+**Walrus assignment expressions.** `while (chunk := read()):`, `if (n := len(x)) > 10:`, and walrus in comprehension filters, with Python's precedence. A walrus bound inside a comprehension does not leak to the enclosing scope. See [Operators](https://scriptling.dev/okf/scriptling-reference/operators.md).
 
 
 
-**Plugin-provided scripts, libraries, and packages.** Fetcher plugins can expose content through custom schemes such as `knot://`, supplying packages for Scriptling's existing app-bundle and server machinery. Fetchers support recursive glob matching and lazy loading, and Go applications can use the same scheme resolution through `pluginpack`. See [Plugin Fetchers](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md).
+**Dict merge operators.** `d1 | d2` builds a new dict with the right operand winning conflicts, and `d |= other` merges in place so aliases observe the update, matching Python (PEP 584). See [Operators](https://scriptling.dev/okf/scriptling-reference/operators.md).
 
 
 
-**Request-aware HTTP transports.** For HTTP-served MCP and JSON-RPC, middleware can authenticate a request, add Scriptling request-context data, and register MCP tools, resources, and prompts for that request. HTTP route handlers receive the normalized Scriptling request directly; MCP and JSON-RPC handlers can read it with `get_request()` and an isolated copy of its context with `request_context()`. `transport()` reports `http`, `stdio`, or `None`; request-scoped registration is HTTP-only.
+**The `...` placeholder.** `def stub(): ...` bodies and `tuple[int, ...]` annotations parse; the expression evaluates to `None`.
 
 
 
-**HTTP authentication covers the full surface.** `--bearer-token` now wraps the entire HTTP mux even when script middleware is registered, protecting health, protocol, route, WebSocket-upgrade, static, webroot, and not-found paths. Script middleware also runs before a WebSocket is promoted, so it can reject the upgrade or pass request-context data to the socket handler.
+**`json.dumps(data, indent=n)` honors a numeric indent.** The kwarg previously only accepted strings, so `indent=2` silently produced compact output; a number now gives that many spaces and `indent=0` newline-separates. See [json](https://scriptling.dev/okf/scriptling-libraries/data-formats/json.md).
 
 
 
-**Generated Scriptling and MCP error payloads are JSON-escaped.** Errors synthesized from middleware, request-scoped MCP registration, and MCP helper failures now encode quotes, backslashes, and newlines correctly instead of producing malformed JSON.
+**`sum()` accepts Python's optional `start` argument.** `sum(iterable, start)` previously failed; it now offsets the total and can seed a float result. See [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md).
 
 
 
-**HTTP request limits and timeouts.** HTTP servers use 10-second header, 5-minute read/write, and 2-minute idle timeouts. Request bodies default to a 32 MiB cap (`ServerConfig.MaxRequestBodyBytes` or `--max-request-body`; zero uses the default and a negative value disables it). Protocol and script handlers now reject an over-limit body with `413 Request Entity Too Large` rather than processing a truncated payload.
+**`list.sort()` is as honest as `sorted()`.** Sorting incomparable elements (dicts without a `key`) silently did nothing where `sorted()` raised; both now use one comparator, so `.sort()` errors the same way and also supports `__lt__` on instances. See [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md).
 
 
 
-**MCP SSE is exempt from the HTTP write deadline.** For the long-lived `GET /mcp` event stream, Scriptling clears the server write deadline after protocol middleware, so the normal HTTP write timeout no longer ends an otherwise healthy subscription.
+**`repr(e)` prints the exception's class.** `ValueError: bad input` instead of the generic `EXCEPTION:` wrapper, matching `type(e)`. The LLM guide also now states that custom exception classes are not supported. See [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md).
 
 
 
-**Background task startup is race-free.** `runtime.background()` now completes task setup on the caller's goroutine before queuing or starting the task, avoiding concurrent reads of partially prepared state.
+**`type(e)` reports the exception's class.** `type()` on a caught exception now returns the class it was raised as (`"ValueError"`, `"KeyError"`) instead of the generic `"EXCEPTION"`, so `except` blocks can discriminate without message sniffing. See [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md).
 
 
 
-**`finally` control flow is complete.** `return`, `break`, and `continue` in a `finally` block now propagate correctly; a normal exception raised there replaces an ordinary pending result. `finally` still runs for `SystemExit` and `PermissionError`, but cannot replace those protected exceptions.
+**A failing tool no longer kills the agent turn.** A tool handler that raises — or a tool name the model invented — now comes back as an `Error: ...` tool result the model can see and recover from, and the other tools in the same batch still run. See [Agent](https://scriptling.dev/okf/scriptling-libraries/ai/agent.md).
 
 
 
-**Circular imports fail fast.** Two modules importing each other used to re-evaluate forever; the import chain is now tracked and a cycle reports `circular import: a -> b -> a`.
+**`ToolRegistry.add()` with a duplicate name now replaces the tool.** Previously re-registering a name appended a second identical schema — the model saw two copies of the tool — while silently swapping the handler. `add_schema()` still errors on duplicates.
 
 
 
-**Self-referential values convert safely.** A list or dict containing itself crashed host conversion with an unrecoverable stack overflow; it now converts cyclic references to a `<cyclic reference>` marker.
+**The positional-only separator `/` is rejected with a clear parse error.** `def f(a, /, b)` previously parsed with the `/` silently accepted as a parameter named `/`, so every call failed with a confusing argument-count error. The parser now reports `positional-only parameters ('/') are not supported` up front.
 
 
 
-**Repetition results are bounded.** `"ab" * n`, `bytes * n`, and `list`/`tuple * n` refuse oversized results with a clear error (1 GiB for strings and bytes, roughly 134 million elements for sequences) instead of allocating unbounded results; a constant-folded repetition no longer panics at parse time.
+**The `@mcp.tool` help example no longer uses `eval()`.** The example used `eval()`, which does not exist in scriptling — copying it produced an error.
 
 
 
-**Release artifacts are built safely for their target platforms.** Cross-platform `scriptling-full` builds now export `GOOS` and `GOARCH`, preventing host binaries from being labeled as another platform. Homebrew formulas are generated to temporary files and atomically moved into place before release tagging, so a failed generator cannot truncate a formula or leave a green release.
+**`scriptling pack --list <package>`.** Prints what a package contains before you deploy it: the manifest's name, version and protocols, each convention directory with its file count, and the sha256. The [Python differences](https://scriptling.dev/okf/scriptling-reference/python-differences.md) page was also re-verified end to end: nested classes and `bytes()` work and are now listed as supported, and `input()`'s availability and the `type(x).__name__` divergence are documented precisely.
 
 
 
-**Releasing remote objects reports the actual outcome.** Concurrent explicit and GC-finalizer releases now wait for the winning destroy request and return its result instead of reporting success while it may still fail.
+**`sys.executable`: the running interpreter's path.** Lets a script relaunch its own binary as a subprocess instead of depending on which `scriptling` resolves to on PATH; the MCP examples now launch their stdio servers this way. See [sys](https://scriptling.dev/okf/scriptling-libraries/http-process/sys.md).
 
 
 
-**Instance destructors get a boundary.** A user-defined `__del__` running on the Go GC finalizer goroutine now has panic recovery and a bounded context, preventing a destructor panic from terminating the host process.
+**`mcp.Client` HTTP requests time out after 30 seconds by default.** Script-level clients previously inherited the library's 5-minute timeout, so a hung server stalled a script for minutes per call. `mcp.Client(url, timeout=300)` opts a known-slow server back up, and timeouts surface as ordinary catchable exceptions. See [MCP Client](https://scriptling.dev/okf/scriptling-libraries/mcp/client.md).
 
 
 
-**Selected shared options work after subcommands.** Package, cache, library/plugin, logging, filesystem/network-security, and Docker/Podman-host options marked global are accepted before or after nested commands such as `cache clear` and `help`; server-only options remain specific to server invocations.
+**`Agent` can use real MCP servers: the `mcp_servers=` argument.** Pass one or more `mcp.Client` clients and the agent gets their tools (namespaced, so a `search` tool on a client with `namespace="shop"` becomes `shop__search`) and skills alongside its own. Each client needs a distinct namespace. See [Agent](https://scriptling.dev/okf/scriptling-libraries/ai/agent.md#mcp-server-integration).
 
 
----
 
-### v0.22.0
+**`tools.Registry.add_schema(name, description, schema, handler)` registers a tool from a full JSON Schema.** For parameter shapes richer than the flat name-to-type map `add()` accepts (nested objects, enums, per-parameter descriptions). Duplicate names are an error instead of a silent overwrite. See [AI Tools](https://scriptling.dev/okf/scriptling-libraries/ai/tools.md).
 
 
 
-**Per-user keys for MCP and JSON-RPC.** The middleware registered with `runtime.http.middleware(...)` now guards the `/mcp` and `/json-rpc` endpoints as well as HTTP routes, so one handler can authenticate API clients, MCP clients, and JSON-RPC callers against whatever it likes, a dict of keys, the KV store, an API. Registering a middleware replaces static `--bearer-token` checking on the protocol endpoints; without one, the static token guards everything as before.
+**Register resources, prompts and skills from script code: `@mcp.resource`, `@mcp.prompt`, `@mcp.skill`.** The tools folder's decorated `.py` files can now register every MCP entry kind, not just tools. One file can mix all four decorators, everything reloads with the tools folder, and the same registrations work in app bundles. See [runtime.mcp](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md).
 
 
 
-**Failed KV disk writes are no longer silent.** With a persistent store (`--kv-storage` or `SCRIPTLING_KV_STORAGE`, and stores opened with `kv.open()`), a snapshot write that failed, disk full, directory deleted, permissions, left no trace: the script reported success and the data was simply gone on the next run. Save failures are now logged with the store path and the cause, and `store.close()` raises the error to the script instead of returning quietly.
+**Booleans order like numbers in `min()`, `max()` and `sorted()`.** `sorted([True, False])` previously failed and `min([True, False])` returned the wrong element; booleans now order as 0 and 1, matching Python. See [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md).
+
+
+
+**`min()` and `max()` honor the `key` function.** Previously `max(records, key=lambda r: r["amount"])` silently returned the first record instead of the largest. A `default` argument is also supported for the single-iterable form. See [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md).
+
+
+
+**App packages can carry skills.** The `skills/` directory joins `tools/`, `resources/`, `prompts/`, `webroot/` and `docs/` as a package convention directory: present means packed and served. See the [Packaging an MCP App](/tutorials/mcp-app-package/) tutorial.
+
+
+
+**`client.namespace` on an MCP client.** The client's namespace (empty string when created without one) is now readable as an attribute, so scripts can tell which server a namespaced tool name or skill URI belongs to. See [MCP Client](https://scriptling.dev/okf/scriptling-libraries/mcp/client.md).
+
+
+**The MCP server can serve skills (SEP-2640).** `--mcp-skills` (env `SCRIPTLING_MCP_SKILLS`) points at a directory of skills — one per subdirectory containing a `SKILL.md` — served per the MCP skills extension via `skills/list` and `skills/get`, with each file readable as a `skill://` resource. See [MCP Server](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md).
+
+
+
+**`mcp.Client` can consume skills: `skills()` and `get_skill(uri)`.** `skills()` lists the skills a server exposes (URI, frontmatter, per-file digests) and `get_skill(uri)` fetches one; the content reads with the existing `read_resource`. Works for HTTP and stdio clients alike. See [MCP Client](https://scriptling.dev/okf/scriptling-libraries/mcp/client.md).

@@ -51,7 +51,7 @@ Converts a Scriptling object to its JSON string representation. Object keys are 
 
 **Parameters:**
 - `object` (`dict`, `list`, `str`, `int`, `float`, `bool`, or `None`): Value to serialize.
-- `indent` (`str`, optional): Indentation string used for pretty-printing. Default: `""` (compact, no whitespace).
+- `indent` (`str` or `number`, optional): Pretty-printing indentation. A string is used verbatim; a number gives that many spaces (`indent=2` is the common idiom). `indent=0` newline-separates with no spaces, as in Python. Default: absent, fully compact (no whitespace, no newlines). Object keys are always emitted in sorted order.
 
 **Returns:** `str`: the JSON-formatted output.
 
@@ -66,6 +66,8 @@ pretty = json.dumps(obj, indent="  ")
 #   "count": 42,
 #   "status": "success"
 # }
+
+pretty = json.dumps(obj, indent=2)  # two spaces per level, the common idiom
 ```
 
 ### `parse(string)`

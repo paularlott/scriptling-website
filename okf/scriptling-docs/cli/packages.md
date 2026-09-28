@@ -122,6 +122,19 @@ scriptling pack ./mylib -o mylib.zip
 # Output includes: sha256=abc123def456...
 ```
 
+Before deploying, check what actually shipped in the artifact:
+
+```bash
+scriptling pack --list mylib.zip
+# package: mylib 1.0.0
+# serves: mcp,http
+#   tools/       4 file(s)
+#   prompts/     2 file(s)
+#   skills/      3 file(s)
+#   total        11
+# sha256=abc123def456...
+```
+
 Or use the `manifest` command to print a package's metadata:
 
 ```bash
@@ -360,9 +373,10 @@ These top-level dirs are auto-discovered when present:
 
 | Dir | Protocol | Contents |
 |-----|----------|----------|
-| `tools/` | mcp | `.py` + `.toml` pairs (MCP tools) |
+| `tools/` | mcp | `.py` + `.toml` pairs, or decorated `.py` files (MCP tools; decorated files may also register resources, prompts and skills) |
 | `resources/` | mcp | Resource tree (static files and `{var}` templates) |
 | `prompts/` | mcp | `.toml` + `.py` pairs or `.md`/`.txt` (MCP prompts) |
+| `skills/` | mcp | One directory per skill, each with a `SKILL.md` (Agent Skills format) |
 | `webroot/` | http | Static assets served at the HTTP root |
 | `docs/` | — | Documentation viewer |
 

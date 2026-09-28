@@ -434,7 +434,7 @@ for v in c.csi_volumes_list(namespace="*"):
 
 This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.nomad` grants full control over the Nomad cluster reachable at the address and ACL token passed to `Client()`, including deregistering CSI volumes and stopping or registering jobs: this is a significant risk, comparable to direct infrastructure access. There is no allowlist parameter for this library; scope the ACL token to the minimum policy needed for the task, and never register this library for untrusted code. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
+`scriptling.nomad` grants full control over the Nomad cluster reachable at the address and ACL token passed to `Client()`, including deregistering CSI volumes and stopping or registering jobs: this is a significant risk, comparable to direct infrastructure access. There is no allowlist parameter for this library; scope the ACL token to the minimum policy needed for the task, and never register this library for untrusted code. The library is also not covered by `--network-policy`: `Client(addr)` connects to whatever address the script supplies, including loopback and private ranges, so confine it at the process level where that matters. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 
 ## See Also
 
