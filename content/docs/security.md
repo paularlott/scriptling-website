@@ -208,7 +208,7 @@ ai.Register(p, policy)
 scriptlingmcp.Register(p, policy)
 ```
 
-The policy governs the five libraries above, including `ai.Client()`'s `remote_servers` (the MCP servers it can attach for tool use) and `mcp.Client()`'s HTTP transport — a script cannot bypass the policy by reaching a blocked endpoint through the AI or MCP client instead of `requests`. Stdio-transport `mcp.Client()` instances (a local subprocess) are unaffected, since the policy only governs network access. `scriptling.provision.fetch` makes network calls too, but to endpoints configured by the host rather than chosen by the script; if scripts can configure those endpoints in your integration, keep it unregistered in untrusted environments.
+The policy governs the five libraries above, including `ai.Client()`'s `remote_servers` (the MCP servers it can attach for tool use) and `mcp.Client()`'s HTTP transport — a script cannot bypass the policy by reaching a blocked endpoint through the AI or MCP client instead of `requests`. Stdio-transport `mcp.Client()` instances (a local subprocess) are unaffected, since the policy only governs network access. `scriptling.provision.fetch` makes network calls too, but to endpoints configured by the host rather than chosen by the script; if scripts can configure those endpoints in your integration, keep it unregistered in untrusted environments. `scriptling.nomad` is not wired to the policy either: `nomad.Client(addr)` connects to whatever address the script supplies, including loopback and private ranges, so keep it unregistered where scripts are untrusted.
 
 ## Database Drivers
 
