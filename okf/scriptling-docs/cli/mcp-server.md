@@ -21,11 +21,11 @@ Scriptling can run as an MCP (Model Context Protocol) server, enabling AI assist
 
 When running in MCP server mode, Scriptling provides:
 
-1. **Custom MCP Tools**: Root-level legacy `.toml` + `.py` tools or decorated `.py` tools from `--mcp-tools`
+1. **Custom MCP Tools**: Root-level legacy `.toml` + `.py` tools or decorated `.py` tools from `--mcp-tools`; a decorated file can also register resources, prompts and skills with `@mcp.resource`, `@mcp.prompt` and `@mcp.skill` (see [runtime.mcp](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md))
 2. **Script Execution Tool**: Allow AI to execute Scriptling code directly (`--mcp-exec-script`)
 3. **Resources**: Recursively scanned files served by URI from `--mcp-resources`; a path containing `{var}` is a template only when it ends in `.py`
 4. **Prompts**: Root-level static `.md`/`.txt` or dynamic `.toml` + `.py` prompts from `--mcp-prompts`
-5. **Skills**: One skill per subdirectory containing a `SKILL.md` (Agent Skills format), served per the Skills extension (SEP-2640) from `--mcp-skills` — every file becomes a `skill://` resource, listed by `skills/list`, entry fetched by `skills/get`, content read with `resources/read`
+5. **Skills**: One skill per subdirectory containing a `SKILL.md` (Agent Skills format), served per the Skills extension (SEP-2640) from `--mcp-skills` — every file becomes a `skill://` resource, listed by `skills/list`, entry fetched by `skills/get`, content read with `resources/read`. The `SKILL.md` frontmatter `name` must match its directory name; a mismatched directory is skipped with a warning, not an error
 5. **HTTP reload notifications**: Supported file-change and signal reloads mutate the live HTTP server and emit `listChanged` notifications, subject to the limitations below
 
 `--mcp-tools`, `--mcp-exec-script`, or an app bundle with `serve = ["mcp"]` activates MCP. Resource, prompt and skill directories are additive; `--mcp-resources`, `--mcp-prompts` or `--mcp-skills` alone does not mount a working MCP endpoint.

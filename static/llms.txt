@@ -4,7 +4,7 @@
 
 Docs: https://scriptling.dev/docs/
 
-All 184 OKF 0.2 concepts below are plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
+All 185 OKF 0.2 concepts below are plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
 
 ## Essential
 
@@ -83,6 +83,7 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [Embedding a Rules Engine](https://scriptling.dev/okf/scriptling-docs/tutorials/embedding-rules-engine.md): Embed Scriptling in a Go application to evaluate business rules at runtime.
 - [Writing a Fetcher Plugin](https://scriptling.dev/okf/scriptling-docs/tutorials/fetcher-plugin.md): Serve libraries, assets and script sources from a plugin-owned scheme such as demo://.
 - [Writing a Go Plugin](https://scriptling.dev/okf/scriptling-docs/tutorials/go-plugin.md): Build an executable plugin that exposes functions and classes under plugin.*.
+- [Packaging an MCP App](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-app-package.md): Build a complete MCP application with an app view, tools, a prompt and a skill, package it as one artifact, and run it from the package.
 - [Building an MCP Resources & Prompts Server](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-resources-prompts.md): Create MCP resources and prompts as files, alongside tools.
 - [Building an MCP Tool Server](https://scriptling.dev/okf/scriptling-docs/tutorials/mcp-tool-server.md): Create a Model Context Protocol server with custom tools for AI assistants.
 - [Plugin Streaming Callbacks](https://scriptling.dev/okf/scriptling-docs/tutorials/plugin-callbacks.md): Pass a Scriptling callback into a Go plugin and stream events back while the function runs.
@@ -183,7 +184,7 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/runtime/http.md): Register HTTP routes, middleware, and response helpers for a Scriptling-backed server.
 - [scriptling.runtime.jsonrpc](https://scriptling.dev/okf/scriptling-libraries/runtime/jsonrpc.md): Register JSON-RPC 2.0 server methods and notifications served over stdio or HTTP.
 - [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/runtime/kv.md): Thread-safe key-value store for sharing state across requests and background tasks.
-- [scriptling.runtime.mcp](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md): Register MCP tools via decorators — metadata and implementation in a single file.
+- [scriptling.runtime.mcp](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md): Register MCP tools, resources, prompts and skills via decorators — metadata and implementation in a single file.
 - [scriptling.runtime.plugin](https://scriptling.dev/okf/scriptling-libraries/runtime/plugin.md): Declare a Scriptling script as a first-class plugin server exposing functions, constants, and classes to remote clients.
 - [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/runtime/runtime.md): Background tasks and concurrency, plus the runtime namespace grouping HTTP, JSON-RPC, KV, MCP, sync, sandbox, and plugin sub-libraries.
 - [scriptling.runtime.sandbox](https://scriptling.dev/okf/scriptling-libraries/runtime/sandbox.md): Create isolated Scriptling execution environments for running script code with its own variable scope.

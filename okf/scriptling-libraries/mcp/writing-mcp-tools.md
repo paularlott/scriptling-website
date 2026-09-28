@@ -66,7 +66,7 @@ description = "Number of times to repeat the greeting"
 | `keywords`    | No       | Keywords for search (array of strings)                    |
 | `discoverable`| No       | Registration mode (default: `false`)                      |
 | `[ui]`        | No       | Links a companion UI resource ([MCP Apps](#linking-a-ui-resource-ui)) |
-| `[[icons]]`   | No       | Visual identifiers shown on the tool's `tools/list` descriptor ([Icons](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md#icons)) |
+| `[[icons]]`   | No       | Visual identifiers shown on the tool's `tools/list` descriptor ([Icons](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md#icons); generate the block from an image file with `scriptling tools/make_icon/make_icon.py`) |
 
 ### Parameter Types
 

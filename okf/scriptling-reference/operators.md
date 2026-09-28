@@ -38,6 +38,9 @@ x % y    # Modulo (remainder)
 10 / 4    # 2.5 (always float)
 10 // 3   # 3 (floor division)
 10 % 3    # 1 (remainder)
+-7 // 2   # -4 (floors toward negative infinity, like Python)
+-7 % 2    # 1 (remainder takes the divisor's sign, like Python)
+5.5 % 3   # 2.5 (float modulo follows the same sign rule)
 
 # String operations
 "Hello, " + "World"  # "Hello, World"
@@ -75,6 +78,26 @@ x ^= y   # x = x ^ y
 x <<= y  # x = x << y
 x >>= y  # x = x >> y
 ```
+
+## Assignment Expressions (Walrus)
+
+`name := value` assigns and yields the value in one expression, using the same scoping as an assignment statement (including `global`/`nonlocal` directives). Only a plain name is a valid target. `:=` binds looser than every other operator, so the value swallows comparisons and conditional expressions to its right; parenthesize when in doubt:
+
+```python
+while (chunk := read_next()) is not None:
+    process(chunk)
+
+if (n := len(items)) > 10:
+    print("large:", n)
+
+# Looser than comparisons: n receives the boolean, as in Python
+ok := 3 > 2        # ok is True
+
+# Right-associative chaining
+a := b := 5        # both a and b are 5
+```
+
+Inside a comprehension the bound name stays local to the comprehension (it does not leak to the enclosing scope the way Python's does); collect through the comprehension result instead.
 
 ## Comparison Operators
 
@@ -212,7 +235,7 @@ a ^ b   # {1, 4}        symmetric difference — in one set but not both
 
 Both operands must be sets; combining a set with a list, tuple, or other iterable raises a type error. For arbitrary iterables, use the equivalent methods: `.intersection()`, `.union()`, `.difference()`, `.symmetric_difference()`.
 
-The augmented-assignment forms (`&=`, `|=`, `-=`, `^=`) work on sets too — they rebind the name to the resulting set:
+The augmented-assignment forms (`&=`, `|=`, `-=`, `^=`) work on sets too — they update the set in place, so other references to it observe the change (matching Python):
 
 ```python
 tags = set([1, 2, 3])
@@ -225,6 +248,29 @@ Set equality (`==` / `!=`) compares contents order-independently:
 set([1, 2, 3]) == set([3, 2, 1])   # True
 set([1, 2]) != set([1, 2, 3])      # True
 ```
+
+## Dict Merge Operators
+
+The `|` operator merges two dicts (matching Python's PEP 584). `d1 | d2` builds a new dict containing all keys from both, with `d2`'s values winning on conflicts; the operands are never modified:
+
+```python
+defaults = {"host": "localhost", "port": 8080, "debug": False}
+override = {"port": 9090, "debug": True}
+
+config = defaults | override
+# {"host": "localhost", "port": 9090, "debug": True}
+```
+
+The augmented form `|=` merges into the left dict **in place**, so other references to it observe the update (exactly like Python):
+
+```python
+config = {"a": 1}
+alias = config
+config |= {"b": 2}
+# both config and alias are now {"a": 1, "b": 2}
+```
+
+Both operands must be dicts; merging a dict with any other type raises a type error. For arbitrary updates use `.update()`.
 
 ## Identity Operators
 
@@ -282,7 +328,8 @@ From highest to lowest. Parentheses `()` override precedence and group explicitl
 | 11 | Bitwise XOR: `^` |
 | 12 | Bitwise OR: `\|` |
 | 13 | `or` |
-| 14 (lowest) | Conditional expression: `x if cond else y` |
+| 14 | Conditional expression: `x if cond else y` |
+| 15 (lowest) | Walrus: `x := expr` |
 
 > **Note:** Scriptling's precedence differs from Python in two places. Unary `not` binds tighter than `**` (so `-2 ** 2` evaluates to `4`, not `-4`), and `and`/`or` bind tighter than the bitwise operators `&`, `^`, `|` (so `a & b and c` parses as `a & (b and c)`). Add parentheses when porting Python expressions that mix these.
 
