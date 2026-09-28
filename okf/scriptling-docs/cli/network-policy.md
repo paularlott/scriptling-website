@@ -22,7 +22,7 @@ For `scriptling.ai`, the policy also covers `remote_servers` — the MCP servers
 scriptling --network-policy=policy.toml --disable-lib subprocess script.py
 ```
 
-A missing or invalid policy file aborts startup rather than running scripts unrestricted. Combine the policy with `--disable-lib subprocess` in any mode so code cannot bypass it by shelling out to `curl`; `scriptling.nomad` is likewise not wired to the policy. A network policy constrains only the libraries wired to it; it is not a process-level network sandbox.
+A missing or invalid policy file aborts startup rather than running scripts unrestricted. Combine the policy with `--disable-lib subprocess` in any mode so code cannot bypass it by shelling out to `curl`; `scriptling.nomad`, `scriptling.provision.fetch`, and the raw-socket `scriptling.net.unicast` / `scriptling.net.gossip` libraries are likewise not wired to the policy, and within `scriptling.wait_for` only `http()` is policy-checked — `port()` dials TCP directly. A network policy constrains only the libraries wired to it; it is not a process-level network sandbox.
 
 With a policy active, these address categories are blocked by default:
 

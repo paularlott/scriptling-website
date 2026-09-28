@@ -205,7 +205,7 @@ print("All services are healthy!")
 
 This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-`scriptling.wait_for` can be used to probe network reachability and timing: `port()` and `http()` make outbound TCP/HTTP connections to any host or URL the script provides, with no built-in restriction on destination. There is no allowlist parameter for this library; if network access should be restricted for untrusted scripts, control it at the network/sandbox level rather than relying on this library. For a full risk breakdown across all libraries, see the [Security Guide](/docs/security/).
+`scriptling.wait_for` can be used to probe network reachability and timing: `port()` and `http()` make outbound TCP/HTTP connections to any host or URL the script provides. `http()` honors a configured network policy; `port()` dials TCP directly and is not policy-checked, so it can reach addresses the policy denies and acts as a reachability oracle for them. There is no allowlist parameter for this library; if network access should be restricted for untrusted scripts, control it at the network/sandbox level rather than relying on this library. For a full risk breakdown across all libraries, see the [Security Guide](/docs/security/).
 
 ## See Also
 

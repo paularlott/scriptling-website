@@ -230,7 +230,7 @@ Closes the UDP listener.
 
 This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.net.unicast` opens raw UDP and TCP sockets, letting scripts initiate outbound connections to any reachable host/port (`connect()`) or bind a listening socket to accept inbound connections (`listen()`). The library does not restrict which hosts, ports, or interfaces a script can use: that is the embedder's responsibility, typically enforced with OS-level firewalling or network namespacing around the process. See [Security Considerations](https://scriptling.dev/okf/scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
+`scriptling.net.unicast` opens raw UDP and TCP sockets, letting scripts initiate outbound connections to any reachable host/port (`connect()`) or bind a listening socket to accept inbound connections (`listen()`). The library does not restrict which hosts, ports, or interfaces a script can use: that is the embedder's responsibility, typically enforced with OS-level firewalling or network namespacing around the process. It is also not wired to `--network-policy` (among the `scriptling.net.*` libraries only the WebSocket client is), so a configured policy does not constrain `connect()`. See [Security Considerations](https://scriptling.dev/okf/scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
 
 ## Examples
 
