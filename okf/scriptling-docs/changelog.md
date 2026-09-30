@@ -16,6 +16,13 @@ type: Guide
 
 ## September 2026
 
+### v0.27.1
+
+
+Rebuild against newer libraries and dependencies.
+
+---
+
 ### v0.27.0
 
 
