@@ -8,6 +8,12 @@ nav-skip: true
 
 ## September 2026
 
+{{< version "v0.27.1" >}}
+
+Rebuild against newer libraries and dependencies.
+
+---
+
 {{< version "v0.27.0" >}}
 
 {{< changelog-item "added" >}}
