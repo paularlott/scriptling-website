@@ -289,6 +289,7 @@ Rebuild against newer libraries and dependencies.
 **`client.namespace` on an MCP client.** The client's namespace (empty string when created without one) is now readable as an attribute, so scripts can tell which server a namespaced tool name or skill URI belongs to. See [MCP Client](https://scriptling.dev/okf/scriptling-libraries/mcp/client.md).
 
 
+
 **The MCP server can serve skills (SEP-2640).** `--mcp-skills` (env `SCRIPTLING_MCP_SKILLS`) points at a directory of skills — one per subdirectory containing a `SKILL.md` — served per the MCP skills extension via `skills/list` and `skills/get`, with each file readable as a `skill://` resource. See [MCP Server](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md).
 
 
