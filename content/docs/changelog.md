@@ -6,6 +6,20 @@ layout: changelog
 nav-skip: true
 ---
 
+## October 2026
+
+{{< version "v0.27.2" >}}
+
+{{< changelog-item "changed" >}}
+**Performance.** Script execution is 15% to 30% faster depending on workload and calls into scripts are up to 20x faster.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Program cache budget is configurable.** Parsed and compiled scripts are kept in a process-wide cache bounded by 64 MiB by default. The CLI gains `--program-cache-max-bytes` (`SCRIPTLING_PROGRAM_CACHE_MAX_BYTES`, `cache.program_max_bytes` in `scriptling.toml`), and Go hosts get `scriptling.SetProgramCacheMaxBytes` plus `scriptling.GetProgramCacheStats` for hit, miss and eviction counts. See [Command-Line Options](/docs/cli/command-line-options/) and [Go Integration Basics](/docs/go-integration/basics/#program-cache).
+{{< /changelog-item >}}
+
+---
+
 ## September 2026
 
 {{< version "v0.27.1" >}}

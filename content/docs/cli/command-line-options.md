@@ -17,6 +17,7 @@ weight: 2
 | `-p`, `--package`     | -                          | `packages`                   | Package directory, zip, or HTTP(S) URL (repeatable) | (none)           |
 | `-k`, `--insecure`    | -                          | `insecure`                   | Allow self-signed HTTPS certificates                 | false            |
 | `--cache-dir`         | `SCRIPTLING_CACHE_DIR`     | `cache.dir`                  | Cache directory for remote packages                  | OS default       |
+| `--program-cache-max-bytes` | `SCRIPTLING_PROGRAM_CACHE_MAX_BYTES` | `cache.program_max_bytes` | Memory budget for parsed scripts kept in memory (bytes; 0 = default, negative = unlimited) | 64 MiB |
 | `-L`, `--libpath`     | `SCRIPTLING_LIBPATH`       | `libpath`                    | Extra library search directory (repeatable)          | (none)           |
 | `--plugin-dir`       | `SCRIPTLING_PLUGIN_DIR`    | `plugins.dirs`               | Plugin executable directory (repeatable)             | (none)           |
 | `--plugin`           | `SCRIPTLING_PLUGIN`        | `plugins.paths`              | Plugin executable to load, path taken literally (repeatable) | (none) |
@@ -231,6 +232,9 @@ generate = false
 
 [cache]
 dir = "/var/cache/scriptling"
+# Parsed and compiled scripts are kept in memory so repeated runs skip
+# parsing. 0 keeps the 64 MiB default; a negative value removes the limit.
+program_max_bytes = 134217728
 
 [lint]
 format = "text"
