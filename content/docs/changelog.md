@@ -15,6 +15,10 @@ nav-skip: true
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
+**Comprehensions are about twice as fast.** List, dict and set comprehensions bind their variable through a slot and iterate `range()` directly.
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
 **Function bodies compile on first call.** A module that defines many functions now retains compiled code only for the ones that run, reducing memory for library-heavy hosts.
 {{< /changelog-item >}}
 

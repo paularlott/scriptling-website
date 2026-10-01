@@ -281,7 +281,7 @@ budget costs time, never correctness.
 // Allow 256 MiB of parsed scripts; useful for hosts that run many distinct scripts.
 scriptling.SetProgramCacheMaxBytes(256 << 20)
 
-// Remove the byte limit entirely (an entry-count limit still applies).
+// Remove the limit entirely.
 scriptling.SetProgramCacheMaxBytes(0)
 
 // Back to the default.
