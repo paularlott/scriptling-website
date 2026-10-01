@@ -276,6 +276,46 @@ p.Eval(`print("Hello")`)
 fmt.Println(buf.String())  // "Hello\n"
 ```
 
+## Program Cache
+
+Every script the interpreter runs is parsed and compiled once and kept in a
+process-wide cache, so evaluating the same source again skips both steps. The
+cache is shared by all interpreter instances in the process and is bounded by a
+memory budget of 64 MiB by default; when it fills, the least recently used
+programs are dropped and simply parsed again on their next use. An undersized
+budget costs time, never correctness.
+
+### Set the Budget
+
+```go
+// Allow 256 MiB of parsed scripts; useful for hosts that run many distinct scripts.
+scriptling.SetProgramCacheMaxBytes(256 << 20)
+
+// Remove the limit entirely.
+scriptling.SetProgramCacheMaxBytes(0)
+
+// Back to the default.
+scriptling.SetProgramCacheMaxBytes(scriptling.DefaultProgramCacheMaxBytes)
+```
+
+Lowering the budget evicts programs immediately. Set it once at startup, before
+scripts run.
+
+### Check Whether It Fits
+
+Hit and miss counts tell you whether the budget suits your set of scripts. A
+miss rate that stays high on a long-running host, together with evictions,
+means scripts are being re-parsed because they no longer fit.
+
+```go
+stats := scriptling.GetProgramCacheStats()
+fmt.Printf("%d programs, %d of %d bytes, hits=%d misses=%d evictions=%d\n",
+    stats.Entries, stats.UsedBytes, stats.MaxBytes,
+    stats.Hits, stats.Misses, stats.Evictions)
+```
+
+`MaxBytes` is 0 when the byte limit is off.
+
 ## Library Management
 
 ### Register Libraries
