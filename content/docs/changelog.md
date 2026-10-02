@@ -8,6 +8,14 @@ nav-skip: true
 
 ## October 2026
 
+{{< version "v0.27.3" >}}
+
+{{< changelog-item "fixed" >}}
+**Pipeline concurrency recovers after a rate limit.** `client.Pipeline`, `completion_parallel` and `ask_parallel` halve their concurrency when a request hits a 429, but never restored it, so one early rate limit left a long run at reduced parallelism to the end. Concurrency now grows back by one after each run of clean completions, up to `max_parallel`, and slot accounting stays exact while the limit changes. See [AI Client](/reference/libraries/ai/client/).
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.27.2" >}}
 
 {{< changelog-item "changed" >}}

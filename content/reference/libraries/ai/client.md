@@ -239,7 +239,7 @@ answer = client.ask("gpt-4", "Explain quantum physics", system_prompt="You are a
 
 Runs multiple chat completions concurrently and returns a list of responses in the same order as the input `messages_list`. Each element of `messages_list` is passed to `completion()`.
 
-Includes **adaptive concurrency**: when a rate limit (429) is detected, the parallelism is automatically halved and workers pause briefly before continuing. Rate limit retries are handled automatically by the client (see `max_retries` on `ai.Client`).
+Includes **adaptive concurrency**: when a rate limit (429) is detected, the parallelism is automatically halved and workers pause briefly before continuing; after each run of clean completions the parallelism grows back by one, up to `max_parallel`. Rate limit retries are handled automatically by the client (see `max_retries` on `ai.Client`).
 
 **Parameters:**
 
@@ -301,7 +301,7 @@ for answer in answers:
 
 Creates a Pipeline that starts processing requests immediately as they are added via `add()`, overlapping prompt generation with inference. Call `complete()` to wait for all results. The Pipeline is the more general primitive behind `completion_parallel()` and `ask_parallel()`.
 
-Includes the same **adaptive concurrency** as the parallel methods: on a rate limit (429), concurrency is automatically halved and workers pause before continuing.
+Includes the same **adaptive concurrency** as the parallel methods: on a rate limit (429), concurrency is automatically halved and workers pause before continuing, then grows back towards `max_parallel` as completions succeed.
 
 **Parameters:**
 
