@@ -245,7 +245,7 @@ Includes **adaptive concurrency**: when a rate limit (429) is detected, the para
 
 - `model` (`str`): Model identifier (e.g. `"gpt-4"`, `"gpt-3.5-turbo"`).
 - `messages_list` (`list`): List of messages, where each element is a string or list of message dicts.
-- `max_parallel` (`int`, optional): Maximum number of concurrent requests. Default: `1`.
+- `max_parallel` (`int`, optional): Maximum number of concurrent requests. Default: `1`. The host may cap this (see [Script Resource Limits](/docs/go-integration/basics/#script-resource-limits)); a larger request is reduced to the cap.
 - `system_prompt` (`str`, optional): System prompt to use when an element of `messages_list` is a string.
 - `tools` (`list`, optional): List of tool schema dicts from `ToolRegistry.build()`.
 - `temperature` (`float`, optional): Sampling temperature (`0.0`-`2.0`).
@@ -277,7 +277,7 @@ Includes the same **adaptive concurrency** behavior as `completion_parallel()`.
 
 - `model` (`str`): Model identifier (e.g. `"gpt-4"`, `"gpt-3.5-turbo"`).
 - `messages_list` (`list`): List of messages, where each element is a string or list of message dicts.
-- `max_parallel` (`int`, optional): Maximum number of concurrent requests. Default: `1`.
+- `max_parallel` (`int`, optional): Maximum number of concurrent requests. Default: `1`. The host may cap this (see [Script Resource Limits](/docs/go-integration/basics/#script-resource-limits)); a larger request is reduced to the cap.
 - `system_prompt` (`str`, optional): System prompt to use when an element of `messages_list` is a string.
 - `tools` (`list`, optional): List of tool schema dicts from `ToolRegistry.build()`.
 - `temperature` (`float`, optional): Sampling temperature (`0.0`-`2.0`).
@@ -306,7 +306,7 @@ Includes the same **adaptive concurrency** as the parallel methods: on a rate li
 **Parameters:**
 
 - `model` (`str`): Model identifier (e.g. `"gpt-4"`, `"gpt-3.5-turbo"`).
-- `max_parallel` (`int`, optional): Maximum concurrent requests. Default: `1`.
+- `max_parallel` (`int`, optional): Maximum concurrent requests. Default: `1`. The host may cap this (see [Script Resource Limits](/docs/go-integration/basics/#script-resource-limits)); a larger request is reduced to the cap.
 - `ask` (`bool`, optional): If `True`, results are plain text strings instead of response dicts. Default: `False`.
 - `system_prompt` (`str`, optional): System prompt applied to each string message.
 - `tools` (`list`, optional): List of tool schema dicts from `ToolRegistry.build()`.

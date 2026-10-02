@@ -306,6 +306,66 @@ fmt.Printf("%d programs, %d of %d bytes, hits=%d misses=%d evictions=%d\n",
 
 `MaxBytes` is 0 when the byte limit is off.
 
+
+## Script Resource Limits
+
+A host that runs scripts written by other people needs two ceilings that a
+per-script timeout does not give it: how far one script can fan out, and how
+much memory the scripts can hold between them. Both are process-wide settings,
+set once at startup, and neither adds any cost to the evaluator's hot path.
+
+### Cap Fan-Out
+
+`max_parallel` is a request from the script. The host decides the ceiling:
+
+```go
+import (
+    "github.com/paularlott/scriptling/extlibs"
+    scriptlingai "github.com/paularlott/scriptling/extlibs/ai"
+)
+
+// client.Pipeline, completion_parallel and ask_parallel
+scriptlingai.SetMaxParallelLimit(10)
+
+// requests.parallel
+extlibs.SetRequestsMaxParallelLimit(10)
+```
+
+A script that asks for `max_parallel=50` under a ceiling of 10 gets 10; nothing
+is raised, because the ceiling is the host's resource policy rather than a
+script error. A ceiling of 0 removes it. The check is one atomic load when a
+pipeline or batch is created.
+
+### Limit Memory
+
+Go cannot attribute heap memory to one interpreter without accounting on
+every allocation, which would slow every script. The memory guard therefore
+works at process level: a single goroutine samples the heap on a timer, and
+while the heap stays above the ceiling after a garbage collection it cancels
+the most recently started script. Shedding newest-first protects work that was
+already within budget from a newcomer that is not.
+
+```go
+// Cancel the newest running script while heap objects exceed 384 MiB.
+scriptling.SetMemoryLimit(384 << 20)
+
+// Disable.
+scriptling.SetMemoryLimit(0)
+```
+
+A cancelled script's evaluation returns an error containing
+`memory limit exceeded`, and `context.Cause` on its context is
+`scriptling.ErrMemoryLimitExceeded`. The ceiling applies to the whole
+process, so set it well above the host's own baseline heap, typically around
+three quarters of the container's memory allocation; a ceiling below the
+baseline cancels every script as soon as it starts.
+
+`scriptling.GetMemoryLimitStats()` reports the configured limit, the heap at
+the last sample, how many scripts are running and how many the guard has
+cancelled since the process started. A cancellation count that keeps rising on
+a host with a sensible ceiling means some script holds far more than it should,
+and the limit is doing its job.
+
 ## Library Management
 
 ### Register Libraries
