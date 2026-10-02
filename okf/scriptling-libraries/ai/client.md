@@ -244,13 +244,13 @@ answer = client.ask("gpt-4", "Explain quantum physics", system_prompt="You are a
 
 Runs multiple chat completions concurrently and returns a list of responses in the same order as the input `messages_list`. Each element of `messages_list` is passed to `completion()`.
 
-Includes **adaptive concurrency**: when a rate limit (429) is detected, the parallelism is automatically halved and workers pause briefly before continuing. Rate limit retries are handled automatically by the client (see `max_retries` on `ai.Client`).
+Includes **adaptive concurrency**: when a rate limit (429) is detected, the parallelism is automatically halved and workers pause briefly before continuing; after each run of clean completions the parallelism grows back by one, up to `max_parallel`. Rate limit retries are handled automatically by the client (see `max_retries` on `ai.Client`).
 
 **Parameters:**
 
 - `model` (`str`): Model identifier (e.g. `"gpt-4"`, `"gpt-3.5-turbo"`).
 - `messages_list` (`list`): List of messages, where each element is a string or list of message dicts.
-- `max_parallel` (`int`, optional): Maximum number of concurrent requests. Default: `1`.
+- `max_parallel` (`int`, optional): Maximum number of concurrent requests. Default: `1`. The host may cap this (see [Script Resource Limits](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#script-resource-limits)); a larger request is reduced to the cap.
 - `system_prompt` (`str`, optional): System prompt to use when an element of `messages_list` is a string.
 - `tools` (`list`, optional): List of tool schema dicts from `ToolRegistry.build()`.
 - `temperature` (`float`, optional): Sampling temperature (`0.0`-`2.0`).
@@ -282,7 +282,7 @@ Includes the same **adaptive concurrency** behavior as `completion_parallel()`.
 
 - `model` (`str`): Model identifier (e.g. `"gpt-4"`, `"gpt-3.5-turbo"`).
 - `messages_list` (`list`): List of messages, where each element is a string or list of message dicts.
-- `max_parallel` (`int`, optional): Maximum number of concurrent requests. Default: `1`.
+- `max_parallel` (`int`, optional): Maximum number of concurrent requests. Default: `1`. The host may cap this (see [Script Resource Limits](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#script-resource-limits)); a larger request is reduced to the cap.
 - `system_prompt` (`str`, optional): System prompt to use when an element of `messages_list` is a string.
 - `tools` (`list`, optional): List of tool schema dicts from `ToolRegistry.build()`.
 - `temperature` (`float`, optional): Sampling temperature (`0.0`-`2.0`).
@@ -306,12 +306,12 @@ for answer in answers:
 
 Creates a Pipeline that starts processing requests immediately as they are added via `add()`, overlapping prompt generation with inference. Call `complete()` to wait for all results. The Pipeline is the more general primitive behind `completion_parallel()` and `ask_parallel()`.
 
-Includes the same **adaptive concurrency** as the parallel methods: on a rate limit (429), concurrency is automatically halved and workers pause before continuing.
+Includes the same **adaptive concurrency** as the parallel methods: on a rate limit (429), concurrency is automatically halved and workers pause before continuing, then grows back towards `max_parallel` as completions succeed.
 
 **Parameters:**
 
 - `model` (`str`): Model identifier (e.g. `"gpt-4"`, `"gpt-3.5-turbo"`).
-- `max_parallel` (`int`, optional): Maximum concurrent requests. Default: `1`.
+- `max_parallel` (`int`, optional): Maximum concurrent requests. Default: `1`. The host may cap this (see [Script Resource Limits](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#script-resource-limits)); a larger request is reduced to the cap.
 - `ask` (`bool`, optional): If `True`, results are plain text strings instead of response dicts. Default: `False`.
 - `system_prompt` (`str`, optional): System prompt applied to each string message.
 - `tools` (`list`, optional): List of tool schema dicts from `ToolRegistry.build()`.
