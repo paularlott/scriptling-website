@@ -294,6 +294,22 @@ def process_data(
     pass
 ```
 
+### Explicit Line Continuation
+
+A backslash at the very end of a line joins it to the next line, exactly as in Python. Use it where there are no brackets to continue inside, such as a long condition or an assignment:
+
+```python
+simple = (not images) and \
+    (not loom_urls) and \
+    estimate_tokens(body) <= budget
+
+if simple and \
+        total < 100:
+    print("single call")
+```
+
+The continuation line's indentation is not significant, and the whole statement belongs to the block it started in. The backslash must be the last character on the line; a backslash followed by anything else is a syntax error. An error inside a continued statement is reported against the line the statement starts on. Inside parentheses, brackets or braces no backslash is needed, and that remains the preferred style.
+
 ## Trailing Commas
 
 Trailing commas are allowed in lists, dictionaries, function calls, and function definitions. This makes it easier to add or remove items in multiline structures.

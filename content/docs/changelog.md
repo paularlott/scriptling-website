@@ -19,6 +19,10 @@ nav-skip: true
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
+**Backslash line continuation.** A backslash at the end of a line joins it to the next, as in Python, so a long condition or assignment can be split without wrapping it in parentheses. The continuation line's indentation is ignored. See [Syntax](/reference/syntax/#explicit-line-continuation).
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
 **Process-wide memory guard for script hosts.** `scriptling.SetMemoryLimit(bytes)` sets a ceiling on heap memory held by objects. While the heap stays above it after a garbage collection, the most recently started script is cancelled and its evaluation returns a `memory limit exceeded` error; `scriptling.GetMemoryLimitStats()` reports the heap, running scripts and cancellations. The guard samples the heap on a timer, so it adds no per-instruction cost to scripts. See [Go Integration Basics](/docs/go-integration/basics/#script-resource-limits).
 {{< /changelog-item >}}
 
