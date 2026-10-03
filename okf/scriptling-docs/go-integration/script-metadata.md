@@ -113,5 +113,5 @@ A runnable version of this whole flow — host version, a registered library sat
 ## See Also
 
 - [Script Metadata](https://scriptling.dev/okf/scriptling-docs/script-metadata.md) — the block format and keys
-- [Embedding Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md) — loading plugins in a host
+- [Plugin Manager](https://scriptling.dev/okf/scriptling-docs/plugins/host-integration.md) — loading plugins in a host
 - [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md) — module resolution to feed `Resolves`

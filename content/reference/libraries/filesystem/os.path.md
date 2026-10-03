@@ -128,7 +128,7 @@ Get the directory name of a path.
 import os.path
 
 print(os.path.dirname("/home/user/file.txt"))  # "/home/user"
-print(os.path.dirname("/home/user/mydir/"))    # "/home/user"
+print(os.path.dirname("/home/user/mydir/"))    # "/home/user/mydir"
 ```
 
 ### `split(path)`

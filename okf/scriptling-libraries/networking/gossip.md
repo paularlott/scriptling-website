@@ -16,6 +16,10 @@ type: API Reference
 
 Gossip protocol cluster membership and messaging, with automatic failure detection, metadata propagation, tag-based routing, node groups, leader election, encryption, and compression.
 
+**In this section**
+
+- [Node Groups & Leader Election](https://scriptling.dev/okf/scriptling-libraries/networking/gossip/coordination.md): `create_node_group()`, `create_leader_election()`, and the objects they return.
+
 ## Overview
 
 The `scriptling.net.gossip` library implements a gossip protocol for decentralized cluster management. Nodes automatically discover each other, detect failures, and propagate metadata across the cluster. It supports both unreliable (UDP) and reliable (TCP) messaging, with optional AES encryption and Snappy compression. Advanced features include request/reply messaging, metadata-criteria-based node groups, and quorum-based leader election with optional metadata filtering.
@@ -67,6 +71,8 @@ The `create()` function returns a cluster object with the following methods.
 | `send_request(node_id, message_type, data)` | Send a request and wait for a reply. |
 | `handle(message_type, handler)` | Register a message handler. |
 | `handle_with_reply(message_type, handler)` | Register a request/reply handler. |
+| `open_stream(node_id, message_type, data)` | Request a reply of any size from a node; returns a readable stream. |
+| `handle_stream(message_type, handler)` | Serve `open_stream()` requests by writing the reply. |
 | `unhandle(message_type)` | Remove a registered handler. |
 | `on_state_change(handler)` | Register a node state-change handler. |
 | `on_metadata_change(handler)` | Register a remote metadata-change handler. |
@@ -90,40 +96,7 @@ The `create()` function returns a cluster object with the following methods.
 | `create_node_group(criteria, on_node_added=None, on_node_removed=None)` | Create a metadata-criteria node group. |
 | `create_leader_election(...)` | Create a leader-election manager. |
 
-### Node group object
-
-The `create_node_group()` method returns a node group object.
-
-| Method | Description |
-|--------|-------------|
-| `nodes()` | Get all nodes in the group. |
-| `contains(node_id)` | Check if a node is in the group. |
-| `count()` | Get the number of nodes in the group. |
-| `send_to_peers(message_type, data, reliable=False)` | Send to all group peers. |
-| `close()` | Close the group and release resources. |
-
-### Leader election object
-
-The `create_leader_election()` method returns a leader election object.
-
-| Method | Description |
-|--------|-------------|
-| `start()` | Start the election process. |
-| `stop()` | Stop the election process. |
-| `is_leader()` | Check if this node is the leader. |
-| `has_leader()` | Check if a leader is elected. |
-| `get_leader_id()` | Get the leader's node ID. |
-| `send_to_peers(message_type, data, reliable=False)` | Send to eligible peers. |
-| `on_event(event_type, handler)` | Register an election event handler. |
-
-Event types passed to `on_event()`:
-
-| Event | Description |
-|-------|-------------|
-| `"elected"` | A leader has been elected. |
-| `"lost"` | The current leader has been lost. |
-| `"became_leader"` | This node became the leader. |
-| `"stepped_down"` | This node stepped down from leadership. |
+`create_node_group()` and `create_leader_election()`, and the objects they return, are documented on [Node Groups & Leader Election](https://scriptling.dev/okf/scriptling-libraries/networking/gossip/coordination.md).
 
 ## Functions
 
@@ -140,7 +113,7 @@ Creates a gossip cluster node.
 - `compression` (`bool`, optional): Enable Snappy compression. Default: `False`.
 - `bearer_token` (`str`, optional): Authentication bearer token. Default: `""`.
 - `app_version` (`str`, optional): Application version for compatibility checks. Default: `""`.
-- `transport` (`str`, optional): Transport type, `"socket"` or `"http"`. Default: `"socket"`.
+- `transport` (`str`, optional): Transport type, `"socket"` or `"http"`. Default: `"socket"`. With `"http"`, the node serves the gossip endpoint over HTTP on `bind_addr`; `advertise_addr` defaults to `http://<bind_addr>` (set it to an `https://` URL behind a TLS proxy), and peers join it by `host:port` as with sockets.
 - `compress_min_size` (`int`, optional): Minimum message size for compression. Default: `256`.
 - `gossip_interval` (`str`, optional): Gossip interval duration. Default: `"5s"`.
 - `gossip_max_interval` (`str`, optional): Maximum gossip interval. Default: `"20s"`.
@@ -320,6 +293,43 @@ def on_request(msg):
     return {"status": "ok", "echo": msg["payload"]}
 
 cluster.handle_with_reply(128, on_request)
+```
+
+### `cluster.open_stream(node_id, message_type, data)`
+
+Sends `data` to the node's `handle_stream()` handler and returns a stream to read the reply from. Unlike `send_request()`, the reply is not limited to one packet: use streams for files, state transfers and other bulk data.
+
+The stream has `read(size=-1)` and `readline()`, which return `bytes` (`b''` at the end), and `close()`. Use it in a `with` statement to close it automatically. An error raised by the handler is raised by the read that reaches it.
+
+### `cluster.handle_stream(message_type, handler)`
+
+Registers `handler(msg, writer)` for `open_stream()` requests. `msg` is the same dict `handle()` receives. Write the reply with `writer.write(data)`, where `data` is `str` (sent as UTF-8) or `bytes`; returning ends the reply, and raising sends the error to the caller. The writer is only valid while the handler runs.
+
+```python
+import time
+import scriptling.net.gossip as gossip
+
+server = gossip.create(bind_addr="127.0.0.1:17946")
+
+def send_report(msg, writer):
+    for i in range(msg["payload"]["rows"]):
+        writer.write(f"row {i}\n")
+
+server.handle_stream(300, send_report)
+server.start()
+
+client = gossip.create(bind_addr="127.0.0.1:17947")
+client.start()
+client.join(["127.0.0.1:17946"])
+while client.get_node(server.node_id()) is None:
+    time.sleep(0.05)
+
+with client.open_stream(server.node_id(), 300, {"rows": 3}) as stream:
+    print(stream.readline())   # b'row 0\n'
+    print(stream.read())       # b'row 1\nrow 2\n'
+
+client.stop()
+server.stop()
 ```
 
 ### `cluster.unhandle(message_type)`
@@ -543,168 +553,6 @@ Deletes a metadata key.
 
 **Returns:** `None`
 
-### `cluster.create_node_group(criteria, on_node_added=None, on_node_removed=None)`
-
-Creates a metadata-criteria-based node group. The group automatically tracks nodes whose metadata matches the criteria.
-
-**Parameters:**
-- `criteria` (`dict`): Metadata key-value pairs to match. Use `"*"` to match any value, or `"~value"` to match values containing `value`.
-- `on_node_added` (`callable`, optional): Function called as `on_node_added(node_dict)` when a node joins the group. Default: `None`.
-- `on_node_removed` (`callable`, optional): Function called as `on_node_removed(node_dict)` when a node leaves the group. Default: `None`.
-
-**Returns:** `NodeGroup`: a node group object.
-
-```python
-workers = cluster.create_node_group(
-    criteria={"role": "worker"},
-    on_node_added=lambda n: print(f"Worker joined: {n['id']}")
-)
-print(f"Workers: {workers.count()}")
-workers.send_to_peers(128, {"task": "process"})
-workers.close()
-```
-
-### `cluster.create_leader_election(check_interval="1s", leader_timeout="3s", heartbeat_msg_type=65, quorum_percentage=60, metadata_criteria=None)`
-
-Creates a leader election manager with quorum-based election.
-
-**Parameters:**
-- `check_interval` (`str`, optional): Duration between leader checks. Default: `"1s"`.
-- `leader_timeout` (`str`, optional): Duration without a heartbeat before the leader is considered lost. Default: `"3s"`.
-- `heartbeat_msg_type` (`int`, optional): Message type for heartbeats, from the reserved (`< 128`) range. Default: `65`.
-- `quorum_percentage` (`int`, optional): Percentage of nodes required for quorum, `1`-`100`. Default: `60`.
-- `metadata_criteria` (`dict`, optional): Metadata criteria to limit eligible nodes. Default: `None` (all nodes eligible).
-
-**Returns:** `LeaderElection`: a leader election object.
-
-```python
-election = cluster.create_leader_election(
-    quorum_percentage=51,
-    metadata_criteria={"role": "leader-eligible"}
-)
-
-election.on_event("became_leader", lambda e, n: print("I'm leader!"))
-election.on_event("stepped_down", lambda e, n: print("Stepped down"))
-election.start()
-```
-
-### `node_group.nodes()`
-
-Gets all nodes currently in the group.
-
-**Parameters:** None
-
-**Returns:** `list`: list of node dicts.
-
-### `node_group.contains(node_id)`
-
-Checks if a node is in the group.
-
-**Parameters:**
-- `node_id` (`str`): Node UUID to check.
-
-**Returns:** `bool`
-
-### `node_group.count()`
-
-Gets the number of nodes in the group.
-
-**Parameters:** None
-
-**Returns:** `int`
-
-### `node_group.send_to_peers(message_type, data, reliable=False)`
-
-Sends a message to all peers in the group.
-
-**Parameters:**
-- `message_type` (`int`): Message type. Must be `>= 128`.
-- `data` (`str`, `int`, `float`, `list`, or `dict`): Message payload.
-- `reliable` (`bool`, optional): Use reliable transport. Default: `False`.
-
-**Returns:** `None`
-
-### `node_group.close()`
-
-Closes the group and releases resources.
-
-**Parameters:** None
-
-**Returns:** `None`
-
-### `leader_election.start()`
-
-Starts the election process.
-
-**Parameters:** None
-
-**Returns:** `None`
-
-### `leader_election.stop()`
-
-Stops the election process.
-
-**Parameters:** None
-
-**Returns:** `None`
-
-### `leader_election.is_leader()`
-
-Checks if this node is the current leader.
-
-**Parameters:** None
-
-**Returns:** `bool`
-
-```python
-if election.is_leader():
-    print("Performing leader-only tasks")
-```
-
-### `leader_election.has_leader()`
-
-Checks if a leader is currently elected.
-
-**Parameters:** None
-
-**Returns:** `bool`
-
-### `leader_election.get_leader_id()`
-
-Gets the current leader's node ID.
-
-**Parameters:** None
-
-**Returns:** `str`
-
-### `leader_election.send_to_peers(message_type, data, reliable=False)`
-
-Sends a message to all eligible peers (those matching `metadata_criteria`, if set).
-
-**Parameters:**
-- `message_type` (`int`): Message type. Must be `>= 128`.
-- `data` (`str`, `int`, `float`, `list`, or `dict`): Message payload.
-- `reliable` (`bool`, optional): Use reliable transport. Default: `False`.
-
-**Returns:** `None`
-
-### `leader_election.on_event(event_type, handler)`
-
-Registers a handler for a leader election event.
-
-**Parameters:**
-- `event_type` (`str`): One of `"elected"`, `"lost"`, `"became_leader"`, `"stepped_down"`.
-- `handler` (`callable`): Function called when the event fires.
-
-**Returns:** `None`
-
-```python
-election.on_event("became_leader", lambda e, n: print("I became the leader!"))
-election.on_event("stepped_down", lambda e, n: print("I stepped down"))
-election.on_event("elected", lambda e, n: print(f"Leader elected: {n}"))
-election.on_event("lost", lambda e, n: print("Leader lost"))
-```
-
 ## Security Considerations
 
 This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
@@ -793,52 +641,6 @@ for node in cluster.alive_nodes():
     print(f"Reply from {node['id']}: {reply}")
 ```
 
-### Node Groups
-
-```python
-import scriptling.net.gossip as gossip
-
-cluster = gossip.create(bind_addr="127.0.0.1:8000")
-cluster.set_metadata("role", "coordinator")
-cluster.start()
-cluster.join(["127.0.0.1:8001"])
-
-# Create a group that tracks worker nodes
-workers = cluster.create_node_group(
-    criteria={"role": "worker"},
-    on_node_added=lambda n: print(f"Worker online: {n['id']}"),
-    on_node_removed=lambda n: print(f"Worker offline: {n['id']}")
-)
-
-# Send tasks to all workers
-workers.send_to_peers(128, {"task": "process_data"})
-
-print(f"Active workers: {workers.count()}")
-workers.close()
-```
-
-### Leader Election
-
-```python
-import scriptling.net.gossip as gossip
-
-cluster = gossip.create(bind_addr="127.0.0.1:8000")
-cluster.start()
-cluster.join(["127.0.0.1:8001", "127.0.0.1:8002"])
-
-election = cluster.create_leader_election(quorum_percentage=51)
-
-election.on_event("became_leader", lambda e, n: print("I became the leader!"))
-election.on_event("stepped_down", lambda e, n: print("I stepped down"))
-election.on_event("elected", lambda e, n: print(f"Leader elected: {n}"))
-election.on_event("lost", lambda e, n: print("Leader lost"))
-
-election.start()
-
-if election.is_leader():
-    print("Performing leader-only tasks")
-```
-
 ### Encrypted Cluster
 
 ```python
@@ -860,8 +662,6 @@ cluster.join(["10.0.0.1:8000"])
 - `reliable=True` uses TCP for guaranteed delivery.
 - Metadata is eventually consistent across the cluster.
 - Always call `stop()` to properly clean up resources.
-- Node group criteria support the `"*"` wildcard and `"~value"` contains matching.
-- Leader election heartbeat message types use the reserved (`< 128`) range.
 
 ## See Also
 

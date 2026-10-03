@@ -27,19 +27,7 @@ brew install paularlott/tap/scriptling
 
 The SQLite, SQL, Valkey and BadgerDB database plugins are compiled in.
 
-Prefer a leaner binary? `scriptling-slim` is the same CLI without them
-(mutually exclusive with `scriptling`); the drivers can still be loaded
-at runtime from their own formula:
-
-```bash
-brew install paularlott/tap/scriptling-slim
-brew install paularlott/tap/scriptling-plugins
-export SCRIPTLING_PLUGIN_DIR="$(brew --prefix)/opt/scriptling-plugins/libexec/plugins"
-```
-
-Release zips carry the binary named plainly `scriptling` whether default or slim.
-
-See [Plugins](https://scriptling.dev/okf/scriptling-docs/plugins.md) for how plugins load and the [database reference](https://scriptling.dev/okf/scriptling-libraries/databases.md) for the APIs.
+A smaller build without them is available: see [Slim Build](#slim-build).
 
 ### GitHub Releases
 
@@ -121,9 +109,22 @@ The same startup script can initialize a Model Context Protocol server; tools ar
 scriptling --server :8000 --mcp-tools ./tools setup.py
 ```
 
+## Slim Build
+
+`scriptling-slim` is the same CLI without the compiled-in database plugins (it is mutually exclusive with `scriptling`); the drivers can still be loaded at runtime from their own formula:
+
+```bash
+brew install paularlott/tap/scriptling-slim
+brew install paularlott/tap/scriptling-plugins
+export SCRIPTLING_PLUGIN_DIR="$(brew --prefix)/opt/scriptling-plugins/libexec/plugins"
+```
+
+Release zips name the binary `scriptling` whether default or slim. See [Plugins](https://scriptling.dev/okf/scriptling-docs/plugins.md) for how plugins load and the [database reference](https://scriptling.dev/okf/scriptling-libraries/databases.md) for the APIs.
+
 ## Next Steps
 
 - [Language Guide](https://scriptling.dev/okf/scriptling-reference/scriptling-reference.md) - Learn the complete language syntax
 - [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Explore available libraries and APIs
 - [CLI Guide](https://scriptling.dev/okf/scriptling-docs/cli.md) - Full command-line interface documentation
+- [Error Handling](https://scriptling.dev/okf/scriptling-reference/error-handling.md) - try/except, raise, and exception types
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security best practices

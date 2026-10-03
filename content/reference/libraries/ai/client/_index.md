@@ -11,6 +11,11 @@ aliases:
 
 The AI Client is the primary interface for making API calls to AI providers: OpenAI, Claude, Gemini, Ollama, Z AI, and Mistral. Create a client with `ai.Client()`, then call methods like `completion()`, `embedding()`, or `response_create()` on it.
 
+**In this section**
+
+- [Streaming Completions](streaming/): `completion_stream()` and the `ChatStream` object.
+- [Responses API](responses/): `response_create()`, `response_stream()`, `response_get()`, `response_cancel()`, `response_delete()`, `response_compact()`, and the `ResponseStream` object.
+
 ## Available Functions
 
 | Function | Description |
@@ -22,19 +27,19 @@ The AI Client is the primary interface for making API calls to AI providers: Ope
 | Method | Description |
 |--------|-------------|
 | `completion(model, messages, **kwargs)` | Chat completion |
-| `completion_stream(model, messages, **kwargs)` | Streaming chat completion |
+| [`completion_stream(model, messages, **kwargs)`](streaming/) | Streaming chat completion |
 | `ask(model, messages, **kwargs)` | Quick completion returning text directly |
 | `completion_parallel(model, messages_list, **kwargs)` | Concurrent completions |
 | `ask_parallel(model, messages_list, **kwargs)` | Concurrent ask completions |
 | `Pipeline(model, **kwargs)` | Streaming completion pipeline |
 | `embedding(model, input)` | Create embedding vectors |
 | `models()` | List available models |
-| `response_create(model, input, **kwargs)` | Create a Responses API response |
-| `response_get(id)` | Get a response by ID |
-| `response_stream(model, input, **kwargs)` | Stream a Responses API response |
-| `response_cancel(id)` | Cancel an in-progress response |
-| `response_delete(id)` | Delete a response by ID |
-| `response_compact(id)` | Compact a response (remove reasoning) |
+| [`response_create(model, input, **kwargs)`](responses/) | Create a Responses API response |
+| [`response_get(id)`](responses/) | Get a response by ID |
+| [`response_stream(model, input, **kwargs)`](responses/) | Stream a Responses API response |
+| [`response_cancel(id)`](responses/) | Cancel an in-progress response |
+| [`response_delete(id)`](responses/) | Delete a response by ID |
+| [`response_compact(id)`](responses/) | Compact a response (remove reasoning) |
 
 ## Constants
 
@@ -166,48 +171,6 @@ tools.add("read_file", "Read a file", {"path": "string"}, lambda args: os.read_f
 
 schemas = tools.build()
 response = client.completion("gpt-4", [{"role": "user", "content": "What time is it?"}], tools=schemas)
-```
-
-### `client.completion_stream(model, messages, **kwargs)`
-
-Creates a streaming chat completion using this client's configuration.
-
-**Parameters:**
-
-- `model` (`str`): Model identifier (e.g. `"gpt-4"`, `"gpt-3.5-turbo"`).
-- `messages` (`str` or `list`): Either a string (user message) or a list of message dicts with `role` and `content` keys.
-- `system_prompt` (`str`, optional): System prompt to use when `messages` is a string.
-- `tools` (`list`, optional): List of tool schema dicts from `ToolRegistry.build()`.
-- `top_p` (`float`, optional): Nucleus sampling threshold (`0.0`-`1.0`).
-- `temperature` (`float`, optional): Sampling temperature (`0.0`-`2.0`).
-- `max_tokens` (`int`, optional): Maximum tokens to generate.
-- `extra_body` (`dict`, optional): Provider-specific fields to merge into the request body.
-- `timeout` (`int`, optional): Overall request timeout in seconds.
-
-**Returns:** `ChatStream`: a stream object with `next()`, `next_timeout()`, `err()`, and `retry()` methods.
-
-```python
-client = ai.Client("", api_key="sk-...")
-stream = client.completion_stream("gpt-4", "Count to 10")
-while True:
-    chunk = stream.next()
-    if chunk is None:
-        break
-    if chunk.choices and len(chunk.choices) > 0:
-        delta = chunk.choices[0].delta
-        if delta.content:
-            print(delta.content, end="")
-print()
-```
-
-With tool calling:
-
-```python
-tools = ai.ToolRegistry()
-tools.add("get_weather", "Get weather for a city", {"city": "string"}, weather_handler)
-schemas = tools.build()
-
-stream = client.completion_stream("gpt-4", [{"role": "user", "content": "What's the weather in Paris?"}], tools=schemas)
 ```
 
 ### `client.ask(model, messages, **kwargs)`
@@ -429,243 +392,6 @@ client = ai.Client("", api_key="sk-...")
 models_response = client.models()
 for model in models_response.data:
     print(model.id)
-```
-
-### `client.response_create(model, input, **kwargs)`
-
-Creates a response using the OpenAI Responses API (newer structured API). It supports background processing, streaming, and compaction.
-
-**Provider support:**
-
-| Provider | Support | Notes |
-|----------|---------|-------|
-| OpenAI | Native | Direct API calls |
-| Claude | Emulated | Transparently emulated via chat completions |
-| Gemini | Emulated | Transparently emulated via chat completions |
-| Ollama / ZAI / Mistral | Emulated | Transparently emulated via chat completions |
-
-**Parameters:**
-
-- `model` (`str`): Model identifier (e.g. `"gpt-4o"`, `"gpt-4"`).
-- `input` (`str` or `list`): Either a string (user message content) or a list of input items (messages).
-- `system_prompt` (`str`, optional): System prompt to use when `input` is a string.
-- `background` (`bool`, optional): If `True`, runs asynchronously and returns immediately with `in_progress` status. Default: `False`.
-- `extra_body` (`dict`, optional): Provider-specific fields to merge into the request body.
-
-**Returns:** `dict`: response object with `id`, `status`, `output`, `usage`, etc.
-
-```python
-client = ai.Client("", api_key="sk-...")
-response = client.response_create("gpt-4o", "Hello!")
-print(response.output)
-
-# Background processing
-response = client.response_create("gpt-4o", "What is AI?", background=True)
-print(response.status)  # "queued" or "in_progress"
-import time
-while response.status in ["queued", "in_progress"]:
-    time.sleep(0.5)
-    response = client.response_get(response.id)
-print(response.status)  # "completed"
-print(response.output)
-
-# Full input array (Responses API format)
-response = client.response_create("gpt-4o", [
-    {"type": "message", "role": "user", "content": "Hello!"}
-])
-```
-
-### `client.response_get(id)`
-
-Retrieves a previously created response by its ID.
-
-**Parameters:**
-
-- `id` (`str`): Response ID.
-
-**Returns:** `dict`: response object with `id`, `status`, `output`, `usage`, etc.
-
-```python
-client = ai.Client("", api_key="sk-...")
-response = client.response_get("resp_123")
-print(response.status)
-```
-
-### `client.response_stream(model, input, **kwargs)`
-
-Streams a response using the OpenAI Responses API, returning a `ResponseStream` object that yields SSE events.
-
-**Parameters:**
-
-- `model` (`str`): Model identifier (e.g. `"gpt-4o"`, `"gpt-4"`).
-- `input` (`str` or `list`): Either a string (user message content) or a list of input items.
-- `system_prompt` (`str`, optional): System prompt to use when `input` is a string.
-- `extra_body` (`dict`, optional): Provider-specific fields to merge into the request body.
-
-**Returns:** `ResponseStream`: a stream object with a `next()` method.
-
-**Event types:**
-
-| Event type | Key fields |
-|---|---|
-| `response.created` | `response` |
-| `response.output_item.added` | `item`, `output_index` |
-| `response.output_text.delta` | `delta`, `item_id`, `output_index`, `content_index` |
-| `response.output_text.done` | `text`, `item_id`, `output_index`, `content_index` |
-| `response.completed` | `response` (full ResponseObject) |
-| `error` | `message` |
-
-```python
-client = ai.Client("", api_key="sk-...")
-
-stream = client.response_stream("gpt-4o", "Count to 5")
-while True:
-    event = stream.next()
-    if event is None:
-        break
-    if event.type == "response.output_text.delta":
-        print(event.delta, end="")
-print()
-```
-
-### `client.response_cancel(id)`
-
-Cancels a currently in-progress response.
-
-**Parameters:**
-
-- `id` (`str`): Response ID to cancel.
-
-**Returns:** `dict`: cancelled response object.
-
-```python
-client = ai.Client("", api_key="sk-...")
-response = client.response_cancel("resp_123")
-```
-
-### `client.response_delete(id)`
-
-Deletes a response by ID, removing it from storage.
-
-**Parameters:**
-
-- `id` (`str`): Response ID to delete.
-
-**Returns:** `None`
-
-```python
-client = ai.Client("", api_key="sk-...")
-client.response_delete("resp_123")
-```
-
-### `client.response_compact(id)`
-
-Compacts a response by removing intermediate reasoning steps, returning a more concise version with only the final output.
-
-**Parameters:**
-
-- `id` (`str`): Response ID to compact.
-
-**Returns:** `dict`: compacted response object with reasoning removed.
-
-```python
-client = ai.Client("", api_key="sk-...")
-response = client.response_create("gpt-4o", "Solve this complex problem: 2+2")
-compacted = client.response_compact(response.id)
-print(compacted.output)  # Output without reasoning blocks
-```
-
-## ChatStream Class
-
-Returned by `client.completion_stream()`. Iterates over response chunks from a streaming chat completion.
-
-### `stream.next()`
-
-Advances to the next response chunk and returns it.
-
-**Returns:** `dict`: the next response chunk, or `None` if the stream is complete.
-
-```python
-client = ai.Client("", api_key="sk-...")
-stream = client.completion_stream("gpt-4", [{"role": "user", "content": "Hello!"}])
-while True:
-    chunk = stream.next()
-    if chunk is None:
-        break
-    if chunk.choices and len(chunk.choices) > 0:
-        delta = chunk.choices[0].delta
-        if delta.content:
-            print(delta.content, end="")
-```
-
-### `stream.next_timeout(timeout)`
-
-Advances to the next response chunk, but stops waiting after `timeout` seconds.
-
-**Parameters:**
-
-- `timeout` (`int`): Timeout in seconds.
-
-**Returns:** `dict`: the next response chunk, `{"timed_out": True}` if the timeout elapsed, or `None` if the stream is complete.
-
-```python
-chunk = stream.next_timeout(30)
-if chunk and chunk.get("timed_out"):
-    print("Stream stalled")
-```
-
-### `stream.err()`
-
-Returns the error that caused the stream to stop, or `None` if there was no error. A cancellation error indicates the stream was cancelled (e.g. the user pressed Esc).
-
-**Returns:** `str` or `None`: error message, or `None` if no error.
-
-```python
-err = stream.err()
-if err:
-    print("Stream error:", err)
-```
-
-### `stream.retry()`
-
-Returns retry metadata if the connection was retried before streaming began, or `None` if no retries occurred. Blocks until retry metadata is available.
-
-**Returns:** `dict` or `None`: retry metadata with keys:
-
-- `attempts` (`int`): Total number of connection attempts (including the initial one).
-- `rate_limit_hit` (`bool`): Whether a 429 rate limit error was encountered.
-- `total_backoff` (`float`): Total seconds spent waiting between retries.
-
-```python
-client = ai.Client("", api_key="sk-...", max_retries=3)
-stream = client.completion_stream("gpt-4", "Hello!")
-result = ai.collect_stream(stream)
-
-retry = stream.retry()
-if retry:
-    print(f"Retried {retry['attempts']}x, backoff: {retry['total_backoff']:.1f}s")
-```
-
-## ResponseStream Class
-
-Returned by `client.response_stream()`. Iterates over SSE events from the Responses API.
-
-### `stream.next()`
-
-Advances to the next SSE event and returns it as a dict, or `None` when the stream is complete.
-
-**Returns:** `dict`: event dict with a `type` field plus event-specific fields, or `None` if complete.
-
-```python
-client = ai.Client("", api_key="sk-...")
-stream = client.response_stream("gpt-4o", "Hello!")
-while True:
-    event = stream.next()
-    if event is None:
-        break
-    if event.type == "response.output_text.delta":
-        print(event.delta, end="")
-print()
 ```
 
 ## Message Format

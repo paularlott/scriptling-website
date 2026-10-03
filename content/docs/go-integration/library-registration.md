@@ -2,7 +2,7 @@
 title: Library Registration
 description: How to register built-in libraries when embedding Scriptling in Go.
 tags: [go-integration, embedding, go]
-weight: 15
+weight: 2
 ---
 
 When embedding Scriptling in a Go application, you control which libraries are available to scripts. Libraries are not loaded unless you explicitly register them.
@@ -381,7 +381,7 @@ plugin.RegisterLibraries(p, manager)  // scriptling.plugin, plus plugin.<name> f
 |-----------|-------------|------|
 | `scriptling.plugin` | `plugin` | `plugin.RegisterLibraries(p, manager)` |
 
-See [Plugins](../plugins/) for the full plugin embedding guide.
+See [Plugin Manager](/docs/plugins/host-integration/) for the full plugin embedding guide.
 
 ## Security Considerations
 

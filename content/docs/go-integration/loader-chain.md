@@ -113,6 +113,8 @@ loader := libloader.NewFilesystem("/app/libs",
 )
 ```
 
+Sources read from disk are cached for the whole process and shared by every `FilesystemLoader`, so creating a new interpreter (and loader) per request does not re-read unchanged files. Each import revalidates its file with a single `stat`: a file that has been edited, replaced or deleted is read again, and a file modified in the last two seconds is never cached. The cache holds at most 32 MiB of source by default; once full, further files are simply read from disk on each import. Change the limit with `libloader.SetSourceCacheMaxBytes(n)` (0 removes it), and call `libloader.ClearSourceCache()` to drop every cached source.
+
 ### MemoryLoader
 
 Load libraries from an in-memory map (useful for testing):

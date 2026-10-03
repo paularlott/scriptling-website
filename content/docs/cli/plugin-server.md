@@ -141,140 +141,17 @@ decorators.
 
 ## API
 
-### `runtime.plugin.serve(name, version="", description="", *, metadata=None)`
+The full parameter reference for each call is on the [scriptling.runtime.plugin](/reference/libraries/runtime/plugin/) library page:
 
-Declare this script as a Scriptling plugin server.
+| Function | Purpose |
+|----------|---------|
+| `serve(name, version="", description="", *, metadata=None)` | Declare the plugin identity; clients import it as `plugin.<name>`. |
+| `register_function(name, handler=None)` | Expose a function; also usable as a decorator. Handlers receive positional arguments, run on a fresh evaluator per call, and may invoke client-supplied callbacks (stdio only). |
+| `register_constant(name, value)` | Expose a JSON-serialisable constant, read by clients as a plain attribute. |
+| `register_class(handler)` | Expose a class; the server handles `object.new`, `object.call_method`, and `object.destroy` (calling `__del__`). Also usable as a decorator. |
+| `register_fetcher(scheme, read_handler, glob_handler=None)` | Serve sources on demand; see [Serving sources](#serving-sources-fetchers) below. |
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `name` | str | Library name. Clients import it as `plugin.<name>`. |
-| `version` | str | Optional version string (e.g. `"1.0.0"`). |
-| `description` | str | Optional human-readable description. |
-| `metadata` | dict | Optional opaque, host-defined manifest data carried verbatim in the handshake — the channel for a host to learn plugin-specific declarations without running plugin code. Keep it static. |
-
-Must be called before `runtime.start_server()`. A warning is printed to stderr
-if called after the server has started.
-
-### `runtime.plugin.register_function(name, handler=None)`
-
-Register a function for the plugin server. Supports three forms:
-
-| Form | Syntax | Description |
-|------|--------|-------------|
-| Named decorator | `@plugin.register_function("add")` | Uses the given name |
-| Bare decorator | `@plugin.register_function` | Uses the function's own name |
-| Imperative | `register_function("add", "handlers.add")` | String reference |
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `name` | str | Function name exposed to plugin clients. |
-| `handler` | str | Handler as `"library.function"` string (imperative only). |
-
-The handler receives individual positional arguments decoded from the plugin
-transport: not a raw params blob like `runtime.jsonrpc` handlers do. Each call
-runs on a fresh, isolated evaluator (the same concurrency model as HTTP and
-JSON-RPC handlers).
-
-**Callbacks:** If a client passes a callable (function, lambda, or builtin) as
-an argument, the handler receives it as a callable object and can invoke it with
-normal call syntax:
-
-```python
-# handlers.py
-def apply(fn, x):
-    return fn(x)   # fn is a callback: calling it sends callback.call back to the client
-```
-
-```python
-# client script
-import plugin.myservice
-result = plugin.myservice.apply(lambda x: x * 2, 5)  # returns 10
-```
-
-Callbacks are only valid during the lifetime of the handler call and are only
-supported over the **stdio transport**. HTTP connections are request/response
-only and cannot carry server→client callback calls.
-
-Must be called before `runtime.start_server()`.
-
-### `runtime.plugin.register_fetcher(scheme, read_handler, glob_handler=None)`
-
-Register a fetcher so the host can ask this peer for files on demand — how a script peer serves a host's declared assets (an icon, a logo) from strings or bytes inside the script itself, with no asset files on disk. The scriptling equivalent of a Go peer's embedded assets.
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `scheme` | str | The source scheme to serve, e.g. `"notes"` (the host asks for `notes://<path>`). Not `http`, `https` or `file`. |
-| `read_handler` | str | Handler ref called as `fn(source, path)`. Return the contents (string or bytes); `None` is a miss (not found); any other error fails the read. |
-| `glob_handler` | str | Optional ref called as `fn(source, pattern)`, returning a list of `{name, is_dir}` dicts. Without it the fetcher reports no glob matches. |
-
-```python
-# setup script
-import scriptling.runtime.plugin as plugin_srv
-
-plugin_srv.register_fetcher("notes", "impl.fetch_read")
-
-# impl.py
-ASSETS = {
-    "assets/icon.svg": "<svg ...>",
-}
-
-def fetch_read(source, path):
-    return ASSETS.get(path)   # None answers a miss
-```
-
-A host reads declared assets peer-first and falls back to disk on a miss, so a scriptling peer can be a single-file plugin. Must be called before `runtime.start_server()`.
-
-### `runtime.plugin.register_constant(name, value)`
-
-Register a constant exported by the plugin server.
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `name` | str | Constant name exposed to plugin clients. |
-| `value` | any | Any JSON-serialisable value: `bool`, `int`, `float`, `str`, `list`, `dict`, or `None`. |
-
-Constants are included in the `scriptling.handshake` schema and delivered to
-clients as part of the plugin library. Clients read them as plain attributes:
-
-```python
-import plugin.myservice
-print(plugin.myservice.VERSION)    # "1.0.0"
-print(plugin.myservice.MAX_RETRIES)  # 5
-```
-
-Must be called before `runtime.start_server()`.
-
-### `runtime.plugin.register_class(handler)`
-
-Register a class exported by the plugin server. Supports two forms:
-
-| Form | Syntax | Description |
-|------|--------|-------------|
-| Bare decorator | `@plugin.register_class` | Uses the class name |
-| Imperative | `register_class("handlers.Config")` | String reference |
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `handler` | str | Class as `"library.ClassName"` string (imperative only). |
-
-The exposed class name is taken from the last segment of `handler`
-(e.g. `"mymodule.Config"` → `"Config"`). The server handles the complete
-object lifecycle:
-
-- **`object.new`**: calls the class constructor (`__init__`), stores the
-  instance server-side, returns a remote handle to the client.
-- **`object.call_method`**: calls a method on the stored instance.
-- **`object.destroy`**: calls `__del__` (if defined) and removes the instance.
-
-Clients use the class as if it were local:
-
-```python
-cfg = plugin.myservice.Config("Hello, ")
-print(cfg.greeting("world"))   # "Hello, world"
-```
-
-The class and its method closures are resolved once at server startup and held
-for the lifetime of the server. Must be called before `runtime.start_server()`.
+All registration calls must happen before `runtime.start_server()`.
 
 ## Serving sources (fetchers)
 

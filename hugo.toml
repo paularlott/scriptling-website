@@ -20,10 +20,10 @@ disableKinds = ['taxonomy', 'term']
       url = '/'
     [[params.navigation.header]]
       name = 'Docs'
-      url = '/docs'
+      url = '/docs/'
     [[params.navigation.header]]
       name = 'Reference'
-      url = '/reference'
+      url = '/reference/'
     [[params.navigation.header]]
       name = 'Changelog'
       url = '/docs/changelog/'

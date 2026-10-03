@@ -54,14 +54,26 @@ while IFS= read -r line; do
 done
 ```
 
-Make it executable and run it:
+Save it as `plugins/hello-bash`, then make it executable and run it:
 
 ```bash
 chmod +x plugins/hello-bash
 scriptling --plugin-dir ./plugins -c 'import plugin.hello; print(plugin.hello.greet("Ada"))'
 ```
 
+Output:
+
+```text
+Hello, Ada
+```
+
 The handshake declares the short name `hello`; Scriptling imports it as `plugin.hello`.
+
+The host sends `scriptling.handshake` first. The plugin returns protocol metadata and a schema. After that, generated wrappers call `function.call` with transported values:
+
+```json
+{"type":"string","value":"Ada"}
+```
 
 ## Protocol Methods
 

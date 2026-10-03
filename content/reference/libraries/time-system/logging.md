@@ -2,10 +2,11 @@
 title: logging
 description: Python-style logging, backed by structured slog-based loggers.
 tags: [libraries, logging]
-weight: 4
+weight: 5
 aliases:
   - /reference/libraries/extlib/logging/
   - /reference/libraries/logging/
+  - /reference/libraries/http-process/logging/
 ---
 
 The `logging` library provides Python-style logging functionality, compatible with the basic Python `logging` interface. It uses the [paularlott/logger](https://github.com/paularlott/logger) library under the hood with `slog` integration. Reach for it instead of `print()` whenever a script's output needs levels, structured output, or to flow through the embedder's own logging pipeline.
@@ -220,4 +221,4 @@ Log messages integrate with Scriptling's output capture system alongside `print(
 ## See Also
 
 - [sys](../sys/): Access argv and stdin
-- [secrets](../secrets/): Generate tokens, separate from logging concerns
+- [secrets](../../math-numbers/secrets/): Generate tokens, separate from logging concerns

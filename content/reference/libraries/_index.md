@@ -8,20 +8,23 @@ aliases:
   - /reference/libraries/scriptling/
 ---
 
-Scriptling provides 60+ libraries organized by capability. Availability depends on the binary, execution mode, and host registration; it is not safe to assume every library is present.
+Scriptling provides 90+ libraries organized by capability. Availability depends on the binary, execution mode, and host registration; it is not safe to assume every library is present.
 
-## Standard Libraries
+Know the import name? Jump to the [A–Z list of every library](#all-libraries-az).
 
-- [Data Formats](data-formats/): JSON, YAML, TOML
-- [Text Processing](text-processing/): Regex, strings, HTML, diffing
-- [Math & Numbers](math-numbers/): Math, random, statistics, hashing, UUID
-- [Collections & Iteration](collections-iteration/): Collections, itertools, functools
-- [Time & System](time-system/): Time, datetime, I/O, platform, URL handling
+## Python-Style Libraries
 
-## Extended Libraries
+Modules that mirror Python's standard library, grouped by subject:
 
-- [File System](filesystem/): OS, paths, binary I/O, glob
-- [HTTP & Process](http-process/): HTTP requests, subprocesses, system, logging, secrets
+- [Data Formats](data-formats/): json, yaml, toml, msgpack, bytes
+- [Text Processing](text-processing/): re, string, html, html.parser, difflib, shlex, textwrap, io
+- [Math & Numbers](math-numbers/): math, random, statistics, base64, hashlib, hmac, uuid, secrets
+- [Collections & Iteration](collections-iteration/): collections, itertools, functools, contextlib
+- [Time & System](time-system/): time, datetime, platform, sys, logging
+- [File System](filesystem/): os, os.path, pathlib, glob, fs, shutil, tempfile, tarfile, zipfile
+- [HTTP & Process](http-process/): requests, urllib.parse, subprocess
+
+The *standard* set (json, re, time, datetime, math, random, statistics, base64, hashlib, hmac, uuid, string, html, textwrap, difflib, io, platform, urllib.parse, collections, itertools, functools, contextlib, msgpack) has no access to the host and is registered together by `stdlib.RegisterAll`. The rest are *extended* libraries, registered one by one because they reach the file system, network, processes or host: see [Availability](#availability).
 
 ## Scriptling Libraries
 
@@ -32,12 +35,18 @@ The `scriptling.*` libraries provide functionality beyond Python's standard libr
 - [MCP](mcp/): MCP clients and tool authoring
 - [Messaging](messaging/): Telegram, Discord, Slack, console
 - [Networking](networking/): Gossip, multicast, unicast, DNS, WebSocket
-- [Package](package/): Read files and metadata from loaded app/plugin bundles
-- [Plugin](plugin/): Control library for executable plugins
+- [Packages](package/): Read files and metadata from loaded app/plugin bundles
+- [Plugins](plugin/): Control library for executable plugins
 - [Provisioning](provisioning/): File and fetch provisioning
 - [Runtime](runtime/): Background tasks, HTTP, JSON-RPC, MCP, KV, sync, sandbox
-- [Template](template/): Go-powered HTML and text templates
+- [Templates](template/): Go-powered HTML and text templates
 - [Utilities](utilities/): Console, containers, Nomad, grep, find, CSV, XML, secrets, and more
+
+## All Libraries A–Z {#all-libraries-az}
+
+Every library by the name you import it as. Use the [cheat sheet](cheat-sheet/) for quick examples of the common ones.
+
+{{< library-index >}}
 
 ## Availability
 

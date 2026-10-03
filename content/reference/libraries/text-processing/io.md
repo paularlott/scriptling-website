@@ -2,11 +2,12 @@
 title: io
 description: In-memory text I/O streams, providing StringIO as a buffer that behaves like a text file.
 tags: [libraries, text]
-weight: 3
+weight: 8
 
 aliases:
   - /reference/libraries/stdlib/io/
   - /reference/libraries/io/
+  - /reference/libraries/time-system/io/
 ---
 
 The `io` library provides in-memory I/O streams. It currently exposes `StringIO`, an in-memory string buffer that behaves like a text file: useful for building up strings incrementally or capturing output that would otherwise go to stdout.
@@ -250,6 +251,6 @@ print(buf.getvalue())  # a,b,c!
 
 ## See Also
 
-- [datetime](../datetime/) - Date and time types
-- [time](../time/) - Time access and conversions
-- [urllib](../urllib/) - URL parsing and encoding
+- [datetime](../../time-system/datetime/) - Date and time types
+- [time](../../time-system/time/) - Time access and conversions
+- [urllib](../../http-process/urllib/) - URL parsing and encoding

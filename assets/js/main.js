@@ -1,202 +1,5 @@
-import FlexSearch from 'flexsearch';
+import SiteSearch from './search.js';
 import MeshAnimation from './mesh-animation.js';
-
-class SiteSearch {
-  constructor() {
-    this.index = null;
-    this.documents = [];
-    this.searchTimeout = null;
-    this.selectedIndex = -1;
-    this.results = [];
-
-    this.initElements();
-    this.loadSearchIndex();
-    this.bindEvents();
-  }
-
-  initElements() {
-    this.searchBtn = document.getElementById('search-btn');
-    this.searchModal = document.getElementById('search-modal');
-    this.searchClose = document.getElementById('search-close');
-    this.searchInput = document.getElementById('search-input');
-    this.searchResults = document.getElementById('search-results');
-    this.searchResultsList = document.getElementById('search-results-list');
-    this.searchEmpty = document.getElementById('search-empty');
-    this.searchBackdrop = this.searchModal.querySelector('.fixed.inset-0.bg-black\\/30');
-  }
-
-  async loadSearchIndex() {
-    try {
-      const response = await fetch('/index.json');
-      const data = await response.json();
-
-      this.index = new FlexSearch.Index({
-        tokenize: 'forward',
-        resolution: 9,
-        minlength: 2,
-        optimize: true,
-        fastupdate: true
-      });
-
-      this.documents = data;
-
-      // Index discovery metadata as well as the full page text.
-      data.forEach((doc, i) => {
-        const content = [
-          doc.title,
-          doc.description,
-          doc.content,
-          doc.section,
-          ...(doc.tags || []),
-          ...(doc.aliases || [])
-        ].filter(Boolean).join(' ');
-        this.index.add(i, content);
-      });
-    } catch (error) {
-      console.error('Error loading search index:', error);
-    }
-  }
-
-  bindEvents() {
-    // Open search
-    this.searchBtn.addEventListener('click', () => this.openSearch());
-
-    // Close search
-    this.searchClose.addEventListener('click', () => this.closeSearch());
-    this.searchBackdrop.addEventListener('click', () => this.closeSearch());
-
-    // Search input
-    this.searchInput.addEventListener('input', (e) => this.handleInput(e));
-    this.searchInput.addEventListener('keydown', (e) => this.handleKeydown(e));
-
-    // Global keyboard shortcuts
-    document.addEventListener('keydown', (e) => this.handleGlobalKeydown(e));
-  }
-
-  handleGlobalKeydown(e) {
-    // Ctrl+K or Cmd+K to open search
-    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-      e.preventDefault();
-      this.openSearch();
-      return;
-    }
-
-    // Escape to close
-    if (e.key === 'Escape' && !this.searchModal.classList.contains('hidden')) {
-      this.closeSearch();
-    }
-  }
-
-  handleKeydown(e) {
-    if (this.results.length === 0) return;
-
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        this.selectedIndex = Math.min(this.selectedIndex + 1, this.results.length - 1);
-        this.updateSelection();
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        this.selectedIndex = Math.max(this.selectedIndex - 1, -1);
-        this.updateSelection();
-        break;
-      case 'Enter':
-        e.preventDefault();
-        if (this.selectedIndex >= 0) {
-          window.location.href = this.results[this.selectedIndex].item.href;
-        }
-        break;
-    }
-  }
-
-  handleInput(e) {
-    clearTimeout(this.searchTimeout);
-    this.searchTimeout = setTimeout(() => {
-      this.performSearch(e.target.value);
-    }, 150);
-  }
-
-  performSearch(query) {
-    if (!query.trim() || !this.index) {
-      this.hideResults();
-      return;
-    }
-
-    const searchResults = this.index.search(query, { limit: 12 });
-    this.results = searchResults.map(id => ({ item: this.documents[id] }));
-    this.selectedIndex = -1;
-
-    if (this.results.length > 0) {
-      this.renderResults(query);
-    } else {
-      this.showEmpty();
-    }
-  }
-
-  renderResults(query) {
-    this.searchResultsList.innerHTML = this.results.map((result, index) => {
-      const item = result.item;
-      const snippet = item.description || item.content || '';
-      const label = [item.section, item.kind].filter(Boolean).join(' · ') || 'Page';
-      return `
-        <a href="${item.href}" class="search-result block p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600 ${index === this.selectedIndex ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700' : ''}" data-index="${index}">
-          <div class="flex items-start space-x-3">
-            <div class="flex-1 min-w-0">
-              <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">${this.highlightText(item.title, query)}</h4>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">${this.highlightText(snippet, query)}</p>
-              <div class="mt-2 text-xs capitalize text-gray-400 dark:text-gray-500">${label}</div>
-            </div>
-          </div>
-        </a>
-      `;
-    }).join('');
-
-    this.searchResults.classList.remove('hidden');
-    this.searchEmpty.classList.add('hidden');
-  }
-
-  highlightText(text, query) {
-    if (!query) return text;
-    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')})`, 'gi');
-    return text.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-800 rounded p-0">$1</mark>');
-  }
-
-  updateSelection() {
-    const items = this.searchResultsList.querySelectorAll('.search-result');
-    items.forEach((item, index) => {
-      if (index === this.selectedIndex) {
-        item.classList.add('bg-blue-50', 'dark:bg-blue-900/20', 'border-blue-200', 'dark:border-blue-700');
-        item.scrollIntoView({ block: 'nearest' });
-      } else {
-        item.classList.remove('bg-blue-50', 'dark:bg-blue-900/20', 'border-blue-200', 'dark:border-blue-700');
-      }
-    });
-  }
-
-  showEmpty() {
-    this.searchResults.classList.add('hidden');
-    this.searchEmpty.classList.remove('hidden');
-  }
-
-  hideResults() {
-    this.searchResults.classList.add('hidden');
-    this.searchEmpty.classList.add('hidden');
-    this.selectedIndex = -1;
-    this.results = [];
-  }
-
-  openSearch() {
-    this.searchModal.classList.remove('hidden');
-    this.searchInput.focus();
-  }
-
-  closeSearch() {
-    this.searchModal.classList.add('hidden');
-    this.searchInput.value = '';
-    this.hideResults();
-  }
-}
 
 class MobileMenu {
   constructor() {
@@ -235,6 +38,9 @@ class MobileMenu {
       this.mobileMenuBackdrop.classList.add('opacity-100');
       this.mobileMenuSidebar.classList.remove('-translate-x-full');
       this.mobileMenuSidebar.classList.add('translate-x-0');
+      // The drawer is hidden at load, so bring the current page into view now.
+      [...this.mobileMenuSidebar.querySelectorAll('.active-nav-item')].pop()
+        ?.scrollIntoView({ block: 'center' });
     });
   }
 
@@ -508,6 +314,14 @@ class TableOfContents {
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   new SiteSearch();
+
+  // Fonts and images can shift the layout after the browser has jumped to
+  // a #heading, leaving it under the header; jump again once loaded.
+  window.addEventListener('load', () => {
+    if (location.hash.length > 1) {
+      document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView();
+    }
+  }, { once: true });
   new MobileMenu();
   new ThemeToggle();
   imageModalInstance = new ImageModal();

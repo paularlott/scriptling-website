@@ -25,14 +25,15 @@ It is registered as a runtime server surface and is independent of `scriptling.a
 
 | Function | Description |
 |----------|-------------|
-| `serve(name, version="", description="")` | Declare this script as a plugin server |
-| `register_function(name, handler)` | Register a callable function |
+| `serve(name, version="", description="", *, metadata=None)` | Declare this script as a plugin server |
+| `register_function(name, handler=None)` | Register a callable function (also usable as a decorator) |
 | `register_constant(name, value)` | Register a read-only constant |
-| `register_class(handler)` | Register a class with full object lifecycle |
+| `register_class(handler)` | Register a class with full object lifecycle (also usable as a decorator) |
+| `register_fetcher(scheme, read_handler, glob_handler=None)` | Serve sources (such as a host's declared assets) on demand |
 
 ## Functions
 
-### `serve(name, version="", description="")`
+### `serve(name, version="", description="", *, metadata=None)`
 
 Declares this script as a Scriptling plugin server. Must be called before `runtime.start_server()`; a warning is printed to stderr if called after the server has started.
 
@@ -40,6 +41,7 @@ Declares this script as a Scriptling plugin server. Must be called before `runti
 - `name` (`str`): Library name. Clients import it as `plugin.<name>`.
 - `version` (`str`, optional): Version string (e.g. `"1.0.0"`). Default: `""`.
 - `description` (`str`, optional): Human-readable description surfaced in plugin metadata. Default: `""`.
+- `metadata` (`dict`, keyword-only, optional): Opaque, host-defined manifest data carried verbatim in the handshake: the channel for a host to learn plugin-specific declarations without running plugin code. Keep it static. Default: `None`.
 
 **Returns:** `None`
 
@@ -52,7 +54,7 @@ plugin_srv.register_function("add", "handlers.add")
 runtime.start_server()
 ```
 
-### `register_function(name, handler)`
+### `register_function(name, handler=None)`
 
 Registers a function for the plugin server. The handler receives individual positional arguments decoded from the plugin transport: not a raw params blob. Each call runs on a fresh, isolated evaluator (the same concurrency model as `runtime.http` and `runtime.jsonrpc` handlers). Raise an exception from the handler to produce an error response on the client side.
 
@@ -60,9 +62,11 @@ If a client passes a callable (function or lambda) as an argument, the handler r
 
 **Parameters:**
 - `name` (`str`): Function name exposed to plugin clients.
-- `handler` (`str`): Handler as `"library.function"` string.
+- `handler` (`str`, optional): Handler as `"library.function"` string. Omitted when used as a decorator.
 
 **Returns:** `None`
+
+It can also be used as a decorator in a handler library: `@plugin.register_function("add")` uses the given name, and bare `@plugin.register_function` uses the function's own name. See [Decorator Syntax](https://scriptling.dev/okf/scriptling-docs/cli/plugin-server.md#decorator-syntax).
 
 ```python
 # setup.py
@@ -109,9 +113,11 @@ The server handles the complete object lifecycle:
 - **`object.destroy`**: calls `__del__` (if defined) and removes the instance.
 
 **Parameters:**
-- `handler` (`str`): Class as `"library.ClassName"` string.
+- `handler` (`str`): Class as `"library.ClassName"` string. Omitted when used as a decorator.
 
 **Returns:** `None`
+
+It can also be used as a bare decorator, `@plugin.register_class`, which uses the class name. See [Decorator Syntax](https://scriptling.dev/okf/scriptling-docs/cli/plugin-server.md#decorator-syntax).
 
 ```python
 # setup.py
@@ -140,6 +146,36 @@ import plugin.formatter
 t = plugin.formatter.Template("Hello, ")
 print(t.render("world"))    # "Hello, world"
 ```
+
+### `register_fetcher(scheme, read_handler, glob_handler=None)`
+
+Registers a fetcher so the host can ask this peer for files on demand: how a script peer serves a host's declared assets (an icon, a logo) from strings or bytes inside the script itself, with no asset files on disk. The scriptling equivalent of a Go peer's embedded assets. A host reads declared assets peer-first and falls back to disk on a miss, so a scriptling peer can be a single-file plugin. Must be called before `runtime.start_server()`.
+
+**Parameters:**
+- `scheme` (`str`): The source scheme to serve, e.g. `"notes"` (the host asks for `notes://<path>`). Not `http`, `https` or `file`.
+- `read_handler` (`str`): Handler ref called as `fn(source, path)`. Return the contents (string or bytes); `None` is a miss (not found); any other error fails the read.
+- `glob_handler` (`str`, optional): Handler ref called as `fn(source, pattern)`, returning a list of `{name, is_dir}` dicts. Without it the fetcher reports no glob matches. Default: `None`.
+
+**Returns:** `None`
+
+```python
+# setup script
+import scriptling.runtime.plugin as plugin_srv
+
+plugin_srv.register_fetcher("notes", "impl.fetch_read")
+```
+
+```python
+# impl.py
+ASSETS = {
+    "assets/icon.svg": "<svg ...>",
+}
+
+def fetch_read(source, path):
+    return ASSETS.get(path)   # None answers a miss
+```
+
+See [Serving sources (fetchers)](https://scriptling.dev/okf/scriptling-docs/cli/plugin-server.md#serving-sources-fetchers) for inlined-asset and from-disk patterns, and [Plugin Fetchers](https://scriptling.dev/okf/scriptling-docs/plugins/fetchers.md) for the fetcher contract.
 
 ## Transports
 
@@ -235,21 +271,12 @@ while runtime.server_running():
 
 ## Comparison with Go Plugins
 
-| | Go plugin | Scriptling plugin server |
-|---|---|---|
-| **Language** | Go | Scriptling (Python-like) |
-| **Distribution** | Compiled binary | Script file |
-| **Handler isolation** | Shared process state | Fresh evaluator per call |
-| **Type safety** | Typed via `FunctionBuilder` | Duck-typed |
-| **Functions** | `RegisterFunc` | `register_function` |
-| **Constants** | `Constant` | `register_constant` |
-| **Classes** | `RegisterClass` | `register_class` |
-| **Callbacks** | stdio and HTTP | stdio only |
+See [Plugin Server Mode: Comparison with Go Plugins](https://scriptling.dev/okf/scriptling-docs/cli/plugin-server.md#comparison-with-go-plugins) for how a script plugin server differs from a compiled Go plugin.
 
 ## Notes
 
 - `runtime.start_server()` is optional. If the setup script exits without calling it, the server starts automatically (backward-compatible behaviour). Call it explicitly when you need `wait=False` lifecycle control.
-- All registration calls (`serve`, `register_function`, `register_constant`, `register_class`) must happen before `runtime.start_server()`. Calls after server start are silently ignored with a stderr warning.
+- All registration calls (`serve`, `register_function`, `register_constant`, `register_class`, `register_fetcher`) must happen before `runtime.start_server()`. Calls after server start are silently ignored with a stderr warning.
 - Handler functions run on fresh evaluators and cannot share in-memory state. Use `runtime.kv` for cross-request state.
 
 ## Security Considerations

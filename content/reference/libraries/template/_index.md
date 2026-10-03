@@ -1,6 +1,6 @@
 ---
 title: scriptling.template
-linkTitle: template
+linkTitle: Templates
 description: Go-powered text and HTML template rendering with automatic escaping.
 tags: [libraries, utilities, template]
 weight: 17

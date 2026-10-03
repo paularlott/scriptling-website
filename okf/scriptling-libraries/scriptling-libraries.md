@@ -13,20 +13,23 @@ type: API Reference
 ---
 # Libraries
 
-Scriptling provides 60+ libraries organized by capability. Availability depends on the binary, execution mode, and host registration; it is not safe to assume every library is present.
+Scriptling provides 90+ libraries organized by capability. Availability depends on the binary, execution mode, and host registration; it is not safe to assume every library is present.
 
-## Standard Libraries
+Know the import name? Jump to the [A–Z list of every library](#all-libraries-az).
 
-- [Data Formats](https://scriptling.dev/okf/scriptling-libraries/data-formats.md): JSON, YAML, TOML
-- [Text Processing](https://scriptling.dev/okf/scriptling-libraries/text-processing.md): Regex, strings, HTML, diffing
-- [Math & Numbers](https://scriptling.dev/okf/scriptling-libraries/math-numbers.md): Math, random, statistics, hashing, UUID
-- [Collections & Iteration](https://scriptling.dev/okf/scriptling-libraries/collections-iteration.md): Collections, itertools, functools
-- [Time & System](https://scriptling.dev/okf/scriptling-libraries/time-system.md): Time, datetime, I/O, platform, URL handling
+## Python-Style Libraries
 
-## Extended Libraries
+Modules that mirror Python's standard library, grouped by subject:
 
-- [File System](https://scriptling.dev/okf/scriptling-libraries/filesystem.md): OS, paths, binary I/O, glob
-- [HTTP & Process](https://scriptling.dev/okf/scriptling-libraries/http-process.md): HTTP requests, subprocesses, system, logging, secrets
+- [Data Formats](https://scriptling.dev/okf/scriptling-libraries/data-formats.md): json, yaml, toml, msgpack, bytes
+- [Text Processing](https://scriptling.dev/okf/scriptling-libraries/text-processing.md): re, string, html, html.parser, difflib, shlex, textwrap, io
+- [Math & Numbers](https://scriptling.dev/okf/scriptling-libraries/math-numbers.md): math, random, statistics, base64, hashlib, hmac, uuid, secrets
+- [Collections & Iteration](https://scriptling.dev/okf/scriptling-libraries/collections-iteration.md): collections, itertools, functools, contextlib
+- [Time & System](https://scriptling.dev/okf/scriptling-libraries/time-system.md): time, datetime, platform, sys, logging
+- [File System](https://scriptling.dev/okf/scriptling-libraries/filesystem.md): os, os.path, pathlib, glob, fs, shutil, tempfile, tarfile, zipfile
+- [HTTP & Process](https://scriptling.dev/okf/scriptling-libraries/http-process.md): requests, urllib.parse, subprocess
+
+The *standard* set (json, re, time, datetime, math, random, statistics, base64, hashlib, hmac, uuid, string, html, textwrap, difflib, io, platform, urllib.parse, collections, itertools, functools, contextlib, msgpack) has no access to the host and is registered together by `stdlib.RegisterAll`. The rest are *extended* libraries, registered one by one because they reach the file system, network, processes or host: see [Availability](#availability).
 
 ## Scriptling Libraries
 
@@ -37,12 +40,18 @@ The `scriptling.*` libraries provide functionality beyond Python's standard libr
 - [MCP](https://scriptling.dev/okf/scriptling-libraries/mcp.md): MCP clients and tool authoring
 - [Messaging](https://scriptling.dev/okf/scriptling-libraries/messaging.md): Telegram, Discord, Slack, console
 - [Networking](https://scriptling.dev/okf/scriptling-libraries/networking.md): Gossip, multicast, unicast, DNS, WebSocket
-- [Package](https://scriptling.dev/okf/scriptling-libraries/package.md): Read files and metadata from loaded app/plugin bundles
-- [Plugin](https://scriptling.dev/okf/scriptling-libraries/plugin.md): Control library for executable plugins
+- [Packages](https://scriptling.dev/okf/scriptling-libraries/package.md): Read files and metadata from loaded app/plugin bundles
+- [Plugins](https://scriptling.dev/okf/scriptling-libraries/plugin.md): Control library for executable plugins
 - [Provisioning](https://scriptling.dev/okf/scriptling-libraries/provisioning.md): File and fetch provisioning
 - [Runtime](https://scriptling.dev/okf/scriptling-libraries/runtime.md): Background tasks, HTTP, JSON-RPC, MCP, KV, sync, sandbox
-- [Template](https://scriptling.dev/okf/scriptling-libraries/template.md): Go-powered HTML and text templates
+- [Templates](https://scriptling.dev/okf/scriptling-libraries/template.md): Go-powered HTML and text templates
 - [Utilities](https://scriptling.dev/okf/scriptling-libraries/utilities.md): Console, containers, Nomad, grep, find, CSV, XML, secrets, and more
+
+## All Libraries A–Z {#all-libraries-az}
+
+Every library by the name you import it as. Use the [cheat sheet](https://scriptling.dev/okf/scriptling-libraries/cheat-sheet.md) for quick examples of the common ones.
+
+
 
 ## Availability
 

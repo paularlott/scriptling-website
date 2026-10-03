@@ -142,7 +142,7 @@ never transferred. `package.glob` speaks the same pattern language as
 
 A fetcher is just one more thing a plugin can serve: the same binary can also
 register functions and classes under `plugin.<name>` alongside its scheme.
-The [fetcher plugin tutorial](../tutorials/fetcher-plugin/) walks through a
+The [fetcher plugin tutorial](../../tutorials/fetcher-plugin/) walks through a
 plugin that does all of it.
 
 ## Setup Scripts in Server Modes
@@ -224,7 +224,7 @@ directory is simply one whose glob answers its entry), so a plugin only ever
 answers "here are the bytes" or "not found".
 
 A complete example lives at `examples/plugins/fetcher-go` in the repository;
-the [fetcher plugin tutorial](../tutorials/fetcher-plugin/) walks through it,
+the [fetcher plugin tutorial](../../tutorials/fetcher-plugin/) walks through it,
 including the function and class halves of the same plugin.
 
 ## Scriptling Plugins

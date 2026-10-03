@@ -7,17 +7,6 @@ weight: 6
 
 Scriptling provides comprehensive error handling with Python 3-style exception handling.
 
-## Error vs Exception
-
-Scriptling has two distinct types of runtime error conditions:
-
-| Aspect | **Error** | **Exception** |
-|--------|-----------|---------------|
-| **Purpose** | Runtime errors surfaced by the interpreter | Explicitly raised conditions |
-| **Can be caught?** | Yes. `try`/`except` catches Errors by inferring an exception type from the error message (see [Automatic Exception Type Inference](#automatic-exception-type-inference)). | Yes, except for the special `SystemExit`, which bypasses script `except` handlers. |
-| **Examples** | Type errors, name errors, index/key errors, division by zero | ValueError, user-defined exceptions, and the special SystemExit |
-| **Propagation** | Converted into a typed Exception when caught | Propagated through `try`/`except`; SystemExit propagates directly to the host after `finally` blocks run |
-
 ## Try/Except/Finally
 
 The basic structure for error handling:
@@ -33,6 +22,8 @@ finally:
     # Always executes (optional)
     print("Cleanup code here")
 ```
+
+`except` catches both runtime errors raised by the interpreter (type errors, missing names, bad indexes, division by zero), whose exception type is [inferred from the error message](#automatic-exception-type-inference), and exceptions raised explicitly with `raise`. The one exception is `SystemExit`, which bypasses `except` handlers (see [SystemExit Exception](#systemexit-exception)).
 
 ### Try/Except/Else
 
@@ -205,7 +196,7 @@ raise  # Error: No active exception to re-raise
 
 ### Raise with Different Type
 
-Change the exception type while preserving context:
+Raise a different type, carrying the original message (`raise ... from ...` chaining is not supported):
 
 ```python
 try:
@@ -244,8 +235,8 @@ When you catch an exception with `as e`, you can access its properties:
 try:
     result = 10 / 0
 except Exception as e:
-    print("Type: " + type(e))       # "EXCEPTION"
-    print("Message: " + str(e))     # "division by zero"
+    print("Type: " + type(e))       # Type: ZeroDivisionError
+    print("Message: " + str(e))     # Message: division by zero
 ```
 
 ## Common Patterns
@@ -317,31 +308,24 @@ finally:
     print("Request complete")
 ```
 
-## Custom Exception Patterns
+## Custom Exceptions
 
-### Creating Custom Error Messages
+Scriptling cannot define custom exception classes: `class MyError(Exception)` fails because classes cannot derive from the built-in exception types. Raise a built-in type with a descriptive message instead, and wrap lower-level errors by re-raising with added context:
 
 ```python
+import json
+
 def validate_user(user):
     if not user.get("name"):
         raise ValueError("User must have a name")
-    if not user.get("email"):
-        raise ValueError("User must have an email")
-    if "@" not in user["email"]:
+    if "@" not in user.get("email", ""):
         raise ValueError("Invalid email format")
     return True
-```
 
-### Exception Chaining
-
-```python
-def load_config(path):
+def load_config(text):
     try:
-        data = read_file(path)
-        return parse_json(data)
-    except FileNotFoundError:
-        raise ValueError("Config file not found: " + path)
-    except JSONParseError as e:
+        return json.loads(text)
+    except Exception as e:
         raise ValueError("Invalid config format: " + str(e))
 ```
 
@@ -365,110 +349,6 @@ print("continuing")
 
 `sys.exit("Fatal error occurred")` carries the message and uses exit code 1. A host can inspect the returned exception and decide whether to terminate the process, return an HTTP status, or continue using the interpreter.
 
-## Exception Handling in Libraries
-
-When writing libraries, follow these guidelines:
-
-1. **Document exceptions** your functions can raise
-2. **Use specific exception types** for different error conditions
-3. **Preserve original exceptions** when wrapping errors
-4. **Consider recovery scenarios** - can the caller reasonably recover?
-
-```python
-# Good library design
-def parse_date(date_string):
-    """
-    Parse a date string into components.
-
-    Args:
-        date_string: Date in YYYY-MM-DD format
-
-    Returns:
-        Dict with year, month, day
-
-    Raises:
-        ValueError: If date_string is not valid format
-        TypeError: If date_string is not a string
-    """
-    if not isinstance(date_string, str):
-        raise TypeError("date_string must be a string")
-    # ... parsing logic
-```
-
-## Common Pitfalls
-
-### Catching Too Broadly
-
-```python
-# Bad - catches every ordinary Error and Exception and hides the cause
-try:
-    some_operation()
-except Exception:
-    pass  # Silently ignores most failures; SystemExit still bypasses this
-
-# Good - catch specific exceptions
-try:
-    some_operation()
-except (ValueError, TypeError) as e:
-    log_error(e)
-    # Handle specific expected errors
-```
-
-### Silent Failures
-
-```python
-# Bad - silently ignores errors
-try:
-    risky_operation()
-except:
-    pass  # What went wrong?
-
-# Good - at least log the error
-try:
-    risky_operation()
-except Exception as e:
-    print("Operation failed: " + str(e))
-```
-
-### Overly Broad Try Blocks
-
-```python
-# Bad - too much code in try block
-try:
-    config = load_config()
-    connect_database()
-    process_data()
-    save_results()
-except Exception:
-    handle_error()  # Which part failed?
-
-# Good - narrow try blocks
-config = load_config()
-connect_database()
-try:
-    process_data()  # Just the risky part
-except DataError as e:
-    handle_data_error(e)
-save_results()
-```
-
-## Performance Considerations
-
-### Try/Except vs Conditional Checks
-
-```python
-# Slower for frequent expected failures
-try:
-    value = dict["key"]
-except KeyError:
-    value = default
-
-# Faster for expected lookups
-value = dict.get("key", default)
-```
-
-**Rule of thumb**: Use exceptions for exceptional cases, not for control flow.
-
 ## For Go Developers
 
 Inspect the returned object even when `err` is nil: `SystemExit(0)` is treated as a clean exit and may return a nil Go error. Non-zero exits return the exception with an error.
@@ -487,17 +367,6 @@ if err != nil {
     return
 }
 ```
-
-## Summary
-
-- Use `try/except/else/finally` for structured error handling; `SystemExit` bypasses `except` but still runs `finally`
-- Use `else` to run code only when no exception was raised
-- Catch specific exception types when possible
-- Use exceptions for exceptional cases, not control flow
-- Always preserve original exceptions when wrapping errors
-- Document which exceptions your functions can raise
-- Add context to exceptions to aid debugging
-- Avoid silent failures and overly broad exception handlers
 
 ## See Also
 

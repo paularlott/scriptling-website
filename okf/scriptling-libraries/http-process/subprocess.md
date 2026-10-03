@@ -113,5 +113,5 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## See Also
 
-- [sys](https://scriptling.dev/okf/scriptling-libraries/http-process/sys.md): Detect the current platform and access environment/argv
+- [sys](https://scriptling.dev/okf/scriptling-libraries/time-system/sys.md): Detect the current platform and access environment/argv
 - [requests](https://scriptling.dev/okf/scriptling-libraries/http-process/requests.md): Make HTTP requests without spawning a process

@@ -1,5 +1,6 @@
 ---
-title: Language Guide
+title: Reference
+linkTitle: Reference
 description: Reference for the Scriptling language - syntax, data types, operators, control flow, functions, classes, and built-in functions.
 tags: [reference]
 weight: 4
@@ -9,9 +10,8 @@ Scriptling is a dynamically-typed, interpreted language with Python-inspired syn
 
 ## Choose a reference path
 
-- **Learning Scriptling:** Read the quick reference below, then follow the detailed language topics in order as needed.
-- **Looking up an API:** Go directly to [Built-in Functions](builtins/) or the [Library Reference](libraries/).
-- **Adding database access:** Browse the [Database Libraries](libraries/databases/) for drivers and the ORM.
+- **Coming from Python:** Skim [Python Differences](python-differences/) first; everything not listed there works as in Python 3.
+- **Looking up an API:** Go directly to [Built-in Functions](builtins/) or the [A–Z library list](libraries/#all-libraries-az).
 - **Using a runtime or host feature:** See the [CLI Guide](/docs/cli/), [Go Integration](/docs/go-integration/), or [Plugins](/docs/plugins/) rather than treating it as language syntax.
 
 ## Quick Reference
@@ -173,9 +173,10 @@ if __name__ == "__main__":
 
 ## Key Differences from Python
 
-- No nested classes
-- No multiple inheritance
-- Use `import library` to load libraries dynamically
+- No multiple inheritance, custom exception classes, `async`/`await`, or `yield` generators
+- A library can be imported only if the host has registered it
+
+See [Python Differences](python-differences/) for the full list.
 
 ## See Also
 

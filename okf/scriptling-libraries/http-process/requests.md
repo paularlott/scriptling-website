@@ -242,4 +242,4 @@ The CLI configures the same guard through its `--network-policy` TOML file and p
 ## See Also
 
 - [subprocess](https://scriptling.dev/okf/scriptling-libraries/http-process/subprocess.md): Run external commands
-- [secrets](https://scriptling.dev/okf/scriptling-libraries/http-process/secrets.md): Generate tokens for API authentication
+- [secrets](https://scriptling.dev/okf/scriptling-libraries/math-numbers/secrets.md): Generate tokens for API authentication

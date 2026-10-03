@@ -4,7 +4,6 @@ linkTitle: console
 description: TUI (terminal UI) console for building interactive chat-style applications.
 tags: [libraries, utilities]
 weight: 1
-
 aliases:
   - /reference/libraries/scriptling/utilities/console/
 ---
@@ -147,7 +146,7 @@ if console.has_panels():
     console.clear_layout()  # toggle back to single panel
 ```
 
-### `styled(color, text)`
+### `styled(color, text)` {#styled}
 
 Applies a foreground color to text and returns the styled string. `color` accepts a constant (`console.PRIMARY`, `console.SECONDARY`, `console.ERROR`, `console.DIM`, `console.USER`, `console.TEXT`), a theme color name string (`"primary"`, `"secondary"`, `"error"`, `"dim"`, `"user"`, `"text"`), or a hex color (`"#ff6600"` or `"ff6600"`).
 

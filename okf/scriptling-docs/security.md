@@ -14,11 +14,9 @@ type: Guide
 ---
 # Security Guide
 
-Scriptling provides a sandboxed Python-like execution environment, but proper security practices are essential when embedding it in your applications.
-
 ## Overview
 
-Scriptling's security boundary depends on how it is configured. **You are responsible for registering only the capabilities your scripts need and for applying process-level isolation where appropriate.**
+Scriptling's security boundary depends entirely on how it is configured. **You are responsible for registering only the capabilities your scripts need and for applying process-level isolation where appropriate.**
 
 ## Bare Embedding vs CLI Defaults
 
@@ -37,29 +35,7 @@ Scriptling runs in a memory-safe Go environment without C extensions and does no
 
 ### Pure Standard Libraries
 
-Embedding hosts can register these pure libraries without granting filesystem or network access. The CLI's normal setup includes them; a bare `scriptling.New()` does not register them automatically.
-
-| Library       | Security Notes                               |
-| ------------- | -------------------------------------------- |
-| `math`        | Pure computation, no external access         |
-| `json`        | Pure computation, no external access         |
-| `datetime`    | Pure computation, no external access         |
-| `time`        | Pure computation, no external access         |
-| `string`      | Pure computation, no external access         |
-| `base64`      | Pure computation, no external access         |
-| `html`        | Pure computation, no external access         |
-| `re`          | Regular expressions, no external access      |
-| `random`      | Pseudo-random generation, no external access |
-| `statistics`  | Pure computation, no external access         |
-| `textwrap`    | Pure computation, no external access         |
-| `functools`   | Pure computation, no external access         |
-| `itertools`   | Pure computation, no external access         |
-| `collections` | Pure computation, no external access         |
-| `hashlib`     | Cryptographic hashing, no external access    |
-| `hmac`        | Keyed hashing (HMAC), no external access     |
-| `platform`    | Platform information, read-only              |
-| `urllib`      | URL parsing only, no network access          |
-| `uuid`        | UUID generation, no external access          |
+These libraries do pure computation with no filesystem, network, or process access, so embedding hosts can register them freely (the CLI includes them; a bare `scriptling.New()` does not): `math`, `json`, `datetime`, `time`, `string`, `base64`, `html`, `re`, `random`, `statistics`, `textwrap`, `functools`, `itertools`, `collections`, `hashlib`, `hmac`, and `uuid`. `platform` is read-only platform information, and `urllib` parses URLs without making network requests.
 
 ### Scriptling-Specific Libraries
 
@@ -78,8 +54,8 @@ These libraries provide Scriptling-specific functionality. This is a capability 
 | `scriptling.provision.*` | **FILESYSTEM + NETWORK ACCESS** - Changes files and can download remote content |
 | `scriptling.secret`   | Host-controlled secret access; scripts see aliases, not provider credentials |
 | `scriptling.console`  | Console I/O, including interactive input                       |
-| `scriptling.similarity` | Pure computation, no external access                        |
-| `scriptling.toon`     | Pure computation, no external access                          |
+
+`scriptling.similarity` and `scriptling.toon` are pure computation with no external access.
 
 ### Runtime Libraries
 

@@ -121,6 +121,6 @@ print(verify(body, "sha256=tampered", secret))  # False
 ## See Also
 
 - [hashlib](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hashlib.md): cryptographic hash functions, including the constructors accepted as `digestmod`.
-- [secrets](https://scriptling.dev/okf/scriptling-libraries/http-process/secrets.md): `token_hex()` for generating a new random secret key.
+- [secrets](https://scriptling.dev/okf/scriptling-libraries/math-numbers/secrets.md): `token_hex()` for generating a new random secret key.
 - [base64](https://scriptling.dev/okf/scriptling-libraries/math-numbers/base64.md): Base64 encoding and decoding.
 - [bytes](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md): the binary type returned by `.digest()` and `digest()`.

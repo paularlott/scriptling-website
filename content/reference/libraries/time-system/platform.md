@@ -2,7 +2,7 @@
 title: platform
 description: Read-only access to the underlying operating system, architecture, and hostname information.
 tags: [libraries, time]
-weight: 4
+weight: 3
 
 aliases:
   - /reference/libraries/stdlib/platform/
@@ -217,4 +217,4 @@ This library implements a subset of Python's `platform` module, using the Script
 
 - [datetime](../datetime/) - Date and time types
 - [time](../time/) - Time access and conversions
-- [io](../io/) - In-memory I/O streams
+- [io](../../text-processing/io/) - In-memory I/O streams

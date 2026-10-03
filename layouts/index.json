@@ -1,13 +1,43 @@
-{{- $.Scratch.Add "index" slice -}}
+{{- /*
+  Search index: one record per page section, so results link straight to the
+  heading that matched. Pages are split at their h2/h3 headings; the text
+  before the first heading becomes the page's own record, which also carries
+  the description and tags.
 
-{{- /* Index complete page text plus discovery metadata. */ -}}
-{{- range .Site.RegularPages -}}
-  {{- $.Scratch.Add "index" (dict "title" .Title "href" .Permalink "description" .Description "content" .Plain "section" .Section "kind" .Kind "tags" (.Params.tags | default slice) "aliases" (.Aliases | default slice)) -}}
+  Short keys keep the file small:
+    t  page title          h  section heading ("" for the page record)
+    u  URL (with #anchor)  p  breadcrumb path
+    d  description         k  keywords (tags, aliases)
+    c  plain text          x  1 for low-priority pages (changelogs)
+*/ -}}
+{{- $index := slice -}}
+{{- $pages := union .Site.RegularPages (where .Site.Pages "Kind" "section") -}}
+{{- range $pages -}}
+  {{- if not (in (slice "docs" "reference") .Section) }}{{ continue }}{{ end -}}
+  {{- $page := . -}}
+  {{- $crumbs := slice -}}
+  {{- range .Ancestors.Reverse -}}
+    {{- if not .IsHome }}{{ $crumbs = $crumbs | append .LinkTitle }}{{ end -}}
+  {{- end -}}
+  {{- $path := delimit $crumbs " › " -}}
+  {{- $low := cond (strings.Contains .RelPermalink "changelog") 1 0 -}}
+  {{- $keywords := delimit (union (.Params.tags | default slice) (.Aliases | default slice)) " " -}}
+
+  {{- /* Normalise h3 to h2 so one split handles both levels. */ -}}
+  {{- $html := .Content | replaceRE `<h3 id=` `<h2 id=` | replaceRE `</h3>` `</h2>` -}}
+  {{- $parts := split $html `<h2 id="` -}}
+
+  {{- $intro := index $parts 0 | plainify | htmlUnescape | replaceRE `\s+` " " | strings.TrimSpace -}}
+  {{- $index = $index | append (dict "t" .Title "h" "" "u" .RelPermalink "p" $path "d" .Description "k" $keywords "c" $intro "x" $low) -}}
+
+  {{- range after 1 $parts -}}
+    {{- $m := findRESubmatch `^([^"]+)"[^>]*>([\s\S]*?)</h2>([\s\S]*)$` . 1 -}}
+    {{- with $m -}}
+      {{- $sec := index . 0 -}}
+      {{- $heading := index $sec 2 | plainify | htmlUnescape | strings.TrimSpace -}}
+      {{- $body := index $sec 3 | plainify | htmlUnescape | replaceRE `\s+` " " | strings.TrimSpace -}}
+      {{- $index = $index | append (dict "t" $page.Title "h" $heading "u" (printf "%s#%s" $page.RelPermalink (index $sec 1)) "p" $path "c" $body "x" $low) -}}
+    {{- end -}}
+  {{- end -}}
 {{- end -}}
-
-{{- /* Include section landing pages so task and persona entry points are searchable. */ -}}
-{{- range where .Site.Pages "Kind" "section" -}}
-  {{- $.Scratch.Add "index" (dict "title" .Title "href" .Permalink "description" .Description "content" .Plain "section" .Section "kind" .Kind "tags" (.Params.tags | default slice) "aliases" (.Aliases | default slice)) -}}
-{{- end -}}
-
-{{- $.Scratch.Get "index" | jsonify -}}
+{{- $index | jsonify -}}

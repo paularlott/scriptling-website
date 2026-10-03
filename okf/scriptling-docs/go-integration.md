@@ -14,95 +14,50 @@ type: Guide
 ---
 # Go Integration
 
-Complete guide for embedding Scriptling in Go applications.
-
-## Choose by integration goal
-
-- **Evaluate scripts and exchange values:** Start with [Basics](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md).
-- **Expose Go functions or classes quickly:** Use the type-safe [Builder API](https://scriptling.dev/okf/scriptling-docs/go-integration/builder.md).
-- **Control conversion and performance directly:** Use the [Native API](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md).
-- **Control which modules scripts can import:** Read [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) and the [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md).
-- **Run scripts that declare their requirements:** Check their [Script Metadata](https://scriptling.dev/okf/scriptling-docs/go-integration/script-metadata.md) blocks before executing them.
-- **Extend the host out of process:** See [Embedding Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md). If you want to run Scriptling itself as a server, use the [CLI server guides](https://scriptling.dev/okf/scriptling-docs/cli.md) instead.
-
-## Installation
+Embed Scriptling in a Go application: create interpreters, choose which libraries scripts can import, and expose your own Go functions, classes, and libraries.
 
 ```bash
 go get github.com/paularlott/scriptling
 ```
 
-## Quick Start
+New to embedding? The [Go embedding quick start](https://scriptling.dev/okf/scriptling-docs/quick-start/embedding.md) runs a first script in a few lines; [Basics](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md) then covers the full interpreter API. Focused examples on the pages below assume an initialized `p` as shown there.
+
+## Reading Order
+
+1. [Basics](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md): create interpreters, exchange variables, call script functions, capture output, set resource limits.
+2. [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md): register standard and extended libraries, and set filesystem and [network policy](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#network-policy) before untrusted scripts run.
+3. [Script Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md): extend the host with libraries written in Scriptling itself.
+4. Extending in Go: pick an API (see below), then follow its pages.
+   - **Native API**: [overview](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md), [functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md), [classes](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes.md), [libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md).
+   - **Builder API**: [overview](https://scriptling.dev/okf/scriptling-docs/go-integration/builder.md), [functions](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-functions.md), [libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md), [classes](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-classes.md), [instantiation](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-instantiation.md) (one library template, per-environment config).
+5. Further topics: [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md), [Plugin Manager](https://scriptling.dev/okf/scriptling-docs/plugins/host-integration.md) (executable plugins in an embedded host), [Documenting Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/documentation.md), [Checking Script Requirements](https://scriptling.dev/okf/scriptling-docs/go-integration/script-metadata.md), [Linting](https://scriptling.dev/okf/scriptling-docs/go-integration/lint.md), [GC Release Hooks](https://scriptling.dev/okf/scriptling-docs/go-integration/gc-release-hooks.md).
+
+To run Scriptling itself as a server instead of embedding it, use the [CLI server guides](https://scriptling.dev/okf/scriptling-docs/cli.md).
+
+## Native vs Builder: Which to Use
+
+The two APIs interoperate: `FunctionBuilder.Build()` returns an ordinary native function, and `LibraryBuilder`/`ClassBuilder` produce the same `*object.Library` and `*object.Class` values the Native API uses. Mix them freely, for example a builder library that exposes a native class, or a builder class inheriting from a native one.
+
+| | Native API | Builder API |
+|--|------------|-------------|
+| You write | `func(ctx, kwargs, args ...object.Object) object.Object` | Ordinary Go funcs, e.g. `func(a, b int) int` |
+| Argument checks and conversion | Manual (`AsInt`, `kwargs.GetString`, ...) | Automatic from the Go signature |
+| Overhead | Direct object handling | Signature cached at build time; common shapes use fast wrappers, others fall back to `reflect.Call` |
+| Best for | Measured hot paths; variable, optional, or mixed-type arguments | Most typed integrations |
+
+Start with the Builder API for typical functions and libraries. Switch a function to the Native API when a benchmark of your real workload shows conversion cost matters, or when you need full control over arguments and return objects. Scriptling's own libraries use both.
 
 ```go
-package main
-
-import (
-    "fmt"
-    "github.com/paularlott/scriptling"
-    "github.com/paularlott/scriptling/stdlib"
-)
-
-func main() {
-    // Create interpreter
-    p := scriptling.New()
-
-    // Register standard libraries
-    stdlib.RegisterAll(p)
-
-    // Execute Scriptling code
-    _, err := p.Eval(`x = 5 + 3`)
-    if err != nil {
-        fmt.Println("Error:", err)
-    }
-}
-```
-
-Focused examples on the pages below generally assume `p` has been initialized as shown here. Setup is repeated only when a registration or interpreter-lifecycle choice is part of the example.
-
-## Topics
-
-- [Basics](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md) - Creating interpreters, variable exchange, calling functions
-- [Native API](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md) - Direct object-level control
-- [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md) - Register individual Go functions
-- [Native Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes.md) - Create custom classes with full control
-- [Native Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md) - Create libraries with functions and constants
-- [Builder API](https://scriptling.dev/okf/scriptling-docs/go-integration/builder.md) - Type-safe, cleaner syntax
-- [Builder Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-functions.md) - Type-safe function builder
-- [Builder Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-libraries.md) - Type-safe library builder
-- [Builder Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-classes.md) - Type-safe class builder
-- [Builder Instantiation](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-instantiation.md) - Library templates with per-instance config
-- [Script Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md) - Extend using Scriptling code
-- [Embedding Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md) - Enable executable plugins in embedded applications
-- [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md) - Flexible library loading from multiple sources
-- [Checking Script Requirements](https://scriptling.dev/okf/scriptling-docs/go-integration/script-metadata.md) - Verify scripts' inline metadata blocks before running them
-- [Documenting Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/documentation.md) - Add help text to functions and libraries
-- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - Register built-in libraries when embedding
-- [Linting](https://scriptling.dev/okf/scriptling-docs/go-integration/lint.md) - Code analysis for detecting syntax errors without execution
-- [GC Release Hooks](https://scriptling.dev/okf/scriptling-docs/go-integration/gc-release-hooks.md) - Best-effort cleanup hooks for Go-owned objects
-
-## Two Integration Approaches
-
-### Native API
-
-Direct object-level control with predictable overhead:
-
-```go
+// Native
 p.RegisterFunc("add", func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
     a, _ := args[0].AsInt()
     b, _ := args[1].AsInt()
     return object.NewInteger(a + b)
 })
-```
 
-### Builder API
-
-Type-safe, cleaner syntax with automatic conversion:
-
-```go
+// Builder
 fb := object.NewFunctionBuilder()
-fb.FunctionWithHelp(func(a, b int) int {
-    return a + b
-}, "add(a, b) - Add two numbers")
+fb.FunctionWithHelp(func(a, b int) int { return a + b }, "add(a, b) - Add two numbers")
 p.RegisterFunc("add", fb.Build())
 ```
 
@@ -128,14 +83,3 @@ for _, source := range scripts {
 ```
 
 For a stateful session, omit `Reset()` so globals and imports persist. See [Interpreter lifecycle](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#interpreter-lifecycle) for `ResetEnv` and `Clone` choices.
-
-## Choosing Your Approach
-
-| Use Case | Recommended Approach |
-|----------|---------------------|
-| Simple functions | Builder API |
-| Rapid development | Builder API |
-| Performance-critical code | Native API |
-| Complex type handling | Native API |
-| Reusing Scriptling code | Script Extensions |
-| Building on Go libraries | Script Extensions |

@@ -3,8 +3,7 @@ title: scriptling.xml
 linkTitle: xml
 description: XML parsing and formatting (dict-based, string-only).
 tags: [libraries, utilities, data-formats]
-weight: 7
-
+weight: 13
 aliases:
   - /reference/libraries/scriptling/utilities/xml/
 ---

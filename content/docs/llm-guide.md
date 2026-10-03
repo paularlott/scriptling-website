@@ -24,7 +24,7 @@ Scriptling is a sandboxed, Python-like scripting language for Go applications. G
 ## Write Scriptling Like This
 
 - Prefer clear Pythonic code over custom conventions.
-- Use `import json`, `import math`, `import re`, `import time`, and similar module imports.
+- Use `import json`, `import math`, `import re`, `import time`, and similar module imports; `from m import (a, b)` with parentheses and a trailing comma is fine for long lists.
 - Use normal methods such as `d.items()`, `d.keys()`, `d.values()`, `s.split()`, `"x".join(parts)`, and `response.json()`.
 - Use keyword arguments naturally: `requests.get(url, timeout=10, headers={...})`.
 - Use `f"..."`, `.format()`, list/dict/set comprehensions, and generator expressions.
@@ -50,6 +50,7 @@ Scriptling is a sandboxed, Python-like scripting language for Go applications. G
 
 - No `async` / `await`.
 - No `yield`-based generator functions.
+- No `from module import *`; import the names you need.
 - A walrus bound inside a comprehension does not leak to the enclosing scope; collect through the comprehension result instead.
 - No multiple inheritance (nested classes are supported).
 - No built-in `open()`, `eval()`, `exec()`, `globals()`, or `locals()`.
@@ -131,9 +132,9 @@ Scriptling supports Python-style `del` in the common cases: `del items[2]`, `del
 4. Use `del` for list indexes, list slices, dict keys, and object attributes when removing data.
 5. For HTTP, always set an explicit timeout and check or raise on status.
 6. Never rely on dict iteration order: it is unspecified. Sort explicitly (`for k in sorted(d):`) or use `json.dumps` when order matters.
-6. For JSON APIs, prefer `response.json()` or `json.loads(response.text)`.
-7. For string accumulation in loops, prefer `"".join(parts)` over repeated concatenation.
-8. Keep code synchronous, explicit, and small rather than clever.
+7. For JSON APIs, prefer `response.json()` or `json.loads(response.text)`.
+8. For string accumulation in loops, prefer `"".join(parts)` over repeated concatenation.
+9. Keep code synchronous, explicit, and small rather than clever.
 
 ## Safe Default Template
 

@@ -236,4 +236,4 @@ The CLI configures the same guard through its `--network-policy` TOML file and p
 ## See Also
 
 - [subprocess](../subprocess/): Run external commands
-- [secrets](../secrets/): Generate tokens for API authentication
+- [secrets](../../math-numbers/secrets/): Generate tokens for API authentication

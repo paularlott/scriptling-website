@@ -3,8 +3,7 @@ title: scriptling.find
 linkTitle: find
 description: Find files and directories by name, type, modification time, and size.
 tags: [libraries, utilities, filesystem]
-weight: 5
-
+weight: 4
 aliases:
   - /reference/libraries/scriptling/utilities/find/
 ---
@@ -24,7 +23,7 @@ The library exposes two functions: `path()` returns matching paths as a list of 
 
 ## Functions
 
-### `path(path, *, recursive=True, type="any", name="", mtime_min=None, mtime_max=None, size_min=None, size_max=None, include_hidden=False, follow_links=False, max_depth=None)`
+### `path(path, *, recursive=True, type="any", name="", mtime_min=None, mtime_max=None, size_min=None, size_max=None, include_hidden=False, follow_links=False, max_depth=None)` {#path}
 
 Finds files and directories under `path` matching the supplied filters and returns their paths as a list of strings. Results are in arbitrary order; an empty list is returned when nothing matches.
 

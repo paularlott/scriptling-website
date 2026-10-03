@@ -2,9 +2,9 @@
 description: In-memory text I/O streams, providing StringIO as a buffer that behaves like a text file.
 generated:
     by: scriptling-website/okf.py
-resource: https://scriptling.dev/reference/libraries/time-system/io/
+resource: https://scriptling.dev/reference/libraries/text-processing/io/
 sources:
-    - resource: https://scriptling.dev/reference/libraries/time-system/io/
+    - resource: https://scriptling.dev/reference/libraries/text-processing/io/
 status: stable
 tags:
     - libraries
@@ -257,4 +257,4 @@ print(buf.getvalue())  # a,b,c!
 
 - [datetime](https://scriptling.dev/okf/scriptling-libraries/time-system/datetime.md) - Date and time types
 - [time](https://scriptling.dev/okf/scriptling-libraries/time-system/time.md) - Time access and conversions
-- [urllib](https://scriptling.dev/okf/scriptling-libraries/time-system/urllib.md) - URL parsing and encoding
+- [urllib](https://scriptling.dev/okf/scriptling-libraries/http-process/urllib.md) - URL parsing and encoding

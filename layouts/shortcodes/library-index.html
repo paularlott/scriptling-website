@@ -1,0 +1,32 @@
+{{- /*
+  A–Z table of every library page under /reference/libraries/, keyed by its
+  import name. Library pages are titled with the import name (lowercase,
+  e.g. "json", "scriptling.runtime.kv"); category pages and guides have
+  Title Case titles and are left out. Generated from front matter, so it
+  never goes stale.
+*/ -}}
+{{- $root := site.GetPage "/reference/libraries" -}}
+{{- $libs := slice -}}
+{{- range $root.RegularPagesRecursive -}}
+  {{- if findRE `^[a-z]` .Title -}}{{- $libs = $libs | append . -}}{{- end -}}
+{{- end -}}
+{{- range $root.Sections -}}
+  {{- if findRE `^[a-z]` .Title -}}{{- $libs = $libs | append . -}}{{- end -}}
+  {{- range .Sections -}}
+    {{- if findRE `^[a-z]` .Title -}}{{- $libs = $libs | append . -}}{{- end -}}
+  {{- end -}}
+{{- end -}}
+<div class="overflow-x-auto">
+<table>
+  <thead><tr><th>Import</th><th>Description</th><th>Category</th></tr></thead>
+  <tbody>
+  {{- range sort $libs "Title" }}
+    <tr>
+      <td><a href="{{ .RelPermalink }}"><code>{{ .Title }}</code></a></td>
+      <td>{{ .Description }}</td>
+      <td>{{ with .Parent }}{{ if ne .RelPermalink $root.RelPermalink }}<a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}{{ end }}</td>
+    </tr>
+  {{- end }}
+  </tbody>
+</table>
+</div>

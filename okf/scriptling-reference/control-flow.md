@@ -297,6 +297,26 @@ except:
     print("assertion failed")
 ```
 
+## Del Statement
+
+`del` removes names, list items and slices, dictionary keys, and object attributes:
+
+```python
+items = [10, 20, 30, 40, 50]
+del items[0]              # [20, 30, 40, 50]
+del items[1:3]            # [20, 50]
+
+data = {"name": "a", "email": "b"}
+del data["email"]         # {"name": "a"}
+
+del user.email            # remove an attribute
+
+a, b = 1, 2
+del a, b                  # a and b are no longer defined
+```
+
+Deleting a missing key raises `KeyError`, and using a deleted name raises `NameError`.
+
 ## Match Statement
 
 Pattern matching for cleaner conditional logic:

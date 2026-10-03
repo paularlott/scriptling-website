@@ -1,6 +1,6 @@
 ---
 title: Syntax Rules
-description: Indentation, comments, case sensitivity, and multiline syntax in Scriptling.
+description: Indentation, comments, strings, multiline syntax, imports and keywords in Scriptling.
 tags: [reference, syntax]
 weight: 1
 ---
@@ -336,6 +336,51 @@ result = process(
 )
 ```
 
+## Imports
+
+Imports work as in Python. A library must be made available by the host (or the CLI's library paths) before a script can import it.
+
+```python
+import json                          # binds json
+import urllib.parse                  # binds urllib, with urllib.parse inside
+import urllib.parse as up            # binds up only
+import math, json                    # several at once
+
+from math import sqrt, floor         # binds the names directly
+from math import sqrt as root        # with an alias
+```
+
+### Parenthesized Import Lists
+
+Wrap the names in parentheses to split a long list across lines. A trailing comma is allowed:
+
+```python
+from scriptling.ai import (
+    Client,
+    ToolRegistry,
+    estimate_tokens,
+)
+```
+
+### Relative Imports
+
+Inside a library module, leading dots import relative to that module's package, as in Python. `from . import x` imports a sibling, `from .. import x` goes up one level, and `from .helpers import x` imports from a sibling module. Relative imports are only valid inside a library; the main script has no package.
+
+### Lazy Imports
+
+Python 3.15's `lazy import` (PEP 810) is accepted so such code runs unchanged:
+
+```python
+lazy import json
+lazy from math import sqrt
+```
+
+The `lazy` hint is ignored and the import happens immediately. Imports in Scriptling are already cheap, and importing eagerly means a missing library fails at the import line rather than at first use. `lazy` is only special directly before `import` or `from`, so it is still an ordinary name everywhere else.
+
+### Not Supported
+
+`from module import *` is not supported; import the names you need.
+
 ## Identifiers
 
 Variable and function names must follow these rules:
@@ -373,6 +418,8 @@ while      with
 ```
 
 `match` and `case` are contextual keywords: they are only special inside a `match` statement and may be used as ordinary identifiers everywhere else (for example, `match = 5`).
+
+`lazy` is also contextual: it is only special directly before `import` or `from` (see [Lazy Imports](#lazy-imports)).
 
 `async`, `await`, and `yield` are not keywords in Scriptling (the features they denote in Python are not implemented). `super` is an ordinary builtin function, not a keyword.
 

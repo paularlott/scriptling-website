@@ -9,7 +9,7 @@ aliases:
   - /reference/libraries/time/
 ---
 
-The `time` library provides time-related functions for working with Unix timestamps, time tuples, formatting, parsing, and pausing execution, with a Python-compatible API.
+The `time` library provides time-related functions for working with Unix timestamps, time tuples, formatting, parsing, and pausing execution, following Python's `time` module with the differences listed below.
 
 ```python
 import time
@@ -19,236 +19,48 @@ import time
 
 | Function | Description |
 |----------|-------------|
-| `now()` | Returns the current date/time as an ISO 8601 string. |
-| `time()` | Returns the current Unix timestamp. |
-| `perf_counter()` | Returns a high-resolution monotonic timer. |
+| `now()` | Scriptling-specific: current local date/time as an ISO 8601 string (`YYYY-MM-DDTHH:MM:SS.ffffff`). |
+| `time()` | Current Unix timestamp as a `float`. |
+| `perf_counter()` | High-resolution monotonic timer; only differences between calls are meaningful. |
 | `sleep(seconds)` | Pauses execution for the specified number of seconds. |
-| `localtime(secs=None)` | Converts a timestamp or datetime to a local time tuple. |
-| `gmtime(secs=None)` | Converts a timestamp or datetime to a UTC time tuple. |
-| `mktime(tuple)` | Converts a time tuple to a Unix timestamp. |
-| `strftime(format, t=None)` | Formats a time tuple as a string. |
-| `strptime(string, format)` | Parses a string into a time tuple. |
-| `asctime(t=None)` | Converts a time tuple to a standard format string. |
-| `ctime(secs=None)` | Converts a Unix timestamp to a standard format string. |
+| `localtime(secs=None)` | Local [time tuple](#time-tuple-format) for a timestamp or `datetime` (default: now). |
+| `gmtime(secs=None)` | UTC [time tuple](#time-tuple-format) for a timestamp or `datetime` (default: now). |
+| `mktime(tuple)` | Unix timestamp for a local time tuple (only the first six fields are used). |
+| `strftime(format, t=None)` | Format a time tuple (default: current local time) using [format codes](#format-codes). |
+| `strptime(string, format)` | Parse a string into a time tuple; raises if it does not match. |
+| `asctime(t=None)` | Time tuple as `"Mon Jan 15 10:30:45 2024"`. |
+| `ctime(secs=None)` | Timestamp as a local `asctime()`-style string. |
 
-## Functions
-
-### `time.now()`
-
-Returns the current date and time as an ISO 8601 formatted string.
-
-**Returns:** `str`: the current date and time, formatted as `YYYY-MM-DDTHH:MM:SS.ffffff`.
+## Example
 
 ```python
 import time
 
-ts = time.now()  # "2025-11-26T11:58:18.123456"
-```
-
-### `time.time()`
-
-Returns the current Unix timestamp.
-
-**Returns:** `float`: seconds since the Unix epoch.
-
-```python
-import time
-
-now = time.time()  # 1732435200.123456
-```
-
-### `time.perf_counter()`
-
-Returns a high-resolution monotonic timer, useful for benchmarking. The value has no defined absolute meaning: only differences between calls are meaningful.
-
-**Returns:** `float`: seconds since an arbitrary fixed point (program start).
-
-```python
-import time
+now = time.time()                 # float seconds since the epoch
+stamp = time.now()                # Scriptling-specific: ISO 8601 string, e.g. "2025-11-26T11:58:18.123456"
 
 start = time.perf_counter()
-# ... some code ...
-end = time.perf_counter()
-elapsed = end - start
-```
+time.sleep(0.1)                   # seconds, int or float
+print(time.perf_counter() - start >= 0.1)   # True
 
-### `time.sleep(seconds)`
+t = time.gmtime(1705314645)       # UTC time tuple (a list)
+print(t)                          # [2024, 1, 15, 10, 30, 45, 1, 15, 0]
+print(time.strftime("%Y-%m-%d %H:%M:%S", t))  # 2024-01-15 10:30:45
+print(time.asctime(t))            # Mon Jan 15 10:30:45 2024
 
-Pauses execution for the specified number of seconds.
+parsed = time.strptime("2024-01-15 10:30:45", "%Y-%m-%d %H:%M:%S")
+print(parsed[:6])                 # [2024, 1, 15, 10, 30, 45]
 
-**Parameters:**
-- `seconds` (`int` or `float`): Number of seconds to sleep.
-
-**Returns:** `None`
-
-```python
-import time
-
-print("Waiting...")
-time.sleep(1)      # Sleep 1 second
-time.sleep(0.5)    # Sleep 0.5 seconds
-print("Done!")
-```
-
-### `time.localtime(secs=None)`
-
-Converts a Unix timestamp or datetime instance to a 9-element time tuple representing local time. See [Time Tuple Format](#time-tuple-format) below.
-
-**Parameters:**
-- `secs` (`int`, `float`, or `datetime`, optional): Unix timestamp or datetime instance to convert. Default: `None` (uses the current time).
-
-**Returns:** `list`: a 9-element time tuple `[year, month, day, hour, minute, second, weekday, yearday, dst]`.
-
-```python
-import time
-import datetime
-
-# Current local time tuple
-local_tuple = time.localtime()
-# [2025, 11, 26, 11, 58, 18, 3, 330, 0]
-
-# Specific timestamp
-specific_tuple = time.localtime(1705314645.0)
-# [2024, 1, 15, 18, 30, 45, 1, 15, 0]
-
-# From a datetime instance
-dt = datetime.datetime.now()
-dt_tuple = time.localtime(dt)
-```
-
-### `time.gmtime(secs=None)`
-
-Converts a Unix timestamp or datetime instance to a 9-element time tuple representing UTC time. See [Time Tuple Format](#time-tuple-format) below.
-
-**Parameters:**
-- `secs` (`int`, `float`, or `datetime`, optional): Unix timestamp or datetime instance to convert. Default: `None` (uses the current time).
-
-**Returns:** `list`: a 9-element time tuple `[year, month, day, hour, minute, second, weekday, yearday, dst]`.
-
-```python
-import time
-import datetime
-
-# Current UTC time tuple
-utc_tuple = time.gmtime()
-# [2025, 11, 26, 3, 58, 18, 3, 330, 0]
-
-# Specific UTC timestamp
-utc_specific = time.gmtime(1705314645.0)
-# [2024, 1, 15, 18, 30, 45, 1, 15, 0]
-
-# From a datetime instance
-dt = datetime.datetime.utcnow()
-dt_tuple = time.gmtime(dt)
-```
-
-### `time.mktime(tuple)`
-
-Converts a time tuple back to a Unix timestamp, interpreting the tuple as local time. Only the first six elements (year through second) are used.
-
-**Parameters:**
-- `tuple` (`list`): 9-element time tuple.
-
-**Returns:** `float`: the corresponding Unix timestamp.
-
-```python
-import time
-
-tuple = [2024, 1, 15, 18, 30, 45, 1, 15, 0]
-timestamp = time.mktime(tuple)
-# 1705314645.0
-```
-
-### `time.strftime(format, t=None)`
-
-Formats a time tuple according to the given format string.
-
-**Parameters:**
-- `format` (`str`): Python-style format string. See [Format Codes](#format-codes) below.
-- `t` (`list`, optional): 9-element time tuple. Default: `None` (uses the current local time).
-
-**Returns:** `str`: the formatted time string.
-
-```python
-import time
-
-# Format current time
-formatted = time.strftime("%Y-%m-%d %H:%M:%S")
-# "2025-11-26 11:58:18"
-
-# Format specific time tuple
-tuple = time.localtime(1705314645.0)
-formatted = time.strftime("%Y-%m-%d %H:%M:%S", tuple)
-# "2024-01-15 18:30:45"
-```
-
-### `time.strptime(string, format)`
-
-Parses a time string according to the given format and returns a time tuple.
-
-**Parameters:**
-- `string` (`str`): Time string to parse.
-- `format` (`str`): Python-style format string. See [Format Codes](#format-codes) below.
-
-**Returns:** `list`: a 9-element time tuple.
-
-**Raises:** `Error`: when `string` does not match `format`.
-
-```python
-import time
-
-tuple = time.strptime("2024-01-15 10:30:45", "%Y-%m-%d %H:%M:%S")
-# [2024, 1, 15, 10, 30, 45, 1, 15, 0]
-```
-
-### `time.asctime(t=None)`
-
-Converts a time tuple to a string in a standard fixed format.
-
-**Parameters:**
-- `t` (`list`, optional): 9-element time tuple. Default: `None` (uses the current local time).
-
-**Returns:** `str`: formatted as `"Wed Nov 26 11:58:18 2025"`.
-
-```python
-import time
-
-# Current time
-ascii_time = time.asctime()
-# "Wed Nov 26 11:58:18 2025"
-
-# Specific time tuple
-tuple = time.localtime(1705314645.0)
-ascii_time = time.asctime(tuple)
-# "Mon Jan 15 18:30:45 2024"
-```
-
-### `time.ctime(secs=None)`
-
-Converts a Unix timestamp to a string in a standard fixed format.
-
-**Parameters:**
-- `secs` (`int` or `float`, optional): Unix timestamp. Default: `None` (uses the current time).
-
-**Returns:** `str`: formatted as `"Wed Nov 26 11:58:18 2025"`.
-
-```python
-import time
-
-# Current time
-ctime_str = time.ctime()
-# "Wed Nov 26 11:58:18 2025"
-
-# Specific timestamp
-ctime_str = time.ctime(1705314645.0)
-# "Mon Jan 15 18:30:45 2024"
+local = time.localtime(now)       # local time tuple; also accepts a datetime
+print(abs(time.mktime(local) - now) < 1)   # True: mktime reverses localtime
+print(time.ctime(now))            # local time, e.g. "Mon Jan 15 10:30:45 2024"
 ```
 
 ## Time Tuple Format
 
 Time tuples are 9-element lists with the following structure:
 
-```python
+```text
 [year, month, day, hour, minute, second, weekday, yearday, dst]
 ```
 
@@ -278,8 +90,16 @@ Time tuples are 9-element lists with the following structure:
 | `%b` | Abbreviated month | Jan |
 | `%p` | AM/PM | PM |
 
+## Differences from Python
+
+- Time tuples are plain 9-element **lists**, not `struct_time`: index them (`t[0]`) rather than using `t.tm_year`. `mktime()` accepts a list.
+- The weekday field counts from Sunday (`0`), not Monday, and `dst` is always `0`.
+- Only the format codes in the table above are supported by `strftime()`/`strptime()`; others (such as `%I`, `%j`, `%y`, `%Z`) are left in the output unchanged. [datetime](../datetime/) formatting also supports `%I`, `%Z` and `%z`.
+- `ctime()`/`asctime()` do not pad single-digit days (`"Fri Jan 5 ..."`; Python gives `"Fri Jan  5 ..."`).
+- `time.now()` is an addition. `monotonic()`, `time_ns()`, `process_time()` and the other `*_ns` variants are not available; use `perf_counter()`.
+
 ## See Also
 
 - [datetime](../datetime/) - Higher-level date/time objects with arithmetic and comparison
 - [platform](../platform/) - Platform identifying data
-- [io](../io/) - In-memory I/O streams
+- [io](../../text-processing/io/) - In-memory I/O streams

@@ -2,7 +2,7 @@
 title: Native API
 description: Direct object-level control for extending Scriptling.
 tags: [go-integration, embedding, go]
-weight: 2
+weight: 4
 aliases:
   - /docs/go-integration/native/
 ---

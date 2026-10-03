@@ -3,8 +3,7 @@ title: scriptling.wait_for
 linkTitle: wait_for
 description: Wait for files, directories, ports, HTTP endpoints, or processes to become available.
 tags: [libraries, utilities]
-weight: 10
-
+weight: 12
 aliases:
   - /reference/libraries/scriptling/utilities/wait_for/
 ---

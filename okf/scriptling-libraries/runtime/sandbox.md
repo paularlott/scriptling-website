@@ -119,7 +119,7 @@ import json
 data.sort()
 result = json.dumps(data)
 """)
-print(env.get("result"))  # "[1, 1, 3, 4, 5]"
+print(env.get("result"))  # [1,1,3,4,5]
 ```
 
 ### `env.exec_file(path)`

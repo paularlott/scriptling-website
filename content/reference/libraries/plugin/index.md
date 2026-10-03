@@ -1,6 +1,6 @@
 ---
 title: scriptling.plugin
-linkTitle: Plugin
+linkTitle: Plugins
 description: Control library for listing, inspecting, calling, and loading executable plugins at runtime.
 tags: [libraries, plugins]
 weight: 95

@@ -279,7 +279,7 @@ def fn(): ...
 
 For full coverage including decorators with arguments, the registration pattern, class decorators, and limitations, see the dedicated [Decorators](../decorators/) page.
 
-See also [Classes](../classes/#decorators) for `@property`, `@<name>.setter`, `@staticmethod`, and `@classmethod`.
+See also [Class Decorators & Properties](../classes/decorators/) for `@property`, `@<name>.setter`, `@staticmethod`, and `@classmethod`.
 
 ## Lambda Functions
 
@@ -377,9 +377,13 @@ head, *tail = [1, 2, 3]
 a, *b, c = [1, 2]
 # a=1, b=[], c=2
 
-# In loops
-for first, *rest in [[1,2,3], [4,5,6,7]]:
+# In loops: unpack inside the body (a starred target in the
+# `for` header itself is not supported)
+for item in [[1,2,3], [4,5,6,7]]:
+    first, *rest = item
     print(f"first={first}, rest={rest}")
+# first=1, rest=[2, 3]
+# first=4, rest=[5, 6, 7]
 ```
 
 ## See Also

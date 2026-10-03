@@ -2,7 +2,7 @@
 title: Checking Script Requirements
 description: Verify a script's inline metadata block — version, libraries, plugins — before running it in an embedded host.
 tags: [go-integration, embedding, metadata]
-weight: 14
+weight: 15
 ---
 
 Scripts can declare their requirements in an inline metadata block (`# /// script`): a minimum interpreter version, the libraries they import, and the plugins they expect to be connected. The format is documented in [Script Metadata](/docs/script-metadata/). The CLI checks it automatically before running a script; an embedding host gets the same guarantee from the `metadata` package — parse the block, verify it against the environment the host actually provides, and refuse to run anything unmet.
@@ -103,5 +103,5 @@ A runnable version of this whole flow — host version, a registered library sat
 ## See Also
 
 - [Script Metadata](/docs/script-metadata/) — the block format and keys
-- [Embedding Plugins](../plugins/) — loading plugins in a host
+- [Plugin Manager](/docs/plugins/host-integration/) — loading plugins in a host
 - [Library Loader Chain](../loader-chain/) — module resolution to feed `Resolves`

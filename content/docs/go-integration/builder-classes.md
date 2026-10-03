@@ -2,7 +2,7 @@
 title: Builder Classes
 description: Type-safe class builder with automatic method conversion.
 tags: [go-integration, embedding, go]
-weight: 9
+weight: 11
 aliases:
   - /docs/go-integration/builder/classes/
 ---

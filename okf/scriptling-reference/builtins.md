@@ -1,5 +1,5 @@
 ---
-description: Type conversions, math, string, list, and dictionary built-in functions in Scriptling.
+description: Every Scriptling built-in function, A to Z, with type conversion, math, string, list, dictionary, attribute and iteration functions.
 generated:
     by: scriptling-website/okf.py
 resource: https://scriptling.dev/reference/builtins/
@@ -9,12 +9,130 @@ status: stable
 tags:
     - reference
     - builtins
+    - abs
+    - all
+    - any
+    - append
+    - bin
+    - bool
+    - bytes
+    - callable
+    - chr
+    - copy
+    - delattr
+    - dict
+    - dir
+    - divmod
+    - enumerate
+    - filter
+    - float
+    - format
+    - getattr
+    - hasattr
+    - hash
+    - help
+    - hex
+    - id
+    - int
+    - isinstance
+    - issubclass
+    - items
+    - iter
+    - keys
+    - len
+    - list
+    - map
+    - max
+    - min
+    - next
+    - oct
+    - ord
+    - pow
+    - print
+    - range
+    - repr
+    - reversed
+    - round
+    - set
+    - setattr
+    - slice
+    - sorted
+    - sort
+    - str
+    - sum
+    - tuple
+    - type
+    - values
+    - yield_now
+    - zip
 title: Built-in Functions
 type: Reference
 ---
 # Built-in Functions
 
 Scriptling provides many built-in functions that are always available without importing.
+
+## All Built-ins A–Z
+
+| Function | Purpose |
+|---|---|
+| [`abs(x)`](#math-functions) | Absolute value |
+| [`all(iterable)`](#iteration-utilities) | True if every item is truthy |
+| [`any(iterable)`](#iteration-utilities) | True if any item is truthy |
+| [`append(list, x)`](#list-functions) | Function form of `list.append` |
+| [`bin(n)`](#number-formatting) | Binary string, `"0b1010"` |
+| [`bool(x)`](#bool) | Convert to `True`/`False` |
+| [`bytes(...)`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) | Immutable byte string |
+| [`callable(x)`](#callable) | True if `x` can be called |
+| [`chr(n)`](#character-conversion) | Character for a code point |
+| [`classmethod`](https://scriptling.dev/okf/scriptling-reference/classes/decorators.md#classmethod) | Decorator for class methods |
+| [`copy(x)`](#copy) | Shallow copy |
+| [`delattr(obj, name)`](#object-and-attribute-functions) | Delete an attribute |
+| [`dict(...)`](#dict) | Create a dictionary |
+| [`dir([obj])`](#dir) | Names defined on an object, or all builtins |
+| [`divmod(a, b)`](#math-functions) | `(quotient, remainder)` |
+| [`enumerate(iterable, start=0)`](#iteration-utilities) | Pairs of `(index, item)` |
+| [`filter(fn, iterable)`](#iteration-utilities) | Items for which `fn` is truthy |
+| [`float(x)`](#float) | Convert to float |
+| [`format(value, spec)`](#object-and-attribute-functions) | Format one value, as in an f-string |
+| [`getattr(obj, name[, default])`](#object-and-attribute-functions) | Read an attribute by name |
+| [`hasattr(obj, name)`](#object-and-attribute-functions) | True if the attribute exists |
+| [`hash(x)`](#object-and-attribute-functions) | Hash value of a hashable object |
+| [`help([name])`](#object-and-attribute-functions) | Show help for a function or library |
+| [`hex(n)`](#number-formatting) | Hexadecimal string, `"0xff"` |
+| [`id(x)`](#object-and-attribute-functions) | Identity of an object |
+| [`int(x[, base])`](#int) | Convert to integer |
+| [`isinstance(x, type)`](#isinstance) | Type check, including subclasses |
+| [`issubclass(cls, base)`](#issubclass) | Class inheritance check |
+| [`items(d), keys(d), values(d)`](#dictionary-functions) | Function forms of the dict view methods |
+| [`iter(x), next(it[, default])`](#iterator-protocol) | Create and advance iterators |
+| [`len(x)`](#list-functions) | Number of items |
+| [`list(iterable)`](#list) | Create a list |
+| [`map(fn, iterable, ...)`](#iteration-utilities) | Apply `fn` to each item |
+| [`max(...), min(...)`](#math-functions) | Largest / smallest, with `key=` and `default=` |
+| [`oct(n)`](#number-formatting) | Octal string, `"0o10"` |
+| [`ord(c)`](#character-conversion) | Code point of a character |
+| [`pow(x, y[, mod])`](#math-functions) | Power, optionally modular |
+| [`print(*values, sep=" ")`](#io-functions) | Write to standard output |
+| [`property`](https://scriptling.dev/okf/scriptling-reference/classes/decorators.md#property) | Decorator for computed attributes |
+| [`range(...)`](#range-function) | Lazy sequence of integers |
+| [`repr(x)`](#object-and-attribute-functions) | Developer representation, strings quoted |
+| [`reversed(seq)`](#iteration-utilities) | Iterate in reverse |
+| [`round(x[, digits])`](#math-functions) | Round half to even |
+| [`set(iterable)`](#set) | Create a set |
+| [`setattr(obj, name, value)`](#object-and-attribute-functions) | Set an attribute by name |
+| [`slice(start, stop[, step])`](../slicing/#the-slice-builtin) | Slice object for indexing |
+| [`sorted(iterable, key=, reverse=)`](#list-functions) | New sorted list |
+| [`staticmethod`](https://scriptling.dev/okf/scriptling-reference/classes/decorators.md#staticmethod) | Decorator for static methods |
+| [`str(x)`](#str) | Convert to string |
+| [`sum(iterable[, start])`](#math-functions) | Sum of items |
+| [`super()`](https://scriptling.dev/okf/scriptling-reference/classes.md#the-super-function) | Call the parent class |
+| [`tuple(iterable)`](#tuple) | Create a tuple |
+| [`type(x)`](#type) | Type name of a value |
+| [`yield_now()`](#yield_now) | Let other tasks run |
+| [`zip(*iterables)`](#iteration-utilities) | Combine iterables item by item |
+
+The exception types (`Exception`, `ValueError`, `KeyError`, ...) are also builtins; see [Error Handling](https://scriptling.dev/okf/scriptling-reference/error-handling.md).
 
 ## Type Conversions
 
@@ -384,9 +502,9 @@ s1.issuperset(s2)           # False
 person = {"name": "Alice", "age": 30}
 
 len(person)                        # 2
-keys(person)                       # dict_keys(["name", "age"])  (a view object)
-values(person)                     # dict_values(["Alice", 30])  (a view object)
-items(person)                      # dict_items([["name", "Alice"], ["age", 30]])  (a view object)
+keys(person)                       # dict_keys(['name', 'age'])  (a view object)
+values(person)                     # dict_values(['Alice', 30])  (a view object)
+items(person)                      # dict_items([('name', 'Alice'), ('age', 30)])  (a view object)
 
 # Iterate over dictionary (views are iterable)
 for item in items(person):
@@ -533,6 +651,53 @@ input("Prompt: ")                  # Read user input (returns string)
 
 `input()` is not a core builtin: it is only available when the `sys` library is registered with a stdin reader (for example, by the `scriptling` CLI in interactive or server stdin mode). It is absent in a bare embedded interpreter unless the embedder provides it.
 
+## Object and Attribute Functions
+
+```python
+class Point:
+    def __init__(self):
+        self.x = 1
+
+p = Point()
+getattr(p, "x")                  # 1
+getattr(p, "z", 0)               # 0: default when the attribute is missing
+hasattr(p, "x")                  # True
+setattr(p, "y", 5)               # p.y is now 5
+delattr(p, "y")                  # removes p.y
+
+repr("a")                        # "'a'" (strings are quoted)
+format(3.14159, ".2f")           # "3.14": same specs as f-strings
+format(42, "05d")                # "00042"
+format("x", ">3")                # "  x"
+
+hash("a") == hash("a")           # True: equal values hash equally
+id(p) == id(p)                   # True: identity of an object
+help("len")                      # prints the help text for len
+```
+
+`getattr(obj, "name")` is exactly `obj.name`: it returns bound methods and property values and consults `__getattr__`. Without a default it raises `AttributeError` for a missing attribute, and `hasattr` returns `False` only when that `AttributeError` occurs. `delattr` on a missing attribute also raises `AttributeError`. All four also work on dictionaries and library modules, treating keys as attributes.
+
+`format(value, spec)` follows Python: numbers and strings take the spec, a class can define `__format__(self, spec)`, and any other value accepts only an empty spec (raising `TypeError` otherwise), so format `str(x)` when you want to pad it.
+
+## Methods as Values
+
+Methods of strings, lists, dicts, tuples, sets and bytes can be used without calling them, as in Python. Through a value they are bound to it; through the type they take the value as their first argument:
+
+```python
+sorted(["banana", "Apple"], key=str.lower)   # ['Apple', 'banana']
+list(map(str.strip, [" a ", "b "]))         # ['a', 'b']
+
+items = []
+add = items.append                           # bound to items
+add(1)                                       # items is now [1]
+
+dict.fromkeys(["x", "y"], 0)                 # {'x': 0, 'y': 0}
+hasattr([], "append")                        # True
+dir("")                                      # ['capitalize', 'casefold', ...]
+```
+
+Numbers have no methods in Scriptling; use the builtins (`abs`, `round`, `int`, `float`) and the `math` library instead.
+
 ## Introspection
 
 ### dir()
@@ -540,8 +705,8 @@ input("Prompt: ")                  # Read user input (returns string)
 Returns a sorted list of names for an object:
 
 ```python
-# No argument: all builtin names
-names = dir()          # ["abs", "all", "any", ...]
+# No argument: builtin names (unlike Python, not the local scope)
+names = dir()          # ['AttributeError', 'Exception', ..., 'abs', 'all', ...]
 
 # Instance: fields + methods (including inherited)
 class Dog:
@@ -551,13 +716,13 @@ class Dog:
         return "woof"
 
 d = Dog("Rex")
-dir(d)   # ["bark", "name", ...]
+dir(d)   # ['__init__', 'bark', 'name']
 
 # Class: method names
-dir(Dog)   # ["bark", "__init__"]
+dir(Dog)   # ['__init__', 'bark']
 
-# Dict: key names
-dir({"x": 1, "y": 2})   # ["x", "y"]
+# Dict: dict method names (not keys)
+dir({"x": 1, "y": 2})   # ['clear', 'copy', 'fromkeys', 'get', 'items', ...]
 ```
 
 ## Copying

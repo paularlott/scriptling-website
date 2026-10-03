@@ -1,5 +1,5 @@
 ---
-description: Libraries for working with text, strings, and markup.
+description: Libraries for working with text, strings, markup, and in-memory text streams.
 generated:
     by: scriptling-website/okf.py
 resource: https://scriptling.dev/reference/libraries/text-processing/
@@ -23,3 +23,4 @@ type: API Reference
 | [html.parser](https://scriptling.dev/okf/scriptling-libraries/text-processing/html.parser.md) | HTML/XHTML parser |
 | [difflib](https://scriptling.dev/okf/scriptling-libraries/text-processing/difflib.md) | Sequence comparison and diff generation |
 | [shlex](https://scriptling.dev/okf/scriptling-libraries/text-processing/shlex.md) | Shell-style quoting, splitting, and joining |
+| [io](https://scriptling.dev/okf/scriptling-libraries/text-processing/io.md) | In-memory text I/O streams (StringIO) |

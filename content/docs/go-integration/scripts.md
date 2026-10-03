@@ -2,7 +2,7 @@
 title: Script Extensions
 description: Extend Scriptling using Scriptling code itself.
 tags: [go-integration, embedding]
-weight: 11
+weight: 3
 ---
 
 In addition to registering Go functions and libraries, you can also register functions and libraries written in Scriptling itself.

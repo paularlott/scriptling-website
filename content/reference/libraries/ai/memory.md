@@ -226,14 +226,14 @@ The simplest way to give an agent memory is to pass `memory=` to `Agent()`. The 
 
 ```python
 import scriptling.ai as ai
-import scriptling.ai.agent as agent
+import scriptling.ai.agent.interact as interact
 import scriptling.ai.memory as memory
 import scriptling.runtime.kv as kv
 
 client = ai.Client("http://127.0.0.1:1234/v1")
 mem = memory.new(kv.open("./memory-db"))
 
-bot = agent.Agent(client, model="gpt-4", memory=mem)
+bot = interact.Agent(client, model="gpt-4", memory=mem)  # interact.Agent adds interact()
 bot.interact()
 ```
 

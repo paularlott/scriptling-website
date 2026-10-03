@@ -1,5 +1,5 @@
 ---
-description: Time access, I/O streams, and platform information.
+description: Time and dates, platform and interpreter information, and logging.
 generated:
     by: scriptling-website/okf.py
 resource: https://scriptling.dev/reference/libraries/time-system/
@@ -18,6 +18,6 @@ type: API Reference
 |---------|-------------|
 | [time](https://scriptling.dev/okf/scriptling-libraries/time-system/time.md) | Time access and conversions |
 | [datetime](https://scriptling.dev/okf/scriptling-libraries/time-system/datetime.md) | Date and time formatting |
-| [io](https://scriptling.dev/okf/scriptling-libraries/time-system/io.md) | In-memory I/O streams (StringIO) |
 | [platform](https://scriptling.dev/okf/scriptling-libraries/time-system/platform.md) | Platform identifying data |
-| [urllib](https://scriptling.dev/okf/scriptling-libraries/time-system/urllib.md) | URL handling |
+| [sys](https://scriptling.dev/okf/scriptling-libraries/time-system/sys.md) | System-specific parameters: argv, stdin, exit (extended; requires registration when embedding) |
+| [logging](https://scriptling.dev/okf/scriptling-libraries/time-system/logging.md) | Logging functionality (extended; requires registration when embedding) |

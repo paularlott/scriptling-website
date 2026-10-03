@@ -1,6 +1,6 @@
 ---
 title: scriptling.package
-linkTitle: package
+linkTitle: Packages
 description: Read metadata and files from app and plugin bundles loaded by the host.
 tags: [libraries, packages, bundles]
 weight: 19
@@ -63,7 +63,7 @@ Returns `True` if `path` names an existing file or directory in the package. Unk
 
 ### `read_file(name, path)` / `read_bytes(name, path)`
 
-Read a packaged file as `str` or [`bytes`](data-formats/bytes/) respectively. Paths are package-relative; a leading slash is removed and path traversal is cleaned before access.
+Read a packaged file as `str` or [`bytes`](../data-formats/bytes/) respectively. Paths are package-relative; a leading slash is removed and path traversal is cleaned before access.
 
 **Raises:** `Error` if the package or file is not available.
 
@@ -89,5 +89,5 @@ The API is read-only, but it makes host-selected bundle contents visible to the 
 
 ## See Also
 
-- [Runtime MCP](runtime/mcp/): tools packaged in app bundles
+- [Runtime MCP](../runtime/mcp/): tools packaged in app bundles
 - [Libraries](./): library availability and registration overview

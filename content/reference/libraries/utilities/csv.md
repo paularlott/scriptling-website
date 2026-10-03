@@ -3,13 +3,12 @@ title: scriptling.csv
 linkTitle: csv
 description: CSV parsing and formatting (string-based, no filesystem access).
 tags: [libraries, utilities, data-formats]
-weight: 6
-
+weight: 3
 aliases:
   - /reference/libraries/scriptling/utilities/csv/
 ---
 
-The `scriptling.csv` library provides CSV parsing and formatting using Go's `encoding/csv` (RFC 4180 compliant). Unlike Python's `csv` module (which works with file objects), this library operates on strings — parse a CSV string into rows, or format rows into a CSV string. Use `os.read_file()` / `os.write_file()` for file I/O.
+The `scriptling.csv` library provides CSV parsing and formatting using Go's `encoding/csv` (RFC 4180 compliant). Unlike Python's `csv` module (which works with file objects), this library operates on strings: `loads()` a CSV string into rows, or `dumps()` rows into a CSV string. Use `os.read_file()` / `os.write_file()` for file I/O.
 
 Available in all environments (including MCP — no filesystem access required).
 
@@ -38,12 +37,12 @@ Parse a CSV string into a list of rows. Handles quoting, embedded commas, and em
 import scriptling.csv as csv
 
 text = "name,age\nAlice,30\nBob,25\n"
-rows = csv.parse(text)
-# [["name", "age"], ["Alice", "30"], ["Bob", "25"]]
+rows = csv.loads(text)
+# [['name', 'age'], ['Alice', '30'], ['Bob', '25']]
 
 # Quoted fields with embedded commas
-rows = csv.parse('a,b\n"hello, world",x\n')
-# [["a", "b"], ["hello, world", "x"]]
+rows = csv.loads('a,b\n"hello, world",x\n')
+# [['a', 'b'], ['hello, world', 'x']]
 ```
 
 ### `loads_dict(content, delimiter=",")`
@@ -55,9 +54,9 @@ Parse CSV text where the first row contains column headers. Each subsequent row 
 ```python
 import scriptling.csv as csv
 
-people = csv.parse_dict("name,age\nAlice,30\nBob,25\n")
-# [{"name": "Alice", "age": "30"}, {"name": "Bob", "age": "25"}]
-print(people[0]["name"])  # "Alice"
+people = csv.loads_dict("name,age\nAlice,30\nBob,25\n")
+# [{'name': 'Alice', 'age': '30'}, {'name': 'Bob', 'age': '25'}]
+print(people[0]["name"])  # Alice
 ```
 
 ### `dumps(rows, delimiter=",")`
@@ -73,7 +72,7 @@ Format a list of lists into CSV text. Values containing commas, quotes, or newli
 ```python
 import scriptling.csv as csv
 
-text = csv.format([["a", "b"], ["1,000", "2"]])
+text = csv.dumps([["a", "b"], ["1,000", "2"]])
 # 'a,b\n"1,000",2\n'
 ```
 
@@ -91,11 +90,11 @@ Format a list of dicts into CSV text with a header row. Column headers are taken
 ```python
 import scriptling.csv as csv
 
-text = csv.format_dict([
+text = csv.dumps_dict([
     {"name": "Alice", "age": "30"},
     {"name": "Bob", "age": "25"},
 ], columns=["name", "age"])
-# "name,age\nAlice,30\nBob,25\n"
+# 'name,age\nAlice,30\nBob,25\n'
 ```
 
 ## Reading and Writing Files
@@ -107,10 +106,10 @@ import scriptling.csv as csv
 import os
 
 # Read
-rows = csv.parse_dict(os.read_file("data.csv"))
+rows = csv.loads_dict(os.read_file("data.csv"))
 
 # Write
-os.write_file("output.csv", csv.format_dict(rows, columns=["name", "age"]))
+os.write_file("output.csv", csv.dumps_dict(rows, columns=["name", "age"]))
 ```
 
 ## See Also

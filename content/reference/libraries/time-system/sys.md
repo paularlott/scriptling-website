@@ -1,18 +1,13 @@
 ---
-description: System-specific parameters and functions, similar to Python's sys module.
-generated:
-    by: scriptling-website/okf.py
-resource: https://scriptling.dev/reference/libraries/http-process/sys/
-sources:
-    - resource: https://scriptling.dev/reference/libraries/http-process/sys/
-status: stable
-tags:
-    - libraries
-    - runtime
 title: sys
-type: API Reference
+description: System-specific parameters and functions, similar to Python's sys module.
+tags: [libraries, runtime]
+weight: 4
+aliases:
+  - /reference/libraries/extlib/sys/
+  - /reference/libraries/sys/
+  - /reference/libraries/http-process/sys/
 ---
-# sys
 
 The `sys` library provides access to system-specific parameters and functions: platform identification, command-line arguments, stdin, and interpreter exit: similar to Python's `sys` module.
 
@@ -188,7 +183,7 @@ for i in range(len(sys.argv) - 1):
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
 `sys` exposes whatever `argv` and `stdin` the embedder passes during registration: if those contain secrets, a script can read them. The actual Go signature requires both values:
 
@@ -196,7 +191,7 @@ This is an extended library, requiring registration in Go, see [Library Registra
 extlibs.RegisterSysLibrary(p, argv, stdin)
 ```
 
-Pass `nil` for `stdin` when input should not be available. Never register this library (or pass sensitive argv/stdin) for untrusted code. See the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#environment-variables).
+Pass `nil` for `stdin` when input should not be available. Never register this library (or pass sensitive argv/stdin) for untrusted code. See the [Security Guide](/docs/security/#environment-variables).
 
 ## Python Compatibility
 
@@ -217,5 +212,5 @@ This library implements a subset of Python's `sys` module:
 
 ## See Also
 
-- [subprocess](https://scriptling.dev/okf/scriptling-libraries/http-process/subprocess.md): Spawn external commands
-- [os](https://scriptling.dev/okf/scriptling-libraries/filesystem/os.md): Environment variables and filesystem access
+- [subprocess](../../http-process/subprocess/): Spawn external commands
+- [os](../../filesystem/os/): Environment variables and filesystem access

@@ -2,7 +2,7 @@
 title: Linting
 description: Lex and parse Scriptling source without execution.
 tags: [go-integration, embedding, go]
-weight: 17
+weight: 16
 ---
 
 The `lint` package lexes and parses Scriptling source without executing it. It reports syntax errors from the parser; it does not perform semantic analysis, name resolution, style checks, or security analysis. Parsing untrusted text is safe because no script code runs, but a successful result does not make later execution safe.

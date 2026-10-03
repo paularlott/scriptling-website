@@ -4,7 +4,7 @@
 
 Docs: https://scriptling.dev/docs/
 
-All 185 OKF 0.2 concepts below are plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
+All 190 OKF 0.2 concepts below are plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
 
 ## Essential
 
@@ -49,11 +49,11 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md): How to register built-in libraries when embedding Scriptling in Go.
 - [Linting](https://scriptling.dev/okf/scriptling-docs/go-integration/lint.md): Lex and parse Scriptling source without execution.
 - [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md): Flexible library loading from multiple sources.
+- [Dunder Methods & Properties](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes/special-methods.md): Give native Go classes special (dunder) methods such as __getitem__, and expose properties and static methods with object.Property and object.StaticMethod.
 - [Native Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes.md): Create custom classes with full control over methods and inheritance.
 - [Native Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md): Register individual Go functions with direct control.
 - [Native Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md): Create libraries with functions, constants, and sub-libraries.
 - [Native API](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md): Direct object-level control for extending Scriptling.
-- [Embedding Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md): Enable executable plugins when embedding Scriptling in Go.
 - [Checking Script Requirements](https://scriptling.dev/okf/scriptling-docs/go-integration/script-metadata.md): Verify a script's inline metadata block — version, libraries, plugins — before running it in an embedded host.
 - [Script Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md): Extend Scriptling using Scriptling code itself.
 - [Go Integration](https://scriptling.dev/okf/scriptling-docs/go-integration.md): Embed Scriptling in your Go application.
@@ -78,7 +78,6 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [Documentation](https://scriptling.dev/okf/scriptling-docs/scriptling-docs.md): Complete documentation for Scriptling - a minimal, sandboxed Python-like scripting language for Go applications.
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md): Security best practices for embedding and running Scriptling in your applications.
 - [Fetching and Processing API Data](https://scriptling.dev/okf/scriptling-docs/tutorials/api-data-fetching.md): Write a CLI script that fetches data from a public API and processes the results.
-- [Writing a Bash Plugin](https://scriptling.dev/okf/scriptling-docs/tutorials/bash-plugin.md): Implement the plugin JSON-RPC protocol directly from a shell script.
 - [Writing a C Plugin](https://scriptling.dev/okf/scriptling-docs/tutorials/c-plugin.md): Build a multi-threaded C plugin with functions, classes, properties, callbacks, and logging.
 - [Embedding a Rules Engine](https://scriptling.dev/okf/scriptling-docs/tutorials/embedding-rules-engine.md): Embed Scriptling in a Go application to evaluate business rules at runtime.
 - [Writing a Fetcher Plugin](https://scriptling.dev/okf/scriptling-docs/tutorials/fetcher-plugin.md): Serve libraries, assets and script sources from a plugin-owned scheme such as demo://.
@@ -93,7 +92,9 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 
 > Language reference: syntax, types, operators, control flow, functions, classes, and error handling.
 
-- [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md): Type conversions, math, string, list, and dictionary built-in functions in Scriptling.
+- [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md): Every Scriptling built-in function, A to Z, with type conversion, math, string, list, dictionary, attribute and iteration functions.
+- [Class Decorators & Properties](https://scriptling.dev/okf/scriptling-reference/classes/decorators.md): Using @property, @staticmethod, @classmethod, and custom function and class decorators with Scriptling classes.
+- [Dunder Methods](https://scriptling.dev/okf/scriptling-reference/classes/dunder-methods.md): The dunder (magic) methods Scriptling classes can define, covering string conversion, length, truthiness, comparison, arithmetic, context managers, membership, finalizers, and iteration.
 - [Classes](https://scriptling.dev/okf/scriptling-reference/classes.md): Class definition, inheritance, super(), dunder methods, __init__, __del__, and property decorators in Scriptling.
 - [Control Flow](https://scriptling.dev/okf/scriptling-reference/control-flow.md): Conditionals, loops, match statements, break, continue, and pass in Scriptling.
 - [Decorators](https://scriptling.dev/okf/scriptling-reference/decorators.md): Using decorators to wrap functions and classes, decorator factories with arguments, stacking, and built-in decorators in Scriptling.
@@ -102,9 +103,9 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [Operators](https://scriptling.dev/okf/scriptling-reference/operators.md): Arithmetic, comparison, boolean, bitwise operators and precedence in Scriptling.
 - [Performance Guide](https://scriptling.dev/okf/scriptling-reference/performance.md): Tips and best practices for writing efficient Scriptling code.
 - [Python Differences](https://scriptling.dev/okf/scriptling-reference/python-differences.md): What's NOT supported and key differences between Scriptling and Python.
-- [Language Guide](https://scriptling.dev/okf/scriptling-reference/scriptling-reference.md): Reference for the Scriptling language - syntax, data types, operators, control flow, functions, classes, and built-in functions.
+- [Reference](https://scriptling.dev/okf/scriptling-reference/scriptling-reference.md): Reference for the Scriptling language - syntax, data types, operators, control flow, functions, classes, and built-in functions.
 - [Indexing & Slicing](https://scriptling.dev/okf/scriptling-reference/slicing.md): Single index access, slice notation, and the slice() builtin in Scriptling.
-- [Syntax Rules](https://scriptling.dev/okf/scriptling-reference/syntax.md): Indentation, comments, case sensitivity, and multiline syntax in Scriptling.
+- [Syntax Rules](https://scriptling.dev/okf/scriptling-reference/syntax.md): Indentation, comments, strings, multiline syntax, imports and keywords in Scriptling.
 - [Data Types](https://scriptling.dev/okf/scriptling-reference/types.md): Integers, floats, strings, booleans, lists, dictionaries, sets, and tuples in Scriptling.
 
 ## scriptling-libraries
@@ -113,6 +114,8 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 
 - [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/ai/agent.md): Agentic AI loop for building AI agents with automatic tool execution.
 - [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/ai/ai.md): AI and LLM functions for OpenAI-compatible APIs: clients, completions, embeddings, and tool-calling helpers.
+- [Responses API](https://scriptling.dev/okf/scriptling-libraries/ai/client/responses.md): Create, stream, fetch, cancel, delete, and compact OpenAI Responses API responses with scriptling.ai.Client.
+- [Streaming Completions](https://scriptling.dev/okf/scriptling-libraries/ai/client/streaming.md): Stream chat completions from scriptling.ai.Client with completion_stream() and the ChatStream object.
 - [scriptling.ai.Client](https://scriptling.dev/okf/scriptling-libraries/ai/client.md): Primary client interface for calling AI providers like OpenAI, Claude, and Gemini.
 - [scriptling.ai.agent.interact](https://scriptling.dev/okf/scriptling-libraries/ai/interact.md): Interactive terminal interface for conversing with AI agents via a REPL-style loop.
 - [scriptling.ai.memory](https://scriptling.dev/okf/scriptling-libraries/ai/memory.md): Long-term, deduplicated memory store for AI agents backed by a KV store.
@@ -146,20 +149,20 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [tempfile](https://scriptling.dev/okf/scriptling-libraries/filesystem/tempfile.md): Temporary file and directory creation with security restrictions.
 - [zipfile](https://scriptling.dev/okf/scriptling-libraries/filesystem/zipfile.md): Read and write ZIP archives.
 - [File System](https://scriptling.dev/okf/scriptling-libraries/filesystem.md): File and directory access libraries. All require registration when embedding.
-- [logging](https://scriptling.dev/okf/scriptling-libraries/http-process/logging.md): Python-style logging, backed by structured slog-based loggers.
 - [requests](https://scriptling.dev/okf/scriptling-libraries/http-process/requests.md): HTTP client for making GET, POST, PUT, DELETE, and PATCH requests.
-- [secrets](https://scriptling.dev/okf/scriptling-libraries/http-process/secrets.md): Cryptographically strong random number generation for tokens, keys, and passwords.
 - [subprocess](https://scriptling.dev/okf/scriptling-libraries/http-process/subprocess.md): Spawn and manage subprocesses, similar to Python's subprocess module.
-- [sys](https://scriptling.dev/okf/scriptling-libraries/http-process/sys.md): System-specific parameters and functions, similar to Python's sys module.
-- [HTTP & Process](https://scriptling.dev/okf/scriptling-libraries/http-process.md): HTTP client, subprocess management, and system libraries. All require registration when embedding.
+- [urllib.parse](https://scriptling.dev/okf/scriptling-libraries/http-process/urllib.md): Parse, split, join, and percent-encode/decode URLs and query strings without network access.
+- [HTTP & Process](https://scriptling.dev/okf/scriptling-libraries/http-process.md): HTTP requests, URL parsing, and subprocess management.
 - [base64](https://scriptling.dev/okf/scriptling-libraries/math-numbers/base64.md): Base64 encoding and decoding.
 - [hashlib](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hashlib.md): Cryptographic hash functions.
 - [hmac](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hmac.md): Keyed-hashing for message authentication (HMAC).
+- [Vectors & FloatArray](https://scriptling.dev/okf/scriptling-libraries/math-numbers/math/vectors.md): Vector and matrix functions in the math library, and the FloatArray type returned by math.array().
 - [math](https://scriptling.dev/okf/scriptling-libraries/math-numbers/math.md): Mathematical functions and constants.
 - [random](https://scriptling.dev/okf/scriptling-libraries/math-numbers/random.md): Random number generation, compatible with Python's random module.
+- [secrets](https://scriptling.dev/okf/scriptling-libraries/math-numbers/secrets.md): Cryptographically strong random number generation for tokens, keys, and passwords.
 - [statistics](https://scriptling.dev/okf/scriptling-libraries/math-numbers/statistics.md): Functions for calculating mathematical statistics of numeric data.
 - [uuid](https://scriptling.dev/okf/scriptling-libraries/math-numbers/uuid.md): UUID generation, matching Python's uuid module.
-- [Math & Numbers](https://scriptling.dev/okf/scriptling-libraries/math-numbers.md): Mathematical functions, hashing, and random number generation.
+- [Math & Numbers](https://scriptling.dev/okf/scriptling-libraries/math-numbers.md): Mathematical functions, hashing, and random and secure-random number generation.
 - [scriptling.mcp](https://scriptling.dev/okf/scriptling-libraries/mcp/client.md): MCP client library for connecting to MCP servers and invoking the tools they expose.
 - [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md): Linking a tool to an interactive UI resource, from any tool registration style.
 - [scriptling.mcp.tool](https://scriptling.dev/okf/scriptling-libraries/mcp/tool.md): MCP tool helper for authoring MCP tools, with parameter access and result handling.
@@ -170,6 +173,7 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [scriptling.messaging.slack](https://scriptling.dev/okf/scriptling-libraries/messaging/slack.md): Slack Bot API client using Socket Mode for real-time events.
 - [scriptling.messaging.telegram](https://scriptling.dev/okf/scriptling-libraries/messaging/telegram.md): Telegram Bot API client for building bots on the Telegram platform.
 - [Messaging](https://scriptling.dev/okf/scriptling-libraries/messaging.md): Platform-agnostic bot framework for Telegram, Discord, Slack, and Console.
+- [Node Groups & Leader Election](https://scriptling.dev/okf/scriptling-libraries/networking/gossip/coordination.md): Metadata-criteria node groups and quorum-based leader election on a scriptling.net.gossip cluster.
 - [scriptling.net.gossip](https://scriptling.dev/okf/scriptling-libraries/networking/gossip.md): Gossip protocol cluster membership and messaging with failure detection and routing.
 - [scriptling.net.multicast](https://scriptling.dev/okf/scriptling-libraries/networking/multicast.md): UDP multicast group messaging for one-to-many communication on local networks.
 - [scriptling.net.resolve](https://scriptling.dev/okf/scriptling-libraries/networking/resolve.md): DNS resolution for hostname lookup, SRV records, and srv+http(s):// URLs.
@@ -197,17 +201,18 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [difflib](https://scriptling.dev/okf/scriptling-libraries/text-processing/difflib.md): Compute deltas between sequences, including unified diffs, similarity ratios, and close-match finding.
 - [html](https://scriptling.dev/okf/scriptling-libraries/text-processing/html.md): Escape and unescape HTML special characters and entities.
 - [html.parser](https://scriptling.dev/okf/scriptling-libraries/text-processing/html.parser.md): An HTML/XHTML parser compatible with Python's html.parser module.
-- [regex](https://scriptling.dev/okf/scriptling-libraries/text-processing/regex.md): Regular expression matching and text processing, following Python's re module conventions.
+- [io](https://scriptling.dev/okf/scriptling-libraries/text-processing/io.md): In-memory text I/O streams, providing StringIO as a buffer that behaves like a text file.
+- [re](https://scriptling.dev/okf/scriptling-libraries/text-processing/regex.md): Regular expression matching and text processing, following Python's re module conventions.
 - [shlex](https://scriptling.dev/okf/scriptling-libraries/text-processing/shlex.md): Shell-style lexical analysis — quoting, splitting, and joining command-line tokens.
 - [string](https://scriptling.dev/okf/scriptling-libraries/text-processing/string.md): String constants for character classification, matching Python's string module.
 - [textwrap](https://scriptling.dev/okf/scriptling-libraries/text-processing/textwrap.md): Text wrapping and filling utilities, compatible with Python's textwrap module.
-- [Text Processing](https://scriptling.dev/okf/scriptling-libraries/text-processing.md): Libraries for working with text, strings, and markup.
+- [Text Processing](https://scriptling.dev/okf/scriptling-libraries/text-processing.md): Libraries for working with text, strings, markup, and in-memory text streams.
 - [datetime](https://scriptling.dev/okf/scriptling-libraries/time-system/datetime.md): Date and time objects with construction, formatting, arithmetic, and comparison, using a Python-compatible API.
-- [io](https://scriptling.dev/okf/scriptling-libraries/time-system/io.md): In-memory text I/O streams, providing StringIO as a buffer that behaves like a text file.
+- [logging](https://scriptling.dev/okf/scriptling-libraries/time-system/logging.md): Python-style logging, backed by structured slog-based loggers.
 - [platform](https://scriptling.dev/okf/scriptling-libraries/time-system/platform.md): Read-only access to the underlying operating system, architecture, and hostname information.
+- [sys](https://scriptling.dev/okf/scriptling-libraries/time-system/sys.md): System-specific parameters and functions, similar to Python's sys module.
 - [time](https://scriptling.dev/okf/scriptling-libraries/time-system/time.md): Time access and conversions, including timestamps, time tuples, formatting, and sleeping.
-- [urllib.parse](https://scriptling.dev/okf/scriptling-libraries/time-system/urllib.md): Parse, split, join, and percent-encode/decode URLs and query strings without network access.
-- [Time & System](https://scriptling.dev/okf/scriptling-libraries/time-system.md): Time access, I/O streams, and platform information.
+- [Time & System](https://scriptling.dev/okf/scriptling-libraries/time-system.md): Time and dates, platform and interpreter information, and logging.
 - [scriptling.console](https://scriptling.dev/okf/scriptling-libraries/utilities/console.md): TUI (terminal UI) console for building interactive chat-style applications.
 - [scriptling.container](https://scriptling.dev/okf/scriptling-libraries/utilities/container.md): Container lifecycle management for Docker, Podman, and Apple Containers through a unified interface.
 - [scriptling.csv](https://scriptling.dev/okf/scriptling-libraries/utilities/csv.md): CSV parsing and formatting (string-based, no filesystem access).
@@ -217,7 +222,7 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [scriptling.nomad](https://scriptling.dev/okf/scriptling-libraries/utilities/nomad.md): HashiCorp Nomad client covering CSI volumes, dynamic host volumes, and jobs.
 - [scriptling.secret](https://scriptling.dev/okf/scriptling-libraries/utilities/secret.md): Resolve secrets through host-configured provider aliases without exposing provider credentials to scripts.
 - [scriptling.sed](https://scriptling.dev/okf/scriptling-libraries/utilities/sed.md): In-place file content replacement and capture group extraction.
-- [scriptling.similarity](https://scriptling.dev/okf/scriptling-libraries/utilities/similarity.md): Text similarity utilities for fuzzy matching, tokenization, and MinHash signatures.
+- [scriptling.similarity](https://scriptling.dev/okf/scriptling-libraries/utilities/similarity.md): Text similarity utilities for fuzzy matching, tokenization, MinHash signatures, and extractive text shortening.
 - [scriptling.toon](https://scriptling.dev/okf/scriptling-libraries/utilities/toon.md): TOON (Token-Oriented Object Notation) encoding and decoding, a compact, human-readable alternative to JSON.
 - [scriptling.wait_for](https://scriptling.dev/okf/scriptling-libraries/utilities/wait_for.md): Wait for files, directories, ports, HTTP endpoints, or processes to become available.
 - [scriptling.xml](https://scriptling.dev/okf/scriptling-libraries/utilities/xml.md): XML parsing and formatting (dict-based, string-only).

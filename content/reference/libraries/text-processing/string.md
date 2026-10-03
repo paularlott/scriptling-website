@@ -11,10 +11,6 @@ aliases:
 
 The `string` library provides string constants for character classification, such as ASCII letters, digits, and punctuation. It is commonly used for validating input or building character sets, matching Python's `string` module.
 
-## Available Functions
-
-This library has no functions, only constants.
-
 ## Constants
 
 | Constant          | Description                                                            |
@@ -28,105 +24,6 @@ This library has no functions, only constants.
 | `punctuation`     | ASCII punctuation characters (`` "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" ``) |
 | `whitespace`      | Whitespace characters (`" \t\n\r\v\f"`)                                 |
 | `printable`       | Concatenation of `digits`, `ascii_letters`, `punctuation`, and `whitespace` |
-
-### `string.ascii_letters`
-
-Concatenation of `ascii_lowercase` and `ascii_uppercase`.
-
-**Value:** `str` (`"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"`)
-
-```python
-import string
-print(string.ascii_letters)  # "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-```
-
-### `string.ascii_lowercase`
-
-Lowercase ASCII letters.
-
-**Value:** `str` (`"abcdefghijklmnopqrstuvwxyz"`)
-
-```python
-import string
-print(string.ascii_lowercase)  # "abcdefghijklmnopqrstuvwxyz"
-```
-
-### `string.ascii_uppercase`
-
-Uppercase ASCII letters.
-
-**Value:** `str` (`"ABCDEFGHIJKLMNOPQRSTUVWXYZ"`)
-
-```python
-import string
-print(string.ascii_uppercase)  # "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-```
-
-### `string.digits`
-
-Decimal digits.
-
-**Value:** `str` (`"0123456789"`)
-
-```python
-import string
-print(string.digits)  # "0123456789"
-```
-
-### `string.hexdigits`
-
-Hexadecimal digits, including both lowercase and uppercase letter forms.
-
-**Value:** `str` (`"0123456789abcdefABCDEF"`)
-
-```python
-import string
-print(string.hexdigits)  # "0123456789abcdefABCDEF"
-```
-
-### `string.octdigits`
-
-Octal digits.
-
-**Value:** `str` (`"01234567"`)
-
-```python
-import string
-print(string.octdigits)  # "01234567"
-```
-
-### `string.punctuation`
-
-ASCII punctuation characters.
-
-**Value:** `str` (`` "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" ``)
-
-```python
-import string
-print(string.punctuation)  # "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
-```
-
-### `string.whitespace`
-
-Whitespace characters: space, tab, newline, carriage return, vertical tab, and form feed.
-
-**Value:** `str` (`" \t\n\r\v\f"`)
-
-```python
-import string
-print(repr(string.whitespace))  # ' \t\n\r\x0b\x0c'
-```
-
-### `string.printable`
-
-Concatenation of `digits`, `ascii_letters`, `punctuation`, and `whitespace`.
-
-**Value:** `str`
-
-```python
-import string
-print(string.printable)
-```
 
 ## Examples
 
@@ -185,7 +82,7 @@ print(is_hex("xyz123"))    # False
 
 ## Python Compatibility
 
-This module provides the same constants as Python's `string` module.
+This module provides the same constants as Python's `string` module. The `capwords()` function and the `Template` and `Formatter` classes are not available; use `str.title()`, f-strings or `str.format()` instead.
 
 ## See Also
 

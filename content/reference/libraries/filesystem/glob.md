@@ -20,7 +20,7 @@ The `glob` library provides Unix shell-style wildcards for filename matching, si
 
 ## Functions
 
-### `glob(pattern, root_dir=".", *, recursive=False, include_hidden=False)`
+### `glob(pattern, root_dir=".", *, recursive=False, include_hidden=False)` {#glob}
 
 Find all pathnames matching a pattern. Pattern syntax: `*` matches everything except a path separator, `?` matches any single character, `[seq]` matches any character in `seq`, `[!seq]` matches any character not in `seq`, and `**` matches all files and directories recursively when `recursive=True`. Results are returned in arbitrary order, and an empty list is returned if there are no matches.
 
@@ -65,7 +65,7 @@ configs = glob.glob("*.json", "/etc/myapp")
 
 ### `iglob(pattern, root_dir=".", *, recursive=False, include_hidden=False)`
 
-Find all pathnames matching a pattern, returned as an iterator instead of a list. This is more memory efficient for large result sets since matches are not all materialized at once. Accepts the same parameters as [`glob()`](#globpattern-root_dir-recursive-include_hidden).
+Find all pathnames matching a pattern, returned as an iterator instead of a list. This is more memory efficient for large result sets since matches are not all materialized at once. Accepts the same parameters as [`glob()`](#glob).
 
 **Parameters:**
 - `pattern` (`str`): Shell-style wildcard pattern to match.

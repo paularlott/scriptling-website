@@ -25,9 +25,9 @@ Build a Go executable plugin that exposes functions and classes under `plugin.*`
 
 Serve libraries in any namespace, static assets, and script sources from a plugin-owned scheme such as `demo://`.
 
-### [Writing a Bash Plugin](bash-plugin/)
+### [Writing a Bash Plugin](/docs/plugins/bash/)
 
-Implement the plugin JSON-RPC protocol directly from a shell script.
+Implement the plugin JSON-RPC protocol directly from a shell script. This walkthrough lives in the Plugins guide.
 
 ### [Writing a C Plugin](c-plugin/)
 

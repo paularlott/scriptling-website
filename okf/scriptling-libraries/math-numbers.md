@@ -1,5 +1,5 @@
 ---
-description: Mathematical functions, hashing, and random number generation.
+description: Mathematical functions, hashing, and random and secure-random number generation.
 generated:
     by: scriptling-website/okf.py
 resource: https://scriptling.dev/reference/libraries/math-numbers/
@@ -23,3 +23,4 @@ type: API Reference
 | [hmac](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hmac.md) | Keyed-Hash Message Authentication Codes |
 | [base64](https://scriptling.dev/okf/scriptling-libraries/math-numbers/base64.md) | Base64 encoding and decoding |
 | [uuid](https://scriptling.dev/okf/scriptling-libraries/math-numbers/uuid.md) | UUID generation |
+| [secrets](https://scriptling.dev/okf/scriptling-libraries/math-numbers/secrets.md) | Cryptographically strong random numbers (extended; requires registration when embedding) |

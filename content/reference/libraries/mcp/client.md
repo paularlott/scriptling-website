@@ -148,7 +148,7 @@ Fetches one skill's entry (frontmatter and per-file digests) by URI.
 
 - `uri` (`str`): skill URI from `skills()` — the `SKILL.md` URI or the skill's root.
 
-**Returns:** `dict`: the skill entry. Read file content with [`read_resource`](#clientread_resource-uri) on any of the entry's resource URIs.
+**Returns:** `dict`: the skill entry. Read file content with [`read_resource`](#clientread_resourceuri) on any of the entry's resource URIs.
 
 ```python
 entry = client.get_skill("skill://code-review/SKILL.md")

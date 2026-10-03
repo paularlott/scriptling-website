@@ -2,7 +2,7 @@
 title: Builder Libraries
 description: Type-safe library builder with functions, constants, and sub-libraries.
 tags: [go-integration, embedding, go]
-weight: 8
+weight: 10
 aliases:
   - /docs/go-integration/builder/libraries/
 ---
@@ -140,24 +140,16 @@ database.transaction.commit(tx)
 
 ## Library with Classes
 
-Classes cannot be attached via `LibraryBuilder`. To expose classes from a library, build the `*object.Library` directly and put them in the `constants` map, as documented under [Native Classes](../native-classes/).
+`Constant` stores any `object.Object` value unchanged, so a class built with the [Class Builder](../builder-classes/) or the [Native API](../native-classes/) is attached the same way as any other constant:
 
 ```go
-myLib := object.NewLibrary("http",
-    map[string]*object.Builtin{
-        "get": {
-            Fn: func(ctx context.Context, kwargs object.Kwargs, args ...object.Object) object.Object {
-                // ... HTTP GET logic
-                return object.NewString("quick GET response")
-            },
-            HelpText: "get(url) - Quick GET request",
-        },
-    },
-    map[string]object.Object{
-        "Client": httpClientClass,  // Class exposed via the constants map
-    },
-    "HTTP utilities",
-)
+lib := object.NewLibraryBuilder("http", "HTTP utilities").
+    Constant("Client", httpClientClass). // *object.Class exposed as http.Client
+    FunctionWithHelp("get", func(url string) string {
+        // ... HTTP GET logic
+        return "quick GET response"
+    }, "get(url) - Quick GET request").
+    Build()
 ```
 
 Usage:

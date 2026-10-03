@@ -15,101 +15,41 @@ The `json` library parses JSON strings into Scriptling objects and serializes Sc
 
 | Function | Description |
 |----------|-------------|
-| `loads(string)` | Parse a JSON string into Scriptling objects. |
-| `dumps(object, indent="")` | Convert Scriptling objects to a JSON string. |
+| `loads(string)` | Parse a JSON string into `dict`, `list`, `str`, `int`, `float`, `bool` or `None`; raises on invalid JSON. |
+| `dumps(object, indent=None)` | Serialise to a JSON string: compact with sorted keys by default; `indent` (spaces or a string) pretty-prints. |
 | `parse(string)` | Alias for `loads()`. |
-| `stringify(object, indent="")` | Alias for `dumps()`. |
+| `stringify(object, indent=None)` | Alias for `dumps()`. |
 
-## Functions
-
-### `loads(string)`
-
-Parses a JSON string and returns the corresponding Scriptling object.
-
-**Parameters:**
-- `string` (`str`): JSON-formatted string to parse.
-
-**Returns:** `dict`, `list`, `str`, `int`, `float`, `bool`, or `None`: depending on the parsed JSON value.
-
-**Raises:** `Error`: if `string` is not valid JSON.
+## Example
 
 ```python
 import json
 
-data = json.loads('{"users":[{"name":"Alice"},{"name":"Bob"}]}')
-first_user = data["users"][0]["name"]  # "Alice"
-```
-
-### `dumps(object, indent="")`
-
-Converts a Scriptling object to its JSON string representation. Object keys are emitted in sorted order.
-
-**Parameters:**
-- `object` (`dict`, `list`, `str`, `int`, `float`, `bool`, or `None`): Value to serialize.
-- `indent` (`str` or `number`, optional): Pretty-printing indentation. A string is used verbatim; a number gives that many spaces (`indent=2` is the common idiom). `indent=0` newline-separates with no spaces, as in Python. Default: absent, fully compact (no whitespace, no newlines). Object keys are always emitted in sorted order.
-
-**Returns:** `str`: the JSON-formatted output.
-
-```python
-import json
+data = json.loads('{"users": [{"name": "Alice"}, {"name": "Bob"}], "ok": true}')
+print(data["users"][0]["name"], data["ok"])   # Alice True
 
 obj = {"status": "success", "count": 42}
-json_str = json.dumps(obj)  # '{"count":42,"status":"success"}'
-
-pretty = json.dumps(obj, indent="  ")
+print(json.dumps(obj))             # {"count":42,"status":"success"}
+print(json.dumps(obj, indent=2))   # pretty-printed, two spaces per level
 # {
 #   "count": 42,
 #   "status": "success"
 # }
 
-pretty = json.dumps(obj, indent=2)  # two spaces per level, the common idiom
-```
-
-### `parse(string)`
-
-Alias for `loads()`.
-
-**Parameters:**
-- `string` (`str`): JSON-formatted string to parse.
-
-**Returns:** `dict`, `list`, `str`, `int`, `float`, `bool`, or `None`
-
-```python
-import json
-
-data = json.parse('{"key": "value"}')  # Same as json.loads()
-```
-
-### `stringify(object, indent="")`
-
-Alias for `dumps()`.
-
-**Parameters:**
-- `object` (`dict`, `list`, `str`, `int`, `float`, `bool`, or `None`): Value to serialize.
-- `indent` (`str`, optional): Indentation string used for pretty-printing. Default: `""`.
-
-**Returns:** `str`: the JSON-formatted output.
-
-```python
-import json
-
-json_str = json.stringify({"key": "value"})  # Same as json.dumps()
-```
-
-## Error Handling
-
-```python
-import json
+print(json.stringify(json.parse('[1, 2.5, null]')))  # [1,2.5,null]
 
 try:
-    data = json.loads('{"valid": "json"}')
-    print("Parsed successfully")
-
-    invalid = json.loads('{invalid json}')
-    print(invalid)  # Won't reach here
+    json.loads("{invalid json}")
 except Exception as e:
-    print("JSON parse error:", e)
+    print("JSON parse error:", e)  # JSON parse error: JSONDecodeError: invalid character 'i' looking for beginning of object key string
 ```
+
+## Differences from Python
+
+- `dumps()` output is compact by default (`{"a":1}`, no spaces after `,` and `:`) and object keys are always sorted. `indent` accepts a number of spaces or a literal string; `indent=0` puts each item on its own line without indentation.
+- Non-ASCII characters are written as-is rather than `\u` escaped; there is no `ensure_ascii`, `sort_keys`, `separators` or `default` parameter.
+- `nan` and `inf` raise an error instead of producing `NaN`/`Infinity`.
+- `parse()` and `stringify()` are Scriptling aliases. There are no file-based `load()`/`dump()` functions: read the file to a string first.
 
 ## See Also
 

@@ -15,23 +15,24 @@ type: API Reference
 ---
 # scriptling.ai.agent.interact
 
-Interactive terminal interface for AI agents. This library extends the `Agent` class with an `interact()` method that provides a REPL-like interface for conversing with AI agents using the TUI console.
+Interactive terminal interface for AI agents. This library exports `Agent`, a subclass of `scriptling.ai.agent.Agent` that adds an `interact()` method providing a REPL-like interface for conversing with AI agents using the TUI console.
 
 ## Availability
 
-CLI registration is mode-dependent: the ordinary non-server CLI execution path adds `scriptling.ai.agent.interact`, while evaluator factories and server-style execution do not add it automatically. Embedders must register it explicitly, together with `scriptling.console`. Importing `scriptling.ai.agent` alone does not provide `interact()`.
+CLI registration is mode-dependent: the ordinary non-server CLI execution path adds `scriptling.ai.agent.interact`, while evaluator factories and server-style execution do not add it automatically. Embedders must register it explicitly, together with `scriptling.console`. Instances of `scriptling.ai.agent.Agent` do not have `interact()`, even after this library is imported: create the agent with `interact.Agent(...)`.
 
 ## Available Functions
 
 | Function | Description |
 |----------|-------------|
-| `agent.interact(max_iterations=25)` | Added to the `Agent` class: starts an interactive TUI session |
+| `Agent(...)` | Subclass of `scriptling.ai.agent.Agent`; same constructor arguments |
+| `agent.interact(max_iterations=25)` | Method on `interact.Agent`: starts an interactive TUI session |
 
-Importing `scriptling.ai.agent.interact` enhances the `scriptling.ai.agent.Agent` class with an `interact()` method; it does not add any standalone module-level functions of its own.
+The module exports only the `Agent` subclass; it has no standalone module-level functions.
 
 ## Overview
 
-After importing, your `Agent` instances gain an additional `interact()` method. When `interact()` is called it uses the shared console singleton, registers commands and handlers, then calls `console.run()` to start the TUI event loop.
+`interact.Agent` behaves exactly like `scriptling.ai.agent.Agent` (including `trigger()`), plus an `interact()` method. When `interact()` is called it uses the shared console singleton, registers commands and handlers, then calls `console.run()` to start the TUI event loop.
 
 During each turn, the interactive loop:
 
@@ -55,12 +56,11 @@ Runs an interactive CLI session for the agent. Requires `scriptling.console` to 
 
 ```python
 import scriptling.ai as ai
-import scriptling.ai.agent as agent
-import scriptling.ai.agent.interact  # Adds interact() to Agent
+import scriptling.ai.agent.interact as interact
 
 client = ai.Client("https://api.openai.com/v1", api_key="your-key")
 
-my_agent = agent.Agent(
+my_agent = interact.Agent(
     client=client,
     model="gpt-4",
     system_prompt="You are a helpful assistant."
@@ -87,7 +87,7 @@ You can set up the console before calling `interact()` using module-level functi
 
 ```python
 import scriptling.console as console
-import scriptling.ai.agent.interact as agent
+import scriptling.ai.agent.interact as interact
 
 console.set_status("MyApp", "v1.0")
 main = console.main_panel()
@@ -96,7 +96,7 @@ main.add_message(
     console.styled(console.DIM, "Type '/exit' to quit.")
 )
 
-bot = agent.Agent(client, model="gpt-4o", system_prompt="You are helpful.")
+bot = interact.Agent(client, model="gpt-4o", system_prompt="You are helpful.")
 bot.interact()
 ```
 

@@ -1,15 +1,14 @@
 ---
 title: scriptling.similarity
 linkTitle: similarity
-description: Text similarity utilities for fuzzy matching, tokenization, and MinHash signatures.
+description: Text similarity utilities for fuzzy matching, tokenization, MinHash signatures, and extractive text shortening.
 tags: [libraries, utilities, text]
-weight: 12
-
+weight: 10
 aliases:
   - /reference/libraries/scriptling/utilities/similarity/
 ---
 
-The `scriptling.similarity` library provides text similarity utilities for fuzzy matching, tokenization, and MinHash signatures. Reach for `search`/`best`/`score` when matching free-text input against a known list of items, and `tokenize`/`minhash`/`minhash_similarity` for lightweight approximate similarity over larger bodies of text.
+The `scriptling.similarity` library provides text similarity utilities for fuzzy matching, tokenization, MinHash signatures, and extractive text shortening. Reach for `search`/`best`/`score` when matching free-text input against a known list of items, `tokenize`/`minhash`/`minhash_similarity` for lightweight approximate similarity over larger bodies of text, and `sentences`/`extract` to shorten a long text to its most informative sentences before handing it to a model.
 
 ## Available Functions
 
@@ -24,6 +23,8 @@ The `scriptling.similarity` library provides text similarity utilities for fuzzy
 | `cosine_similarity(a, b)` | Compare two numeric vectors (-1.0 to 1.0) |
 | `most_similar(query, vectors, top_k=5)` | Rank vectors by similarity to a query |
 | `vectorize(text, dims=256)` | Generate a vector from text (CPU-only, no model) |
+| `sentences(text)` | Split text into sentences |
+| `extract(text, max_chars=None, max_sentences=None, ratio=None)` | Keep the most informative sentences within a bound (CPU-only, no model) |
 
 ## Functions
 
@@ -197,9 +198,59 @@ v = sim.vectorize("hello world", dims=128)
 print(len(v))  # 128
 ```
 
+### `sentences(text)`
+
+Split text into sentences. A sentence ends at `". "`, `"! "` or `"? "` when the next character is a capital letter, digit or opening quote, so `"e.g. this"` and `"3.5 mm"` stay whole, and at every line break, so transcripts, chat logs and pasted output split one line per sentence. Sentences are trimmed and empty ones dropped.
+
+**Parameters:**
+- `text` (`str`): Text to split.
+
+**Returns:** `list[str]`: sentences in order.
+
+```python
+import scriptling.similarity as sim
+
+sim.sentences("Hello world. This is a test! Is it?\nA new line here")
+# ["Hello world.", "This is a test!", "Is it?", "A new line here"]
+```
+
+### `extract(text, max_chars=None, max_sentences=None, ratio=None)`
+
+Keep the most informative sentences of a text, in their original order, within the given bounds. CPU-only: no model or API call.
+
+Sentences are scored with TextRank. Each sentence is a node, edges are weighted by the cosine similarity of the sentences' hashed word vectors (the same vectors as `vectorize()`), and the stationary distribution ranks them, so the sentences most representative of the text as a whole score highest. The similarity matrix is built in parallel across CPUs. Text that already fits the bounds is returned unchanged.
+
+Repetitive line-oriented text, such as a log or a stack trace where most lines repeat with only numbers changing, is handled differently: there the rare lines carry the information, so the leading and trailing lines are kept together with the first occurrence of each distinct line, in order, and ranking is not used.
+
+Use `extract` where you would otherwise cut a long text at a fixed length before sending it to a model. The result is the same size but keeps what the text is about rather than whatever happened to come first.
+
+**Parameters:**
+- `text` (`str`): The text to shorten.
+- `max_chars` (`int`, keyword-only): Keep sentences while the result fits in this many characters.
+- `max_sentences` (`int`, keyword-only): Keep at most this many sentences.
+- `ratio` (`float`, keyword-only): Keep this fraction of the sentences (`0 < ratio <= 1`).
+
+With no bounds, `ratio` defaults to `0.3`. When several bounds are given, the tightest applies. A single sentence longer than `max_chars` is cut to fit rather than dropped, so the result is never empty for non-empty input.
+
+**Returns:** `str`: the selected sentences, joined with spaces, or with newlines when the input was line-oriented.
+
+```python
+import scriptling.similarity as sim
+
+# A long transcript down to roughly 20,000 characters of its most representative lines.
+short = sim.extract(transcript, max_chars=20000)
+
+# The gist of a verbose reply.
+gist = sim.extract(reply, ratio=0.25)
+
+# Everything but the noise from a pasted log.
+log = sim.extract(pasted_log, max_sentences=40)
+```
+
 ## Notes
 
 - `search`, `best`, and `score` are the home for the fuzzy-matching API.
+- `extract` is extractive, not abstractive: it only ever returns sentences that appear in the input, unchanged apart from trimming, so it cannot invent content. Pair it with a model for the summary itself.
 - `minhash` uses 64 hashes by default, which is a good balance for lightweight similarity estimation.
 - `tokenize` and `minhash` are useful for memory stores, semantic recall, and approximate deduplication.
 

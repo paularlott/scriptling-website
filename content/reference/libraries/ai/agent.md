@@ -17,7 +17,7 @@ Agentic AI loop for building AI agents with automatic tool execution. The `Agent
 |--------------|-------------|
 | `Agent(client, tools, system_prompt, model, memory, mcp_servers, max_tokens, compaction_threshold, request_timeout, extra_body)` | Create an AI agent |
 | `agent.trigger(message, max_iterations)` | One-shot trigger with response |
-| `agent.interact(max_iterations)` | Start an interactive session (requires `scriptling.ai.agent.interact`) |
+| `interact.Agent(...).interact(max_iterations)` | Start an interactive session (subclass provided by `scriptling.ai.agent.interact`) |
 | `agent.get_messages()` | Get conversation history |
 | `agent.set_messages(messages)` | Set conversation history |
 
@@ -43,7 +43,14 @@ bot = agent.Agent(client, tools=tools, system_prompt="You are a helpful assistan
 response = bot.trigger("What is the square root of 144?", max_iterations=10)
 print(response.content)
 
-# Interactive session (requires scriptling.ai.agent.interact + scriptling.console)
+```
+
+For an interactive terminal session, create the agent from `scriptling.ai.agent.interact` instead (requires `scriptling.console`); see [scriptling.ai.agent.interact](../interact/):
+
+```python
+import scriptling.ai.agent.interact as interact
+
+bot = interact.Agent(client, tools=tools, system_prompt="You are a helpful assistant", model="gpt-4")
 bot.interact()
 ```
 
@@ -126,7 +133,7 @@ print(response.content)
 
 ### `agent.interact(max_iterations=25)`
 
-Runs an interactive CLI session. Requires the `scriptling.ai.agent.interact` library to be imported, which adds this method to the `Agent` class: see [scriptling.ai.agent.interact](../interact/) for the full reference.
+Runs an interactive CLI session. This method exists only on the `Agent` subclass exported by `scriptling.ai.agent.interact` (`interact.Agent`); a plain `agent.Agent` has no `interact()`. See [scriptling.ai.agent.interact](../interact/) for the full reference.
 
 **Parameters:**
 
@@ -135,7 +142,9 @@ Runs an interactive CLI session. Requires the `scriptling.ai.agent.interact` lib
 **Returns:** `None`
 
 ```python
-bot = agent.Agent(client, tools=tools, system_prompt="Coding assistant")
+import scriptling.ai.agent.interact as interact
+
+bot = interact.Agent(client, tools=tools, system_prompt="Coding assistant")
 bot.interact()
 ```
 
@@ -177,13 +186,14 @@ Pass a memory store to `Agent` via the `memory=` kwarg. The agent automatically:
 ```python
 import scriptling.ai as ai
 import scriptling.ai.agent as agent
+import scriptling.ai.agent.interact as interact
 import scriptling.ai.memory as memory
 import scriptling.runtime.kv as kv
 
 client = ai.Client("http://127.0.0.1:1234/v1")
 mem = memory.new(kv.open("./memory-db"))
 
-bot = agent.Agent(
+bot = interact.Agent(
     client,
     model="gpt-4",
     system_prompt="You are a helpful assistant.",
@@ -356,6 +366,7 @@ clean_content = result["content"]
 #!/usr/bin/env scriptling
 import scriptling.ai as ai
 import scriptling.ai.agent as agent
+import scriptling.ai.agent.interact as interact
 import scriptling.ai.memory as memory
 import scriptling.runtime.kv as kv
 import os
@@ -371,7 +382,7 @@ tools.add("reverse", "Reverse a text string", {"text": "string"}, lambda args: a
 mem = memory.new(kv.open("./memory-db"))
 
 # Agent with tools and memory
-bot = agent.Agent(
+bot = interact.Agent(
     client,
     tools=tools,
     memory=mem,

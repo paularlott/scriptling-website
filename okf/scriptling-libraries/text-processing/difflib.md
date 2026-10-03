@@ -73,7 +73,7 @@ Returns a float between `0.0` (completely different) and `1.0` (identical) indic
 import difflib
 
 print(difflib.ratio("hello", "hello"))   # 1.0
-print(difflib.ratio("hello", "world"))   # 0.4
+print(difflib.ratio("hello", "world"))   # 0.2
 print(difflib.ratio("", ""))             # 1.0
 ```
 

@@ -4,7 +4,6 @@ linkTitle: toon
 description: TOON (Token-Oriented Object Notation) encoding and decoding, a compact, human-readable alternative to JSON.
 tags: [libraries, utilities, data-formats]
 weight: 11
-
 aliases:
   - /reference/libraries/scriptling/utilities/toon/
 ---

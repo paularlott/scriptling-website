@@ -115,6 +115,6 @@ print(verify(body, "sha256=tampered", secret))  # False
 ## See Also
 
 - [hashlib](../hashlib/): cryptographic hash functions, including the constructors accepted as `digestmod`.
-- [secrets](../../http-process/secrets/): `token_hex()` for generating a new random secret key.
+- [secrets](../secrets/): `token_hex()` for generating a new random secret key.
 - [base64](../base64/): Base64 encoding and decoding.
 - [bytes](../../data-formats/bytes/): the binary type returned by `.digest()` and `digest()`.

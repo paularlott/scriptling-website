@@ -14,60 +14,15 @@ type: API Reference
 ---
 # uuid
 
-The `uuid` library generates universally unique identifiers (UUIDs) using time-based, random, or sortable timestamp-based schemes.
+The `uuid` library generates universally unique identifiers (UUIDs) using time-based, random, or sortable timestamp-based schemes. Each function returns the UUID as a string such as `"550e8400-e29b-41d4-a716-446655440000"`.
 
 ## Available Functions
 
 | Function | Description |
 |----------|-------------|
-| `uuid1()` | Generate UUID version 1 (time-based). |
-| `uuid4()` | Generate UUID version 4 (random). |
-| `uuid7()` | Generate UUID version 7 (timestamp-based, sortable). |
-
-## Functions
-
-### `uuid1()`
-
-Generates a UUID version 1, based on the current time and MAC address. Useful for unique IDs where time ordering matters (the timestamp can be partially recovered from the value, though it isn't lexicographically sortable as a string).
-
-**Returns:** `str`: a UUID in the form `xxxxxxxx-xxxx-1xxx-yxxx-xxxxxxxxxxxx`.
-
-**Raises:** `Error`: if UUID generation fails.
-
-```python
-import uuid
-
-id = uuid.uuid1()
-print(id)  # e.g., "f47ac10b-58cc-1e4c-a26f-e3fc32165abc"
-```
-
-### `uuid4()`
-
-Generates a UUID version 4, fully random. The most commonly used form for general-purpose unique identifiers.
-
-**Returns:** `str`: a UUID in the form `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`.
-
-```python
-import uuid
-
-id = uuid.uuid4()
-print(id)  # e.g., "550e8400-e29b-41d4-a716-446655440000"
-```
-
-### `uuid7()`
-
-Generates a UUID version 7, based on the Unix timestamp in milliseconds. UUIDs generated in sequence sort in chronological order as strings, making this ideal for database primary keys.
-
-**Returns:** `str`: a UUID in the form `xxxxxxxx-xxxx-7xxx-yxxx-xxxxxxxxxxxx`.
-
-**Raises:** `Error`: if UUID generation fails.
-
-```python
-import uuid
-
-id = uuid.uuid7()
-print(id)  # e.g., "018f6b1c-4e5d-7abc-8def-0123456789ab"
-```
+| `uuid1()` | Version 1 UUID from the current time and MAC address. |
+| `uuid4()` | Version 4 (random) UUID; the usual general-purpose choice. |
+| `uuid7()` | Version 7 UUID from a millisecond timestamp; sorts in creation order as a string, which suits database keys. |
 
 ## UUID Versions Comparison
 
@@ -77,45 +32,25 @@ print(id)  # e.g., "018f6b1c-4e5d-7abc-8def-0123456789ab"
 | `uuid4()` | Random | No | General purpose, most common |
 | `uuid7()` | Timestamp | Yes | Database keys, distributed systems |
 
-## Examples
-
-### Generate a Unique Request ID
+## Example
 
 ```python
 import uuid
 
-def make_request():
-    request_id = uuid.uuid4()
-    print("Request ID:", request_id)
+request_id = uuid.uuid4()         # a str, e.g. "550e8400-e29b-41d4-a716-446655440000"
+print(len(request_id), request_id[14])   # 36 4  (the version digit)
 
-make_request()
+a = uuid.uuid7()                  # time-ordered: later IDs sort after earlier ones
+b = uuid.uuid7()
+print(a < b, a[14])               # True 7
+
+print(uuid.uuid1()[14])           # 1
 ```
 
-### Database Record ID
+## Differences from Python
 
-```python
-import uuid
-
-def create_record(data):
-    record = {
-        "id": uuid.uuid7(),  # Sortable by creation time
-        "data": data
-    }
-    return record
-
-record = create_record({"name": "Test"})
-print(record["id"])
-```
-
-## Python Compatibility
-
-| Function | Supported |
-|----------|-----------|
-| `uuid1()` | Yes |
-| `uuid4()` | Yes |
-| `uuid7()` | Yes (Python 3.12+) |
-| `uuid3()` | No (name-based, MD5) |
-| `uuid5()` | No (name-based, SHA-1) |
+- The functions return the UUID as a lowercase hyphenated `str`, not a `uuid.UUID` object: there is no `.hex`, `.int` or `.bytes`, and no `uuid.UUID` class for parsing.
+- `uuid7()` matches Python 3.14+. `uuid3()` and `uuid5()` (name-based) are not available.
 
 ## See Also
 

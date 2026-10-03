@@ -17,6 +17,12 @@
     scroll-padding-top: 4rem;
   }
 
+  /* A little breathing room below the sticky header (on top of the
+     html scroll-padding) when jumping to a heading. */
+  :where(h2, h3, h4)[id] {
+    scroll-margin-top: 1rem;
+  }
+
   @font-face {
     font-family: 'Nunito';
     font-style: normal;

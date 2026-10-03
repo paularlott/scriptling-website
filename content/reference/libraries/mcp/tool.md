@@ -209,7 +209,7 @@ Gets a boolean array parameter (`array:bool` type) from the tool's input argumen
 ```python
 import scriptling.mcp.tool as tool
 
-flags = tool.get_bool_list("flags")  # [true, false, true]
+flags = tool.get_bool_list("flags")  # [True, False, True]
 options = tool.get_bool_list("options", [False])
 ```
 

@@ -7,7 +7,7 @@ Language reference: syntax, types, operators, control flow, functions, classes, 
 
 ## Concepts
 
-- [Language Guide](https://scriptling.dev/okf/scriptling-reference/scriptling-reference.md)
+- [Reference](https://scriptling.dev/okf/scriptling-reference/scriptling-reference.md)
 - [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md)
 - [Classes](https://scriptling.dev/okf/scriptling-reference/classes.md)
 - [Control Flow](https://scriptling.dev/okf/scriptling-reference/control-flow.md)

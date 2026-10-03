@@ -98,49 +98,7 @@ Use `scriptling.plugin.release(cfg)` for deterministic cleanup. A GC finalizer i
 
 ## Class Styles
 
-The example above uses a **typed receiver**: the constructor returns a Go struct pointer and methods receive it directly. You can also use `*object.Instance` for manual field management:
-
-### Typed Receiver (recommended)
-
-```go
-type counter struct {
-    value int64
-}
-
-cb := object.NewClassBuilder("Counter").
-    Constructor(func(start int) *counter {
-        return &counter{value: int64(start)}
-    }).
-    Method("inc", func(self *counter, n int) int {
-        self.value += int64(n)
-        return int(self.value)
-    }).
-    Method("get", func(self *counter) int {
-        return int(self.value)
-    })
-```
-
-The constructor returns a pointer type. All methods whose first parameter matches that type receive the unwrapped struct directly: no manual field boxing.
-
-### Instance Fields
-
-```go
-cb := object.NewClassBuilder("Counter").
-    Method("__init__", func(self *object.Instance, start int) {
-        self.SetField("value", object.NewInteger(int64(start)))
-    }).
-    Method("inc", func(self *object.Instance, n int) int {
-        current := self.Field("value").(*object.Integer).IntValue()
-        next := current + int64(n)
-        self.SetField("value", object.NewInteger(next))
-        return int(next)
-    }).
-    Method("get", func(self *object.Instance) int {
-        return int(self.Field("value").(*object.Integer).IntValue())
-    })
-```
-
-Methods receive the raw `*object.Instance` and manage fields manually. Use this for simple cases or when you need direct control over instance state.
+The `Config` class above uses a **typed receiver**: the constructor returns a Go struct pointer and methods receive it directly, with no manual field boxing. Classes can instead manage fields on a raw `*object.Instance` with `SetField`/`Field`. Both styles, error-returning constructors, and `__del__` cleanup are covered in [RegisterClass with ClassBuilder](https://scriptling.dev/okf/scriptling-docs/plugins/go-plugins.md#registerclass-with-classbuilder) and [Storing Go Structs](https://scriptling.dev/okf/scriptling-docs/plugins/go-plugins.md#storing-go-structs).
 
 ## Custom Wrappers
 

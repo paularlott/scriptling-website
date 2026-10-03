@@ -1,6 +1,6 @@
 ---
 title: Time & System
-description: Time access, I/O streams, and platform information.
+description: Time and dates, platform and interpreter information, and logging.
 tags: [libraries, time]
 weight: 6
 ---
@@ -9,6 +9,6 @@ weight: 6
 |---------|-------------|
 | [time](time/) | Time access and conversions |
 | [datetime](datetime/) | Date and time formatting |
-| [io](io/) | In-memory I/O streams (StringIO) |
 | [platform](platform/) | Platform identifying data |
-| [urllib](urllib/) | URL handling |
+| [sys](sys/) | System-specific parameters: argv, stdin, exit (extended; requires registration when embedding) |
+| [logging](logging/) | Logging functionality (extended; requires registration when embedding) |

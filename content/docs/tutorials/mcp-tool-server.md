@@ -190,11 +190,12 @@ curl -X POST http://127.0.0.1:8000/mcp \
 
 ## Step 8: Add Discoverable Tools
 
-For tools that need to be explicitly registered via script (e.g., tools that depend on runtime state), set `discoverable = false` in the TOML file:
+By default (`discoverable = false`) a tool appears in `tools/list` and the client can call it directly. With a large tool set, set `discoverable = true` to keep a tool out of `tools/list`: the client finds it through the built-in `tool_search` tool (matching its description and `keywords`) and runs it through `execute_tool`:
 
 ```toml
 description = "Query the internal database"
-discoverable = false
+keywords = ["database", "sql", "query"]
+discoverable = true
 
 [[parameters]]
 name = "query"
@@ -203,14 +204,7 @@ description = "SQL-like query string"
 required = true
 ```
 
-Then register them in your setup script:
-
-```python
-import scriptling.mcp.tool as mcp
-
-# Register the tool with a custom handler
-mcp.register("db_query", "internal/db_query.py")
-```
+No registration code is needed: discoverable tools live in the tools directory like any other. For tools that should only exist for some callers or depend on runtime state, register them per request from middleware with [`mcp.register_request_tool()`](/reference/libraries/runtime/mcp/#request-scoped-registration).
 
 ## Tool Directory Structure
 
@@ -233,7 +227,7 @@ my-tools/
 - Starting Scriptling as an MCP server
 - Configuring Claude Desktop to use custom tools
 - Testing tools from the command line
-- Discoverable vs manually-registered tools
+- Native vs discoverable tools
 
 ## See Also
 

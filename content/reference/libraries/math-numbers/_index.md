@@ -1,6 +1,6 @@
 ---
 title: Math & Numbers
-description: Mathematical functions, hashing, and random number generation.
+description: Mathematical functions, hashing, and random and secure-random number generation.
 tags: [libraries, math]
 weight: 4
 ---
@@ -14,3 +14,4 @@ weight: 4
 | [hmac](hmac/) | Keyed-Hash Message Authentication Codes |
 | [base64](base64/) | Base64 encoding and decoding |
 | [uuid](uuid/) | UUID generation |
+| [secrets](secrets/) | Cryptographically strong random numbers (extended; requires registration when embedding) |

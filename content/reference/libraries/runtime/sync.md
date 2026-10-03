@@ -67,7 +67,12 @@ config["debug"] = False
 shared.set(config)
 
 # Atomic read-modify-write: fn receives the current value and returns the new one
-shared.update(lambda c: {**c, "reloads": c.get("reloads", 0) + 1})
+def bump(c):
+    c = dict(c)
+    c["reloads"] = c.get("reloads", 0) + 1
+    return c
+
+print(shared.update(bump))  # {'debug': False, 'reloads': 1}
 ```
 
 #### `Shared.update(fn)`

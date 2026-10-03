@@ -2,11 +2,12 @@
 title: urllib.parse
 description: Parse, split, join, and percent-encode/decode URLs and query strings without network access.
 tags: [libraries, http]
-weight: 5
+weight: 2
 
 aliases:
   - /reference/libraries/stdlib/urllib/
   - /reference/libraries/urllib/
+  - /reference/libraries/time-system/urllib/
 ---
 
 The `urllib.parse` library provides URL parsing, splitting, joining, and percent-encoding/decoding, matching Python's `urllib.parse` module. It does not perform any network access: use it to take URLs and query strings apart and put them back together as plain strings.
@@ -281,6 +282,6 @@ query = urllib.parse.urlencode({"tags": ["python", "go"]}, True)
 
 ## See Also
 
-- [requests](../../http-process/requests/) - Make actual HTTP requests (GET/POST/etc.); use it together with `urllib.parse` for building and parsing URLs.
-- [datetime](../datetime/) - Date and time types.
-- [io](../io/) - In-memory I/O streams.
+- [requests](../requests/) - Make actual HTTP requests (GET/POST/etc.); use it together with `urllib.parse` for building and parsing URLs.
+- [datetime](../../time-system/datetime/) - Date and time types.
+- [io](../../text-processing/io/) - In-memory I/O streams.

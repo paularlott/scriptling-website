@@ -15,45 +15,38 @@ The `collections` library provides Python-compatible specialized container datat
 
 | Function | Description |
 |----------|-------------|
-| `Counter([iterable])` | Create a counter of element occurrences. |
+| `Counter([iterable_or_mapping], **kwargs)` | Create a counter of element occurrences. |
 | `most_common(counter[, n])` | Get the `n` most common elements from a `Counter`. |
 | `OrderedDict([items])` | Create an order-preserving dict. |
-| `deque([iterable[, maxlen]])` | Create a double-ended queue. |
-| `deque_appendleft(deque, elem)` | Add an element to the left of a deque. |
-| `deque_popleft(deque)` | Remove and return the leftmost element of a deque. |
-| `deque_extendleft(deque, iterable)` | Extend the left side of a deque with an iterable. |
-| `deque_rotate(deque, n)` | Rotate a deque `n` steps to the right (or left if negative). |
+| `deque([iterable[, maxlen]])` | Create a double-ended queue (with `appendleft()`, `popleft()`, `extendleft()`, `rotate()`, `maxlen`). |
 | `namedtuple(typename, field_names)` | Create a class for named tuple instances. |
 | `defaultdict(default_factory)` | Create a dict with default values for missing keys. |
 | `ChainMap(*maps)` | Group multiple dicts for a single lookup. |
 
 ## Functions
 
-### `Counter([iterable])`
+### `Counter([iterable_or_mapping], **kwargs)`
 
-Creates a dict-like object that counts occurrences of elements. Counting a missing key returns `0` instead of raising an error.
-
-**Parameters:**
-- `iterable` (`list`, `tuple`, `str`, or `dict`, optional): Elements to count. A list/tuple/string counts each element/character; a dict is copied directly as counts.
-
-**Returns:** `Counter`: an instance supporting `c[key]`, `c.most_common([n])`, and `c.elements()`.
+A dict of element -> count, as in Python. Count an iterable, copy a mapping or Counter, or pass counts as keyword arguments. A missing element counts `0`.
 
 ```python
 import collections
 
 c = collections.Counter([1, 1, 2, 3, 3, 3])
-print(c[1])  # 2
-print(c[4])  # 0 (missing keys return 0, not KeyError)
+print(c)                  # Counter({3: 3, 1: 2, 2: 1})
+print(c[3], c[4])         # 3 0
+print(c.most_common(2))   # [(3, 3), (1, 2)]
 
-c = collections.Counter("hello")
-print(c["l"])  # 2
+c.update([1, 1])          # add counts
+c.subtract({3: 1})        # subtract counts (may go negative)
+print(c.total())          # 7
+
+words = collections.Counter("hello")
+print(words["l"], "h" in words, len(words))   # 2 True 4
+print(collections.Counter(a=3) + collections.Counter(a=1, b=2))  # Counter({'a': 4, 'b': 2})
 ```
 
-Counter instances support these methods:
-
-- `c[key]`: get the count for `key` (returns `0` if absent).
-- `c.most_common([n])`: return the `n` most common `(element, count)` tuples, sorted by count descending. Omit `n` to return all.
-- `c.elements()`: return a list of elements, each repeated by its count.
+Counters support `c[key]`, assignment, `del`, `len`, `in`, iteration, `keys()`, `values()`, `items()`, `get()`, `pop()`, `copy()`, `clear()`, `update()`, `subtract()`, `total()`, `most_common([n])`, `elements()`, `==`, and the `+`, `-`, `|` and `&` operators (which keep only positive counts). Elements with equal counts are ordered by value rather than first insertion.
 
 ### `most_common(counter[, n])`
 
@@ -91,95 +84,40 @@ print(od["a"])  # 1
 
 ### `deque([iterable[, maxlen]])`
 
-Creates a double-ended queue from an iterable. The returned value is a regular list; use the `deque_*` functions for deque-specific operations (`append()`/`pop()` work directly via the list's own methods for the right side).
+Creates a double-ended queue object, like Python's `collections.deque`.
 
 **Parameters:**
 - `iterable` (`list`, `tuple`, or `str`, optional): Initial elements.
-- `maxlen` (`int`, optional): If given and the deque is longer, elements are trimmed from the left so only the last `maxlen` elements remain.
+- `maxlen` (`int` or `None`, optional): Maximum length. If the initial elements exceed it, only the last `maxlen` are kept. Available afterwards as `d.maxlen`.
 
-**Returns:** `list`: usable as a deque with the `deque_*` functions.
+**Returns:** `deque`. Supports `len()`, indexing, iteration, `list(d)`, and these methods:
 
-```python
-import collections
-
-d = collections.deque([1, 2, 3])
-```
-
-### `deque_appendleft(deque, elem)`
-
-Adds an element to the left side of a deque, in place.
-
-**Parameters:**
-- `deque` (`list`): The deque to modify.
-- `elem` (`any`): Element to add.
-
-**Returns:** `None`
+- `d.append(x)` / `d.appendleft(x)`: add to the right / left end.
+- `d.pop()` / `d.popleft()`: remove and return from the right / left end (`IndexError` if empty).
+- `d.extend(iterable)` / `d.extendleft(iterable)`: add several elements; `extendleft` adds them one at a time, so they end up in reverse order.
+- `d.rotate(n)`: rotate `n` steps to the right (negative `n` rotates left).
+- `d.clear()`: remove all elements.
 
 ```python
 import collections
 
 d = collections.deque([1, 2, 3])
-collections.deque_appendleft(d, 0)
-print(d)  # [0, 1, 2, 3]
-```
+d.appendleft(0)
+d.append(4)
+print(d)                  # deque([0, 1, 2, 3, 4])
+print(d.popleft(), d.pop(), d)  # 0 4 deque([1, 2, 3])
 
-### `deque_popleft(deque)`
-
-Removes and returns the leftmost element of a deque, in place.
-
-**Parameters:**
-- `deque` (`list`): The deque to modify.
-
-**Returns:** `any`: the removed element.
-
-**Raises:** `Error`: if the deque is empty.
-
-```python
-import collections
-
-d = collections.deque([1, 2, 3])
-x = collections.deque_popleft(d)
-print(x, d)  # 1 [2, 3]
-```
-
-### `deque_extendleft(deque, iterable)`
-
-Extends the left side of a deque with elements from `iterable`, in place. Elements are added in reverse order, so the first element of `iterable` ends up closest to the front.
-
-**Parameters:**
-- `deque` (`list`): The deque to modify.
-- `iterable` (`list` or `tuple`): Elements to add.
-
-**Returns:** `None`
-
-```python
-import collections
-
-d = collections.deque([1, 2, 3])
-collections.deque_extendleft(d, [4, 5])
-print(d)  # [5, 4, 1, 2, 3]
-```
-
-### `deque_rotate(deque, n)`
-
-Rotates a deque `n` steps to the right, in place. Negative `n` rotates left.
-
-**Parameters:**
-- `deque` (`list`): The deque to modify.
-- `n` (`int`): Number of steps to rotate.
-
-**Returns:** `None`
-
-```python
-import collections
+d.extendleft([4, 5])
+print(d)                  # deque([5, 4, 1, 2, 3])
 
 d = collections.deque([1, 2, 3, 4])
-collections.deque_rotate(d, 1)
-print(d)  # [4, 1, 2, 3]
+d.rotate(1)
+print(d)                  # deque([4, 1, 2, 3])
+d.rotate(-1)
+print(d)                  # deque([1, 2, 3, 4])
 
-d = collections.deque([1, 2, 3, 4])
-collections.deque_rotate(d, -1)
-print(d)  # [2, 3, 4, 1]
+d = collections.deque([1, 2, 3, 4, 5], maxlen=3)
+print(d, d.maxlen)        # deque([3, 4, 5], maxlen=3) 3
 ```
 
 ### `namedtuple(typename, field_names)`

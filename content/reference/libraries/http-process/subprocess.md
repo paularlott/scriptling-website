@@ -2,7 +2,7 @@
 title: subprocess
 description: Spawn and manage subprocesses, similar to Python's subprocess module.
 tags: [libraries, subprocess]
-weight: 2
+weight: 3
 aliases:
   - /reference/libraries/extlib/subprocess/
   - /reference/libraries/subprocess/
@@ -107,5 +107,5 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 ## See Also
 
-- [sys](../sys/): Detect the current platform and access environment/argv
+- [sys](../../time-system/sys/): Detect the current platform and access environment/argv
 - [requests](../requests/): Make HTTP requests without spawning a process

@@ -15,7 +15,7 @@ type: Guide
 ---
 # Embedding
 
-Get up and running with Scriptling as an embedded scripting language in your Go application. Later fragments assume an initialized `p`; the complete examples show setup when registration or lifecycle is the topic.
+Get up and running with Scriptling as an embedded scripting language in your Go application.
 
 ## Installation
 
@@ -146,4 +146,5 @@ Extended and `scriptling.*` libraries are registered individually. See [Library 
 - [Native API](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md) - Direct object-level control
 - [Builder API](https://scriptling.dev/okf/scriptling-docs/go-integration/builder.md) - Type-safe, cleaner syntax
 - [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Library usage and registration reference
+- [Error Handling](https://scriptling.dev/okf/scriptling-reference/error-handling.md) - try/except, raise, and returning SystemExit to the host
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security best practices for embedding

@@ -8,18 +8,17 @@ sources:
 status: stable
 tags:
     - reference
-title: Language Guide
+title: Reference
 type: Reference
 ---
-# Language Guide
+# Reference
 
 Scriptling is a dynamically-typed, interpreted language with Python-inspired syntax designed for embedding in Go applications.
 
 ## Choose a reference path
 
-- **Learning Scriptling:** Read the quick reference below, then follow the detailed language topics in order as needed.
-- **Looking up an API:** Go directly to [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md) or the [Library Reference](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md).
-- **Adding database access:** Browse the [Database Libraries](https://scriptling.dev/okf/scriptling-libraries/databases.md) for drivers and the ORM.
+- **Coming from Python:** Skim [Python Differences](https://scriptling.dev/okf/scriptling-reference/python-differences.md) first; everything not listed there works as in Python 3.
+- **Looking up an API:** Go directly to [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md) or the [A–Z library list](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md#all-libraries-az).
 - **Using a runtime or host feature:** See the [CLI Guide](https://scriptling.dev/okf/scriptling-docs/cli.md), [Go Integration](https://scriptling.dev/okf/scriptling-docs/go-integration.md), or [Plugins](https://scriptling.dev/okf/scriptling-docs/plugins.md) rather than treating it as language syntax.
 
 ## Quick Reference
@@ -192,9 +191,10 @@ if __name__ == "__main__":
 
 ## Key Differences from Python
 
-- No nested classes
-- No multiple inheritance
-- Use `import library` to load libraries dynamically
+- No multiple inheritance, custom exception classes, `async`/`await`, or `yield` generators
+- A library can be imported only if the host has registered it
+
+See [Python Differences](https://scriptling.dev/okf/scriptling-reference/python-differences.md) for the full list.
 
 ## See Also
 

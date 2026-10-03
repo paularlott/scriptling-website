@@ -3,8 +3,7 @@ title: scriptling.nomad
 linkTitle: nomad
 description: HashiCorp Nomad client covering CSI volumes, dynamic host volumes, and jobs.
 tags: [libraries, utilities]
-weight: 3
-
+weight: 7
 aliases:
   - /reference/libraries/scriptling/utilities/nomad/
 ---

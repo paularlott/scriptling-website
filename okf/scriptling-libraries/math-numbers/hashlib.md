@@ -21,59 +21,11 @@ The `hashlib` library provides cryptographic hash functions (MD5, SHA-1, SHA-256
 
 | Function | Description |
 |----------|-------------|
-| `md5([data])` | Create an MD5 hash object. |
-| `sha1([data])` | Create a SHA-1 hash object. |
-| `sha256([data])` | Create a SHA-256 hash object. |
+| `md5([data])` | MD5 hash object, optionally seeded with `data`. |
+| `sha1([data])` | SHA-1 hash object, optionally seeded with `data`. |
+| `sha256([data])` | SHA-256 hash object, optionally seeded with `data`. |
 
-## Functions
-
-### `sha256([data])`
-
-Creates a SHA-256 hash object, optionally seeded with `data`.
-
-**Parameters:**
-- `data` (`str`, `bytes`, or `list`, optional): Initial data to hash: a string (encoded as UTF-8), a `bytes` value, or a list of byte values (as returned by `str.encode()`).
-
-**Returns:** `Hash`: an instance supporting `.update()`, `.hexdigest()`, `.digest()`, and `.copy()` (see Hash Object Methods below).
-
-```python
-import hashlib
-
-h = hashlib.sha256("hello")
-print(h.hexdigest())  # "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
-print(h.name)         # "sha256"
-print(h.digest_size)  # 32
-```
-
-### `sha1([data])`
-
-Creates a SHA-1 hash object, optionally seeded with `data`.
-
-**Parameters:**
-- `data` (`str` or `list`, optional): Initial data to hash.
-
-**Returns:** `Hash`: `.hexdigest()` is 40 hex characters.
-
-```python
-import hashlib
-
-print(hashlib.sha1("hello").hexdigest())  # "aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d"
-```
-
-### `md5([data])`
-
-Creates an MD5 hash object, optionally seeded with `data`.
-
-**Parameters:**
-- `data` (`str` or `list`, optional): Initial data to hash.
-
-**Returns:** `Hash`: `.hexdigest()` is 32 hex characters.
-
-```python
-import hashlib
-
-print(hashlib.md5("hello").hexdigest())  # "5d41402abc4b2a76b9719d911017c592"
-```
+`data` (and the argument to `.update()`) may be a `str`, which is hashed as UTF-8, a `bytes` value, or a list of byte values.
 
 ## Hash Object Methods
 
@@ -92,18 +44,25 @@ Objects returned by `md5()`, `sha1()`, and `sha256()` support:
 ```python
 import hashlib
 
-# Build a hash incrementally
+print(hashlib.sha256("hello").hexdigest())  # 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
+print(hashlib.sha1("hello").hexdigest())    # aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d
+print(hashlib.md5(b"hello").hexdigest())    # 5d41402abc4b2a76b9719d911017c592
+
 h = hashlib.sha256()
 h.update("foo")
 h.update("bar")
-assert h.hexdigest() == hashlib.sha256("foobar").hexdigest()
+print(h.hexdigest() == hashlib.sha256("foobar").hexdigest())  # True
+print(h.name, h.digest_size, len(h.digest()))  # sha256 32 32
 
-# copy() is independent
-c = h.copy()
+c = h.copy()                    # independent of h from here on
 h.update("baz")
-assert c.hexdigest() == hashlib.sha256("foobar").hexdigest()
-assert h.hexdigest() == hashlib.sha256("foobarbaz").hexdigest()
+print(c.hexdigest() == hashlib.sha256("foobar").hexdigest())  # True
 ```
+
+## Differences from Python
+
+- Strings are accepted directly and hashed as UTF-8 (Python requires `bytes`).
+- Only `md5`, `sha1`, and `sha256` exist; there is no `hashlib.new()`, `sha512`, `blake2b`, or other algorithm.
 
 ## See Also
 

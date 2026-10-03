@@ -141,7 +141,7 @@ content = os.read_file("/tmp/data.txt")
 print(content)
 ```
 
-### `read_bytes(path)`
+### `read_bytes(path)` {#read_bytes}
 
 Read entire file contents as a [`bytes`](../../data-formats/bytes/) value,
 preserving binary data byte-for-byte. Use this for msgpack/protobuf payloads,

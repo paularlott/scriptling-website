@@ -57,7 +57,17 @@ Registration status is a one-line tag in the body (see below), not front matter.
    immediately after, same two-column format (`Constant`, `Description`, with the value
    shown in the description, e.g. "The ratio of circumference to diameter (`3.14159...`)").
 
-4. **Functions**: one `###` subsection per function, in the same order as the table above.
+4. **Functions**: choose the form by how much the reader needs beyond the table.
+
+   - **Python-mirroring libraries** (`math`, `datetime`, `re`, `itertools`, `string` and the
+     like): the table is the reference. Follow it with one combined, runnable example block
+     (its `#` comments must be the real output), then a **Differences from Python** section
+     listing only behaviour that differs. Give a function its own `###` subsection only when
+     it is Scriptling-specific or behaves differently enough to need explaining.
+   - **Scriptling-specific libraries** (`scriptling.*`): one `###` subsection per function,
+     as below, because there is no Python documentation to fall back on.
+
+   Per-function subsections go in the same order as the table above.
    For libraries with more than ~12 functions, group related functions under `##` thematic
    headers (e.g. "Combinatorics", "Path Operations") with `###` functions underneath.
    `math.md` and `itertools.md` already do this; keep it for libraries of similar size.
@@ -85,7 +95,7 @@ Registration status is a one-line tag in the body (see below), not front matter.
    Rules:
    - Always show the type in backticks for params and returns: `` `str` ``, `` `int` ``, `` `list` ``, `` `dict` ``, `` `Match` ``, etc.
    - Optional/defaulted parameters: show the default in the signature *and* state it again in the description ("Default: `0`"). Both, always, don't pick one.
-   - Every function gets at least one runnable code example. Don't defer all examples to a single section at the end of the page.
+   - In per-function subsections, every function gets at least one runnable code example.
    - "Returns:" is required even when the return is `None`, write `**Returns:** \`None\``.
    - No em dashes. Use a period or comma instead.
 

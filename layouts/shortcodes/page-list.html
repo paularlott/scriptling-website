@@ -1,0 +1,16 @@
+{{- /*
+  Lists the pages of a section in sidebar order with their descriptions, so
+  landing pages never fall behind the content.
+  Usage: {{< page-list section="/docs/tutorials" >}}
+*/ -}}
+{{- with site.GetPage (.Get "section") -}}
+<ul>
+  {{- range .Pages.ByWeight }}
+  {{- if not (index .Params "nav-skip") }}
+  <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ with .Description }}: {{ . }}{{ end }}</li>
+  {{- end }}
+  {{- end }}
+</ul>
+{{- else -}}
+{{- errorf "page-list: section %q not found in %s" (.Get "section") .Page.File.Path -}}
+{{- end -}}

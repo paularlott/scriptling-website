@@ -32,7 +32,6 @@ General purpose utility libraries for common scripting tasks.
 | [scriptling.wait_for](https://scriptling.dev/okf/scriptling-libraries/utilities/wait_for.md) | Wait for resources to become available |
 | [scriptling.toon](https://scriptling.dev/okf/scriptling-libraries/utilities/toon.md) | TOON (Token-Oriented Object Notation) encoding/decoding |
 | [scriptling.similarity](https://scriptling.dev/okf/scriptling-libraries/utilities/similarity.md) | Text similarity utilities including fuzzy search and MinHash |
-| [scriptling.template](https://scriptling.dev/okf/scriptling-libraries/template.md) | Go-powered template rendering (HTML and text) |
 | [scriptling.markdown](https://scriptling.dev/okf/scriptling-libraries/utilities/markdown.md) | Markdown to HTML conversion (GitHub Flavored Markdown) |
 
 ## Quick Start

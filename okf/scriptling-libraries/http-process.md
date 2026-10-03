@@ -1,5 +1,5 @@
 ---
-description: HTTP client, subprocess management, and system libraries. All require registration when embedding.
+description: HTTP requests, URL parsing, and subprocess management.
 generated:
     by: scriptling-website/okf.py
 resource: https://scriptling.dev/reference/libraries/http-process/
@@ -14,10 +14,10 @@ type: API Reference
 ---
 # HTTP & Process
 
+`requests` and `subprocess` are extended libraries and require registration when embedding; `urllib.parse` is a standard library.
+
 | Library | Description |
 |---------|-------------|
 | [requests](https://scriptling.dev/okf/scriptling-libraries/http-process/requests.md) | HTTP library for sending requests |
+| [urllib.parse](https://scriptling.dev/okf/scriptling-libraries/http-process/urllib.md) | URL parsing, joining, and percent-encoding |
 | [subprocess](https://scriptling.dev/okf/scriptling-libraries/http-process/subprocess.md) | Spawn and manage subprocesses |
-| [sys](https://scriptling.dev/okf/scriptling-libraries/http-process/sys.md) | System-specific parameters |
-| [logging](https://scriptling.dev/okf/scriptling-libraries/http-process/logging.md) | Logging functionality |
-| [secrets](https://scriptling.dev/okf/scriptling-libraries/http-process/secrets.md) | Cryptographically strong random numbers |

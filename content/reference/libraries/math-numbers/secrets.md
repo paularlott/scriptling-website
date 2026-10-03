@@ -1,18 +1,13 @@
 ---
-description: Cryptographically strong random number generation for tokens, keys, and passwords.
-generated:
-    by: scriptling-website/okf.py
-resource: https://scriptling.dev/reference/libraries/http-process/secrets/
-sources:
-    - resource: https://scriptling.dev/reference/libraries/http-process/secrets/
-status: stable
-tags:
-    - libraries
-    - security
 title: secrets
-type: API Reference
+description: Cryptographically strong random number generation for tokens, keys, and passwords.
+tags: [libraries, security]
+weight: 8
+aliases:
+  - /reference/libraries/extlib/secrets/
+  - /reference/libraries/secrets/
+  - /reference/libraries/http-process/secrets/
 ---
-# secrets
 
 The `secrets` library provides functions for generating cryptographically strong random numbers suitable for managing secrets such as account authentication tokens, API keys, and passwords, similar to Python's `secrets` module. Use it instead of `random` any time the output needs to be unpredictable.
 
@@ -175,5 +170,5 @@ This library implements Python's `secrets` module:
 
 ## See Also
 
-- [requests](https://scriptling.dev/okf/scriptling-libraries/http-process/requests.md): Use generated tokens for API authentication
-- [subprocess](https://scriptling.dev/okf/scriptling-libraries/http-process/subprocess.md): Run external commands
+- [requests](../../http-process/requests/): Use generated tokens for API authentication
+- [subprocess](../../http-process/subprocess/): Run external commands

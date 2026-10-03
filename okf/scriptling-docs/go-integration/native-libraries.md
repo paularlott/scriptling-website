@@ -215,42 +215,7 @@ print(url.parse.quote("hello world"))                   # hello+world
 
 ## Library Loader
 
-For flexible library loading, use the `libloader` package. It supports loading from filesystem with Python-style folder structure, API calls, and chaining multiple loaders.
-
-```go
-import (
-    "github.com/paularlott/scriptling"
-    "github.com/paularlott/scriptling/libloader"
-)
-
-func main() {
-    p := scriptling.New()
-
-    // Load script libraries from filesystem
-    loader := libloader.NewFilesystem("/app/libs")
-    p.SetLibraryLoader(loader)
-
-    // Libraries are loaded on first import
-    p.Eval(`
-import knot.groups  # Loads from /app/libs/knot/groups.py
-import knot.roles   # Loads from /app/libs/knot/roles.py
-`)
-}
-```
-
-### Loader Chain
-
-Chain multiple loaders to try different sources:
-
-```go
-chain := libloader.NewChain(
-    libloader.NewFilesystem("/app/libs"),           // Try disk first
-    libloader.NewMemoryLoader(map[string]string{}), // Then in-memory
-)
-p.SetLibraryLoader(chain)
-```
-
-See [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md) for full documentation.
+Libraries written in Scriptling (rather than Go) are loaded on first import through a library loader: `p.SetLibraryLoader(libloader.NewFilesystem("/app/libs"))` lets scripts `import knot.groups` from `/app/libs/knot/groups.py`, and `libloader.NewChain(...)` tries several sources in order. See [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md) for the filesystem, memory, function, and custom loaders.
 
 ## Complete Library Example
 

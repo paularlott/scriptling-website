@@ -391,7 +391,7 @@ plugin.RegisterLibraries(p, manager)  // scriptling.plugin, plus plugin.<name> f
 |-----------|-------------|------|
 | `scriptling.plugin` | `plugin` | `plugin.RegisterLibraries(p, manager)` |
 
-See [Plugins](https://scriptling.dev/okf/scriptling-docs/go-integration/plugins.md) for the full plugin embedding guide.
+See [Plugin Manager](https://scriptling.dev/okf/scriptling-docs/plugins/host-integration.md) for the full plugin embedding guide.
 
 ## Security Considerations
 

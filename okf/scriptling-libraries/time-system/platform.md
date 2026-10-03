@@ -222,4 +222,4 @@ This library implements a subset of Python's `platform` module, using the Script
 
 - [datetime](https://scriptling.dev/okf/scriptling-libraries/time-system/datetime.md) - Date and time types
 - [time](https://scriptling.dev/okf/scriptling-libraries/time-system/time.md) - Time access and conversions
-- [io](https://scriptling.dev/okf/scriptling-libraries/time-system/io.md) - In-memory I/O streams
+- [io](https://scriptling.dev/okf/scriptling-libraries/text-processing/io.md) - In-memory I/O streams

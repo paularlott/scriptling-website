@@ -2,9 +2,9 @@
 description: Parse, split, join, and percent-encode/decode URLs and query strings without network access.
 generated:
     by: scriptling-website/okf.py
-resource: https://scriptling.dev/reference/libraries/time-system/urllib/
+resource: https://scriptling.dev/reference/libraries/http-process/urllib/
 sources:
-    - resource: https://scriptling.dev/reference/libraries/time-system/urllib/
+    - resource: https://scriptling.dev/reference/libraries/http-process/urllib/
 status: stable
 tags:
     - libraries
@@ -288,4 +288,4 @@ query = urllib.parse.urlencode({"tags": ["python", "go"]}, True)
 
 - [requests](https://scriptling.dev/okf/scriptling-libraries/http-process/requests.md) - Make actual HTTP requests (GET/POST/etc.); use it together with `urllib.parse` for building and parsing URLs.
 - [datetime](https://scriptling.dev/okf/scriptling-libraries/time-system/datetime.md) - Date and time types.
-- [io](https://scriptling.dev/okf/scriptling-libraries/time-system/io.md) - In-memory I/O streams.
+- [io](https://scriptling.dev/okf/scriptling-libraries/text-processing/io.md) - In-memory I/O streams.

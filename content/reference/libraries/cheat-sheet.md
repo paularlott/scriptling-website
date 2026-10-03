@@ -133,9 +133,11 @@ collections.most_common(counter, 2)                 # [(3, 3), (1, 2)]
 
 # deque - double-ended queue
 d = collections.deque([1, 2, 3])
-collections.deque_appendleft(d, 0)          # [0, 1, 2, 3]
-collections.deque_popleft(d)                # Returns 0, d is [1, 2, 3]
-collections.deque_rotate(d, 1)              # Rotate right
+d.appendleft(0)                             # deque([0, 1, 2, 3])
+d.popleft()                                 # Returns 0, d is deque([1, 2, 3])
+d.rotate(1)                                 # Rotate right: deque([3, 1, 2])
+d.extendleft([5, 4])                        # deque([4, 5, 3, 1, 2])
+bounded = collections.deque([1, 2, 3], maxlen=2)  # deque([2, 3], maxlen=2)
 
 # namedtuple - factory for dict with named fields
 Point = collections.namedtuple("Point", ["x", "y"])
@@ -207,14 +209,15 @@ import datetime
 
 # Current time
 now = time.time()               # Unix timestamp (seconds since epoch)
-formatted = datetime.now()      # Formatted date string
+now_dt = datetime.datetime.now()  # datetime object
+formatted = now_dt.strftime("%Y-%m-%d %H:%M:%S")
 
 # Sleep
 time.sleep(1)                   # Sleep for 1 second
 
 # Parse/format
-dt = datetime.datetime("2024-01-15 10:30:00", "%Y-%m-%d %H:%M:%S")
-ts = datetime.timestamp(dt)     # Convert to timestamp
+dt = datetime.datetime.strptime("2024-01-15 10:30:00", "%Y-%m-%d %H:%M:%S")
+ts = dt.timestamp()             # Convert to timestamp
 ```
 
 ## Base64

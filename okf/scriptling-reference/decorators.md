@@ -108,8 +108,8 @@ def my_handler():
     return "handled"
 
 # my_handler is still callable normally
-print(my_handler())       # "handled"
-print(_registry.keys())   # ["my_handler"]
+print(my_handler())       # handled
+print(_registry.keys())   # dict_keys(['my_handler'])
 ```
 
 ## The Registration Pattern (Decorator with Arguments)
@@ -258,5 +258,5 @@ print(Counter.increment())  # 2
 ## See Also
 
 - [Functions](https://scriptling.dev/okf/scriptling-reference/functions.md) — Function definition, parameters, closures
-- [Classes](https://scriptling.dev/okf/scriptling-reference/classes.md#decorators) — `@property`, `@staticmethod`, `@classmethod`
+- [Class Decorators & Properties](https://scriptling.dev/okf/scriptling-reference/classes/decorators.md) — `@property`, `@staticmethod`, `@classmethod`
 - [runtime.mcp](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md) — MCP tool registration via decorators

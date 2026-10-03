@@ -97,8 +97,8 @@ def my_handler():
     return "handled"
 
 # my_handler is still callable normally
-print(my_handler())       # "handled"
-print(_registry.keys())   # ["my_handler"]
+print(my_handler())       # handled
+print(_registry.keys())   # dict_keys(['my_handler'])
 ```
 
 ## The Registration Pattern (Decorator with Arguments)
@@ -247,5 +247,5 @@ print(Counter.increment())  # 2
 ## See Also
 
 - [Functions](../functions/) — Function definition, parameters, closures
-- [Classes](../classes/#decorators) — `@property`, `@staticmethod`, `@classmethod`
+- [Class Decorators & Properties](../classes/decorators/) — `@property`, `@staticmethod`, `@classmethod`
 - [runtime.mcp](/reference/libraries/runtime/mcp/) — MCP tool registration via decorators

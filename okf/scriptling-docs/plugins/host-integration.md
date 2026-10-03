@@ -15,7 +15,7 @@ type: Guide
 ---
 # Plugin Manager
 
-Applications that embed Scriptling own a plugin manager. Load plugins once, then register plugin libraries with every Scriptling environment you create.
+Applications that embed Scriptling own a plugin manager. Load plugins once, then register plugin libraries with every Scriptling environment you create. This page is part of embedding Scriptling in Go; see [Go Integration](https://scriptling.dev/okf/scriptling-docs/go-integration.md) for the rest of the host API, and [Go Plugins](https://scriptling.dev/okf/scriptling-docs/plugins/go-plugins.md) for writing the plugin executable itself.
 
 ```go
 package main
@@ -67,7 +67,9 @@ print(plugin.hello.greet("Ada"))
 
 ## Multiple Environments
 
-The manager starts each plugin executable once. Multiple Scriptling environments can share the same manager. Each environment must still be evaluated by only one Go thread at a time. The stdio JSON-RPC connection multiplexes overlapping calls by request id; connection pooling is intentionally not used because it would create multiple plugin process instances and violate the singleton plugin model:
+Each Scriptling environment is safe to evaluate from many goroutines: a per-environment interpreter lock (GIL) serializes script execution, so concurrent calls into one environment cannot corrupt its state. You can therefore share a single environment across goroutines for shared state, or create one environment per request/worker for isolation (independent environments also run fully in parallel, since each has its own lock). In either case, call `plugin.RegisterLibraries(env, manager)` per environment.
+
+The manager starts each plugin executable once, or keeps one logical client per loaded HTTP(S) JSON-RPC endpoint. Multiple environments can share that manager, and plugin calls from those separate environments may overlap on the same plugin process or endpoint. The stdio JSON-RPC connection multiplexes overlapping calls by request id; HTTP endpoints receive one POST per call or batch. HTTP plugin transport is request/response only, so the server cannot initiate callbacks back to the client; use stdio plugins for host callbacks and `plugin.Logger(ctx)`. Connection pooling for executable plugins is intentionally not used because it would create multiple plugin process instances and violate the singleton plugin model.
 
 ```go
 p1 := scriptling.New()
@@ -346,6 +348,12 @@ defer requestScope.Close()
 
 Pass a logger to `plugin.NewManager(appLogger, crashHandler)` to install the manager-lifetime host logger used for records emitted by Go plugins through `plugin.Logger(ctx)`. Pass the same `github.com/paularlott/logger.Logger` your application already uses; the example above uses `github.com/paularlott/logger/slog` so plugin logs are visible during development. `manager.SetLogger()` is also available for late wiring. If no logger is configured, plugin log records are acknowledged and dropped.
 
+A Go plugin writes to the host logger from an active plugin call:
+
+```go
+plugin.Logger(ctx).Info("plugin work started", "name", name)
+```
+
 ## Crash Handling
 
 Pass a crash handler to `plugin.NewManager(appLogger, crashHandler)` to handle plugin processes that exit unexpectedly after loading. `manager.SetCrashHandler()` is also available for late wiring. Long-running applications can log the failure, terminate, restart the process, or mark themselves unhealthy.
@@ -357,6 +365,10 @@ manager.SetCrashHandler(func(name string, err error) {
 ```
 
 `manager.Health()` is still available for polling or health endpoints. It returns a map of unhealthy plugin library names to errors and is empty when all loaded plugins are healthy.
+
+## Startup and Failure Behavior
+
+Plugins are loaded eagerly. Missing or invalid executables become manager warnings, which lets applications decide how visible those startup problems should be. A runtime RPC failure from a plugin call is returned as the script error for that call.
 
 ## Server Applications
 
