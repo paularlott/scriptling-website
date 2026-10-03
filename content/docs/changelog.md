@@ -47,7 +47,7 @@ nav-skip: true
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
-**Iterators, comparisons and errors.** `map()`, `filter()`, `any()` and `all()` pull from iterators lazily, so they work with `itertools.count()`, and collecting an endless iterator raises an error instead of exhausting memory. `!=` falls back to `__eq__`; `key=` accepts bound methods and callable objects; `zip(strict=True)` works; `except` accepts a variable or tuple of types and the `LookupError`, `ArithmeticError` and `BaseException` parents; `Counter` takes float counts and compares like Python; `textwrap` splits words exactly as CPython does; `random.sample(range(10**9), k)` no longer expands the range. See [Built-in Functions](/reference/builtins/#iteration-utilities) and [Error Handling](/reference/error-handling/#exception-type-hierarchy).
+**Iterators, comparisons and errors.** `map()`, `filter()`, `any()` and `all()` pull from iterators lazily, so they work with `itertools.count()`, and collecting an endless iterator raises an error instead of exhausting memory. `!=` falls back to `__eq__`; `key=` accepts bound methods and callable objects; `zip(strict=True)` works, and `zip()` of two dict views is a `TypeError` since dict order is unspecified (use `d.items()`); `except` accepts a variable or tuple of types and the `LookupError`, `ArithmeticError` and `BaseException` parents; `Counter` takes float counts and compares like Python; `textwrap` splits words exactly as CPython does; `random.sample(range(10**9), k)` no longer expands the range. See [Built-in Functions](/reference/builtins/#iteration-utilities) and [Error Handling](/reference/error-handling/#exception-type-hierarchy).
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
