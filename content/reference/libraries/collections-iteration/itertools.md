@@ -19,7 +19,7 @@ Unlike Python, these functions return a **list** (of tuples, where Python yields
 |----------|-------------|
 | `chain(*iterables)` | Concatenate iterables into one list. |
 | `cycle(iterable[, n])` | With `n`: the elements repeated `n` times, as a list. Without `n`: an endless iterator (see below). |
-| `repeat(elem[, n])` | `elem` repeated `n` times (default `1`). |
+| `repeat(elem[, n])` | An iterator giving `elem` `n` times, or endlessly when `n` is omitted. |
 | `zip_longest(*iterables, fillvalue=None)` | Zip, padding shorter inputs with `fillvalue`. |
 | `count(start=0, step=1)` | Endless count from `start` by `step`; take items with `islice()`, `zip()` or `next()`. |
 | `islice(iterable, stop)` / `islice(iterable, start, stop[, step])` | Elements selected by index, like slice notation. |
@@ -45,7 +45,7 @@ import itertools
 # Chaining, repeating, zipping
 print(itertools.chain([1, 2], [3, 4], "ab"))        # [1, 2, 3, 4, 'a', 'b']
 print(itertools.cycle([1, 2], 3))                   # [1, 2, 1, 2, 1, 2]
-print(itertools.repeat("x", 3))                     # ['x', 'x', 'x']
+print(list(itertools.repeat("x", 3)))               # ['x', 'x', 'x']
 print(itertools.zip_longest([1, 2, 3], ["a"], fillvalue="-"))  # [(1, 'a'), (2, '-'), (3, '-')]
 
 # Slicing and filtering
@@ -74,7 +74,8 @@ print(itertools.starmap(pow, [(2, 3), (3, 2)]))     # [8, 9]
 
 ## Differences from Python
 
-- Results are lists, so they can be indexed and printed directly but are built eagerly. Avoid huge combinatorial inputs.
+- Results are lists, so they can be indexed and printed directly but are built eagerly. Avoid huge combinatorial inputs. `count()`, `repeat()` and `cycle()` without a count are iterators, as in Python.
+- Passing an endless iterator (`count()`, `cycle()`, `repeat()` without a count) to a function that builds a list, such as `dropwhile()` or `list()`, raises an error instead of running out of memory. Bound it with `islice()` first.
 - `groupby()` returns a list of `(key, list)` pairs rather than lazy groupers.
 - `tee()` and `chain.from_iterable()` are not available; use `itertools.chain(*nested)` to flatten.
 

@@ -218,7 +218,7 @@ sim.sentences("Hello world. This is a test! Is it?\nA new line here")
 
 Keep the most informative sentences of a text, in their original order, within the given bounds. CPU-only: no model or API call.
 
-Sentences are scored with TextRank. Each sentence is a node, edges are weighted by the cosine similarity of the sentences' hashed word vectors (the same vectors as `vectorize()`), and the stationary distribution ranks them, so the sentences most representative of the text as a whole score highest. The similarity matrix is built in parallel across CPUs. Text that already fits the bounds is returned unchanged.
+Sentences are scored with TextRank. Each sentence is a node, edges are weighted by the cosine similarity of the sentences' hashed word vectors (the same vectors as `vectorize()`), and the stationary distribution ranks them, so the sentences most representative of the text as a whole score highest. A sentence that repeats, such as a signature carried through a thread, is ranked once and kept at most once, so repetition cannot make it look like the main point. The similarity matrix is built in parallel across CPUs. Text that already fits the bounds is returned unchanged.
 
 Repetitive line-oriented text, such as a log or a stack trace where most lines repeat with only numbers changing, is handled differently: there the rare lines carry the information, so the leading and trailing lines are kept together with the first occurrence of each distinct line, in order, and ranking is not used.
 

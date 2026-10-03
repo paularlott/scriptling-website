@@ -103,12 +103,12 @@ Creates a gossip cluster node.
 - `bind_addr` (`str`, optional): Address to bind to. Default: `"127.0.0.1:8000"`.
 - `node_id` (`str`, optional): Unique node ID. Default: `""` (auto-generated).
 - `advertise_addr` (`str`, optional): Address to advertise to peers. Default: same as `bind_addr`.
-- `encryption_key` (`str`, optional): AES encryption key, 16, 24, or 32 bytes. Default: `""` (no encryption).
+- `encryption_key` (`str`, optional): AES encryption key, 16, 24, or 32 bytes. Default: `""` (no encryption). Socket transport only; the `"http"` transport relies on HTTPS instead and rejects a key.
 - `tags` (`list`, optional): Tags for tag-based message routing. Default: `[]`.
 - `compression` (`bool`, optional): Enable Snappy compression. Default: `False`.
 - `bearer_token` (`str`, optional): Authentication bearer token. Default: `""`.
 - `app_version` (`str`, optional): Application version for compatibility checks. Default: `""`.
-- `transport` (`str`, optional): Transport type, `"socket"` or `"http"`. Default: `"socket"`. With `"http"`, the node serves the gossip endpoint over HTTP on `bind_addr`; `advertise_addr` defaults to `http://<bind_addr>` (set it to an `https://` URL behind a TLS proxy), and peers join it by `host:port` as with sockets.
+- `transport` (`str`, optional): Transport type, `"socket"` or `"http"`. Default: `"socket"`. With `"http"`, the node serves the gossip endpoint over HTTP on `bind_addr`; `advertise_addr` defaults to `http://<bind_addr>` (set it to an `https://` URL behind a TLS proxy; a value without a scheme gets `http://`), and peers join it by `host:port` as with sockets. When `bind_addr` listens on all interfaces (for example `0.0.0.0:8000`), set `advertise_addr` to the address peers should use.
 - `compress_min_size` (`int`, optional): Minimum message size for compression. Default: `256`.
 - `gossip_interval` (`str`, optional): Gossip interval duration. Default: `"5s"`.
 - `gossip_max_interval` (`str`, optional): Maximum gossip interval. Default: `"20s"`.
@@ -181,7 +181,7 @@ cluster.leave()
 
 ### `cluster.stop()`
 
-Stops the cluster and cleans up all resources.
+Stops the cluster and cleans up all resources. Streams this node opened with `open_stream()` are closed.
 
 **Parameters:** None
 

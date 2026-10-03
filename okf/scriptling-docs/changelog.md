@@ -19,18 +19,6 @@ type: Guide
 ### v0.28.0
 
 
-**Upgrading.** Several behaviours now match Python 3 and can change what existing scripts do:
-
-- A missing attribute raises `AttributeError` instead of returning `None`; use `getattr(obj, "name", None)` where it's optional.
-- Strings print quoted inside containers: `print(["a"])` shows `['a']`. `json.dumps` is unchanged.
-- `repr()` and `%r` use only `__repr__`, never `__str__`.
-- `format()` uses Python's default precision (`format(0.5, "%")` is `"50.000000%"`), and a spec on a type without one, such as `f"{items:>10}"`, is a `TypeError`.
-- Modules expose only their members: `math.nope` is an `AttributeError` and `math.keys()` no longer works.
-- `obj["name"]` on an instance without `__getitem__` is a `TypeError`; use `obj.name`.
-- `itertools.count(start, step)` is infinite as in Python; the old `count(start, stop)` range form is gone (use `range`).
-- `Counter` keeps real keys: `Counter([1, 1])[1]` is `2` (keys were strings).
-- `html.escape` and `json.dumps` produce Python's output (`&quot;`, `&#x27;`; JSON no longer escapes `<`, `>`, `&`).
-
 
 **Python 3 behaviour.** Objects, modules, printing and formatting now behave as listed above, with Python's error messages, `__getattr__` and `__format__` support, and `getattr()`/`hasattr()` working exactly like dot access. `pathlib.Path` supports `/`. See [Python Differences](https://scriptling.dev/okf/scriptling-reference/python-differences.md).
 
@@ -48,7 +36,7 @@ type: Guide
 
 
 
-**Gossip streams.** `cluster.open_stream()` requests a reply of any size from one node and `cluster.handle_stream()` serves it, for files and state transfers beyond the packet limit. See [scriptling.net.gossip](https://scriptling.dev/okf/scriptling-libraries/networking/gossip.md#clusteropen_streamnode_id-message_type-data).
+**Gossip streams.** `cluster.open_stream()` requests a reply of any size from one node and `cluster.handle_stream()` serves it, for files and state transfers beyond the packet limit. Closing a stream, or stopping its cluster, ends a read in progress. See [scriptling.net.gossip](https://scriptling.dev/okf/scriptling-libraries/networking/gossip.md#clusteropen_streamnode_id-message_type-data).
 
 
 
@@ -64,11 +52,15 @@ type: Guide
 
 
 
-**`format()`** applies zero padding, fill, sign and grouping like f-strings: `format(42, "05d")` is `"00042"`.
+**`format()`** applies zero padding, fill, sign and grouping like f-strings: `format(42, "05d")` is `"00042"`. Unknown format codes raise `ValueError`, and `#` (`0xff`), `_` grouping, `c` and `n` are supported.
 
 
 
-**Gossip HTTP transport.** `transport="http"` nodes now serve the gossip endpoint on `bind_addr`; before, they could send but never receive, so HTTP clusters could not form.
+**Iterators, comparisons and errors.** `map()`, `filter()`, `any()` and `all()` pull from iterators lazily, so they work with `itertools.count()`, and collecting an endless iterator raises an error instead of exhausting memory. `!=` falls back to `__eq__`; `key=` accepts bound methods and callable objects; `zip(strict=True)` works; `except` accepts a variable or tuple of types and the `LookupError`, `ArithmeticError` and `BaseException` parents; `Counter` takes float counts and compares like Python; `textwrap` splits words exactly as CPython does; `random.sample(range(10**9), k)` no longer expands the range. See [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md#iteration-utilities) and [Error Handling](https://scriptling.dev/okf/scriptling-reference/error-handling.md#exception-type-hierarchy).
+
+
+
+**Gossip HTTP transport.** `transport="http"` nodes now serve the gossip endpoint on `bind_addr`; before, they could send but never receive, so HTTP clusters could not form. `encryption_key` is rejected with this transport (use HTTPS), and a node bound to all interfaces needs `advertise_addr`.
 
 
 

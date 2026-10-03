@@ -93,16 +93,30 @@ except:
 Scriptling supports Python 3-style exception type matching:
 
 ```
-Exception (base class)
-├── ValueError      - Invalid values
-├── TypeError       - Type mismatches
-├── NameError       - Undefined names
-├── ImportError     - Library or imported name cannot be imported
-├── ZeroDivisionError - Division by zero
-├── IndexError      - Sequence index out of range
-├── KeyError        - Dictionary key not found
-├── AttributeError  - Attribute not found on object
-└── ... (more specific types)
+BaseException
+└── Exception (base class)
+    ├── ValueError        - Invalid values
+    ├── TypeError         - Type mismatches
+    ├── NameError         - Undefined names
+    ├── ImportError       - Library or imported name cannot be imported
+    ├── ArithmeticError
+    │   └── ZeroDivisionError - Division by zero
+    ├── LookupError
+    │   ├── IndexError    - Sequence index out of range
+    │   └── KeyError      - Dictionary key not found
+    ├── AttributeError    - Attribute not found on object
+    ├── OSError           - OS-level errors
+    └── RuntimeError      - General runtime errors
+```
+
+An `except` clause catches its type and the types below it, so `except LookupError:` catches both `KeyError` and `IndexError`. The type can also come from a variable, including a tuple of types:
+
+```python
+retryable = (KeyError, IndexError)
+try:
+    value = data[key]
+except retryable:
+    value = None
 ```
 
 ### Built-in Exception Types
@@ -110,6 +124,8 @@ Exception (base class)
 | Exception Type | When Raised |
 |----------------|-------------|
 | `Exception` | Base class for all exceptions |
+| `LookupError` | Base of `IndexError` and `KeyError` |
+| `ArithmeticError` | Base of `ZeroDivisionError` |
 | `ValueError` | Invalid value for operation |
 | `TypeError` | Operation on wrong type |
 | `NameError` | Variable/identifier not found |

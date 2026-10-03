@@ -103,6 +103,16 @@ int("1010", 2)   # 10
 int("0b1010", 2) # 10 (0b prefix stripped automatically)
 int("77", 8)     # 63
 int("z", 36)     # 35
+int("1_000")     # 1000 (underscores between digits, as in Python)
+```
+
+A string that is not a valid integer raises `ValueError`, with Python's message:
+
+```python
+try:
+    int("abc")
+except ValueError as e:
+    print(e)   # invalid literal for int() with base 10: 'abc'
 ```
 
 ### float()
@@ -113,7 +123,11 @@ Convert to float:
 float("3.14") # 3.14
 float(42)     # 42.0
 float("42")   # 42.0
+float("1e3")  # 1000.0
+float("inf")  # inf (also "-inf", "nan")
 ```
+
+An invalid string raises `ValueError`: `could not convert string to float: '1.5abc'`.
 
 ### bool()
 
@@ -483,7 +497,7 @@ d.setdefault("b", 200)             # 200 (sets and returns new value)
 ## Iteration Utilities
 
 ```python
-# These return iterators (lazy evaluation)
+# These return iterators
 enumerate(["a", "b"])              # Iterator: (0, "a"), (1, "b")
 enumerate(["a", "b"], start=1)     # Iterator: (1, "a"), (2, "b")
 zip([1, 2], ["a", "b"])            # Iterator: (1, "a"), (2, "b")
@@ -492,14 +506,27 @@ map(lambda x: x*2, [1, 2, 3])      # Iterator: 2, 4, 6
 filter(lambda x: x > 1, [1, 2, 3]) # Iterator: 2, 3
 
 # Convert to list if needed
-list(enumerate(["a", "b"]))       # [[0, "a"], [1, "b"]]
-list(zip([1, 2], ["a", "b"]))     # [[1, "a"], [2, "b"]]
+list(enumerate(["a", "b"]))       # [(0, 'a'), (1, 'b')]
+list(zip([1, 2], ["a", "b"]))     # [(1, 'a'), (2, 'b')]
+
+# strict=True: inputs of different lengths raise ValueError
+list(zip([1, 2], "abc", strict=True))  # ValueError: zip() argument 2 is longer than argument 1
 
 # Boolean tests (work with any iterable)
 any([False, True, False])         # True
 all([True, True, True])           # True
 all([True, False, True])          # False
 ```
+
+Given an iterator, `map()`, `filter()`, `zip()`, `enumerate()`, `any()` and `all()` pull one item at a time, so they work on endless iterators such as `itertools.count()`:
+
+```python
+import itertools
+next(filter(lambda n: n * n > 50, itertools.count()))   # 8
+any(map(lambda n: n > 3, itertools.count()))             # True
+```
+
+Collecting an endless iterator, with `list()`, `sorted()`, `sum()`, a comprehension or a generator expression (which Scriptling builds eagerly), raises an error rather than running out of memory. Bound it first with `itertools.islice()` or `zip()`, or break out of a `for` loop.
 
 ## Iterator Protocol
 

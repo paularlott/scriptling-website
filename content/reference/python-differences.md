@@ -58,7 +58,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 
 | Feature | Notes |
 |---------|-------|
-| Exception hierarchy | Simplified error model |
+| Exception hierarchy | Built-in types only: `BaseException`, `Exception`, `LookupError` and `ArithmeticError` group the common errors, but there is no `OSError` subtree such as `FileNotFoundError` |
 | Exception groups (Python 3.11+) | Not supported |
 | `except*` syntax | Not supported |
 | `raise X from Y` | Exception chaining not supported; use `raise ExcType(msg)` directly |
@@ -77,7 +77,8 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Walrus in a comprehension | `y` in `[y for x in a if (y := f(x))]` binds inside the comprehension and does not leak to the enclosing scope, unlike Python (PEP 572); use the collected list instead |
 | `type(x).__name__` | `type(x)` returns the type name directly as a string (`type(42)` is `"INTEGER"`, a custom class instance gives its class name), so there is no type object to hang `.__name__` on — use `type(x)` itself; a raised built-in exception reports the class it was raised as (`"ValueError"`) |
 | Lazy iteration | `any`/`all`/`sorted`/`min`/`max`/`map`/`filter` materialize their iterable eagerly; `any([True, boom()])` raises where Python short-circuits |
-| Generator expressions | `(x for x in a)` syntax works but is evaluated eagerly into a list, not a lazy generator object |
+| Generator expressions | `(x for x in a)` syntax works but is evaluated eagerly into a list, not a lazy generator object; over an endless iterator such as `itertools.count()` it raises an error instead of hanging (use `map()`/`filter()`, which stay lazy) |
+| `\N{name}` string escapes | Not supported; use `\u` with the code point |
 | Number methods | Numbers have no methods (`(5).bit_length()`, `x.is_integer()`, `x.real`): use `abs`, `round`, `int`, `float` and `math` |
 | `dir()` with no argument | Lists the builtin names, not the local scope |
 | `json.dumps()` output | Compact with sorted keys: `json.dumps({"b": 1, "a": [1, 2]})` gives `{"a":[1,2],"b":1}` (Python gives `{"b": 1, "a": [1, 2]}`) |

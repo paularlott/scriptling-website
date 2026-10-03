@@ -41,6 +41,28 @@ multi-line string
 single_line = '''Also works with single quotes'''
 ```
 
+## Escape Sequences
+
+Strings, triple-quoted strings, f-strings and bytes literals process Python's escape sequences:
+
+| Escape | Meaning |
+|--------|---------|
+| `\n`, `\t`, `\r` | Newline, tab, carriage return |
+| `\\`, `\'`, `\"` | Backslash and quotes |
+| `\a`, `\b`, `\f`, `\v` | Bell, backspace, form feed, vertical tab |
+| `\xhh` | Character (in bytes, the byte) with hex value `hh` |
+| `\ooo` | Character or byte with octal value `ooo` (`\0` is NUL) |
+| `\uXXXX`, `\UXXXXXXXX` | Unicode code point (not in bytes literals) |
+| `\` at the end of a line | Continues the string on the next line |
+
+Any other backslash sequence, such as `\d` in a regular expression, is kept as written. `\N{name}` is not supported; use `\u` with the code point. Raw strings are still the clearest choice for regular expressions.
+
+```python
+"caf\u00e9"    # 'café'
+b"\x00\xff"     # 2 bytes
+"\x41\101"      # 'AA'
+```
+
 ## Raw Strings
 
 Raw string prefixes `r` or `R` prevent escape sequence processing:
@@ -55,6 +77,9 @@ raw = r"\n\t"  # Contains backslash-n and backslash-t literally
 # Useful for regular expressions and file paths
 import re
 pattern = r"\d+\.\d+"  # Matches decimal numbers
+
+# Raw bytes: rb"..." or br"..."
+raw_bytes = rb"\x41"  # 4 bytes: backslash, x, 4, 1
 ```
 
 ### Adjacent String Literals
