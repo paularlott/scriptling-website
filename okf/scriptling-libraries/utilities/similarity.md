@@ -212,7 +212,7 @@ Split text into sentences. A sentence ends at `". "`, `"! "` or `"? "` when the 
 **Parameters:**
 - `text` (`str`): Text to split.
 
-**Returns:** `list[str]`: sentences in order.
+**Returns:** `list[str]`: sentences in order; an empty list for blank text, never `None`.
 
 ```python
 import scriptling.similarity as sim
