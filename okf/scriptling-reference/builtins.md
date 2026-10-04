@@ -119,6 +119,7 @@ Scriptling provides many built-in functions that are always available without im
 | [`repr(x)`](#object-and-attribute-functions) | Developer representation, strings quoted |
 | [`reversed(seq)`](#iteration-utilities) | Iterate in reverse |
 | [`round(x[, digits])`](#math-functions) | Round half to even |
+| [`sentinel(name, *, repr=None)`](#sentinel) | Unique marker value, equal only to itself |
 | [`set(iterable)`](#set) | Create a set |
 | [`setattr(obj, name, value)`](#object-and-attribute-functions) | Set an attribute by name |
 | [`slice(start, stop[, step])`](../slicing/#the-slice-builtin) | Slice object for indexing |
@@ -318,6 +319,39 @@ callable(lambda x: x)     # True
 callable(42)              # False
 callable("hello")         # False
 ```
+
+## Sentinel Values
+
+### sentinel()
+
+Creates a unique marker value, like Python 3.15's `sentinel()` builtin (PEP 661). Each call returns a new value that is equal only to itself, so it can never collide with real data — including `None`:
+
+```python
+MISSING = sentinel("MISSING")
+
+def fetch(key, default=MISSING):
+    if default is MISSING:
+        return load(key)          # no default was given
+    return default
+
+fetch("a")          # loads the value: None is a real default too
+fetch("a", None)    # returns None, the caller's choice
+```
+
+Check a sentinel with `is`. `==` agrees with identity (true only against the same sentinel), and `repr` defaults to the name:
+
+```python
+MISSING is MISSING                   # True
+MISSING is sentinel("MISSING")       # False: every call is a new sentinel
+MISSING == "MISSING"                 # False
+repr(MISSING)                        # "MISSING"
+
+NOT_GIVEN = sentinel("x", repr="<NOT_GIVEN>")
+repr(NOT_GIVEN)                      # "<NOT_GIVEN>"
+MISSING.__name__                     # "MISSING"
+```
+
+Sentinels are truthy, hashable by identity (they work as set members and dict keys), not callable, and unsupported operations — ordering (`<`, `>=`), `len()`, indexing, iterating — raise `TypeError`, as does a name that is not a string.
 
 ## Math Functions
 

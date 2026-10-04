@@ -16,6 +16,15 @@ type: Guide
 
 ## October 2026
 
+### v0.28.1
+
+
+
+**`sentinel()` marker values.** `MISSING = sentinel("MISSING")` creates a unique value, equal only to itself, for "not supplied" defaults that `None` cannot express (PEP 661, Python 3.15). See [Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md#sentinel).
+
+
+---
+
 ### v0.28.0
 
 

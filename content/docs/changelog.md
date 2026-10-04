@@ -8,6 +8,14 @@ nav-skip: true
 
 ## October 2026
 
+{{< version "v0.28.1" >}}
+
+{{< changelog-item "added" >}}
+**`sentinel()` marker values.** `MISSING = sentinel("MISSING")` creates a unique value, equal only to itself, for "not supplied" defaults that `None` cannot express (PEP 661, Python 3.15). See [Built-in Functions](/reference/builtins/#sentinel).
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.28.0" >}}
 
 {{< changelog-item "changed" >}}
