@@ -411,7 +411,7 @@ Decision models are separate from chat models: use `clef-flash` (fast, image-cap
 - `images` (`list`, optional): base64 strings or `bytes`, shared by all questions (needs a vision-capable model such as `clef-flash`).
 - `keep_alive` (`str` or `int`, optional): model keep-alive, as for other Ollama calls.
 
-**Returns:** `dict` with `model`, `answers` (keyed by question name: the winning `choice` plus `probabilities` and `confidence`; the probability of true as `noul`; the probability-weighted level as `score` plus `legend`) and `usage` (`input_tokens`, `output_tokens`).
+**Returns:** `dict` with `model`, `answers` (keyed by question name: the winning `choice` plus `probabilities` and `confidence`; the probability of true as `noul`; the probability-weighted level as `score` plus `legend` — for score questions, `legend` and `probabilities` are keyed by level index, `"0"` upward) and `usage` (`input_tokens`, `output_tokens`).
 
 ```python
 client = ai.Client("http://localhost:11434", provider=ai.OLLAMA)
