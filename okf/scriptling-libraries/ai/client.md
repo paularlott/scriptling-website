@@ -38,6 +38,7 @@ The AI Client is the primary interface for making API calls to AI providers: Ope
 | `ask_parallel(model, messages_list, **kwargs)` | Concurrent ask completions |
 | `Pipeline(model, **kwargs)` | Streaming completion pipeline |
 | `embedding(model, input)` | Create embedding vectors |
+| `decide(model, state, questions=, ...)` | Ask a decision model (Ollama) |
 | `models()` | List available models |
 | [`response_create(model, input, **kwargs)`](https://scriptling.dev/okf/scriptling-libraries/ai/client/responses.md) | Create a Responses API response |
 | [`response_get(id)`](https://scriptling.dev/okf/scriptling-libraries/ai/client/responses.md) | Get a response by ID |
@@ -385,6 +386,56 @@ response = client.embedding("text-embedding-3-small", ["Hello", "World"])
 for emb in response.data:
     print(emb.embedding)
 ```
+
+### `client.decide(model, state, questions=, images=, keep_alive=)`
+
+Runs a decision model against a state and up to 64 named questions in a single response — classification, yes/no probabilities or rubric scoring instead of chat generation. No streaming, no temperature, no tools.
+
+**Provider support:**
+
+| Provider | Support | Notes |
+|----------|---------|-------|
+| Ollama | Native | System One (`POST /v1/systemone`), server v0.35.0+ |
+| Others | Not supported | Returns an error naming the provider |
+
+Decision models are separate from chat models: use `clef-flash` (fast, image-capable), `clef`, `nimble` or `tev1`. The server rejects non-decision models.
+
+**Parameters:**
+
+- `model` (`str`): decision model name (e.g. `"clef-flash"`).
+- `state` (`str`, `dict` or `list`): the input the questions are judged against.
+- `questions` (`dict`, required): 1–64 named questions, each a dict with:
+  - `"type"`: `"choice"` (pick from options), `"noul"` (yes/no probability) or `"score"` (position on an ordered rubric)
+  - `"instructions"` (`str`): what to judge
+  - `"criteria"`: for `choice`, a dict of 2–26 option descriptions; for `noul`, optional `"false"`/`"true"` descriptions; for `score`, an ordered list of 2–26 descriptions, lowest to highest
+- `images` (`list`, optional): base64 strings or `bytes`, shared by all questions (needs a vision-capable model such as `clef-flash`).
+- `keep_alive` (`str` or `int`, optional): model keep-alive, as for other Ollama calls.
+
+**Returns:** `dict` with `model`, `answers` (keyed by question name: the winning `choice` plus `probabilities` and `confidence`; the probability of true as `noul`; the probability-weighted level as `score` plus `legend`) and `usage` (`input_tokens`, `output_tokens`).
+
+```python
+client = ai.Client("http://localhost:11434", provider=ai.OLLAMA)
+
+result = client.decide(
+    "clef-flash",
+    "Our checkout has returned 500 errors since 9am; sales are stopped.",
+    questions={
+        "label": {"type": "choice",
+                  "instructions": "Which label fits this ticket?",
+                  "criteria": {"billing": "Payments and refunds",
+                               "bug": "Software errors",
+                               "account": "Login and access"}},
+        "urgent": {"type": "noul",
+                   "instructions": "Does this need immediate human attention?"},
+    },
+)
+
+result["answers"]["label"]["choice"]        # "bug"
+result["answers"]["label"]["confidence"]    # 0.52
+result["answers"]["urgent"]["noul"]         # 0.98
+```
+
+`confidence` is 1 − H(p)/ln(N): 0 means uniform, near 1 one dominant candidate — a strength signal, not a correctness guarantee.
 
 ### `client.models()`
 

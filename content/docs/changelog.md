@@ -30,6 +30,10 @@ nav-skip: true
 **`frozenset()` and `OverflowError`.** Immutable sets, hashable by content, so they work as dict keys and set members; set operators follow Python's left-operand rule and mutating methods raise `AttributeError`. `OverflowError` (an `ArithmeticError` subclass) is now a built-in exception. See [Built-in Functions](/reference/builtins/#frozenset).
 {{< /changelog-item >}}
 
+{{< changelog-item "added" >}}
+**Decision models.** `client.decide(model, state, questions=, images=, keep_alive=)` on Ollama clients runs a System One decision model (`clef-flash`, `clef`, `nimble`, `tev1`): classification, yes/no probabilities and rubric scoring over up to 64 named questions in one response, with per-question probabilities and confidence. Other providers return a clear error naming the provider. See [AI Client](/reference/libraries/ai/client/#clientdecidemodel-state-questions-images-keep_alive).
+{{< /changelog-item >}}
+
 {{< changelog-item "fixed" >}}
 **Operator precedence now matches Python.** Bitwise `&`, `^`, `|` bind tighter than comparisons (`3 & 1 == 1` is `(3 & 1) == 1`) but looser than `and`/`or` — both previously reversed; `not` is looser than comparisons (`not a == b` is `not (a == b)`); `**` is right-associative (`2**3**2` is `512`) and binds tighter than unary minus (`-2 ** 2` is `-4`); and `in`/`is` comparisons now chain (`1 in xs == flag` is `(1 in xs) and (xs == flag)`). Verified by a 97-expression audit diffed against CPython. See [Operators](/reference/operators/#operator-precedence).
 {{< /changelog-item >}}

@@ -40,6 +40,10 @@ type: Guide
 
 
 
+**Decision models.** `client.decide(model, state, questions=, images=, keep_alive=)` on Ollama clients runs a System One decision model (`clef-flash`, `clef`, `nimble`, `tev1`): classification, yes/no probabilities and rubric scoring over up to 64 named questions in one response, with per-question probabilities and confidence. Other providers return a clear error naming the provider. See [AI Client](https://scriptling.dev/okf/scriptling-libraries/ai/client.md#clientdecidemodel-state-questions-images-keep_alive).
+
+
+
 **Operator precedence now matches Python.** Bitwise `&`, `^`, `|` bind tighter than comparisons (`3 & 1 == 1` is `(3 & 1) == 1`) but looser than `and`/`or` — both previously reversed; `not` is looser than comparisons (`not a == b` is `not (a == b)`); `**` is right-associative (`2**3**2` is `512`) and binds tighter than unary minus (`-2 ** 2` is `-4`); and `in`/`is` comparisons now chain (`1 in xs == flag` is `(1 in xs) and (xs == flag)`). Verified by a 97-expression audit diffed against CPython. See [Operators](https://scriptling.dev/okf/scriptling-reference/operators.md#operator-precedence).
 
 
