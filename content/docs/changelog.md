@@ -11,7 +11,7 @@ nav-skip: true
 {{< version "v0.28.0" >}}
 
 {{< changelog-item "changed" >}}
-**Python 3 behaviour.** Objects, modules, printing and formatting now behave as listed above, with Python's error messages, `__getattr__` and `__format__` support, and `getattr()`/`hasattr()` working exactly like dot access. `pathlib.Path` supports `/`. See [Python Differences](/reference/python-differences/).
+**Python 3 behaviour.** Objects, modules, printing and formatting now behave as Python 3 does, with Python's error messages, `__getattr__` and `__format__` support, and `getattr()`/`hasattr()` working exactly like dot access. `pathlib.Path` supports `/`. See [Python Differences](/reference/python-differences/).
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
@@ -36,6 +36,14 @@ nav-skip: true
 
 {{< changelog-item "fixed" >}}
 **F-strings** with slices (`f"{items[1:3]}"`), `!=`, lambdas or braces inside string literals now evaluate correctly.
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+**`html.escape(s, quote=True)`** gains Python's `quote` argument and escapes a single quote as `&#x27;` (previously `&#39;`), matching CPython.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**`similarity.sentences()` and `similarity.tokenize()`** return an empty list for blank text instead of `None`, so the result can always be iterated or measured with `len()`.
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
