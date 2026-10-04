@@ -24,7 +24,6 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 |---------|-------|
 | `async`/`await` | Not supported; use [`runtime.background()`](https://scriptling.dev/okf/scriptling-libraries/runtime/runtime.md) for concurrency |
 | Generators with `yield` | Generator functions are not supported |
-| Positional-only separator (`/`) | Rejected with a parse error; bare `*` keyword-only parameters are supported |
 | Multiple inheritance | Only single inheritance is supported |
 | Metaclasses | Custom metaclasses are not supported |
 | Descriptors | The descriptor protocol is not implemented: a `__get__` method is never invoked, attribute access returns the object itself |
@@ -42,7 +41,6 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | `__import__()` | Use `import` statement |
 | `memoryview()`, `bytearray()` | Advanced byte manipulation not supported; `bytes()` and `b"..."` literals work |
 | `complex()` | Complex numbers not implemented |
-| `frozenset()` | Use regular `set()` |
 
 ### Standard Library NOT Included
 
@@ -88,7 +86,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Lazy iteration | `any`/`all`/`sorted`/`min`/`max`/`map`/`filter` materialize their iterable eagerly; `any([True, boom()])` raises where Python short-circuits |
 | Generator expressions | `(x for x in a)` syntax works but is evaluated eagerly into a list, not a lazy generator object; over an endless iterator such as `itertools.count()` it raises an error instead of hanging (use `map()`/`filter()`, which stay lazy) |
 | `\N{name}` string escapes | Not supported; use `\u` with the code point |
-| Number methods | Numbers have no methods (`(5).bit_length()`, `x.is_integer()`, `x.real`): use `abs`, `round`, `int`, `float` and `math` |
+| Number methods | `bit_length()`, `bit_count()`, `is_integer()`, `hex()`, `fromhex()` and `as_integer_ratio()` work ([see Built-in Functions](https://scriptling.dev/okf/scriptling-reference/builtins.md#number-methods)); other number attributes (`x.real`, `x.imag`, `(5).to_bytes()`) do not exist |
 | `dir()` with no argument | Lists the builtin names, not the local scope |
 | `json.dumps()` output | Compact with sorted keys: `json.dumps({"b": 1, "a": [1, 2]})` gives `{"a":[1,2],"b":1}` (Python gives `{"b": 1, "a": [1, 2]}`) |
 

@@ -100,7 +100,8 @@ BaseException
     ├── NameError         - Undefined names
     ├── ImportError       - Library or imported name cannot be imported
     ├── ArithmeticError
-    │   └── ZeroDivisionError - Division by zero
+    │   ├── ZeroDivisionError - Division by zero
+    │   └── OverflowError     - Result too large (e.g. an integer ratio beyond int64)
     ├── LookupError
     │   ├── IndexError    - Sequence index out of range
     │   └── KeyError      - Dictionary key not found
@@ -125,7 +126,7 @@ except retryable:
 |----------------|-------------|
 | `Exception` | Base class for all exceptions |
 | `LookupError` | Base of `IndexError` and `KeyError` |
-| `ArithmeticError` | Base of `ZeroDivisionError` |
+| `ArithmeticError` | Base of `ZeroDivisionError` and `OverflowError` |
 | `ValueError` | Invalid value for operation |
 | `TypeError` | Operation on wrong type |
 | `NameError` | Variable/identifier not found |

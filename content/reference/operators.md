@@ -302,27 +302,25 @@ x not in y   # True if x is not contained in y
 
 ## Operator Precedence
 
-From highest to lowest. Parentheses `()` override precedence and group explicitly.
+From highest to lowest. Parentheses `()` override precedence and group explicitly. The order is Python's.
 
 | Precedence | Operators |
 |------------|-----------|
 | 1 (highest) | Calls, indexing, attribute access: `f()`, `x[0]`, `obj.attr` |
-| 2 | Unary: `-x`, `not x`, `~x` |
-| 3 | Exponentiation: `**` |
+| 2 | Exponentiation: `**` (right-associative: `2**3**2` is `2**(3**2)`) |
+| 3 | Unary: `-x`, `~x` (so `-2 ** 2` is `-(2 ** 2)`) |
 | 4 | Multiplicative: `*`, `/`, `//`, `%` |
 | 5 | Additive: `+`, `-` |
 | 6 | Shifts: `<<`, `>>` |
-| 7 | Comparisons: `<`, `>`, `<=`, `>=` |
-| 8 | Equality, membership, identity: `==`, `!=`, `is`, `in` |
-| 9 | `and` |
-| 10 | Bitwise AND: `&` |
-| 11 | Bitwise XOR: `^` |
-| 12 | Bitwise OR: `\|` |
+| 7 | Bitwise AND: `&` |
+| 8 | Bitwise XOR: `^` |
+| 9 | Bitwise OR: `\|` |
+| 10 | Comparisons, equality, membership, identity: `<`, `>`, `<=`, `>=`, `==`, `!=`, `is`, `in` (chained, including `in`/`is`: `a < b <= c`, `1 in xs == flag`) |
+| 11 | `not` (prefix: `not a == b` is `not (a == b)`) |
+| 12 | `and` |
 | 13 | `or` |
 | 14 | Conditional expression: `x if cond else y` |
 | 15 (lowest) | Walrus: `x := expr` |
-
-> **Note:** Scriptling's precedence differs from Python in two places. Unary `not` binds tighter than `**` (so `-2 ** 2` evaluates to `4`, not `-4`), and `and`/`or` bind tighter than the bitwise operators `&`, `^`, `|` (so `a & b and c` parses as `a & (b and c)`). Add parentheses when porting Python expressions that mix these.
 
 ### Examples
 

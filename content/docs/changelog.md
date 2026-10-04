@@ -8,10 +8,34 @@ nav-skip: true
 
 ## October 2026
 
-{{< version "v0.28.1" >}}
+{{< version "v0.29.0" >}}
 
 {{< changelog-item "added" >}}
 **`sentinel()` marker values.** `MISSING = sentinel("MISSING")` creates a unique value, equal only to itself, for "not supplied" defaults that `None` cannot express (PEP 661, Python 3.15). See [Built-in Functions](/reference/builtins/#sentinel).
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**`copy` library.** `copy.deepcopy()` is cycle-safe, preserves shared references, and honours `__deepcopy__` methods — the deep-copy behaviour the `copy()` builtin's docs had always promised. See [Built-in Functions](/reference/builtins/#copying).
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Positional-only parameters.** The `/` marker (PEP 570) is accepted in `def` and `lambda` parameter lists; naming such a parameter by keyword raises `TypeError`, as in Python.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**Number methods.** `(5).bit_length()`, `(5).bit_count()`, `x.is_integer()`, `(2.0).hex()`, `float.fromhex()` and `(0.1).as_integer_ratio()` work on int and float values, as bound methods, as values, and through their types (`int.bit_count(5)`). See [Built-in Functions](/reference/builtins/#number-methods).
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+**`frozenset()` and `OverflowError`.** Immutable sets, hashable by content, so they work as dict keys and set members; set operators follow Python's left-operand rule and mutating methods raise `AttributeError`. `OverflowError` (an `ArithmeticError` subclass) is now a built-in exception. See [Built-in Functions](/reference/builtins/#frozenset).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**Operator precedence now matches Python.** Bitwise `&`, `^`, `|` bind tighter than comparisons (`3 & 1 == 1` is `(3 & 1) == 1`) but looser than `and`/`or` — both previously reversed; `not` is looser than comparisons (`not a == b` is `not (a == b)`); `**` is right-associative (`2**3**2` is `512`) and binds tighter than unary minus (`-2 ** 2` is `-4`); and `in`/`is` comparisons now chain (`1 in xs == flag` is `(1 in xs) and (xs == flag)`). Verified by a 97-expression audit diffed against CPython. See [Operators](/reference/operators/#operator-precedence).
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+**Set methods accept any iterable.** `union`, `intersection`, `difference`, `symmetric_difference`, `issubset` and `issuperset` no longer require a set argument (`s.union([2, 3])` works), and `union`/`intersection`/`difference` accept multiple arguments folded left, as in Python.
 {{< /changelog-item >}}
 
 ---
