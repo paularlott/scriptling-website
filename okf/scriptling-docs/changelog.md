@@ -48,6 +48,10 @@ type: Guide
 
 
 
+**Chained comparisons evaluate each operand once**, as in Python: `a < f() < c` calls `f()` a single time, and once a link is false the remaining operands are never evaluated. The middle operand previously ran twice. Unary `-` and `~` on non-numbers now raise Python's catchable `TypeError` (`bad operand type for unary -: 'str'`) instead of a fatal error.
+
+
+
 **Set methods accept any iterable.** `union`, `intersection`, `difference`, `symmetric_difference`, `issubset` and `issuperset` no longer require a set argument (`s.union([2, 3])` works), and `union`/`intersection`/`difference` accept multiple arguments folded left, as in Python.
 
 
