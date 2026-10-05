@@ -1,7 +1,7 @@
 ---
 title: Scriptling
 layout: index
-description: A minimal, sandboxed Python-like scripting language for Go applications and LLM agents.
+description: Python-like embedded scripting for Go and AI agents, with host-controlled capabilities for filesystem, network, processes, libraries, and application APIs.
 tags: [home]
 ---
 
