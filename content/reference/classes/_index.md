@@ -142,6 +142,8 @@ class Child(Parent):
         super().__init__(value)  # Call parent __init__
 ```
 
+`super().__init__()` is always safe: when no parent class defines `__init__` it falls back to `object.__init__`, which takes no arguments (passing any raises `TypeError`, as in Python). `super().__repr__()`, `__str__()`, `__eq__()` and `__ne__()` likewise fall back to `object`'s versions.
+
 ### Explicit super()
 
 ```python
@@ -216,6 +218,40 @@ print(a2.bank_name)  # "First National"
 print(a1.balance)    # 100
 print(a2.balance)    # 200
 ```
+
+A subclass can override a class-level field by assigning the same name in its own body, exactly as it can override a method. The base class keeps its value:
+
+```python
+class Animal:
+    sound = "..."
+
+class Cat(Animal):
+    sound = "meow"
+
+print(Cat.sound, Cat().sound, Animal.sound)   # meow meow ...
+```
+
+## Instance Attributes as a Dict (`__dict__`)
+
+`obj.__dict__` (and `vars(obj)`) gives an instance's attributes as a dict, in the order they were first assigned. Writing to it writes through to the object, so the common idioms work:
+
+```python
+class Bag:
+    def __init__(self, **kw):
+        self.__dict__.update(kw)      # set attributes from keyword arguments
+
+b = Bag(x=1, y=2)
+print(b.x, b.__dict__)                # 1 {'x': 1, 'y': 2}
+
+b.__dict__["z"] = 3                   # same as b.z = 3
+del b.__dict__["x"]                   # same as del b.x
+print(vars(b))                        # {'y': 2, 'z': 3}
+
+import json
+print(json.dumps(b.__dict__))         # {"y": 2, "z": 3}
+```
+
+Like Python, writes through `__dict__` bypass property setters. Two differences: each access returns a fresh view, so a reference you keep (`d = obj.__dict__`) does not show attributes assigned later (its own writes still apply); and assigning a whole new dict (`obj.__dict__ = {...}`) is an `AttributeError` — use `obj.__dict__.clear()` and `update()`, or `setattr()`. Names are not mangled, so `self.__x` appears as `__x` rather than `_Class__x`.
 
 ## Nested Classes
 

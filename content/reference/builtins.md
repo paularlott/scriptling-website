@@ -30,6 +30,7 @@ Scriptling provides many built-in functions that are always available without im
 | [`filter(fn, iterable)`](#iteration-utilities) | Items for which `fn` is truthy |
 | [`float(x)`](#float) | Convert to float |
 | [`format(value, spec)`](#object-and-attribute-functions) | Format one value, as in an f-string |
+| [`frozenset([iterable])`](#frozenset) | Immutable, hashable set |
 | [`getattr(obj, name[, default])`](#object-and-attribute-functions) | Read an attribute by name |
 | [`hasattr(obj, name)`](#object-and-attribute-functions) | True if the attribute exists |
 | [`hash(x)`](#object-and-attribute-functions) | Hash value of a hashable object |
@@ -54,6 +55,7 @@ Scriptling provides many built-in functions that are always available without im
 | [`repr(x)`](#object-and-attribute-functions) | Developer representation, strings quoted |
 | [`reversed(seq)`](#iteration-utilities) | Iterate in reverse |
 | [`round(x[, digits])`](#math-functions) | Round half to even |
+| [`sentinel(name, *, repr=None)`](#sentinel) | Unique marker value, equal only to itself |
 | [`set(iterable)`](#set) | Create a set |
 | [`setattr(obj, name, value)`](#object-and-attribute-functions) | Set an attribute by name |
 | [`slice(start, stop[, step])`](../slicing/#the-slice-builtin) | Slice object for indexing |
@@ -81,6 +83,7 @@ str(3.14)     # "3.14"
 str(True)     # "True"
 str([1, 2])   # "[1, 2]"
 str({"a": 1}) # '{"a": 1}'
+str()         # "" (no argument gives the empty string)
 ```
 
 ### int()
@@ -92,6 +95,8 @@ int("42")        # 42
 int(3.14)        # 3 (truncates toward zero)
 int(-3.9)        # -3 (truncates toward zero)
 int(42)          # 42 (no change)
+int(True)        # 1 (bool is an int, as in Python)
+int()            # 0
 ```
 
 Optional `base` argument (2 to 36) for base conversion from a string:
@@ -122,6 +127,8 @@ Convert to float:
 ```python
 float("3.14") # 3.14
 float(42)     # 42.0
+float(True)   # 1.0
+float()       # 0.0
 float("42")   # 42.0
 float("1e3")  # 1000.0
 float("inf")  # inf (also "-inf", "nan")
@@ -173,6 +180,19 @@ Create a set from an iterable:
 set([1, 2, 2, 3])  # {1, 2, 3}
 set("hello")       # {'h', 'e', 'l', 'o'}
 set()              # Empty set
+```
+
+### frozenset()
+
+Create an immutable set. Frozen sets cannot be modified (`add`, `update`, … raise `AttributeError`) and are hashable by content, so — unlike regular sets — they can be used as dict keys and set members:
+
+```python
+fs = frozenset([1, 2])
+fs | {3}                      # frozenset({1, 2, 3}) — operators follow the
+                              # left operand's type, as in Python
+d = {frozenset("ab"): 1}      # legal: hashable key
+d[frozenset("ba")]            # 1 — equal frozensets hash equally
+isinstance(fs, frozenset)     # True; isinstance(fs, set) is False
 ```
 
 ### dict()
@@ -254,6 +274,61 @@ callable(42)              # False
 callable("hello")         # False
 ```
 
+## Sentinel Values
+
+### sentinel()
+
+Creates a unique marker value, like Python 3.15's `sentinel()` builtin (PEP 661). Each call returns a new value that is equal only to itself, so it can never collide with real data — including `None`:
+
+```python
+MISSING = sentinel("MISSING")
+
+def fetch(key, default=MISSING):
+    if default is MISSING:
+        return load(key)          # no default was given
+    return default
+
+fetch("a")          # loads the value: None is a real default too
+fetch("a", None)    # returns None, the caller's choice
+```
+
+Check a sentinel with `is`. `==` agrees with identity (true only against the same sentinel), and `repr` defaults to the name:
+
+```python
+MISSING is MISSING                   # True
+MISSING is sentinel("MISSING")       # False: every call is a new sentinel
+MISSING == "MISSING"                 # False
+repr(MISSING)                        # "MISSING"
+
+NOT_GIVEN = sentinel("x", repr="<NOT_GIVEN>")
+repr(NOT_GIVEN)                      # "<NOT_GIVEN>"
+MISSING.__name__                     # "MISSING"
+```
+
+Sentinels are truthy, hashable by identity (they work as set members and dict keys), not callable, and unsupported operations — ordering (`<`, `>=`), `len()`, indexing, iterating — raise `TypeError`, as does a name that is not a string.
+
+## Number Methods
+
+Numbers have Python's value methods, on the value itself, as a bound method value, and through the type:
+
+```python
+(5).bit_length()          # 3 (binary digits; (-5).bit_length() is 3 too)
+(255).bit_count()         # 8 (population count)
+(5).is_integer()          # True — always, for ints (Python 3.12)
+(2.0).is_integer()        # True; (2.5).is_integer() is False
+
+(2.0).hex()               # "0x1.0000000000000p+1" — exact hex float
+float.fromhex("0x1.8p+1") # 3.0 (also float.fromhex("0x1.8") == 1.5)
+(0.1).as_integer_ratio()  # [3602879701896397, 36028797018963968] — exact;
+                          # ratios beyond int64 raise OverflowError
+
+bl = (5).bit_length       # bound method value
+bl()                      # 3
+int.bit_count(7)          # 3 — unbound, like str.lower
+```
+
+Numbers keep no other methods: arithmetic goes through the operators and the `math` library, as before.
+
 ## Math Functions
 
 ```python
@@ -276,6 +351,7 @@ divmod(17, 5)             # (3, 2) - returns (quotient, remainder)
 sum([1, 2, 3, 4, 5])      # 15
 sum([1.5, 2.5, 3.0])      # 7.0
 sum([1, 2], 10)           # 13: optional start value, as in Python
+sum(x > 2 for x in [1, 3, 4])   # 2: bools count as 1/0, so this counts the matches
 ```
 
 ## Number Formatting
@@ -434,10 +510,12 @@ s.pop()             # Removes and returns arbitrary element
 s.clear()           # Removes all elements
 s.copy()            # Returns a shallow copy
 
-# Set operations
+# Set operations — the argument may be any iterable, and union /
+# intersection / difference accept several (folded left, as in Python)
 s1 = set([1, 2])
 s2 = set([2, 3])
 s1.union(s2)                # {1, 2, 3}
+s1.union([2, 3])            # {1, 2, 3}
 s1.intersection(s2)         # {2}
 s1.difference(s2)           # {1}
 s1.symmetric_difference(s2) # {1, 3}
@@ -502,6 +580,7 @@ enumerate(["a", "b"])              # Iterator: (0, "a"), (1, "b")
 enumerate(["a", "b"], start=1)     # Iterator: (1, "a"), (2, "b")
 zip([1, 2], ["a", "b"])            # Iterator: (1, "a"), (2, "b")
 reversed([1, 2, 3])                # Iterator: 3, 2, 1
+reversed({"a": 1, "b": 2})        # Iterator over the keys: "b", "a" (dicts and views reverse insertion order)
 map(lambda x: x*2, [1, 2, 3])      # Iterator: 2, 4, 6
 filter(lambda x: x > 1, [1, 2, 3]) # Iterator: 2, 3
 
@@ -692,6 +771,29 @@ dir({"x": 1, "y": 2})   # ['clear', 'copy', 'fromkeys', 'get', 'items', ...]
 ### copy()
 
 Returns a shallow copy of an object. Nested objects are not copied: use `copy.deepcopy()` from the `copy` library for that. For native-backed instances, hidden Go-only state is not copied.
+
+### copy.deepcopy()
+
+`import copy` gives `copy.copy(x)` (same as the builtin) and `copy.deepcopy(x)`. The deep copy recurses through lists, tuples, dicts, sets and instances; it is cycle-safe, keeps shared references shared (two references to one list stay one list in the copy), returns all-atomic tuples, frozen sets and functions unchanged, and calls a class's `__deepcopy__(self, memo)` when defined:
+
+```python
+import copy
+
+src = {"items": [1, 2], "meta": {"on": True}}
+dup = copy.deepcopy(src)
+dup["items"].append(3)
+src["items"]          # [1, 2] — untouched
+
+shared = [7]
+holder = {"a": shared, "b": shared}
+h = copy.deepcopy(holder)
+h["a"] is h["b"]      # True — sharing preserved
+
+cyc = [1]
+cyc.append(cyc)
+c = copy.deepcopy(cyc)
+c[1] is c             # True — cycle handled
+```
 
 ```python
 # List copy: mutations don't affect the original

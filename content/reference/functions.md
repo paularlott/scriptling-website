@@ -118,6 +118,8 @@ print(sum_all(1, 2, 3, 4))   # 10
 print(sum_all())             # 0
 ```
 
+Inside the function, `args` is a **tuple**, as in Python: you can index, slice, iterate and `len()` it, but not modify it (`args.append(x)` raises `AttributeError`). Use `list(args)` when you need a mutable copy.
+
 ### Mixing with Regular Parameters
 
 ```python
@@ -171,6 +173,8 @@ result = test_kwargs(a=1, b=2, c=3)
 print(result)  # {"a": 1, "b": 2, "c": 3}
 ```
 
+The keyword names arrive in **alphabetical order**, not the order written at the call site, so the result is the same on every run: `test_kwargs(b=1, a=2)` gives `{"a": 2, "b": 1}`. If you need a specific order, sort or build it explicitly.
+
 ### Combining All Parameter Types
 
 ```python
@@ -184,7 +188,7 @@ func_with_all(1, 2, 3, 4, x=5, y=6)
 # Output:
 # a: 1
 # b: 2
-# args: [3, 4]
+# args: (3, 4)
 # kwargs: {"x": 5, "y": 6}
 ```
 
@@ -220,7 +224,17 @@ print(add_coords(*coords))  # 30
 
 # Partial unpacking
 result = sum_three(10, *numbers[1:])  # Same as sum_three(10, 2, 3)
+
+# Arguments after an unpack keep their written order
+def show(*items):
+    return items
+
+print(show(*[1, 2], 3))       # (1, 2, 3)
+print(show(0, *[1, 2], 3))    # (0, 1, 2, 3)
+print(show(*"ab", "c"))       # ('a', 'b', 'c')
 ```
+
+Any iterable can be unpacked, including strings, tuples, sets, generators and objects that define `__iter__`.
 
 ### Keyword Argument Unpacking (**)
 

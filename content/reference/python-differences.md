@@ -14,8 +14,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Feature | Notes |
 |---------|-------|
 | `async`/`await` | Not supported; use [`runtime.background()`](/reference/libraries/runtime/runtime/) for concurrency |
-| Generators with `yield` | Generator functions are not supported |
-| Positional-only separator (`/`) | Rejected with a parse error; bare `*` keyword-only parameters are supported |
+| `yield from` and `generator.send()` | Generator functions with `yield` work, but delegation (`yield from iterable`) and `send(value)` are not supported; loop or iterate manually |
 | Multiple inheritance | Only single inheritance is supported |
 | Metaclasses | Custom metaclasses are not supported |
 | Descriptors | The descriptor protocol is not implemented: a `__get__` method is never invoked, attribute access returns the object itself |
@@ -29,11 +28,10 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | `open()` | Use `os.read_file()` and `os.write_file()` |
 | `compile()`, `eval()`, `exec()` | Dynamic code execution not supported |
 | `globals()`, `locals()` | Scope introspection not available |
-| `vars()` | Variable introspection not supported |
+| `vars()` | `vars(obj)` works like `obj.__dict__`; `vars()` with no argument returns the module-level bindings |
 | `__import__()` | Use `import` statement |
 | `memoryview()`, `bytearray()` | Advanced byte manipulation not supported; `bytes()` and `b"..."` literals work |
 | `complex()` | Complex numbers not implemented |
-| `frozenset()` | Use regular `set()` |
 
 ### Standard Library NOT Included
 
@@ -58,11 +56,11 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 
 | Feature | Notes |
 |---------|-------|
-| Exception hierarchy | Built-in types only: `BaseException`, `Exception`, `LookupError` and `ArithmeticError` group the common errors, but there is no `OSError` subtree such as `FileNotFoundError` |
+| Exception hierarchy | Built-in types group as in Python: `BaseException`, `LookupError` and `ArithmeticError` are catchable parents, and the `OSError` family (`FileNotFoundError`, `FileExistsError`, ...) derives from `OSError` |
 | Exception groups (Python 3.11+) | Not supported |
 | `except*` syntax | Not supported |
-| `raise X from Y` | Exception chaining not supported; use `raise ExcType(msg)` directly |
-| Custom exception classes | Cannot inherit from built-in exception types |
+| `raise X from Y` | Accepted and re-raises `X` as in Python, but the chain is not introspectable: there is no `__cause__`/`__context__` attribute and no chained traceback |
+| Custom exception classes | Can inherit from a built-in exception type (`class MyError(Exception)`) and from other user exception classes; multiple inheritance does not apply |
 
 ### Other Differences
 
@@ -71,17 +69,18 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Module `__all__` | Export lists are not used |
 | `__future__` imports | Not applicable |
 | `__next__` returning a `StopIteration()` *value* | Ends iteration without yielding it — only *raising* `StopIteration` signals end-of-iteration |
-| Default argument evaluation | Defaults are evaluated on each call (Python evaluates once, at `def` time) |
 | Type annotations | Parsed and ignored, including `def f(a: int) -> str`, `x: int = 5`, and `self.n: int = 0`; there is no `__annotations__` and no runtime checking, and comma subscripts parse as tuple indexes (`dict[str, int]`) |
-| Dict iteration order | Unspecified and not reproducible run to run (unlike Python 3.7+): `for k in d`, `keys()`/`values()`/`items()`, and printing a dict may come out in any order. Lookups, equality, and `json.dumps` are unaffected (dumps sorts keys). Sort explicitly (`sorted(d)`) when order matters. Because two walks of one dict can differ, `zip()` and `map()` refuse two dicts or dict views at once (`zip(d.keys(), d.values())` is a `TypeError`); use `d.items()` |
+| `**kwargs` order | The `**kwargs` dict holds the names in alphabetical order, not call order (deterministic, but not Python's order) |
+| Subclassing built-in containers | `class C(dict)`, `class C(list)`, `class C(OrderedDict)` and `class C(defaultdict)` are not supported (`Counter` can be subclassed) |
+| `OrderedDict` | An ordinary insertion-ordered dict: `move_to_end()` and `popitem(last=False)` work, but they are also accepted on plain dicts, and it prints like a plain dict |
+| `obj.__dict__` | A fresh dict view per access that writes through to the object; `obj.__dict__ = {...}` is an `AttributeError`, names are not mangled (`__x` stays `__x`), and `SomeClass.__dict__` is not available |
+| Dicts from other formats | Dicts built from YAML, TOML, MessagePack and plugin results have their keys in sorted order (those formats give no key order); `json.loads()`, `requests` `.json()` and literals keep document/insertion order |
 | Walrus in a comprehension | `y` in `[y for x in a if (y := f(x))]` binds inside the comprehension and does not leak to the enclosing scope, unlike Python (PEP 572); use the collected list instead |
 | `type(x).__name__` | `type(x)` returns the type name directly as a string (`type(42)` is `"INTEGER"`, a custom class instance gives its class name), so there is no type object to hang `.__name__` on — use `type(x)` itself; a raised built-in exception reports the class it was raised as (`"ValueError"`) |
-| Lazy iteration | `any`/`all`/`sorted`/`min`/`max`/`map`/`filter` materialize their iterable eagerly; `any([True, boom()])` raises where Python short-circuits |
-| Generator expressions | `(x for x in a)` syntax works but is evaluated eagerly into a list, not a lazy generator object; over an endless iterator such as `itertools.count()` it raises an error instead of hanging (use `map()`/`filter()`, which stay lazy) |
+| Generator expressions | `(x for x in a)` syntax works but is evaluated eagerly into a list, not a lazy generator object; over an endless iterator such as `itertools.count()` it raises an error instead of hanging (`any(map(f, itertools.count()))` does terminate: `map`/`filter` and `any`/`all` pull lazily over them) |
 | `\N{name}` string escapes | Not supported; use `\u` with the code point |
-| Number methods | Numbers have no methods (`(5).bit_length()`, `x.is_integer()`, `x.real`): use `abs`, `round`, `int`, `float` and `math` |
+| Number methods | `bit_length()`, `bit_count()`, `is_integer()`, `hex()`, `fromhex()` and `as_integer_ratio()` work ([see Built-in Functions](../builtins/#number-methods)); other number attributes (`x.real`, `x.imag`, `(5).to_bytes()`) do not exist |
 | `dir()` with no argument | Lists the builtin names, not the local scope |
-| `json.dumps()` output | Compact with sorted keys: `json.dumps({"b": 1, "a": [1, 2]})` gives `{"a":[1,2],"b":1}` (Python gives `{"b": 1, "a": [1, 2]}`) |
 
 Everything not listed on this page behaves as in Python 3; see the [Language Guide](/reference/).
 

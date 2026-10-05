@@ -8,6 +8,54 @@ nav-skip: true
 
 ## October 2026
 
+{{< version "v0.29.0" >}}
+
+{{< changelog-item "breaking" >}}
+- Evaluate parameter defaults once, at definition, as Python does. A mutable default is now shared between calls.
+- Pass `*args` as a tuple instead of a list. Code that modifies `args` must copy it first with `list(args)`.
+- Keep every `;`-separated statement of a one-line block inside that block. `def f(): return 1; f()` no longer calls `f`; put the call on its own line.
+- Raise `OverflowError` when integer arithmetic passes 64 bits, instead of wrapping.
+- Change `json.dumps()` output to Python's format: keys in insertion order (was sorted), `", "` and `": "` separators (was compact), non-ASCII escaped. Use `sort_keys=True`, `separators=(",", ":")` and `ensure_ascii=False` for the old shape. ([docs](/reference/libraries/data-formats/json/))
+- Return `UUID` objects from the `uuid` functions instead of strings. Use `str(u)` for the text form.
+- Return `bytes` from the `base64` encoders instead of a string.
+- Return a `timedelta` from `datetime` and `date` subtraction (was a number), and return a struct from `time.gmtime()` and `time.localtime()` with Python's weekday numbering (Monday is 0).
+- Follow `posixpath` in `os.path.dirname()`, `basename()` and `splitext()` for empty paths, trailing slashes and dotfiles.
+- Uppercase `ß` as `SS` in `str.upper()`.
+- Remove subclassing of `defaultdict`: it is now a function that returns a dict.
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+- Iterate dicts in insertion order (was unspecified), including `json.loads()`, `requests` `.json()`, `Counter`, `popitem()` and copies. Dicts built from YAML, TOML, MessagePack and plugin results have sorted keys. ([docs](/reference/types/#dictionary))
+- Make dict-building code 10-30% slower than v0.28.0 in return for ordering. Lookups, `get()` and counting are unchanged.
+- Deliver `**kwargs` in alphabetical order (was random per call). Call-site order is not kept.
+- Rewrite `defaultdict` as an ordinary dict with a default factory: every dict method works, lambda and function factories work, keys keep their types, and it is about twice as fast. ([docs](/reference/libraries/collections-iteration/collections/#defaultdictdefault_factory))
+- Make named tuples behave like tuples: indexing, slicing, `len()`, unpacking, ordering, hashing, immutability, keyword construction and `defaults=`.
+- Raise catchable Python exceptions: `TypeError` for unhashable keys, unorderable sorts and wrong argument counts, `KeyError` and `IndexError` from `pop()`, the `FileNotFoundError` and `OSError` family from file operations, and Python's types from `assert`, `str.index`, `set.remove` and `min()` of an empty sequence.
+- Hash plain instances by identity, and raise `AttributeError` when assigning to a property without a setter.
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+- Add generators: `yield` in a function makes a lazy generator that `for`, `list()`, `next()` and `itertools` consume. `yield from` and `send()` are not supported. ([docs](/reference/functions/))
+- Add `@dataclass`, `enum.Enum` and `IntEnum`, `functools.lru_cache`, `cache` and `wraps`, user exception classes, and `from typing import ...`.
+- Add `obj.__dict__`, a view of an instance's attributes whose writes go through to the object, and make `vars(obj)` the same view. ([docs](/reference/classes/#instance-attributes-as-a-dict-__dict__))
+- Add `OrderedDict.move_to_end()` and `popitem(last=False)`, and accept dicts and dict views in `reversed()`.
+- Add unpacking forms: `(*a, *b)`, `x = *t, 1`, starred targets in nested groups and `for` headers, `{**d}`, and `f(**d)`. ([docs](/reference/syntax/#assignment))
+- Add `/` positional-only parameters, `raise X from e`, `.5` and `1.` float literals, nested and chained assignment targets, and `frozenset`.
+- Add `copy.deepcopy()`, `sentinel()`, `csv.DictReader` and `DictWriter`, `math.fsum`, `time.monotonic`, `os.getpid`, number methods such as `bit_count()` and `to_bytes()`, and `int()`, `float()` and `str()` without arguments.
+- Add `client.decide()` for Ollama System One decision models. ([docs](/reference/libraries/ai/client/#clientdecidemodel-state-questions-images-keep_alive))
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+- Fix a subclass's class attribute being discarded when a base class defines the same name.
+- Fix arguments written after a `*` unpack being passed before it.
+- Fix keyword-only parameters with defaults being unbound when not passed, and a keyword named like a positional-only parameter being rejected when the function takes `**kwargs`.
+- Fix `itertools` materialising infinite generators.
+- Fix `super().__init__()` failing when no base class defines `__init__`.
+- Fix `int(True)`, `float(False)` and `sum()` of booleans, `%g` precision, and UUID comparison and hashing.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.28.0" >}}
 
 {{< changelog-item "changed" >}}
@@ -55,7 +103,7 @@ nav-skip: true
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
-**Iterators, comparisons and errors.** `map()`, `filter()`, `any()` and `all()` pull from iterators lazily, so they work with `itertools.count()`, and collecting an endless iterator raises an error instead of exhausting memory. `!=` falls back to `__eq__`; `key=` accepts bound methods and callable objects; `zip(strict=True)` works, and `zip()` of two dict views is a `TypeError` since dict order is unspecified (use `d.items()`); `except` accepts a variable or tuple of types and the `LookupError`, `ArithmeticError` and `BaseException` parents; `Counter` takes float counts and compares like Python; `textwrap` splits words exactly as CPython does; `random.sample(range(10**9), k)` no longer expands the range. `itertools.islice()` accepts `None` bounds (`islice(it, 2, None)`) and stops at the right element when given a step. See [Built-in Functions](/reference/builtins/#iteration-utilities) and [Error Handling](/reference/error-handling/#exception-type-hierarchy).
+**Iterators, comparisons and errors.** `map()`, `filter()`, `any()` and `all()` pull from iterators lazily, so they work with `itertools.count()`, and collecting an endless iterator raises an error instead of exhausting memory. `!=` falls back to `__eq__`; `key=` accepts bound methods and callable objects; `zip(strict=True)` works; `except` accepts a variable or tuple of types and the `LookupError`, `ArithmeticError` and `BaseException` parents; `Counter` takes float counts and compares like Python; `textwrap` splits words exactly as CPython does; `random.sample(range(10**9), k)` no longer expands the range. `itertools.islice()` accepts `None` bounds (`islice(it, 2, None)`) and stops at the right element when given a step. See [Built-in Functions](/reference/builtins/#iteration-utilities) and [Error Handling](/reference/error-handling/#exception-type-hierarchy).
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
