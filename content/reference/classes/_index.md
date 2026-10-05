@@ -142,6 +142,8 @@ class Child(Parent):
         super().__init__(value)  # Call parent __init__
 ```
 
+`super().__init__()` is always safe: when no parent class defines `__init__` it falls back to `object.__init__`, which takes no arguments (passing any raises `TypeError`, as in Python). `super().__repr__()`, `__str__()`, `__eq__()` and `__ne__()` likewise fall back to `object`'s versions.
+
 ### Explicit super()
 
 ```python
@@ -215,6 +217,18 @@ print(a2.bank_name)  # "First National"
 
 print(a1.balance)    # 100
 print(a2.balance)    # 200
+```
+
+A subclass can override a class-level field by assigning the same name in its own body, exactly as it can override a method. The base class keeps its value:
+
+```python
+class Animal:
+    sound = "..."
+
+class Cat(Animal):
+    sound = "meow"
+
+print(Cat.sound, Cat().sound, Animal.sound)   # meow meow ...
 ```
 
 ## Nested Classes

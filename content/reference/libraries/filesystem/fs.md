@@ -33,7 +33,7 @@ Read a range of bytes from a file. `length` is capped at 64 MiB per call.
 - `offset` (`int`): 0-based byte position to start reading.
 - `length` (`int`): Number of bytes to read (max 64 MiB per call).
 
-**Returns:** `str`: the raw bytes read from the file.
+**Returns:** `str`: the raw bytes read from the file, as a binary string. Every other `fs` function that takes binary data (`unpack`, `byte_at`, `len`, `slice`, `write_bytes`) accepts either this or a `bytes` object.
 
 ```python
 import fs
@@ -48,7 +48,7 @@ Write raw bytes at an offset. Creates the file if it does not exist.
 **Parameters:**
 - `path` (`str`): File path to write.
 - `offset` (`int`): 0-based byte position to start writing.
-- `data` (`str`): Raw bytes to write.
+- `data` (`bytes` or `str`): Raw bytes to write: a `bytes` object (`b"\x00\x01"`) or a binary string such as `read_bytes()` returns.
 - `mode` (`int`, optional): Permission bits used when creating a new file. Default: `0o644`.
 
 **Returns:** `None`

@@ -159,6 +159,7 @@ int("42")        # 42
 int(3.14)        # 3 (truncates toward zero)
 int(-3.9)        # -3 (truncates toward zero)
 int(42)          # 42 (no change)
+int(True)        # 1 (bool is an int, as in Python)
 ```
 
 Optional `base` argument (2 to 36) for base conversion from a string:
@@ -189,6 +190,7 @@ Convert to float:
 ```python
 float("3.14") # 3.14
 float(42)     # 42.0
+float(True)   # 1.0
 float("42")   # 42.0
 float("1e3")  # 1000.0
 float("inf")  # inf (also "-inf", "nan")
@@ -411,6 +413,7 @@ divmod(17, 5)             # (3, 2) - returns (quotient, remainder)
 sum([1, 2, 3, 4, 5])      # 15
 sum([1.5, 2.5, 3.0])      # 7.0
 sum([1, 2], 10)           # 13: optional start value, as in Python
+sum(x > 2 for x in [1, 3, 4])   # 2: bools count as 1/0, so this counts the matches
 ```
 
 ## Number Formatting

@@ -11,27 +11,27 @@ nav-skip: true
 {{< version "v0.29.0" >}}
 
 {{< changelog-item "added" >}}
-**Generators.** `def gen(xs): for x in xs: yield f(x)` returns a lazy generator consumed by `for`, `list()`, `next()` and the itertools functions; locals persist across yields. Yields are supported as statements at the top level of the body or of its top-level loop.
+**Generators.** `yield` turns a function into a lazy generator consumed by `for`, `list()`, `next()` and the itertools functions; locals persist across yields. See [Functions](/reference/functions/).
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
-**Data modelling: dataclasses, enums, custom exceptions.** `@dataclass` generates `__init__`/`__repr__`/`__eq__` (plus `order=True`, `frozen=True`, `field()`, `asdict`/`astuple`); `enum.Enum`/`IntEnum` with `.name`/`.value`, value lookup and `auto()`; `class MyError(Exception)` works end to end; `functools.lru_cache`/`@cache`; `from typing import ...` resolves so annotated code runs. Named tuples behave like tuples (indexing, `len()`, unpacking, equality).
+**Data modelling.** `@dataclass` (init/repr/eq, `order=True`, `frozen=True`, `asdict`), `enum.Enum`/`IntEnum`, user exception classes (`class MyError(Exception)`), `functools.lru_cache`/`@cache`, and named tuples that behave like tuples (`p[0]`, `len(p)`, unpacking, ordering, `defaults=`). See [collections](/reference/libraries/collections-iteration/collections/#namedtupletypename-field_names-defaultsnone).
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
-**Libraries.** `copy.deepcopy()`, `sentinel()` (PEP 661), `csv.DictReader`/`DictWriter`, UUID objects (`uuid.uuid4()` etc.), number methods (`bit_count()`, `to_bytes()`, `float.fromhex()`, ...), `math.fsum`, `time.monotonic`, `os.getpid`, `functools.wraps`, `vars()` and `frozenset`.
+**Libraries.** `copy.deepcopy()`, `sentinel()` (PEP 661), `csv.DictReader`/`DictWriter`, UUID objects, number methods (`bit_count()`, `to_bytes()`, ...), `math.fsum`, `time.monotonic`, `os.getpid`, `functools.wraps`, `vars()` and `frozenset`.
 {{< /changelog-item >}}
 
 {{< changelog-item "changed" >}}
-**Language semantics match Python.** Nested and chained destructuring (`(a, (b, c)) = ...`, `x[0], y = ...`, `(a,b) = c = (1,2)`); display and call unpacking (`[*a, 3]`, `{**d}`, `f(**d)`); parameter defaults evaluate at definition; `/` positional-only parameters (PEP 570); `raise X from e`; `.5` and `1.` float literals; set comparisons; operator precedence and chained comparisons are Python-exact. See [Operators](/reference/operators/#operator-precedence) and [Syntax](/reference/syntax/#assignment).
+**Language semantics match Python.** Nested and chained assignment targets, unpacking everywhere (`[*a, 3]`, `{**d}`, `f(*d)`, `(1, *xs)`, `for a, *rest in ...`), `*args` as a tuple, definition-time parameter defaults, `/` positional-only parameters, `raise ... from`, `.5`/`1.` float literals, Python-exact operator precedence, class-body assignments shadowing inherited attributes, and one-line blocks keeping every `;`-separated statement. See [Syntax](/reference/syntax/#assignment) and [Functions](/reference/functions/#variadic-arguments-args).
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
-**Errors are Python's errors.** Integer overflow past int64 raises `OverflowError` instead of wrapping; unhashable dict keys, unorderable sorts and wrong-arity calls raise catchable `TypeError`; file operations raise the `FileNotFoundError`/`OSError` family; `assert` failures, `str.index`, `set.remove` and `min()`/`max()` of empty raise their Python exception types; `type(x) is int` and `type(e).__name__` work.
+**Errors are Python's errors.** Integer overflow past int64 raises `OverflowError`; unhashable keys, unorderable sorts and wrong-arity calls raise catchable `TypeError`; file operations raise the `FileNotFoundError`/`OSError` family; `assert`, `str.index` and friends raise their Python exception types.
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
-**Iterator and formatting correctness.** `itertools.islice`/`takewhile`/`chain`/`cycle`/`zip_longest` pull generators lazily (infinite generators no longer materialise); `%`-formatting covers `%u`/`%E`/`%G`/`%#o` with Python's error types; `str.split(None, n)`, `os.path` posixpath semantics, `dict.popitem()`, `csv` cell coercion and `json.JSONDecodeError` match CPython.
+**Correctness round.** `itertools` consumes generators lazily (infinite generators no longer materialise); arguments keep their written order around `*` unpacks; `%`-formatting, `os.path`, `csv`, `super().__init__()`, boolean arithmetic and UUID comparisons match CPython. See [Python Differences](/reference/python-differences/).
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
@@ -39,6 +39,7 @@ nav-skip: true
 {{< /changelog-item >}}
 
 ---
+
 
 {{< version "v0.28.0" >}}
 

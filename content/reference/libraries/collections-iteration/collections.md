@@ -120,13 +120,14 @@ d = collections.deque([1, 2, 3, 4, 5], maxlen=3)
 print(d, d.maxlen)        # deque([3, 4, 5], maxlen=3) 3
 ```
 
-### `namedtuple(typename, field_names)`
+### `namedtuple(typename, field_names, defaults=None)`
 
-Creates a class for named tuple instances, supporting both attribute access (`p.x`) and dict-style access (`p["x"]`).
+Creates a class for named tuple instances. Instances behave like tuples (indexing, slicing, `len()`, iteration, unpacking, `*` splatting, `in`, equality with plain tuples, hashing and tuple ordering) and also expose attribute access (`p.x`) and dict-style access (`p["x"]`). They are immutable: assigning to a field raises `AttributeError`.
 
 **Parameters:**
 - `typename` (`str`): Name of the generated class.
 - `field_names` (`list` or `tuple` of `str`, or a space-separated `str`): Field names. A string is split on spaces and/or commas.
+- `defaults` (`list` or `tuple`, optional): Default values for the rightmost fields.
 
 **Returns:** `type`: a class whose instances expose the given fields.
 
@@ -139,6 +140,18 @@ print(p.x, p.y)    # 1 2
 print(p["x"])      # 1
 
 Person = collections.namedtuple("Person", "name age")
+
+# Tuple behaviour
+x, y = p                           # unpacking
+print(p[0], p[-1], p[::-1], len(p))  # 1 2 (2, 1) 2
+print(p == (1, 2), max(p), 2 in p)   # True 2 True
+print(sorted([Point(2, 1), Point(1, 5)]))  # [Point(x=1, y=5), Point(x=2, y=1)]
+
+# Keyword construction, defaults and helpers
+print(Point(y=2, x=1))             # Point(x=1, y=2)
+Opt = collections.namedtuple("Opt", "a b c", defaults=(0, 9))
+print(Opt(1))                      # Opt(a=1, b=0, c=9)
+print(p._replace(x=9), p._asdict(), Point._fields)
 ```
 
 ### `defaultdict(default_factory)`

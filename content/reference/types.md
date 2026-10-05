@@ -87,6 +87,8 @@ result = True or False   # True
 result = not True        # False
 ```
 
+A `bool` counts as an integer in arithmetic and conversions, as in Python (`True + 1` is `2`, `int(True)` is `1`, `float(False)` is `0.0`), so counting matches with `sum(x > 2 for x in items)` works.
+
 ## List
 
 Ordered, mutable sequences:

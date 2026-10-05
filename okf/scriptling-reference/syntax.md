@@ -28,6 +28,16 @@ if x > 5:
 
 Indentation determines which statements belong to which block. Consistent indentation is required throughout a file.
 
+A block can also sit on the same line as its header, and `;` separates several statements on that line. All of them belong to the block, as in Python:
+
+```python
+def total(): x = 1; return x          # both statements are in the body
+if ready: log("go"); start()          # both run only when ready is true
+for i in range(3): n = i; print(n)
+```
+
+Because the call is part of the body, `def f(): return 1; f()` defines `f` but never calls it. Put the call on its own line.
+
 ## Comments
 
 ```python
@@ -187,6 +197,7 @@ F-strings support Python's full format spec mini-language: `f"{value:[[fill]alig
 | `.2e` | Scientific notation | `f"{12345:.2e}"` | `"1.23e+04"` |
 | `.2E` | Scientific uppercase | `f"{12345:.2E}"` | `"1.23E+04"` |
 | `.3g` | General (shorter of f/e) | `f"{0.00012:.3g}"` | `"0.00012"` |
+| `g` | General, default 6 significant digits | `f"{3.14159265358979:g}"` | `"3.14159"` |
 | `.1%` | Percentage | `f"{0.75:.1%}"` | `"75.0%"` |
 | `+.2f` | Always show sign | `f"{3.14:+.2f}"` | `"+3.14"` |
 
@@ -382,9 +393,21 @@ obj.attr = 42            # attribute
 
 a, b = 1, 2              # unpack
 a, *rest, z = [1, 2, 3, 4]   # one starred target collects the middle
-(a, (b, c)) = (1, (2, 3))    # groups nest
+(a, (b, *c)) = (1, (2, 3, 4))  # groups nest, and a nested group may have a starred target
+t = *rest, 5             # starred items build a tuple (rest is a list here): (2, 3, 5)
 x[0], y = 5, 6           # index targets mix with names
 (a, b) = c = (1, 2)      # chains accept any target shape; value evaluated once
+```
+
+A starred element also works in tuple displays, `(*a, *b)` and `(1, *xs, 4)`, as it does in list, set and call arguments. A lone `*xs` that is not part of a tuple is a syntax error.
+
+`for` loops unpack each item the same way, including starred and nested targets, and from any iterable (a tuple, list, string, set, dict view):
+
+```python
+for first, *rest in [(1, 2, 3), (4, 5)]:
+    print(first, rest)       # 1 [2, 3]  then  4 [5]
+for i, (name, *tags) in enumerate([("a", "x", "y")]):
+    print(i, name, tags)     # 0 a ['x', 'y']
 ```
 
 Unpack failures raise as in Python: `ValueError` for a length mismatch (`too many values to unpack (expected 2, got 3)`) and `TypeError` for a non-iterable value.
