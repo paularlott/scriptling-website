@@ -17,10 +17,10 @@ The `collections` library provides Python-compatible specialized container datat
 |----------|-------------|
 | `Counter([iterable_or_mapping], **kwargs)` | Create a counter of element occurrences. |
 | `most_common(counter[, n])` | Get the `n` most common elements from a `Counter`. |
-| `OrderedDict([items])` | Create an order-preserving dict. |
+| `OrderedDict([items], **kwargs)` | Create an order-preserving dict with `move_to_end()` and `popitem(last=False)`. |
 | `deque([iterable[, maxlen]])` | Create a double-ended queue (with `appendleft()`, `popleft()`, `extendleft()`, `rotate()`, `maxlen`). |
 | `namedtuple(typename, field_names)` | Create a class for named tuple instances. |
-| `defaultdict(default_factory)` | Create a dict with default values for missing keys. |
+| `defaultdict(default_factory)` | Create a dict that builds a default value for missing keys. |
 | `ChainMap(*maps)` | Group multiple dicts for a single lookup. |
 
 ## Functions
@@ -66,21 +66,42 @@ print(collections.most_common(c, 2))
 # [(3, 3), (1, 2)]
 ```
 
-### `OrderedDict([items])`
+### `OrderedDict([items], **kwargs)`
 
-Creates a dict that maintains insertion order. Scriptling's regular dicts already maintain insertion order, so this is equivalent to `dict()` and exists for Python-compatibility.
+Creates a dict that maintains insertion order. Scriptling's regular dicts already maintain insertion order, so an `OrderedDict` is an ordinary dict; what it adds for Python compatibility is the two methods LRU-cache code relies on, `move_to_end()` and `popitem(last=False)`.
 
 **Parameters:**
-- `items` (`list` of 2-tuples, or `dict`, optional): Initial key-value pairs.
+- `items` (`dict` or `list`/`tuple` of 2-tuples, optional): Initial key-value pairs.
+- `**kwargs`: Further entries, added after `items` in sorted key order (call order is not kept).
 
 **Returns:** `dict`
+
+| Method | Description |
+|--------|-------------|
+| `od.move_to_end(key, last=True)` | Move an existing key to the end, or to the front with `last=False`. Raises `KeyError` if the key is missing. |
+| `od.popitem(last=True)` | Remove and return the newest `(key, value)` pair, or the oldest with `last=False`. Raises `KeyError` when empty. |
 
 ```python
 import collections
 
 od = collections.OrderedDict([("a", 1), ("b", 2), ("c", 3)])
-print(od["a"])  # 1
+od.move_to_end("a")
+print(list(od))                  # ['b', 'c', 'a']
+od.move_to_end("a", last=False)
+print(list(od))                  # ['a', 'b', 'c']
+print(od.popitem(last=False))    # ('a', 1)
+
+# The LRU-cache idiom
+cache = collections.OrderedDict()
+def put(key, value, capacity=2):
+    if key in cache:
+        cache.move_to_end(key)
+    cache[key] = value
+    if len(cache) > capacity:
+        cache.popitem(last=False)   # evict the least recently used
 ```
+
+Unlike Python, `move_to_end()` and `popitem(last=...)` are accepted on every dict, not only on an `OrderedDict`, and an `OrderedDict` prints like a plain dict (`{'a': 1}`, not `OrderedDict({'a': 1})`).
 
 ### `deque([iterable[, maxlen]])`
 
@@ -156,22 +177,39 @@ print(p._replace(x=9), p._asdict(), Point._fields)
 
 ### `defaultdict(default_factory)`
 
-Creates a dict that automatically creates a default value (using `default_factory`) when a missing key is accessed.
+Creates a dict that builds a default value when a missing key is read. A `defaultdict` is an ordinary dict, so every dict operation works on it: iteration, `items()`, `get()`, `pop()`, `update()`, `copy()`, `==`, `json.dumps()` and insertion order.
 
 **Parameters:**
-- `default_factory` (callable or `type`): Called with no arguments to produce the default value for a missing key (e.g. `list`, `int`, `dict`, or a custom function).
+- `default_factory` (callable or `None`): Called with no arguments to produce the default for a missing key. Use a type (`int`, `list`, `set`, `dict`, `float`, `str`), a function, or a lambda; `None` makes a plain dict that raises `KeyError`.
+- `init` (`dict` or list of pairs, optional) and `**kwargs`: initial entries, as for `dict()`.
 
-**Returns:** `defaultdict`: a dict-like instance with automatic default value creation.
+**Returns:** `defaultdict`: a dict that creates, stores and returns the default on a missing-key read.
+
+Only a read of a missing key (`d[key]`) calls the factory. `d.get(key)`, `key in d`, `d.pop(key, default)` and `d.setdefault(key, v)` never do, as in Python.
 
 ```python
 import collections
 
-d = collections.defaultdict(list)
-d["items"].append(1)  # creates [] then appends -> [1]
-
 counts = collections.defaultdict(int)
-counts["x"] = counts["x"] + 1  # creates 0 then increments -> 1
+for word in "a b a c b a".split():
+    counts[word] += 1
+print(sorted(counts.items(), key=lambda kv: -kv[1]))   # [('a', 3), ('b', 2), ('c', 1)]
+
+groups = collections.defaultdict(list)
+for key, value in [("x", 1), ("y", 2), ("x", 3)]:
+    groups[key].append(value)
+print(groups)                       # defaultdict(<class 'list'>, {'x': [1, 3], 'y': [2]})
+
+# Nested counting needs a lambda (or function) factory
+nested = collections.defaultdict(lambda: collections.defaultdict(int))
+nested["a"]["b"] += 1
+print(dict(nested["a"]))            # {'b': 1}
+
+print(groups.default_factory)       # the factory object
+print(dict(groups))                 # a plain dict copy: {'x': [1, 3], 'y': [2]}
 ```
+
+`copy()`, `copy.copy()` and `copy.deepcopy()` keep the factory; `dict(d)` and `{**d}` give plain dicts. `isinstance(d, defaultdict)` and `isinstance(d, dict)` are both true. A class cannot inherit from `defaultdict` (or from `dict`, `list` or `OrderedDict`).
 
 ### `ChainMap(*maps)`
 

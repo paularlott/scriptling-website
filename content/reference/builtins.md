@@ -83,6 +83,7 @@ str(3.14)     # "3.14"
 str(True)     # "True"
 str([1, 2])   # "[1, 2]"
 str({"a": 1}) # '{"a": 1}'
+str()         # "" (no argument gives the empty string)
 ```
 
 ### int()
@@ -95,6 +96,7 @@ int(3.14)        # 3 (truncates toward zero)
 int(-3.9)        # -3 (truncates toward zero)
 int(42)          # 42 (no change)
 int(True)        # 1 (bool is an int, as in Python)
+int()            # 0
 ```
 
 Optional `base` argument (2 to 36) for base conversion from a string:
@@ -126,6 +128,7 @@ Convert to float:
 float("3.14") # 3.14
 float(42)     # 42.0
 float(True)   # 1.0
+float()       # 0.0
 float("42")   # 42.0
 float("1e3")  # 1000.0
 float("inf")  # inf (also "-inf", "nan")
@@ -577,6 +580,7 @@ enumerate(["a", "b"])              # Iterator: (0, "a"), (1, "b")
 enumerate(["a", "b"], start=1)     # Iterator: (1, "a"), (2, "b")
 zip([1, 2], ["a", "b"])            # Iterator: (1, "a"), (2, "b")
 reversed([1, 2, 3])                # Iterator: 3, 2, 1
+reversed({"a": 1, "b": 2})        # Iterator over the keys: "b", "a" (dicts and views reverse insertion order)
 map(lambda x: x*2, [1, 2, 3])      # Iterator: 2, 4, 6
 filter(lambda x: x > 1, [1, 2, 3]) # Iterator: 2, 3
 

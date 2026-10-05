@@ -240,6 +240,28 @@ class Cat(Animal):
 print(Cat.sound, Cat().sound, Animal.sound)   # meow meow ...
 ```
 
+## Instance Attributes as a Dict (`__dict__`)
+
+`obj.__dict__` (and `vars(obj)`) gives an instance's attributes as a dict, in the order they were first assigned. Writing to it writes through to the object, so the common idioms work:
+
+```python
+class Bag:
+    def __init__(self, **kw):
+        self.__dict__.update(kw)      # set attributes from keyword arguments
+
+b = Bag(x=1, y=2)
+print(b.x, b.__dict__)                # 1 {'x': 1, 'y': 2}
+
+b.__dict__["z"] = 3                   # same as b.z = 3
+del b.__dict__["x"]                   # same as del b.x
+print(vars(b))                        # {'y': 2, 'z': 3}
+
+import json
+print(json.dumps(b.__dict__))         # {"y": 2, "z": 3}
+```
+
+Like Python, writes through `__dict__` bypass property setters. Two differences: each access returns a fresh view, so a reference you keep (`d = obj.__dict__`) does not show attributes assigned later (its own writes still apply); and assigning a whole new dict (`obj.__dict__ = {...}`) is an `AttributeError` — use `obj.__dict__.clear()` and `update()`, or `setattr()`. Names are not mangled, so `self.__x` appears as `__x` rather than `_Class__x`.
+
 ## Nested Classes
 
 Classes can be defined inside functions and inside other classes, and used like any other class:

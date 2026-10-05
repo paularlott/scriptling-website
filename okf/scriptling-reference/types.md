@@ -126,7 +126,7 @@ numbers.extend([7, 8]) # Add multiple
 
 ## Dictionary
 
-Key-value pairs. Any hashable type can be used as a key: integers, floats, booleans, strings, `None`, tuples of hashable elements, and class instances that define `__hash__`.
+Key-value pairs. Any hashable type can be used as a key: integers, floats, booleans, strings, `None`, tuples of hashable elements, and class instances that define `__hash__`. Dictionaries preserve insertion order, as in Python 3.7+: iteration, `keys()`/`values()`/`items()`, printing and `json.dumps` all follow it.
 
 ```python
 person = {"name": "Alice", "age": 30}
@@ -149,6 +149,19 @@ keys(person)      # ["name", "age", "email"]
 values(person)    # ["Alice", 31, "alice@example.com"]
 items(person)     # [["name", "Alice"], ["age", 31], ...]
 ```
+
+Removal and order-sensitive methods follow Python:
+
+```python
+d = {"a": 1, "b": 2, "c": 3}
+d.pop("a")              # 1; a missing key raises KeyError unless you pass a default: d.pop("x", None)
+d.popitem()             # ("c", 3): removes the most recently inserted pair
+del d["b"]              # KeyError if the key is missing
+d["z"] = 0              # a new key goes to the end; re-assigning an existing key keeps its place
+list(reversed(d))       # ["z"]: reversed() walks insertion order backwards (also d.keys(), d.values(), d.items())
+```
+
+Use [`collections.defaultdict`](https://scriptling.dev/okf/scriptling-libraries/collections-iteration/collections.md#defaultdictdefault_factory) for dicts that build missing values, and `collections.OrderedDict` when you need `move_to_end()`.
 
 ## Set
 

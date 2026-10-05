@@ -182,6 +182,8 @@ result = test_kwargs(a=1, b=2, c=3)
 print(result)  # {"a": 1, "b": 2, "c": 3}
 ```
 
+The keyword names arrive in **alphabetical order**, not the order written at the call site, so the result is the same on every run: `test_kwargs(b=1, a=2)` gives `{"a": 2, "b": 1}`. If you need a specific order, sort or build it explicitly.
+
 ### Combining All Parameter Types
 
 ```python

@@ -139,7 +139,7 @@ Scriptling supports Python-style `del` in the common cases: `del items[2]`, `del
 3. Use dictionary methods like `.items()` and keyword arguments naturally.
 4. Use `del` for list indexes, list slices, dict keys, and object attributes when removing data.
 5. For HTTP, always set an explicit timeout and check or raise on status.
-6. Never rely on dict iteration order: it is unspecified. Sort explicitly (`for k in sorted(d):`) or use `json.dumps` when order matters.
+6. Dicts keep insertion order, exactly as in Python 3.7+: iteration, `.keys()`/`.values()`/`.items()`, and `json.dumps` all follow it. Sort explicitly (`for k in sorted(d):`) only when you want key order rather than insertion order.
 7. For JSON APIs, prefer `response.json()` or `json.loads(response.text)`.
 8. For string accumulation in loops, prefer `"".join(parts)` over repeated concatenation.
 9. Keep code synchronous, explicit, and small rather than clever.
