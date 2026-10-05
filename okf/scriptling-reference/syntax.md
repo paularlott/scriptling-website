@@ -370,6 +370,27 @@ result = process(
 )
 ```
 
+## Assignment
+
+Assignment works as in Python: a name, index, slice or attribute on the left, any expression on the right. A comma-separated target list unpacks the value, and tuple or list groups nest, with each level requiring an exact length match.
+
+```python
+x = 1                    # name
+items[0] = "first"       # index
+items[1:3] = ["a", "b"]  # slice splice
+obj.attr = 42            # attribute
+
+a, b = 1, 2              # unpack
+a, *rest, z = [1, 2, 3, 4]   # one starred target collects the middle
+(a, (b, c)) = (1, (2, 3))    # groups nest
+x[0], y = 5, 6           # index targets mix with names
+(a, b) = c = (1, 2)      # chains accept any target shape; value evaluated once
+```
+
+Unpack failures raise as in Python: `ValueError` for a length mismatch (`too many values to unpack (expected 2, got 3)`) and `TypeError` for a non-iterable value.
+
+Function parameter defaults are evaluated once, at the definition, and keep the value they produce there — `def f(x=n)` fixes `x`'s default to `n`'s value at the `def`, and `lambda x, n=n: ...` captures `n` per iteration when created in a loop.
+
 ## Imports
 
 Imports work as in Python. A library must be made available by the host (or the CLI's library paths) before a script can import it.

@@ -11,39 +11,31 @@ nav-skip: true
 {{< version "v0.29.0" >}}
 
 {{< changelog-item "added" >}}
-**`sentinel()` marker values.** `MISSING = sentinel("MISSING")` creates a unique value, equal only to itself, for "not supplied" defaults that `None` cannot express (PEP 661, Python 3.15). See [Built-in Functions](/reference/builtins/#sentinel).
+**Generators.** `def gen(xs): for x in xs: yield f(x)` returns a lazy generator consumed by `for`, `list()`, `next()` and the itertools functions; locals persist across yields. Yields are supported as statements at the top level of the body or of its top-level loop.
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
-**`copy` library.** `copy.deepcopy()` is cycle-safe, preserves shared references, and honours `__deepcopy__` methods — the deep-copy behaviour the `copy()` builtin's docs had always promised. See [Built-in Functions](/reference/builtins/#copying).
+**Data modelling: dataclasses, enums, custom exceptions.** `@dataclass` generates `__init__`/`__repr__`/`__eq__` (plus `order=True`, `frozen=True`, `field()`, `asdict`/`astuple`); `enum.Enum`/`IntEnum` with `.name`/`.value`, value lookup and `auto()`; `class MyError(Exception)` works end to end; `functools.lru_cache`/`@cache`; `from typing import ...` resolves so annotated code runs. Named tuples behave like tuples (indexing, `len()`, unpacking, equality).
 {{< /changelog-item >}}
 
 {{< changelog-item "added" >}}
-**Positional-only parameters.** The `/` marker (PEP 570) is accepted in `def` and `lambda` parameter lists; naming such a parameter by keyword raises `TypeError`, as in Python.
+**Libraries.** `copy.deepcopy()`, `sentinel()` (PEP 661), `csv.DictReader`/`DictWriter`, UUID objects (`uuid.uuid4()` etc.), number methods (`bit_count()`, `to_bytes()`, `float.fromhex()`, ...), `math.fsum`, `time.monotonic`, `os.getpid`, `functools.wraps`, `vars()` and `frozenset`.
 {{< /changelog-item >}}
 
-{{< changelog-item "added" >}}
-**Number methods.** `(5).bit_length()`, `(5).bit_count()`, `x.is_integer()`, `(2.0).hex()`, `float.fromhex()` and `(0.1).as_integer_ratio()` work on int and float values, as bound methods, as values, and through their types (`int.bit_count(5)`). See [Built-in Functions](/reference/builtins/#number-methods).
-{{< /changelog-item >}}
-
-{{< changelog-item "added" >}}
-**`frozenset()` and `OverflowError`.** Immutable sets, hashable by content, so they work as dict keys and set members; set operators follow Python's left-operand rule and mutating methods raise `AttributeError`. `OverflowError` (an `ArithmeticError` subclass) is now a built-in exception. See [Built-in Functions](/reference/builtins/#frozenset).
-{{< /changelog-item >}}
-
-{{< changelog-item "added" >}}
-**Decision models.** `client.decide(model, state, questions=, images=, keep_alive=)` on Ollama clients runs a System One decision model (`clef-flash`, `clef`, `nimble`, `tev1`): classification, yes/no probabilities and rubric scoring over up to 64 named questions in one response, with per-question probabilities and confidence. Other providers return a clear error naming the provider. See [AI Client](/reference/libraries/ai/client/#clientdecidemodel-state-questions-images-keep_alive).
+{{< changelog-item "changed" >}}
+**Language semantics match Python.** Nested and chained destructuring (`(a, (b, c)) = ...`, `x[0], y = ...`, `(a,b) = c = (1,2)`); display and call unpacking (`[*a, 3]`, `{**d}`, `f(**d)`); parameter defaults evaluate at definition; `/` positional-only parameters (PEP 570); `raise X from e`; `.5` and `1.` float literals; set comparisons; operator precedence and chained comparisons are Python-exact. See [Operators](/reference/operators/#operator-precedence) and [Syntax](/reference/syntax/#assignment).
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
-**Operator precedence now matches Python.** Bitwise `&`, `^`, `|` bind tighter than comparisons (`3 & 1 == 1` is `(3 & 1) == 1`) but looser than `and`/`or` — both previously reversed; `not` is looser than comparisons (`not a == b` is `not (a == b)`); `**` is right-associative (`2**3**2` is `512`) and binds tighter than unary minus (`-2 ** 2` is `-4`); and `in`/`is` comparisons now chain (`1 in xs == flag` is `(1 in xs) and (xs == flag)`). Verified by a 97-expression audit diffed against CPython. See [Operators](/reference/operators/#operator-precedence).
+**Errors are Python's errors.** Integer overflow past int64 raises `OverflowError` instead of wrapping; unhashable dict keys, unorderable sorts and wrong-arity calls raise catchable `TypeError`; file operations raise the `FileNotFoundError`/`OSError` family; `assert` failures, `str.index`, `set.remove` and `min()`/`max()` of empty raise their Python exception types; `type(x) is int` and `type(e).__name__` work.
 {{< /changelog-item >}}
 
 {{< changelog-item "fixed" >}}
-**Chained comparisons evaluate each operand once**, as in Python: `a < f() < c` calls `f()` a single time, and once a link is false the remaining operands are never evaluated. The middle operand previously ran twice. Unary `-` and `~` on non-numbers now raise Python's catchable `TypeError` (`bad operand type for unary -: 'str'`) instead of a fatal error.
+**Iterator and formatting correctness.** `itertools.islice`/`takewhile`/`chain`/`cycle`/`zip_longest` pull generators lazily (infinite generators no longer materialise); `%`-formatting covers `%u`/`%E`/`%G`/`%#o` with Python's error types; `str.split(None, n)`, `os.path` posixpath semantics, `dict.popitem()`, `csv` cell coercion and `json.JSONDecodeError` match CPython.
 {{< /changelog-item >}}
 
-{{< changelog-item "fixed" >}}
-**Set methods accept any iterable.** `union`, `intersection`, `difference`, `symmetric_difference`, `issubset` and `issuperset` no longer require a set argument (`s.union([2, 3])` works), and `union`/`intersection`/`difference` accept multiple arguments folded left, as in Python.
+{{< changelog-item "added" >}}
+**Decision models.** `client.decide(model, state, questions=, images=, keep_alive=)` runs an Ollama System One decision model with per-question probabilities and confidence. See [AI Client](/reference/libraries/ai/client/#clientdecidemodel-state-questions-images-keep_alive).
 {{< /changelog-item >}}
 
 ---
