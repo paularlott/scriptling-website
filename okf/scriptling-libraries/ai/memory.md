@@ -255,7 +255,7 @@ Memory can be exposed as MCP tools so any LLM client (Claude Desktop, Cursor, et
 |----------|-------------|---------|
 | `SCRIPTLING_MEMORY_DB` | Path to the memory KV store directory | `./memory-db` |
 | `SCRIPTLING_AI_BASE_URL` | Base URL of the AI provider for LLM deduplication | (disabled) |
-| `SCRIPTLING_AI_PROVIDER` | Provider type: `openai`, `claude`, `gemini`, `ollama`, `zai`, `mistral` | `openai` |
+| `SCRIPTLING_AI_PROVIDER` | Provider type: `openai`, `claude`, `gemini`, `ollama`, `zai`, `mistral`, `grok` | `openai` |
 | `SCRIPTLING_AI_MODEL` | Model name for LLM deduplication | (disabled) |
 | `SCRIPTLING_AI_TOKEN` | API key / bearer token for the AI provider | (empty) |
 

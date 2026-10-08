@@ -116,7 +116,7 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/ai/ai.md): AI and LLM functions for OpenAI-compatible APIs: clients, completions, embeddings, and tool-calling helpers.
 - [Responses API](https://scriptling.dev/okf/scriptling-libraries/ai/client/responses.md): Create, stream, fetch, cancel, delete, and compact OpenAI Responses API responses with scriptling.ai.Client.
 - [Streaming Completions](https://scriptling.dev/okf/scriptling-libraries/ai/client/streaming.md): Stream chat completions from scriptling.ai.Client with completion_stream() and the ChatStream object.
-- [scriptling.ai.Client](https://scriptling.dev/okf/scriptling-libraries/ai/client.md): Primary client interface for calling AI providers like OpenAI, Claude, and Gemini.
+- [scriptling.ai.Client](https://scriptling.dev/okf/scriptling-libraries/ai/client.md): Primary client interface for calling AI providers like OpenAI, Claude, Gemini and Grok.
 - [scriptling.ai.agent.interact](https://scriptling.dev/okf/scriptling-libraries/ai/interact.md): Interactive terminal interface for conversing with AI agents via a REPL-style loop.
 - [scriptling.ai.memory](https://scriptling.dev/okf/scriptling-libraries/ai/memory.md): Long-term, deduplicated memory store for AI agents backed by a KV store.
 - [scriptling.ai.tools](https://scriptling.dev/okf/scriptling-libraries/ai/tools.md): Tool schema builder for AI agents.

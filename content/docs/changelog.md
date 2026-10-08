@@ -8,6 +8,32 @@ nav-skip: true
 
 ## October 2026
 
+{{< version "v0.30.0" >}}
+
+{{< changelog-item "breaking" >}}
+- Change `client.response_compact(id)` to `client.response_compact(model, previous_response_id=, input=, instructions=)`. It now compacts a conversation into an `output` to continue from, using OpenAI's and xAI's compaction endpoints or, for other providers, a model summary; the old call only stripped reasoning items from a stored response. ([docs](/reference/libraries/ai/client/responses/#clientresponse_compactmodel-previous_response_idnone-inputnone-instructionsnone))
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+- Add Grok (xAI) as a provider: `ai.Client("", provider=ai.GROK, api_key="xai-...")`, using xAI's native Responses API. ([docs](/reference/libraries/ai/client/))
+- Add `previous_response_id`, `instructions`, `tools` and `store` to `client.response_create()` and `client.response_stream()`, for multi-turn conversations and tool calling with the Responses API. ([docs](/reference/libraries/ai/client/responses/))
+- Add `ai.tool_outputs()` to send tool results back to the Responses API, and read Responses API output in `ai.text()` and `ai.tool_calls()`. ([docs](/reference/libraries/ai/ai/#aitool_outputstool_results))
+- Add `client.supports(capability)`, reporting whether a client uses a native (`"responses"`) or emulated (`"responses_emulated"`) Responses API, and supports `"embeddings"` and `"decision"`. ([docs](/reference/libraries/ai/client/#clientsupportscapability))
+{{< /changelog-item >}}
+
+{{< changelog-item "changed" >}}
+- Continue emulated Responses API conversations (Claude, Gemini, Ollama, Z AI, Mistral) with `previous_response_id`, which was previously ignored, keeping each response's turn in the process for 15 minutes after last use. Responses are only visible to clients with the same provider, base URL and API key.
+- Stream tool calls as `function_call` items from emulated `client.response_stream()`, and stream a single response when the client runs `remote_servers` tools on the native Responses API.
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+- Fix native Responses API streaming returning no events, tool calls through the native Responses API failing, and emulated responses ignoring input messages without a `type` field and the `instructions` of a request.
+- Fix Ollama tool calls: parallel calls to the same tool sharing an ID, and all but the last of several streamed calls being dropped.
+- Fix tool calls without arguments being sent as `"null"` instead of `{}`.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.29.0" >}}
 
 {{< changelog-item "breaking" >}}

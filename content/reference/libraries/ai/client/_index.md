@@ -1,7 +1,7 @@
 ---
 title: scriptling.ai.Client
 linkTitle: ai.Client
-description: Primary client interface for calling AI providers like OpenAI, Claude, and Gemini.
+description: Primary client interface for calling AI providers like OpenAI, Claude, Gemini and Grok.
 tags: [libraries, ai]
 weight: 2
 
@@ -9,7 +9,7 @@ aliases:
   - /reference/libraries/scriptling/ai/client/
 ---
 
-The AI Client is the primary interface for making API calls to AI providers: OpenAI, Claude, Gemini, Ollama, Z AI, and Mistral. Create a client with `ai.Client()`, then call methods like `completion()`, `embedding()`, or `response_create()` on it.
+The AI Client is the primary interface for making API calls to AI providers: OpenAI, Claude, Gemini, Ollama, Z AI, Mistral, and Grok (xAI). Create a client with `ai.Client()`, then call methods like `completion()`, `embedding()`, or `response_create()` on it.
 
 **In this section**
 
@@ -35,12 +35,13 @@ The AI Client is the primary interface for making API calls to AI providers: Ope
 | `embedding(model, input)` | Create embedding vectors |
 | `decide(model, state, questions=, ...)` | Ask a decision model (Ollama) |
 | `models()` | List available models |
+| `supports(capability)` | Check a client capability, e.g. native or emulated Responses API |
 | [`response_create(model, input, **kwargs)`](responses/) | Create a Responses API response |
 | [`response_get(id)`](responses/) | Get a response by ID |
 | [`response_stream(model, input, **kwargs)`](responses/) | Stream a Responses API response |
 | [`response_cancel(id)`](responses/) | Cancel an in-progress response |
 | [`response_delete(id)`](responses/) | Delete a response by ID |
-| [`response_compact(id)`](responses/) | Compact a response (remove reasoning) |
+| [`response_compact(model, ...)`](responses/) | Compact a conversation to continue from |
 
 ## Constants
 
@@ -52,6 +53,7 @@ The AI Client is the primary interface for making API calls to AI providers: Ope
 | `ai.OLLAMA` | Ollama provider |
 | `ai.ZAI` | Z AI provider |
 | `ai.MISTRAL` | Mistral provider |
+| `ai.GROK` | Grok (xAI) provider |
 
 ## Functions
 
@@ -61,7 +63,7 @@ Creates a new AI client instance for making API calls to a supported provider.
 
 **Parameters:**
 
-- `base_url` (`str`): Base URL of the API. Default: `https://api.openai.com/v1` if empty.
+- `base_url` (`str`): Base URL of the API. Default if empty: the provider's own API, e.g. `https://api.openai.com/v1` or, for Grok, `https://api.x.ai/v1`.
 - `provider` (`str`, optional): Provider type: one of the constants above. Default: `ai.OPENAI`.
 - `api_key` (`str`, optional): API key for authentication.
 - `max_tokens` (`int`, optional): Default `max_tokens` applied to all requests from this client. Claude defaults to `4096` if not set.
@@ -94,6 +96,9 @@ client = ai.Client(
     max_tokens=4096,
     temperature=0.7
 )
+
+# Grok (xAI)
+client = ai.Client("", provider=ai.GROK, api_key="xai-...")
 
 # LM Studio / local LLM
 client = ai.Client("http://127.0.0.1:1234/v1")
@@ -358,7 +363,7 @@ Creates an embedding vector for the given input text(s) using the specified mode
 | OpenAI | Native | `POST /embeddings` |
 | Gemini | Native | Translates to embedContent API |
 | Ollama / ZAI / Mistral | Native | OpenAI-compatible endpoint |
-| Claude | Not supported | Returns error |
+| Claude / Grok | Not supported | Returns error |
 
 **Parameters:**
 
@@ -367,7 +372,7 @@ Creates an embedding vector for the given input text(s) using the specified mode
 
 **Returns:** `dict`: response containing `data` (list of embeddings with `index`, `embedding`, `object`), `model`, and `usage`.
 
-**Raises:** `Error`: when called against a Claude client (embeddings unsupported).
+**Raises:** `Error`: when called against a Claude or Grok client (embeddings unsupported). Check first with `client.supports("embeddings")`.
 
 ```python
 client = ai.Client("", api_key="sk-...")
@@ -431,6 +436,31 @@ result["answers"]["urgent"]["noul"]         # 0.98
 ```
 
 `confidence` is 1 − H(p)/ln(N): 0 means uniform, near 1 one dominant candidate — a strength signal, not a correctness guarantee.
+
+### `client.supports(capability)`
+
+Reports whether the client supports a capability.
+
+| Capability | Meaning |
+|---|---|
+| `"responses"` | Uses the provider's native Responses API (OpenAI, Grok on their own APIs) |
+| `"responses_emulated"` | Emulates the Responses API over chat completions, storing responses in this process |
+| `"embeddings"` | `client.embedding()` works |
+| `"decision"` | `client.decide()` works (Ollama) |
+
+Every client reports exactly one of `"responses"` and `"responses_emulated"`. Any other name returns `False`.
+
+**Parameters:**
+
+- `capability` (`str`): Capability name.
+
+**Returns:** `bool`
+
+```python
+client = ai.Client("", provider=ai.GROK, api_key="xai-...")
+print(client.supports("responses"))   # True
+print(client.supports("embeddings"))  # False
+```
 
 ### `client.models()`
 

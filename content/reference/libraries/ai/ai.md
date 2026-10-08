@@ -46,6 +46,7 @@ For the full client method reference (completion, streaming, parallel, embedding
 | `extract_thinking(text)` | Extract thinking blocks from a text string |
 | `tool_calls(input)` | Extract normalized tool calls |
 | `execute_tool_calls(registry, tool_calls)` | Execute tool calls with a tool registry |
+| `tool_outputs(tool_results)` | Convert tool results into Responses API input items |
 | `collect_stream(stream, **kwargs)` | Aggregate a chat stream into one result |
 | `estimate_tokens(request, response=None)` | Estimate token counts for a request/response |
 | `cosine_similarity(a, b)` | Compare two vectors (e.g. embeddings) |
@@ -55,11 +56,11 @@ For the full client method reference (completion, streaming, parallel, embedding
 
 ### `ai.text(response)`
 
-Extracts the text content from a completion response, automatically removing any thinking blocks.
+Extracts the text content from a completion response or a Responses API response, automatically removing any thinking blocks.
 
 **Parameters:**
 
-- `response` (`dict`): Chat completion response from `client.completion()`.
+- `response` (`dict`): Response from `client.completion()` or `client.response_create()`.
 
 **Returns:** `str`: the response text with thinking blocks removed.
 
@@ -133,11 +134,11 @@ print("Response:", result["content"])
 
 ### `ai.tool_calls(response_or_message)`
 
-Extracts normalized tool calls from a completion response, assistant message dict, or raw tool call list.
+Extracts normalized tool calls from a completion response, a Responses API response, an assistant message dict, or a raw tool call list. For a Responses API response, each call's `id` is its `call_id`.
 
 **Parameters:**
 
-- `response_or_message` (`dict` or `list`): Completion response, assistant message, or tool call list.
+- `response_or_message` (`dict` or `list`): Completion or Responses API response, assistant message, or tool call list.
 
 **Returns:** `list`: normalized tool call dicts with `id`, `type`, and `function` fields.
 
@@ -179,6 +180,26 @@ tool_calls = [{
 
 tool_results = ai.execute_tool_calls(tools, tool_calls)
 print(tool_results[0]["content"])  # "echo:hello"
+```
+
+### `ai.tool_outputs(tool_results)`
+
+Converts tool result messages, as returned by `ai.execute_tool_calls()`, into `function_call_output` items for the Responses API. Send them as the input of the next `client.response_create()` or `client.response_stream()` call, continuing from the response that asked for the tools with `previous_response_id`.
+
+**Parameters:**
+
+- `tool_results` (`list`): Tool result dicts with `tool_call_id` and `content`.
+
+**Returns:** `list`: `function_call_output` dicts with `call_id` and `output`.
+
+```python
+response = client.response_create("gpt-4o", "What's the weather in Paris?", tools=tools.build())
+calls = ai.tool_calls(response)
+if calls:
+    results = ai.execute_tool_calls(tools, calls)
+    response = client.response_create("gpt-4o", ai.tool_outputs(results),
+                                      previous_response_id=response.id, tools=tools.build())
+print(ai.text(response))
 ```
 
 ### `ai.collect_stream(stream, **kwargs)`
