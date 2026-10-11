@@ -8,6 +8,22 @@ nav-skip: true
 
 ## October 2026
 
+{{< version "v0.30.2" >}}
+
+{{< changelog-item "changed" >}}
+- Block reserved address ranges (CGNAT, documentation, benchmarking, NAT64, 6to4 and similar) under a network policy unless `allow_reserved_ips = true` ([docs](/docs/cli/network-policy/))
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+- Add `allow_reserved_ips` network policy option (`AllowReservedIPs` in Go) ([docs](/docs/go-integration/library-registration/#network-policy))
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+- Accept TLS 1.2 on connections made under a network policy
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.30.0" >}}
 
 {{< changelog-item "breaking" >}}

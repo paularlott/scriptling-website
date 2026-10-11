@@ -20,6 +20,7 @@ With a policy active, these address categories are blocked by default:
 - Loopback (`127.0.0.0/8`, `::1`)
 - Link-local (`169.254.0.0/16` including cloud metadata endpoints, `fe80::/10`)
 - Private (`10/8`, `172.16/12`, `192.168/16`, `fc00::/7`)
+- Reserved: ranges that are neither private nor publicly routable — shared address space / CGNAT (`100.64/10`, home to some cloud metadata endpoints), `0/8`, `192.0.0/24`, documentation (`192.0.2/24`, `198.51.100/24`, `203.0.113/24`, `2001:db8::/32`, `3fff::/20`), benchmarking (`198.18/15`, `2001:2::/48`), `240/4` and broadcast, and the IPv6 forms that embed or translate IPv4 (IPv4-compatible `::/96`, NAT64 `64:ff9b::/96` and `64:ff9b:1::/48`, 6to4 `2002::/16`, Teredo `2001::/32`), plus discard `100::/64` and deprecated site-local `fec0::/10`
 - Unspecified (`0.0.0.0`, `::`) and multicast addresses
 - URLs that name an IP directly (e.g. `http://10.0.0.1/`)
 
@@ -41,6 +42,12 @@ allow_loopback = false
 
 # Permit private network addresses (10/8, 172.16/12, 192.168/16, fc00::/7)
 allow_private_ips = false
+
+# Permit reserved addresses: CGNAT 100.64/10, 0/8, documentation and
+# benchmarking ranges, 240/4, IPv4-compatible/NAT64/6to4/Teredo IPv6 and
+# similar non-public ranges. To reach just one of them (e.g. a CGNAT
+# overlay network), prefer allow_cidrs.
+allow_reserved_ips = false
 
 # Host allowlist: when set, ONLY these hosts may be contacted. Listed
 # hosts are trusted — they may resolve to internal addresses. An exact

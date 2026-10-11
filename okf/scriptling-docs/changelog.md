@@ -16,6 +16,26 @@ type: Guide
 
 ## October 2026
 
+### v0.30.2
+
+
+**changed**
+
+- Block reserved address ranges (CGNAT, documentation, benchmarking, NAT64, 6to4 and similar) under a network policy unless `allow_reserved_ips = true` ([docs](https://scriptling.dev/okf/scriptling-docs/cli/network-policy.md))
+
+
+**added**
+
+- Add `allow_reserved_ips` network policy option (`AllowReservedIPs` in Go) ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#network-policy))
+
+
+**fixed**
+
+- Accept TLS 1.2 on connections made under a network policy
+
+
+---
+
 ### v0.30.0
 
 

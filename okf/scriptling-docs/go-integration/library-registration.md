@@ -303,6 +303,7 @@ if err != nil {
 | `AllowIPLiterals` | `bool` | `false` | Permit URLs that name an IP directly; granted addresses still face the address rules |
 | `AllowLoopback` | `bool` | `false` | Permit `127.0.0.0/8` and `::1` |
 | `AllowPrivateIPs` | `bool` | `false` | Permit RFC1918 and IPv6 unique-local ranges |
+| `AllowReservedIPs` | `bool` | `false` | Permit reserved ranges that are neither private nor publicly routable — CGNAT `100.64.0.0/10`, `0.0.0.0/8`, documentation and benchmarking ranges, `240.0.0.0/4`, IPv4-compatible/NAT64/6to4/Teredo IPv6 and more; the full list is `netsecurity.ReservedCIDRs`. Policy files set it as `allow_reserved_ips = true` |
 | `AllowHosts` | `[]string` | `nil` | Host allowlist; when set, only these hosts may be contacted. Listed hosts are trusted — they may resolve to internal addresses. Exact names match themselves; a leading dot (`.corp.example.com`) matches the domain and all subdomains |
 | `DenyHosts` | `[]string` | `nil` | Host denylist; always wins, even over `AllowHosts`. Same syntax |
 | `AllowedCIDRs` | `[]string` | `nil` | Address ranges permitted explicitly, overriding the built-in blocks (how you grant one slice of a LAN) |
