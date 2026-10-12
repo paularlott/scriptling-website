@@ -15,6 +15,8 @@ type: Guide
 
 ## Command Line Options
 
+Give these options before the script file: everything after it is passed to the script in `sys.argv` (see [Pass Arguments to a Script](https://scriptling.dev/okf/scriptling-docs/cli/basic-usage.md#pass-arguments-to-a-script)).
+
 | Flag                  | Env Variable               | Config Path                  | Description                                          | Default          |
 | --------------------- | -------------------------- | ---------------------------- | ---------------------------------------------------- | ---------------- |
 | `-C`, `--config`      | `SCRIPTLING_CONFIG`        | -                            | Path to configuration file                           | see below        |

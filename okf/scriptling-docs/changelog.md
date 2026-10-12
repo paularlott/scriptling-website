@@ -16,6 +16,21 @@ type: Guide
 
 ## October 2026
 
+### v0.30.3
+
+
+**breaking**
+
+- Pass everything after the script file to the script in `sys.argv`, flags included, so `scriptling tool.py input.json --verbose` works without `--`; give scriptling's own options before the script file. A `--` straight after the file is still accepted and dropped ([docs](https://scriptling.dev/okf/scriptling-docs/cli/basic-usage.md#pass-arguments-to-a-script))
+
+
+**fixed**
+
+- Fix a script argument that matches a subcommand name, such as `scriptling tool.py cache` or `scriptling tool.py help`, running that subcommand instead of the script
+
+
+---
+
 ### v0.30.2
 
 

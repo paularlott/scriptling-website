@@ -157,7 +157,7 @@ print(sys.path_sep)  # "/" on Unix, "\" on Windows
 
 ### `argv`
 
-A list of command-line arguments passed to the script.
+A list of command-line arguments passed to the script: the script file, then everything after it on the command line, flags included. `scriptling script.py data.csv --verbose` gives `["script.py", "data.csv", "--verbose"]`.
 
 ```python
 import sys

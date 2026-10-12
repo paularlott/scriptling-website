@@ -13,6 +13,23 @@ weight: 1
 scriptling script.py
 ```
 
+### Pass Arguments to a Script
+
+Everything after the script file goes to the script in [`sys.argv`](/reference/libraries/time-system/sys/#argv), flags included, as with `python`:
+
+```bash
+scriptling tool.py input.json --verbose --output out
+# sys.argv == ["tool.py", "input.json", "--verbose", "--output", "out"]
+```
+
+Give scriptling's own options before the script file. After it, even a scriptling flag such as `-L` or a word like `help` is passed to the script:
+
+```bash
+scriptling -L ./libs tool.py input.json
+```
+
+A `--` straight after the script file is accepted and dropped, so `scriptling tool.py -- input.json` works too.
+
 ### Pipe Script via Stdin
 
 ```bash
