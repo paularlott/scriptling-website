@@ -60,7 +60,7 @@ Both plugins provide transactions: `conn.begin()` returns a handle whose `query(
 
 ## Availability
 
-- **Compiled in:** the default `scriptling` build includes SQLite, SQL, Valkey, and BadgerDB; `scriptling-slim` omits them. Custom builds select them with `plugin_sqlite`, `plugin_sql`, `plugin_valkey`, and `plugin_badgerdb` build tags.
+- **Compiled in:** the default `scriptling` build (and `scriptling-onepassword`) includes SQLite, SQL, Valkey, and BadgerDB; `scriptling-slim` (and `scriptling-slim-onepassword`) omits them. Custom builds select them with `plugin_sqlite`, `plugin_sql`, `plugin_valkey`, and `plugin_badgerdb` build tags.
 - **External plugins:** matching `sqlite`, `sql`, `valkey`, and `badgerdb` executables can be discovered or loaded through the host's plugin manager. This keeps the core binary lean but adds a separate plugin process and protocol boundary.
 
 The script APIs are aligned across compiled and external forms, including streaming `query_iter()` and ORM `iterate()`.

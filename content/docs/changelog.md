@@ -8,6 +8,20 @@ nav-skip: true
 
 ## October 2026
 
+{{< version "v0.30.4" >}}
+
+{{< changelog-item "changed" >}}
+- Read 1Password Connect secrets in one request instead of three after an item's first lookup, by remembering vault and item ids for 10 minutes
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+- Add 1Password service accounts to the `onepassword` secret provider through the separate [scriptling-onepassword](https://github.com/paularlott/scriptling-onepassword) extension: give `service_account_token` instead of a Connect `address` and `token`; the released CLI supports Connect only ([docs](/reference/libraries/utilities/secret/#1password-service-accounts))
+- Add the `scriptlingcmd` package, so a custom CLI with extensions compiled in is a `main.go` calling `scriptlingcmd.Main()` ([docs](/reference/libraries/utilities/secret/#service-accounts-in-embedded-applications-and-custom-builds))
+- Add the `scriptling-onepassword` and `scriptling-slim-onepassword` builds, with 1Password service accounts compiled in, to the release and Homebrew ([docs](/docs/quick-start/cli/#1password-builds))
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.30.3" >}}
 
 {{< changelog-item "breaking" >}}

@@ -27,7 +27,7 @@ brew install paularlott/tap/scriptling
 
 The SQLite, SQL, Valkey and BadgerDB database plugins are compiled in.
 
-A smaller build without them is available: see [Slim Build](#slim-build).
+A smaller build without them is available: see [Slim Build](#slim-build). For 1Password service accounts in `scriptling.secret`, see [1Password Builds](#1password-builds).
 
 ### GitHub Releases
 
@@ -120,6 +120,24 @@ export SCRIPTLING_PLUGIN_DIR="$(brew --prefix)/opt/scriptling-plugins/libexec/pl
 ```
 
 Release zips name the binary `scriptling` whether default or slim. See [Plugins](https://scriptling.dev/okf/scriptling-docs/plugins.md) for how plugins load and the [database reference](https://scriptling.dev/okf/scriptling-libraries/databases.md) for the APIs.
+
+## 1Password Builds
+
+Two more builds add 1Password service account support to `scriptling.secret`, so its `onepassword` provider accepts a `service_account_token` as well as 1Password Connect. They are otherwise the same as `scriptling` and `scriptling-slim`, and add about 14 MB:
+
+```bash
+brew install paularlott/tap/scriptling-onepassword        # database plugins compiled in
+brew install paularlott/tap/scriptling-slim-onepassword   # without the database plugins
+```
+
+| Formula / release zip | Database plugins | 1Password service accounts |
+| --- | --- | --- |
+| `scriptling` | compiled in | — |
+| `scriptling-slim` | load with `scriptling-plugins` | — |
+| `scriptling-onepassword` | compiled in | yes |
+| `scriptling-slim-onepassword` | load with `scriptling-plugins` | yes |
+
+All four install the same `scriptling` command, so install only one; every release zip names the binary `scriptling`. 1Password Connect works in all of them. See [1Password service accounts](https://scriptling.dev/okf/scriptling-libraries/utilities/secret.md#1password-service-accounts) for configuration.
 
 ## Next Steps
 
