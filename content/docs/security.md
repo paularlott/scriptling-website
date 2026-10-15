@@ -260,13 +260,26 @@ if err == context.DeadlineExceeded {
 }
 ```
 
-### Memory Limits
+### Memory and Value Limits
 
-Scriptling runs within Go's memory management, but consider:
+Each interpreter can have a memory limit and a value limit (see
+[Script Resource Limits](/docs/go-integration/basics/#script-resource-limits)).
+Both are off until set, so set them for untrusted code, along with a timeout:
 
-1. **Large allocations** can cause memory pressure
-2. **Infinite loops** can consume CPU indefinitely
-3. **Recursion depth** is limited by Go's stack
+1. **Memory limit**: cancels the interpreter's running calls when the
+   estimated memory it holds stays over the limit after a garbage collection.
+   Within a call, an interpreter that keeps going over forces at most one
+   collection every 100 ms, so a script catching `MemoryError` in a loop
+   cannot stall the process.
+2. **Value limit**: a single string, bytes value, list, tuple, dict, set,
+   read body or captured output larger than the limit raises `MemoryError`.
+3. **Recursion depth** is limited to 1000 calls, including calls from Go
+   through `CallFunction`.
+
+Memory is estimated, not measured exactly, and every interpreter shares the
+host's process. For untrusted code that must not affect anything else, run the
+interpreters in a separate process with an operating-system memory limit as
+well.
 
 ## Code Injection Prevention
 
@@ -326,6 +339,7 @@ Use this checklist when deploying Scriptling in production:
 - [ ] Scripts run with minimal privileges
 - [ ] Error messages don't leak sensitive information
 - [ ] Logs are sanitized before display
+- [ ] A memory limit, a value limit and a timeout are set for untrusted code
 - [ ] Runtime KV store size is monitored (unbounded memory)
 - [ ] Background tasks are properly managed and terminated
 
@@ -340,7 +354,7 @@ while True:
     big_list = big_list + ["x" * 1000000]
 ```
 
-**Mitigation**: Use execution timeouts.
+**Mitigation**: Set a memory limit and a value limit, and use execution timeouts.
 
 ### 2. Infinite Loops
 

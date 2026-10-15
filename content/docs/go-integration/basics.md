@@ -309,10 +309,11 @@ fmt.Printf("%d programs, %d of %d bytes, hits=%d misses=%d evictions=%d\n",
 
 ## Script Resource Limits
 
-A host that runs scripts written by other people needs two ceilings that a
-per-script timeout does not give it: how far one script can fan out, and how
-much memory the scripts can hold between them. Both are process-wide settings,
-set once at startup, and neither adds any cost to the evaluator's hot path.
+A host that runs scripts written by other people needs limits that a timeout
+alone does not give it: how far a script can fan out, how much memory it can
+hold and how large a single value can grow. Bound running time with the
+context passed to `EvalWithContext` and the other `*WithContext` calls (see
+[With Context and Timeout](#with-context-and-timeout)).
 
 ### Cap Fan-Out
 
@@ -336,35 +337,143 @@ is raised, because the ceiling is the host's resource policy rather than a
 script error. A ceiling of 0 removes it. The check is one atomic load when a
 pipeline or batch is created.
 
-### Limit Memory
+### Per-Interpreter Limits
 
-Go cannot attribute heap memory to one interpreter without accounting on
-every allocation, which would slow every script. The memory guard therefore
-works at process level: a single goroutine samples the heap on a timer, and
-while the heap stays above the ceiling after a garbage collection it cancels
-the most recently started script. Shedding newest-first protects work that was
-already within budget from a newcomer that is not.
+Every interpreter has two limits. Each follows a process-wide default
+unless the interpreter sets its own. Nothing is limited until a limit is set:
+every default is off.
+
+| Limit | Default | What happens when it is reached |
+| --- | --- | --- |
+| Memory: estimated memory the interpreter holds | none | Garbage is collected; if still over, the interpreter's running calls are cancelled with `memory limit exceeded` |
+| Value: largest single string, bytes value, list, tuple, dict or set | none | The operation raises `MemoryError`, which the script can catch |
+
+Set the defaults once at startup. They apply to each interpreter separately,
+never to the process as a whole:
 
 ```go
-// Cancel the newest running script while heap objects exceed 384 MiB.
-scriptling.SetMemoryLimit(384 << 20)
-
-// Disable.
-scriptling.SetMemoryLimit(0)
+scriptling.SetMemoryLimit(64 << 20)   // 64 MiB per interpreter
+scriptling.SetMaxValueBytes(8 << 20)  // 8 MiB per value
 ```
 
-A cancelled script's evaluation returns an error containing
-`memory limit exceeded`, and `context.Cause` on its context is
-`scriptling.ErrMemoryLimitExceeded`. The ceiling applies to the whole
-process, so set it well above the host's own baseline heap, typically around
-three quarters of the container's memory allocation; a ceiling below the
-baseline cancels every script as soon as it starts.
+An interpreter can set its own limits when it is created, or later. `0` means
+no limit for that interpreter whatever the default, and
+`scriptling.InheritLimit` returns it to the default:
 
-`scriptling.GetMemoryLimitStats()` reports the configured limit, the heap at
-the last sample, how many scripts are running and how many the guard has
-cancelled since the process started. A cancellation count that keeps rising on
-a host with a sensible ceiling means some script holds far more than it should,
-and the limit is doing its job.
+```go
+p := scriptling.New(
+    scriptling.WithMemoryLimit(256 << 20),
+    scriptling.WithMaxValueBytes(0), // no value limit for this one
+)
+
+p.SetMemoryLimit(scriptling.InheritLimit) // back to the default
+```
+
+An interpreter without its own limit follows the default as it changes, so
+raising the default later raises it for every interpreter that inherits it.
+Change limits between calls: a change is enforced from the next call. When a
+memory limit is lowered below what the interpreter already holds, the next
+call collects garbage and, if it is still over, stops before it runs.
+`p.Clone()` keeps the parent's limit settings, with its own memory accounting.
+
+### Memory Limit
+
+Go cannot attribute heap memory to an interpreter, so memory is estimated.
+The points where a script can make memory grow (strings, bytes, list storage,
+dicts, sets and object attributes) report their sizes. One allocation in
+roughly every 64 KiB is sampled at random, as Go's heap profiler does, and
+charged to the interpreter running on that goroutine; the charge is credited
+back when the object is collected. Allocations of 64 KiB or more are charged
+exactly. The estimate is unbiased, but it is an estimate: integers and floats
+are not counted on their own, only through the lists and dicts that hold them.
+
+When the estimate goes over the limit, the interpreter forces a garbage
+collection, because much of what was charged may already be garbage. Only if
+it is still over are its running calls cancelled. A script that allocates far
+more than its limit in total, but holds little at once, is not stopped.
+
+Large values are checked before they are made: a string repetition, padding,
+join, read body and so on that would not fit in the room left raises
+`MemoryError` instead of allocating.
+
+A cancelled call returns an error containing `memory limit exceeded`. Go
+builtins and libraries running inside the call see
+`context.Cause(ctx) == scriptling.ErrMemoryLimitExceeded` on the context
+they are given; the context the host passed in is not cancelled. The
+interpreter can be used again afterwards.
+
+`p.ResourceUsage()` reports the interpreter's estimated memory in use, its
+peak, the total allocated and how many calls the limit has cancelled:
+
+```go
+usage := p.ResourceUsage()
+fmt.Println(usage.MemoryBytes, usage.PeakMemoryBytes, usage.AllocatedBytes, usage.MemoryLimitCancellations)
+```
+
+Memory is only measured while accounting is on, which it is once any memory
+limit has been set in the process. From then on each string and bytes value
+created costs a few nanoseconds more; with no memory limit set anywhere the
+cost is one atomic load. A value limit is similar: once one has been set
+anywhere, values larger than the smallest limit ever set take the checking
+path for the rest of the process, in every interpreter.
+
+Sandboxes (`scriptling.runtime.sandbox`) and background tasks
+(`runtime.background`) share the guard of the script that started them: the
+same memory and value limits, and their memory counts against the same
+budget. A script cannot get round its limits by running code in them. If the
+shared budget is exceeded, every call running under it is cancelled. A
+background task is not part of the call that started it, though: it keeps
+running after that call returns, still charged to the same budget.
+
+A host can do the same for its own nested interpreters, such as a builtin that
+runs a second `Scriptling`:
+
+```go
+child := scriptling.New()
+child.ShareResourceGuard(parent.ResourceGuard())
+```
+
+Without that, a nested interpreter has its own limits and budget, and memory
+it allocates is charged to it rather than to the interpreter that called it.
+
+### Value Limit
+
+The value limit stops a single operation asking for a huge allocation:
+`"x" * n`, `"x".center(n)`, `f"{x:>{n}}"`, `bytes(n)`, `str.join`,
+`str.replace`, `str.split`, `list(range(n))`, list, dict and set growth,
+literals (checked before their elements are evaluated), `*args`,
+`secrets.token_bytes(n)`, HTTP response bodies, file and archive reads,
+`sys.stdin.read()`, `io.StringIO` buffers, rendered templates and captured
+`print` output. The results of library functions and string and bytes methods
+(`base64.b64encode`, `json.dumps` and so on) are also checked as they are
+returned, and script data handed to `json.dumps`, templates and request
+bodies is converted under the limit, since a value shared by many containers
+converts once per reference. Lists, tuples, dicts and sets count 16 bytes per element. Going over
+raises `MemoryError`:
+
+```python
+try:
+    data = "x" * n
+except MemoryError as e:
+    print("too big:", e)
+```
+
+With only a memory limit set, reads, captured output, `StringIO` buffers and
+rendered templates are still refused once they no longer fit in the memory
+left. Libraries whose results come from files or directories rather than
+script values, such as `scriptling.grep`, `scriptling.sed`, `scriptling.find`,
+`os.listdir` and `csv.loads`, build their results under the limits as they
+go: a call whose result would not fit stops with `MemoryError` rather than
+gathering everything first.
+
+Constant expressions folded when the script is parsed, such as `"ab" * 3`,
+are checked against the value limit when they are evaluated, like the same
+expression with a variable. Whatever the value limit, a
+string or bytes repetition (`"x" * n`), padding width (`"x".ljust(n)`) or
+format width (`"%*d"`) is still capped at 1 GiB and a list or tuple
+repetition at about 134 million elements, as before limits existed. Libraries that read data of
+unknown size can use `object.ReadAllLimited` and `object.ReadFileLimited`,
+and check a size up front with `object.CheckAlloc`.
 
 ## Library Management
 
