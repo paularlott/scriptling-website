@@ -29,7 +29,7 @@ Give these options before the script file: everything after it is passed to the 
 | `--cache-dir`         | `SCRIPTLING_CACHE_DIR`     | `cache.dir`                  | Cache directory for remote packages                  | OS default       |
 | `--program-cache-max-bytes` | `SCRIPTLING_PROGRAM_CACHE_MAX_BYTES` | `cache.program_max_bytes` | Memory budget for parsed scripts kept in memory (bytes; 0 = default, negative = unlimited) | 64 MiB |
 | `--memory-limit` | `SCRIPTLING_MEMORY_LIMIT` | `limits.memory_bytes` | Estimated memory each interpreter may hold (bytes; 0 = no limit) | 0 |
-| `--max-value-bytes` | `SCRIPTLING_MAX_VALUE_BYTES` | `limits.max_value_bytes` | Largest single string, bytes value or container (list, tuple, dict, set) one operation may create (bytes; 0 = no limit) | 0 |
+| `--max-value-bytes` | `SCRIPTLING_MAX_VALUE_BYTES` | `limits.max_value_bytes` | Largest single string, bytes value or container (list, tuple, dict, set) one operation may create (bytes; 0 = no limit). Separate from the fixed 1 GiB cap on a single repetition or padding width, which always applies | 0 |
 | `-L`, `--libpath`     | `SCRIPTLING_LIBPATH`       | `libpath`                    | Extra library search directory (repeatable)          | (none)           |
 | `--plugin-dir`       | `SCRIPTLING_PLUGIN_DIR`    | `plugins.dirs`               | Plugin executable directory (repeatable)             | (none)           |
 | `--plugin`           | `SCRIPTLING_PLUGIN`        | `plugins.paths`              | Plugin executable to load, path taken literally (repeatable) | (none) |

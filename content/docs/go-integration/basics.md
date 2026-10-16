@@ -373,7 +373,10 @@ An interpreter without its own limit follows the default as it changes, so
 raising the default later raises it for every interpreter that inherits it.
 Change limits between calls: a change is enforced from the next call. When a
 memory limit is lowered below what the interpreter already holds, the next
-call collects garbage and, if it is still over, stops before it runs.
+call collects garbage and, if it is still over, stops before it runs; later
+calls within 100 ms are stopped without another collection, so an
+interpreter left over its limit costs the host at most one collection per
+100 ms.
 `p.Clone()` keeps the parent's limit settings, with its own memory accounting.
 
 ### Memory Limit
@@ -397,10 +400,13 @@ join, read body and so on that would not fit in the room left raises
 `MemoryError` instead of allocating.
 
 A cancelled call returns an error containing `memory limit exceeded`. Go
-builtins and libraries running inside the call see
+builtins and libraries running inside the call see `ctx.Err()` set and
 `context.Cause(ctx) == scriptling.ErrMemoryLimitExceeded` on the context
 they are given; the context the host passed in is not cancelled. The
-interpreter can be used again afterwards.
+cancellation is seen at the script's next statement rather than through
+the context's `Done` channel, which stays the host's, so a library call
+blocked on the network finishes its current operation before the script is
+stopped. The interpreter can be used again afterwards.
 
 `p.ResourceUsage()` reports the interpreter's estimated memory in use, its
 peak, the total allocated and how many calls the limit has cancelled:
@@ -446,10 +452,13 @@ literals (checked before their elements are evaluated), `*args`,
 `sys.stdin.read()`, `io.StringIO` buffers, rendered templates and captured
 `print` output. The results of library functions and string and bytes methods
 (`base64.b64encode`, `json.dumps` and so on) are also checked as they are
-returned, and script data handed to `json.dumps`, templates and request
-bodies is converted under the limit, since a value shared by many containers
-converts once per reference. Lists, tuples, dicts and sets count 16 bytes per element. Going over
-raises `MemoryError`:
+returned. Script data handed to `json.dumps`, templates and request bodies
+is held to the limit as the single value it is encoded into, so a small value
+shared by many containers, which converts once per reference, cannot expand
+past the limit on the way out, while data the script was allowed to build is
+not refused for its size in Go. Each part of an outgoing request (the URL,
+the body, each header) is a value of its own. Lists, tuples, dicts and sets
+count 16 bytes per element. Going over raises `MemoryError`:
 
 ```python
 try:

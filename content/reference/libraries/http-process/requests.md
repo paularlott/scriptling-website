@@ -153,7 +153,7 @@ Execute multiple HTTP requests concurrently with a configurable concurrency limi
   - `timeout` (`int`, optional): Request timeout in seconds. Default: `30`.
 - `max_parallel` (`int`, optional): Maximum number of concurrent requests. Default: `4`. The host may cap this (see [Script Resource Limits](/docs/go-integration/basics/#script-resource-limits)); a larger request is reduced to the cap.
 
-**Returns:** `list`: `Response` objects in the same order as the input list. A malformed request spec (missing `url` or un-encodable `json`) yields a `Response` with `status_code=0` and the error message in `text`; a transport-level failure (timeout, DNS, connection refused) surfaces as an `Error` object in the corresponding position.
+**Returns:** `list`: `Response` objects in the same order as the input list. A request that fails for any reason, a malformed spec (missing `url` or un-encodable `json`), a transport failure (timeout, DNS, connection refused) or a response over the interpreter's limits, yields a `Response` with `status_code=0` and the error message in `text` in the corresponding position, so one failure never stops the batch.
 
 ```python
 import requests

@@ -122,12 +122,37 @@ th code {
   overflow-wrap: break-word;
 }
 
+/* Pages that opt in via `nowrap_table_first_col: true` front matter list
+   short code tokens (flags) in the first table column. Those must never
+   wrap: a flag broken at a hyphen across two lines reads as two flags.
+   Only code spans, so plain-text first columns keep wrapping normally. */
+.table-first-col-nowrap td:first-child code {
+  white-space: nowrap;
+}
+
 @media (max-width: 767px) {
   table {
     display: block;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+}
+
+/* Pages that opt in via `nowrap_table_first_col: true` front matter list
+   short code tokens (flags) in the first table column. Those must never
+   wrap: a flag broken at a hyphen across two lines reads as two flags.
+   The unbreakable flags (plus env-var/config tokens, which have no break
+   opportunities) make the table wider than the content column at every
+   size, so it scrolls in place at any width — the same treatment tables
+   already get below tablet width — instead of overflowing the page. */
+.table-first-col-nowrap td:first-child code {
+  white-space: nowrap;
+}
+
+.table-first-col-nowrap table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Custom table styles */

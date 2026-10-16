@@ -21,35 +21,39 @@ type: Guide
 
 **changed**
 
-- **Breaking:** make `scriptling.SetMemoryLimit` the default memory limit for each interpreter instead of a ceiling on the whole process: an interpreter that goes over has its running calls cancelled with `memory limit exceeded`, and no other interpreter is affected ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#memory-limit))
-- Apply the call-depth limit to `CallFunction`, `CallMethod` and `CreateInstance`, so runaway recursion from a host call is an error rather than a Go stack overflow
-- Run `requests.parallel` with a fixed pool of `max_parallel` workers instead of a goroutine per request, and stream files into zip and tar archives instead of reading each one into memory first
-- Build the results of `scriptling.grep`, `scriptling.sed`, `scriptling.find`, `os.listdir` and `csv.loads` under the interpreter's limits as they are gathered, so a call whose result would not fit stops with `MemoryError` instead of materialising it first
-- Refuse `json.dumps` of a value nested more than 10,000 levels deep with `MemoryError`, as parsing already did, instead of risking the Go stack
-- Force at most one garbage collection every 100 ms for an interpreter that keeps going over its memory limit within a call, so a script catching `MemoryError` in a loop cannot keep the process collecting
+- **Breaking:** apply `scriptling.SetMemoryLimit` to each interpreter separately instead of the whole process ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#memory-limit))
+- Apply the call-depth limit to `CallFunction`, `CallMethod` and `CreateInstance`
+- Run `requests.parallel` on a fixed pool of `max_parallel` workers
+- Stream files into zip and tar archives instead of reading each into memory
+- Build `scriptling.grep`, `scriptling.sed`, `scriptling.find`, `os.listdir` and `csv.loads` results under the interpreter's limits
+- Refuse `json.dumps` of a value nested more than 10,000 levels deep
+- Force at most one garbage collection per 100 ms for an interpreter over its memory limit
 
 
 **added**
 
-- Add per-interpreter memory and value limits, both off unless set, and the `MemoryError` exception raised when an operation would create a value larger than the interpreter allows. Set them for the process (`SetMemoryLimit`, `SetMaxValueBytes`), when an interpreter is created (`scriptling.New` now takes options: `WithMemoryLimit`, `WithMaxValueBytes`; every existing `New()` call compiles unchanged) or later (`p.SetMemoryLimit` and the like). Sandboxes and background tasks share their parent's limits and budget, and clones keep their parent's settings ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#script-resource-limits))
-- Add `p.ResourceUsage()`, reporting an interpreter's estimated memory, peak, total allocated and memory-limit cancellations, and `p.ShareResourceGuard()` to run several interpreters under one set of limits
-- Add `--memory-limit` and `--max-value-bytes` CLI options (`limits.*` in `scriptling.toml`) ([docs](https://scriptling.dev/okf/scriptling-docs/cli/command-line-options.md))
-- Add `object.CheckAlloc`, `object.ReadAllLimited` and `object.ReadFileLimited` for libraries that create values sized by script input
+- Add per-interpreter memory and value limits, off unless set, and the `MemoryError` exception ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#script-resource-limits))
+- Add `WithMemoryLimit` and `WithMaxValueBytes` options to `scriptling.New`, and `p.SetMemoryLimit` and `p.SetMaxValueBytes`
+- Add `p.ResourceUsage()` and `p.ShareResourceGuard()`
+- Add `--memory-limit` and `--max-value-bytes` CLI options and `limits.*` in `scriptling.toml` ([docs](https://scriptling.dev/okf/scriptling-docs/cli/command-line-options.md))
+- Add `object` helpers for libraries that create values from script input: `CheckAlloc`, `CheckElements`, `CheckRoom`, `CheckValue`, `TrackSlice`, `TrackMap`, `ReadAllLimited`, `ReadFileLimited`, `BindGuard`, `CurrentGuard` and `RunFromContext` ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#value-limit))
 
 
 **removed**
 
-- **Breaking:** remove `scriptling.GetMemoryLimitStats`, `MemoryLimitStats` and `DefaultMemoryLimitCheckInterval`; use `p.ResourceUsage()` ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#memory-limit))
+- **Breaking:** remove `scriptling.GetMemoryLimitStats`, `MemoryLimitStats` and `DefaultMemoryLimitCheckInterval`; use `p.ResourceUsage()`
 
 
 **fixed**
 
-- Fix comprehensions over a huge `range`, and `f(*iterator)` with a long iterator, ignoring timeouts and allocating their whole result before the first element
+- Fix comprehensions over a huge `range` and `f(*iterator)` ignoring timeouts and allocating their whole result up front
 - Fix `secrets.randbits(k)` for k over 63 returning a truncated value; it now raises `OverflowError`
-- Fix `str.expandtabs(0)` dividing by zero; a tab size of zero or less now removes tabs, as in Python
-- Fix a huge padding or format width, such as `"x".ljust(10**12)` or `"%010000000000d" % 1`, attempting the allocation; like a repetition it is capped at 1 GiB and raises `MemoryError`
-- Fix the CLI server occasionally starting, with its error lost, when the setup script fails at the moment the server is signalled to start
-- Fix the CLI server resetting its runtime state while a WebSocket handler from the previous server was still running
+- Fix `str.expandtabs(0)` dividing by zero
+- Fix a huge padding or format width, such as `"x".ljust(10**12)`, attempting the allocation; it now raises `MemoryError`
+- Fix `requests.parallel` returning an error object instead of a status 0 `Response` for a request that failed before it was sent
+- Fix the call-depth counter staying incremented after a call refused for exceeding the limit
+- Fix the CLI server starting with its error lost when the setup script fails as the server is signalled to start
+- Fix the CLI server resetting its runtime while a previous server's WebSocket handler was still running
 
 
 ---
