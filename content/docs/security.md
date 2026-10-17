@@ -268,9 +268,9 @@ Both are off until set, so set them for untrusted code, along with a timeout:
 
 1. **Memory limit**: cancels the interpreter's running calls when the
    estimated memory it holds stays over the limit after a garbage collection.
-   Within a call, an interpreter that keeps going over forces at most one
-   collection every 100 ms, so a script catching `MemoryError` in a loop
-   cannot stall the process.
+   An interpreter that keeps going over, within a call or between calls,
+   forces at most one collection every 100 ms, so a script catching
+   `MemoryError` in a loop cannot stall the process.
 2. **Value limit**: a single string, bytes value, list, tuple, dict, set,
    read body or captured output larger than the limit raises `MemoryError`.
 3. **Recursion depth** is limited to 1000 calls, including calls from Go

@@ -39,7 +39,7 @@
       {{ end }}
 
       <!-- Main content -->
-      <main class="flex-1 min-w-0">
+      <main class="flex-1 min-w-0{{ if .Params.nowrap_table_first_col }} table-first-col-nowrap{{ end }}">
         <div class="py-6">
           <div class="px-4 sm:px-6 lg:px-8">
             {{ block "main" . }}{{ end }}
