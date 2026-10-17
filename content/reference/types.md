@@ -344,16 +344,17 @@ if value is None:
 ## Type Checking
 
 ```python
-# type() function returns type name as string
-type(42)        # "INTEGER"
-type(3.14)      # "FLOAT"
-type("hello")   # "STRING"
-type([1, 2])    # "LIST"
-type({"a": 1})  # "DICT"
-type(True)      # "BOOLEAN"
-type(None)      # "NULL"
-type((1, 2))    # "TUPLE"
-type(math.array([1.0]))  # "FLOAT_ARRAY"
+# type() returns the type name as a string, as Python's type(x).__name__
+type(42)        # "int"
+type(3.14)      # "float"
+type("hello")   # "str"
+type([1, 2])    # "list"
+type({"a": 1})  # "dict"
+type(True)      # "bool"
+type(None)      # "NoneType"
+type((1, 2))    # "tuple"
+type(math.array([1.0]))  # "FloatArray"
+type(42) == int # True
 
 # isinstance() checks type
 isinstance(42, "int")       # True
@@ -362,7 +363,7 @@ isinstance([1, 2], "list")  # True
 
 # .type() method on any object
 x = 42
-x.type()  # "INTEGER"
+x.type()  # "int"
 ```
 
 ## Type Conversion

@@ -16,6 +16,24 @@ type: Guide
 
 ## October 2026
 
+### v0.32.0
+
+
+**breaking**
+
+- Return Python's type names from `type(x)` and `x.type()`: `"int"`, `"str"`, `"bool"`, `"NoneType"`, `"list"`, `"dict"`, `"bytes"`, `"function"`, `"method"`, `"builtin_function_or_method"`, `"module"`, `"type"`, `"FloatArray"`, and for iterators `"range"`, `"map"`, `"filter"`, `"zip"`, `"enumerate"`, `"list_iterator"`, `"count"` and so on. The old names (`"INTEGER"`, `"STRING"`, `"NULL"`, `"ITERATOR"`, ...) no longer match, so `type(x) == "INTEGER"` is now `False`; compare with `int`, `"int"` or `isinstance()` instead ([docs](https://scriptling.dev/okf/scriptling-reference/builtins.md#type))
+- Match `isinstance()` type-name strings exactly as `type()` reports them: `isinstance(x, "int")` and `isinstance(None, "NoneType")` work, but `"INTEGER"`, `"Int"`, `"None"` and a class name in the wrong case no longer match
+
+
+**fixed**
+
+- Fix `type(x).__name__` returning scriptling's upper-case name (`"INTEGER"`) instead of Python's (`"int"`)
+- Fix `type()` reporting a module as `"DICT"`, a class and `type(int)` as `"CLASS"`/`"BUILTIN"` instead of `"type"`, and a bound method as `"FUNCTION"` instead of `"method"`
+- Fix `"INTEGER" == int` and `"STR" == str` comparing equal
+
+
+---
+
 ### v0.31.0
 
 

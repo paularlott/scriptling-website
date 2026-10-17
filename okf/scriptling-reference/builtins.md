@@ -272,18 +272,29 @@ dict()  # {}
 
 ### type()
 
-Get the type name as a string:
+Get the type's name as a string, spelled as Python's `type(x).__name__`:
 
 ```python
-type(42)        # "INTEGER"
-type(3.14)      # "FLOAT"
-type("hello")   # "STRING"
-type([1, 2])    # "LIST"
-type({"a": 1})  # "DICT"
-type(True)      # "BOOLEAN"
-type(None)      # "NULL"
-type((1, 2))    # "TUPLE"
+type(42)        # "int"
+type(3.14)      # "float"
+type("hello")   # "str"
+type([1, 2])    # "list"
+type({"a": 1})  # "dict"
+type(True)      # "bool"
+type(None)      # "NoneType"
+type((1, 2))    # "tuple"
+type(range(3))  # "range"
+type(len)       # "builtin_function_or_method"
+
+type(42) == int           # True
+type(42).__name__         # "int"
 ```
+
+A class instance gives its class name, and an exception gives the class it
+was raised as (`"ValueError"`).
+
+Before 0.32.0, `type()` returned scriptling's own names (`"INTEGER"`,
+`"STRING"`, `"NULL"`, `"ITERATOR"`, ...); those names no longer match.
 
 ### .type() Method
 
@@ -291,10 +302,10 @@ All objects support the `.type()` method:
 
 ```python
 x = 42
-x.type()  # "INTEGER"
+x.type()  # "int"
 
 y = "hello"
-y.type()  # "STRING"
+y.type()  # "str"
 ```
 
 ### isinstance()
