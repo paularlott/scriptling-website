@@ -30,6 +30,8 @@ Encodes a Scriptling value to TOON format.
 
 **Returns:** `str`: TOON-formatted string.
 
+**Raises:** `RecursionError`: if `data` nests more than 10,000 levels deep. The value would otherwise be cut short and the output silently corrupt.
+
 ```python
 import scriptling.toon as toon
 
@@ -92,6 +94,8 @@ Encodes data to TOON format with a custom indentation width and array delimiter.
 - `delimiter` (`str`): Delimiter for arrays and tabular data.
 
 **Returns:** `str`: TOON-formatted string.
+
+**Raises:** `RecursionError`: if `data` nests more than 10,000 levels deep. The value would otherwise be cut short and the output silently corrupt.
 
 ```python
 import scriptling.toon as toon

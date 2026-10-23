@@ -44,6 +44,8 @@ Parse an XML string into a nested dict using the dict-based representation.
 
 **Returns:** `dict`: nested dict representing the XML document.
 
+**Raises:** an error if the XML is malformed, or if elements nest more than 1,000 levels deep. The depth cap keeps a hostile document from exhausting the stack, which would otherwise end the whole process rather than raise.
+
 ```python
 import scriptling.xml as xml
 
@@ -73,6 +75,8 @@ Format a dict back into an XML string. The dict should have a single root key wh
 - `indent` (`str`, keyword-only): Indentation string. Default: `""` (compact).
 
 **Returns:** `str`: XML-formatted text.
+
+**Raises:** an error if `data` nests more than 1,000 levels deep (including nested lists, or a dict that contains itself).
 
 ```python
 import scriptling.xml as xml

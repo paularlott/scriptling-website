@@ -122,7 +122,7 @@ Creates a gossip cluster node.
 - `fan_out_multiplier` (`float`, optional): Fan-out scaling factor. Default: `1.0`.
 - `ttl_multiplier` (`float`, optional): TTL scaling factor. Default: `1.0`.
 - `state_exchange_multiplier` (`float`, optional): State exchange scaling. Default: `0.8`.
-- `force_reliable_transport` (`bool`, optional): Force TCP for all messages. Default: `False`.
+- `force_reliable_transport` (`bool`, optional): Force TCP for all messages. Default: `False`; always on under a network policy.
 - `prefer_ipv6` (`bool`, optional): Prefer IPv6 for DNS resolution. Default: `False`.
 - `node_cleanup_interval` (`str`, optional): Dead node cleanup interval. Default: `"20s"`.
 - `node_retention_time` (`str`, optional): How long to keep dead nodes. Default: `"1h"`.
@@ -557,7 +557,7 @@ Deletes a metadata key.
 
 This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.net.gossip` opens raw UDP/TCP sockets to bind, join, and exchange traffic with other cluster nodes, and can both send and receive arbitrary script-supplied payloads over the network. The library itself does not restrict which hosts or ports a script can bind to or contact: that is the embedder's responsibility, typically enforced with OS-level firewalling, network namespacing, or by controlling which addresses are reachable from the process. It is also not wired to `--network-policy`, so a configured policy does not constrain the peers `join()` contacts. Use `encryption_key` and `bearer_token` to protect traffic and authenticate peers when running across untrusted networks. See [Security Considerations](https://scriptling.dev/okf/scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
+`scriptling.net.gossip` opens raw UDP/TCP sockets to bind, join, and exchange traffic with other cluster nodes, and can both send and receive arbitrary script-supplied payloads over the network. Under a [network policy](https://scriptling.dev/okf/scriptling-docs/cli/network-policy.md) every outbound connection a cluster makes is checked — to the peers `join()` names and to peers learned from the cluster — on both the socket and http transports, and all traffic is carried over TCP (UDP datagrams are not used). Peers given by IP face the address rules (`allow_cidrs`, `deny_cidrs`, and the loopback/private/link-local categories) rather than the URL IP-literal rule: grant a private cluster with, for example, `allow_cidrs = ["10.20.0.0/16"]`. With `allow_hosts` set, peers are limited to the listed names, and a peer given by IP must be granted by `allow_cidrs` or `allow_ip_literals`, as a URL host would be. Which address and port a node binds to is not restricted by the policy; without a policy nothing is restricted, so use OS-level firewalling or network namespacing where that matters. Use `encryption_key` and `bearer_token` to protect traffic and authenticate peers when running across untrusted networks. See [Security Considerations](https://scriptling.dev/okf/scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
 
 ## Examples
 

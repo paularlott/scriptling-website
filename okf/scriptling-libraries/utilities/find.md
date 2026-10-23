@@ -51,7 +51,7 @@ If `path` is a single file, it is checked directly against the filters and retur
 
 **Returns:** `list[str]`: matching paths.
 
-**Raises:** `Error`: if `path` is outside the allowed paths (see [Security Considerations](#security-considerations)).
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths (see [Security Considerations](#security-considerations)).
 
 ```python
 import scriptling.find as find
@@ -104,7 +104,7 @@ Each entry dict has the keys:
 
 **Returns:** `list[dict]`: one dict per match.
 
-**Raises:** `Error`: if `path` is outside the allowed paths.
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths.
 
 ```python
 import scriptling.find as find

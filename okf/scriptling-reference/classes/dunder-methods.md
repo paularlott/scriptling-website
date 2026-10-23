@@ -127,7 +127,37 @@ class Vec:
 v = Vec(1, 2) + Vec(3, 4)  # Vec(4, 6)
 ```
 
-Supported: `__add__`, `__sub__`, `__mul__`, `__truediv__`, `__floordiv__`, `__mod__`.
+Supported: `__add__`, `__sub__`, `__mul__`, `__truediv__`, `__floordiv__`, `__mod__`, `__or__`, `__and__`.
+
+As in Python, the right operand handles an operator its left operand does not
+through the reflected method (`__radd__`, `__rsub__`, `__rmul__`,
+`__rtruediv__`, `__rfloordiv__`, `__rmod__`, `__ror__`, `__rand__`), so
+`2 * v` calls `v.__rmul__(2)`. An augmented assignment such as `v += w` calls
+the in-place method (`__iadd__`, `__isub__`, `__imul__`, `__itruediv__`,
+`__ifloordiv__`, `__imod__`, `__ior__`, `__iand__`) when the class defines it
+and assigns what it returns, usually `self`; otherwise it is `v = v + w`.
+
+```python
+class Bag:
+    def __init__(self):
+        self.items = []
+
+    def __iadd__(self, item):
+        self.items.append(item)
+        return self
+
+    def __rmul__(self, n):
+        return [self] * n
+
+b = Bag()
+b += "apple"        # b.items is ["apple"], b is still the same object
+pair = 2 * b        # Bag.__rmul__(b, 2)
+```
+
+## `__reversed__`
+
+`reversed(obj)` calls `obj.__reversed__()` when the class defines it, which
+returns an iterator.
 
 ## `__enter__` and `__exit__`
 

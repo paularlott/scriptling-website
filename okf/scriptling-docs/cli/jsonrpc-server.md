@@ -62,6 +62,9 @@ scriptling --server :8000 --json-rpc --mcp-tools ./tools setup.py
 | `--libpath`       | `SCRIPTLING_LIBPATH`       | Extra library search directories     | none       |
 | `--package`       | -                          | Load libraries from a package (zip)  | none       |
 | `--plugin-dir`    | `SCRIPTLING_PLUGIN_DIR`    | Load plugin libraries                | none       |
+| `--json-rpc-max-batch` | `SCRIPTLING_JSONRPC_MAX_BATCH` | Maximum elements in one batch (negative = unlimited) | 1000 |
+| `--json-rpc-concurrency` | `SCRIPTLING_JSONRPC_CONCURRENCY` | Maximum handlers running at once (negative = unlimited) | 4 × CPUs |
+| `--json-rpc-cors-origin` | `SCRIPTLING_JSONRPC_CORS_ORIGIN` | Browser origin allowed to call `/json-rpc` cross-origin (repeatable, `*` for any) | same-origin |
 
 `--json-rpc` selects one transport. Without `--server` it uses stdio; with
 `--server` it mounts HTTP JSON-RPC at `/json-rpc`.
@@ -73,6 +76,20 @@ Over HTTP, the script middleware registered with
 use it for token or per-user key authentication (see
 [Per-User Keys](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md#per-user-keys)). Without a middleware, a
 `--bearer-token` guards the endpoint instead.
+
+HTTP `/json-rpc` is same-origin by default. A browser request from another
+origin is refused with `403` before any middleware or handler runs, so a page
+on another site cannot make a visitor's browser call your methods (a
+`text/plain` POST needs no preflight, so CORS headers alone would not stop the
+call). Clients that send no `Origin` header — curl, other servers, scriptling
+plugin clients — are unaffected. To serve a browser app on another origin,
+allowlist it with `--json-rpc-cors-origin https://app.example.com`
+(repeatable, or `*` for any): its preflight is answered and its responses
+carry `Access-Control-Allow-Origin`. The list replaces the same-origin
+default, so if pages the server serves itself also call `/json-rpc`, list the
+server's own origin too. With `--bearer-token`, the preflight is
+answered without the token, as browsers never send it there; the request
+itself still needs it.
 
 ## Registering Handlers
 
@@ -193,6 +210,20 @@ curl -i -X POST http://127.0.0.1:8000/json-rpc \
 Each request is dispatched on its own goroutine with a fresh Scriptling
 evaluator, mirroring `runtime.http`, MCP, and WebSocket serving. Two slow
 handlers running back-to-back finish in roughly one handler's time, not the sum.
+
+Two limits keep one client from exhausting the server, over both stdio and
+HTTP:
+
+- **Batch size.** A batch of more than 1000 elements is refused before any of
+  it runs, with a single Invalid Request error (`-32600`, "batch too large: N
+  elements exceeds the limit of 1000"). Change it with `--json-rpc-max-batch`.
+- **Concurrent handlers.** At most 4 × the CPU count of handlers run at once,
+  shared across every batch, request and stream. Further calls wait for a
+  free slot rather than failing, so every call is still answered; a call whose
+  request is cancelled while it waits fails with "server busy". Change it with
+  `--json-rpc-concurrency`.
+
+Set either to a negative value (`--json-rpc-concurrency=-1`) to remove it.
 
 Handlers cannot share in-memory state across requests. To coordinate between
 requests, use `runtime.kv` (with `--kv-storage` for persistence) or the

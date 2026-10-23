@@ -114,7 +114,7 @@ List directory contents.
 
 **Returns:** `list`: entry names in the directory.
 
-**Raises:** `Error`: if `path` is outside the allowed paths, or cannot be read.
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths; `Error` if it cannot be read.
 
 ```python
 import os
@@ -138,7 +138,7 @@ data.
 
 **Returns:** `str`: the file's contents.
 
-**Raises:** `Error`: if `path` is outside the allowed paths, or the file cannot be read.
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths; `Error` if the file cannot be read.
 
 ```python
 import os
@@ -158,7 +158,7 @@ images, hashes, and any other non-text data.
 
 **Returns:** `bytes`: the file's raw contents.
 
-**Raises:** `Error`: if `path` is outside the allowed paths, or the file cannot be read.
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths; `Error` if the file cannot be read.
 
 ```python
 import os, msgpack
@@ -183,7 +183,7 @@ garbage-collected — the same behaviour as Python's bare `open()` without
 
 **Returns:** An iterator yielding `str`, one per line.
 
-**Raises:** `Error`: if `path` is outside the allowed paths, or the file cannot be opened.
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths; `Error` if the file cannot be opened.
 
 ```python
 import os
@@ -210,7 +210,7 @@ encoded) or [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-forma
 
 **Returns:** `None`
 
-**Raises:** `Error`: if `path` is outside the allowed paths, or the file cannot be written.
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths; `Error` if the file cannot be written.
 
 ```python
 import os
@@ -232,7 +232,7 @@ or [`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.
 
 **Returns:** `None`
 
-**Raises:** `Error`: if `path` is outside the allowed paths, or the file cannot be written.
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths; `Error` if the file cannot be written.
 
 ```python
 import os
@@ -249,7 +249,7 @@ Remove a file.
 
 **Returns:** `None`
 
-**Raises:** `Error`: if `path` is outside the allowed paths, or the file cannot be removed.
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths; `Error` if the file cannot be removed.
 
 ```python
 import os
@@ -267,7 +267,7 @@ Change the permissions of a file or directory.
 
 **Returns:** `None`
 
-**Raises:** `Error`: if `path` is outside the allowed paths.
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths.
 
 ```python
 import os
@@ -285,7 +285,7 @@ Create a directory.
 
 **Returns:** `None`
 
-**Raises:** `Error`: if `path` is outside the allowed paths, or the directory cannot be created.
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths; `Error` if the directory cannot be created.
 
 ```python
 import os
@@ -304,7 +304,7 @@ Create directories recursively, creating all parent directories as needed.
 
 **Returns:** `None`
 
-**Raises:** `Error`: if `path` is outside the allowed paths, or the directory already exists and `exist_ok` is `False`.
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths; `Error` if the directory already exists and `exist_ok` is `False`.
 
 ```python
 import os
@@ -321,7 +321,7 @@ Remove an empty directory.
 
 **Returns:** `None`
 
-**Raises:** `Error`: if `path` is outside the allowed paths, or the directory is not empty.
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths; `Error` if the directory is not empty.
 
 ```python
 import os
@@ -338,7 +338,7 @@ Remove an empty directory, then remove empty parent directories until a parent c
 
 **Returns:** `None`
 
-**Raises:** `Error`: if `name` is outside the allowed paths.
+**Raises:** `PermissionError`, which the script cannot catch, if `name` is outside the allowed paths.
 
 ```python
 import os
@@ -356,7 +356,7 @@ Rename a file or directory.
 
 **Returns:** `None`
 
-**Raises:** `Error`: if either path is outside the allowed paths.
+**Raises:** `PermissionError`, which the script cannot catch, if either path is outside the allowed paths.
 
 ```python
 import os
@@ -366,13 +366,15 @@ os.rename("/tmp/old.txt", "/tmp/new.txt")
 
 ### `symlink(src, dst)`
 
-Create a symbolic link named `dst` that points to `src`. If `dst` already exists, an error is raised. The destination must be within the allowed paths configured at registration.
+Create a symbolic link named `dst` that points to `src`. If `dst` already exists, an error is raised. Under allowed paths both ends are checked: `dst` must lie within them, and so must the target, with a relative `src` resolved from the directory `dst` is in, as the kernel resolves it. A link cannot be used to reach a file outside the allowed paths.
 
 **Parameters:**
 - `src` (`str`): The target the symlink points to (may be relative or absolute).
 - `dst` (`str`): The path where the symlink is created.
 
 **Returns:** `None`
+
+**Raises:** `PermissionError`, which the script cannot catch, if `dst` or the target it would point to is outside the allowed paths; `Error` if `dst` already exists.
 
 ```python
 import os

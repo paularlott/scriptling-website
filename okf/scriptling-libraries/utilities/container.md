@@ -50,7 +50,7 @@ Docker and Podman endpoints are configured via the `--docker-host` / `--podman-h
 
 ### `runtimes()`
 
-Returns the names of container runtimes that are currently installed and running on this system.
+Returns the container runtimes `Client()` can use: `"docker"` and `"podman"` when their configured endpoint (`--docker-host` / `--podman-host`, or the default socket) answers, and `"apple"` when the Apple `container` CLI is installed at `/usr/local/bin/container`. Nothing is run to find out.
 
 **Returns:** `list` of `str`: subset of `["docker", "podman", "apple"]`.
 
@@ -67,7 +67,7 @@ Creates a `ContainerClient` for the specified runtime.
 
 **Parameters:**
 - `driver` (`str`): Runtime to use: `"docker"`, `"podman"`, or `"apple"`.
-- `socket` (`str`, optional): Override the endpoint. Accepts a Unix socket path, `unix://` URI, `tcp://` address, or `https://` address (Docker/Podman only). Default: `""`: uses the `DOCKER_SOCK` / `PODMAN_SOCK` environment variables, then the built-in defaults.
+- `socket` (`str`, optional): Override the endpoint. Accepts a Unix socket path, `unix://` URI, `tcp://` address, or `https://` address (Docker/Podman only). Default: `""`: uses the `DOCKER_SOCK` / `PODMAN_SOCK` environment variables, then the built-in defaults. A TCP or HTTPS endpoint must not contain a query string or fragment.
 
 **Returns:** `ContainerClient`: a client bound to the chosen runtime.
 
@@ -219,12 +219,14 @@ Creates and starts a container.
 - `name` (`str`, optional): Container name. Default: `""`.
 - `ports` (`list`, optional): Port mappings, e.g. `["8080:80"]`. Default: `None`.
 - `env` (`list`, optional): Environment variables, e.g. `["KEY=value"]`. Default: `None`.
-- `volumes` (`list`, optional): Volume mounts, e.g. `["mydata:/data"]`. Default: `None`.
+- `volumes` (`list`, optional): Volume mounts, e.g. `["mydata:/data"]` or a host bind such as `["/srv/app:/app:ro"]`. Under `--allowed-paths`, a host path must lie within the allowed directories (symlinks are resolved first). Default: `None`.
 - `command` (`list`, optional): Override command, e.g. `["/bin/sh", "-c", "echo hi"]`. Default: `None`.
-- `network` (`str`, optional): Network name. Default: `""`.
-- `privileged` (`bool`, optional): Run privileged. Default: `False`.
+- `network` (`str`, optional): Network name. `"host"` is refused under a network policy. Default: `""`.
+- `privileged` (`bool`, optional): Run privileged. Refused when the host denies privileged containers (`--container-deny-privileged`). Default: `False`.
 
 **Returns:** `str`: the new container's ID.
+
+**Raises:** `PermissionError` (which scripts cannot catch, like other jail denials): if a bind mount names a host path outside `--allowed-paths`, `network="host"` is used under a network policy, or `privileged=True` is used where the host denies it.
 
 ```python
 id = c.run(
@@ -384,7 +386,24 @@ c.image_remove("ubuntu:24.04")
 
 This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.container` controls Docker/Podman containers over the socket paths passed to `Register(p, dockerSock, podmanSock)`, effectively granting the ability to run arbitrary containers and images on the host: this is a significant risk, on par with direct process execution. Never register this library for untrusted code. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
+`scriptling.container` controls Docker/Podman containers over the socket paths passed to `Register(p, dockerSock, podmanSock)`, effectively granting the ability to run arbitrary containers and images on the host: this is a significant risk, on par with direct process execution. Never register this library for untrusted code.
+
+The host's configured endpoints (the CLI's `--docker-host` / `--podman-host`, or the defaults) are trusted. An endpoint a script passes as `socket=` is checked: a TCP or HTTPS endpoint must pass the [network policy](https://scriptling.dev/okf/scriptling-docs/cli/network-policy.md), and a Unix socket path must lie within `--allowed-paths` (symlinks are resolved first). `run()` applies the same restrictions to what it gives a container: under `--allowed-paths`, every bind mount's host path must lie within the allowed directories (named and anonymous volumes are unaffected), and under a network policy `network="host"` is refused, since it would give the container the host's loopback services. Privileged containers are allowed by default; a privileged container can reach every host device and disk, so pass `--container-deny-privileged` (env `SCRIPTLING_CONTAINER_DENY_PRIVILEGED`, config `container.deny_privileged`) where scripts must not control the host. With Apple Containers, script-supplied names, IDs and images are always passed to the `container` CLI as arguments, never as options. The CLI is run from `/usr/local/bin/container`, where Apple's installer puts it, and never looked up on `PATH`, where a script able to write to a `PATH` directory could plant its own. Like the Docker and Podman endpoints it is the operator's, so the Apple driver works under `--no-subprocess` too.
+
+Go hosts configure all of this with `RegisterWithOptions`:
+
+```go
+container.RegisterWithOptions(p, container.Options{
+    DockerSock:     dockerSock,                               // "" = default
+    PodmanSock:     podmanSock,                               // "" = default
+    Paths:          fssecurity.Config{AllowedPaths: paths},   // jail for socket= and bind mounts
+    Policy:         policy,                                   // network policy for socket= and network="host"
+    DenyPrivileged: true,                                     // refuse run(privileged=True); false (default) allows it
+    AppleCLI:       "/usr/local/bin/container",               // the Apple CLI's absolute path ("" = this default)
+})
+```
+
+`container.RegisterConfigured(p, dockerSock, podmanSock, fssecurity.Config{AllowedPaths: paths}, policy)` is the same with privileged containers allowed. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 
 ## See Also
 

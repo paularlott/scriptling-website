@@ -30,6 +30,7 @@ Give these options before the script file: everything after it is passed to the 
 | `--program-cache-max-bytes` | `SCRIPTLING_PROGRAM_CACHE_MAX_BYTES` | `cache.program_max_bytes` | Memory budget for parsed scripts kept in memory (bytes; 0 = default, negative = unlimited) | 64 MiB |
 | `--memory-limit` | `SCRIPTLING_MEMORY_LIMIT` | `limits.memory_bytes` | Estimated memory each interpreter may hold (bytes; 0 = no limit) | 0 |
 | `--max-value-bytes` | `SCRIPTLING_MAX_VALUE_BYTES` | `limits.max_value_bytes` | Largest single string, bytes value or container (list, tuple, dict, set) one operation may create (bytes; 0 = no limit). Separate from the fixed 1 GiB cap on a single repetition or padding width, which always applies | 0 |
+| `--max-background-tasks` | `SCRIPTLING_MAX_BACKGROUND_TASKS` | `limits.max_background_tasks` | Most `runtime.background` tasks each interpreter may have queued or running at once; one more raises `RuntimeError` (0 = no limit) | 0 |
 | `-L`, `--libpath`     | `SCRIPTLING_LIBPATH`       | `libpath`                    | Extra library search directory (repeatable)          | (none)           |
 | `--plugin-dir`       | `SCRIPTLING_PLUGIN_DIR`    | `plugins.dirs`               | Plugin executable directory (repeatable)             | (none)           |
 | `--plugin`           | `SCRIPTLING_PLUGIN`        | `plugins.paths`              | Plugin executable to load, path taken literally (repeatable) | (none) |
@@ -43,18 +44,24 @@ Give these options before the script file: everything after it is passed to the 
 | `--web-root`          | `SCRIPTLING_WEB_ROOT`      | `server.web_root`            | Directory to serve static files from                 | (disabled)       |
 | `--json-rpc`          | `SCRIPTLING_JSONRPC`       | -                            | JSON-RPC server mode: stdio by default, HTTP `/json-rpc` with `--server` | false            |
 | `--mcp-tools`         | `SCRIPTLING_MCP_TOOLS`     | `mcp.tools`                  | Directory containing MCP tools                       | (disabled)       |
-| `--mcp-exec-script`   | `SCRIPTLING_MCP_EXEC_SCRIPT` | `mcp.exec_script`          | Enable MCP script execution tool                     | false            |
+| `--mcp-exec-script`   | `SCRIPTLING_MCP_EXEC_SCRIPT` | `mcp.exec_script`          | Enable MCP script execution tool; over HTTP requires `--bearer-token` | false            |
 | `--mcp-resources`     | `SCRIPTLING_MCP_RESOURCES` | `mcp.resources`              | Directory containing MCP resources                   | (disabled)       |
 | `--mcp-prompts`       | `SCRIPTLING_MCP_PROMPTS`   | `mcp.prompts`                | Directory containing MCP prompts                     | (disabled)       |
 | `--bearer-token`      | `SCRIPTLING_BEARER_TOKEN`  | `server.bearer_token`        | Bearer token for authentication                      | none             |
 | `--max-request-body`  | `SCRIPTLING_MAX_REQUEST_BODY` | `server.max_request_body` | Maximum HTTP request body in bytes (0 = 32MiB, negative = unlimited) | 0 (32MiB)        |
+| `--json-rpc-max-batch` | `SCRIPTLING_JSONRPC_MAX_BATCH` | `server.json_rpc_max_batch` | Maximum elements in one JSON-RPC batch; a larger batch gets one Invalid Request error (0 = 1000, negative = unlimited, e.g. `--json-rpc-max-batch=-1`) | 0 (1000) |
+| `--json-rpc-concurrency` | `SCRIPTLING_JSONRPC_CONCURRENCY` | `server.json_rpc_concurrency` | Maximum JSON-RPC handlers running at once across all batches, requests and streams (0 = 4 × CPUs, negative = unlimited) | 0 (4 × CPUs) |
 | `--websocket-origin`  | `SCRIPTLING_WEBSOCKET_ORIGIN` | `server.websocket_origins` | Allowed browser origin for WebSocket upgrades (repeatable, `*` for any) | same-origin      |
 | `--mcp-cors-origin`   | `SCRIPTLING_MCP_CORS_ORIGIN` | `server.mcp_cors_origins`  | Allowed browser origin for cross-origin MCP requests on `/mcp` (repeatable, `*` for any) | same-origin      |
+| `--json-rpc-cors-origin` | `SCRIPTLING_JSONRPC_CORS_ORIGIN` | `server.json_rpc_cors_origins` | Allowed browser origin for cross-origin requests to `/json-rpc` (repeatable, `*` for any); other origins get `403` | same-origin |
+| `--allowed-hosts`     | `SCRIPTLING_ALLOWED_HOSTS` | `server.allowed_hosts`     | Host name the HTTP server answers (repeatable; `.example.com` or `*.example.com` for a domain and its subdomains; a port is ignored). A loopback-bound server answers only loopback names plus these. Any other bind answers every `Host` until this is set; then it answers loopback names, IP addresses, its own host name and these, and refuses the rest with `421`, blocking DNS rebinding | loopback binds: loopback names only; other binds: every `Host` |
 | `--allowed-paths`     | `SCRIPTLING_ALLOWED_PATHS` | `security.allowed_paths`     | Restrict participating library filesystem I/O; `-` denies it entirely | (no restriction) |
 | `--network-policy`    | `SCRIPTLING_NETWORK_POLICY`| `security.network_policy`    | TOML network policy file for script outbound access  | (no restriction) |
 | `--disable-lib`       | `SCRIPTLING_DISABLE_LIB`   | `security.disable_libs`      | Disable a built-in library by name (repeatable)      | (none)           |
+| `--no-subprocess`   | `SCRIPTLING_NO_SUBPROCESS` | `security.no_subprocess`     | Same as `--disable-lib subprocess`: removes the `subprocess` library and refuses stdio MCP servers in `scriptling.mcp` and script-driven executable `scriptling.plugin.load()`; applies to every command, `help` included | false |
 | `--list-libs`         | -                          | -                            | Print the CLI's current built-in inventory and exit  | -            |
 | `--kv-storage`        | `SCRIPTLING_KV_STORAGE`    | `kv.storage`                 | Directory for persistent KV store                    | (in-memory)      |
+| `--container-deny-privileged` | `SCRIPTLING_CONTAINER_DENY_PRIVILEGED` | `container.deny_privileged` | Refuse `scriptling.container` `run(privileged=True)` | false (allowed) |
 | `--docker-host`       | `DOCKER_HOST`              | `container.docker_host`      | Docker endpoint (socket path, tcp://, https://)      | `/var/run/docker.sock` |
 | `--podman-host`       | `CONTAINER_HOST`           | `container.podman_host`      | Podman endpoint (socket path or unix:// URI)         | `/var/run/podman.sock` |
 | `--secret-config`     | `SCRIPTLING_SECRET_CONFIG` | `secret.config`              | TOML file for secret provider aliases                | none             |
@@ -203,6 +210,11 @@ insecure = false
 level = "debug"
 format = "console" # console, json, or null
 
+[limits]
+memory_bytes = 268435456     # 0 = no limit
+max_value_bytes = 67108864   # 0 = no limit
+max_background_tasks = 100   # 0 = no limit
+
 [plugins]
 dirs = ["/usr/local/lib/scriptling/plugins"]
 paths = ["/usr/local/bin/knot"]
@@ -215,6 +227,10 @@ insecure = ["https://plugins.internal:8443"]
 address = ":8000"
 web_root = "./public"
 bearer_token = "secret"
+allowed_hosts = ["app.example.com", ".internal.example.com"]
+json_rpc_cors_origins = ["https://app.example.com"]
+json_rpc_max_batch = 0       # 0 = 1000, negative = unlimited
+json_rpc_concurrency = 0     # 0 = 4 x CPUs, negative = unlimited
 
 [mcp]
 tools = "./tools"
@@ -226,6 +242,7 @@ prompts = "./prompts"
 allowed_paths = "/tmp/data,./uploads"
 network_policy = "./network-policy.toml"
 disable_libs = ["subprocess", "os"]
+no_subprocess = false        # true is the same as listing "subprocess" in disable_libs
 
 [kv]
 storage = "/var/lib/scriptling/kv"
@@ -233,6 +250,7 @@ storage = "/var/lib/scriptling/kv"
 [container]
 docker_host = "unix:///Users/paul/.lima/docker/sock/docker.sock"
 podman_host = "unix:///run/user/1000/podman/podman.sock"
+deny_privileged = false   # true refuses run(privileged=True)
 
 [secret]
 config = "/etc/scriptling/secrets.toml"

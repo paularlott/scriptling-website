@@ -44,23 +44,20 @@ scriptling --server :8000 --mcp-tools ./tools setup.py
 ### With Script Execution Enabled
 
 ```bash
-# Enable script execution tool (allows AI to run code)
-scriptling --server :8000 --mcp-exec-script setup.py
+# Enable script execution tool (allows AI to run code); over HTTP it requires a bearer token
+scriptling --server 127.0.0.1:8000 --mcp-exec-script --bearer-token my-secret-token setup.py
 ```
 
 ### Combined Setup
 
 ```bash
-# Both custom tools and script execution
-scriptling --server :8000 --mcp-tools ./tools --mcp-exec-script setup.py
-
-# With authentication
-scriptling --server :8000 --mcp-tools ./tools --mcp-exec-script \
+# Both custom tools and script execution (the token is required)
+scriptling --server 127.0.0.1:8000 --mcp-tools ./tools --mcp-exec-script \
   --bearer-token my-secret-token setup.py
 
 # With filesystem restrictions
-scriptling --server :8000 --mcp-tools ./tools --mcp-exec-script \
-  --allowed-paths "/tmp/sandbox,./data" setup.py
+scriptling --server 127.0.0.1:8000 --mcp-tools ./tools --mcp-exec-script \
+  --bearer-token my-secret-token --allowed-paths "/tmp/sandbox,./data" setup.py
 ```
 
 ### Choosing the transport: HTTP vs stdio
@@ -131,8 +128,10 @@ The `--mcp-exec-script` flag enables a built-in MCP tool that allows AI assistan
 ### Enabling Script Execution
 
 ```bash
-scriptling --server :8000 --mcp-exec-script setup.py
+scriptling --server 127.0.0.1:8000 --mcp-exec-script --bearer-token my-secret-token setup.py
 ```
+
+Over HTTP the tool requires `--bearer-token`: without one the server refuses to start, because any web page the user visits can reach a server on their machine. Over stdio (no `--server`) no token is needed.
 
 ### Tool Details
 
@@ -401,18 +400,22 @@ Stdio MCP does not currently consume watcher events or send reload notifications
 
 ## Security Considerations
 
+### Browser Access and DNS Rebinding
+
+A local MCP server is reachable from any web page the user visits. A server bound to loopback (`--server 127.0.0.1:8000`, `[::1]` or `localhost`) checks the request's `Host` header on every endpoint and answers only loopback names, refusing the rest with `421 Misdirected Request`; that stops DNS rebinding (a page on an attacker's domain that re-points its name at your machine). A server bound to all interfaces (`--server :8000`) answers every `Host` until `--allowed-hosts` is set; once set it answers loopback names, IP addresses, the machine's own host name and the listed names only (see [HTTP Server](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md#authentication)). Bind to loopback unless the server must be reachable from elsewhere.
+
 ### Script Execution Tool
 
 The `--mcp-exec-script` flag allows AI assistants to execute arbitrary code. Consider:
 
 - Use `--allowed-paths` to restrict participating library filesystem I/O; it is not a complete sandbox
 - Use `--disable-lib subprocess` to remove shell access
-- Use `--bearer-token` to require authentication, or register script middleware for per-user keys (see [Per-User Keys](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md#per-user-keys)). The token wraps every endpoint including `/mcp` and the built-in `/health`; middleware guards `/mcp` and script routes but not the built-in `/health` or static routes (a route claiming `GET /health` replaces the built-in — see [Health Checks](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md#health-checks)).
+- Over HTTP, `--bearer-token` is required (the server refuses to start without it); add script middleware for per-user keys (see [Per-User Keys](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md#per-user-keys)). The token wraps every endpoint including `/mcp` and the built-in `/health`; middleware guards `/mcp` and script routes but not the built-in `/health` or static routes (a route claiming `GET /health` replaces the built-in — see [Health Checks](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md#health-checks)).
 - Run in a sandboxed environment for untrusted AI systems
 
 ```bash
 # Restricted configuration for script execution
-scriptling --server :8000 --mcp-exec-script \
+scriptling --server 127.0.0.1:8000 --mcp-exec-script \
   --allowed-paths "/tmp/sandbox" \
   --disable-lib subprocess \
   --bearer-token secure-token setup.py

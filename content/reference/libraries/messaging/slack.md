@@ -308,6 +308,8 @@ Sends a file to a channel or DM.
 
 **Returns:** `None`
 
+A local file must lie inside `--allowed-paths` (or the embedder's allowed paths); one outside them raises a `PermissionError` before it is read, which the script cannot catch. URLs and base64 data are not files and are unaffected.
+
 ```python
 slack.send_file(bot, "C1234567890", "/path/to/file.pdf", filename="document.pdf")
 
@@ -361,6 +363,8 @@ Downloads a file by its ID or URL.
 
 **Returns:** `str`: base64-encoded file data.
 
+The bot token is sent only to Slack's own hosts (`slack.com` and its subdomains); a URL on any other host is fetched without it. Under a network policy every request must pass the policy, Slack's own included.
+
 ```python
 def handle_file(ctx):
     data = slack.download(bot, ctx.file.url)
@@ -387,7 +391,7 @@ caps = slack.capabilities(bot)
 
 This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-This library sends and receives messages via the Slack API using the bot and app tokens that the script passes to `client()`. Go registration is `Register(p, logger)`: it supplies logging only and does not supply or retain credentials. The script, its configuration source, and anyone able to inspect that execution context may therefore have access to both tokens. Keep them out of source control and logs, inject them from an appropriate secret source, and restrict who can run or modify the script. An omitted or empty `allowed_users` list installs no default user restriction; provide an allowlist or a custom `auth()` handler for exposed bots. The Slack client is a separate networking surface and is not governed by the `requests` URL policy. Treat both tokens as secrets because anyone who obtains them can act as the bot in the workspace. See [Security Considerations](/docs/security/#network-security) for broader network guidance.
+This library sends and receives messages via the Slack API using the bot and app tokens that the script passes to `client()`. Go registration is `Register(p, logger, policy...)`, where the optional `*netsecurity.Config` is the network policy, or `RegisterConfigured(p, logger, allowedPaths, policy...)`, which also confines the local files `send_file()` reads to `allowedPaths`; neither supplies or retains credentials. The script, its configuration source, and anyone able to inspect that execution context may therefore have access to both tokens. Keep them out of source control and logs, inject them from an appropriate secret source, and restrict who can run or modify the script. An omitted or empty `allowed_users` list installs no default user restriction; provide an allowlist or a custom `auth()` handler for exposed bots. Under a [network policy](/docs/cli/network-policy/) every request and the socket-mode connection go through the policy, calls to Slack itself included, and raise a `network policy: …` error when denied: a script supplies the tokens, so Slack is an egress channel like any other host. Under a strict `allow_hosts`, list `slack.com` and its subdomains. URLs a script passes to `download()` or as an `answer_callback()` response URL that are not on `slack.com` never receive the bot token. Treat both tokens as secrets because anyone who obtains them can act as the bot in the workspace. See [Security Considerations](/docs/security/#network-security) for broader network guidance.
 
 ## See Also
 

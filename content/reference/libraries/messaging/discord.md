@@ -278,6 +278,8 @@ Sends a file to a channel.
 
 **Returns:** `None`
 
+A local file must lie inside `--allowed-paths` (or the embedder's allowed paths); one outside them raises a `PermissionError` before it is read, which the script cannot catch. URLs and base64 data are not files and are unaffected.
+
 ```python
 discord.send_file(bot, channel_id, "/path/to/file.pdf", filename="document.pdf")
 
@@ -331,6 +333,8 @@ Downloads a file by its ID/reference.
 
 **Returns:** `str`: base64-encoded file data.
 
+The bot token is sent only to Discord's own hosts (`discord.com`, `discordapp.com`, `discordapp.net` and their subdomains); a URL on any other host is fetched without it. Under a network policy every request must pass the policy, Discord's own included.
+
 ```python
 def handle_file(ctx):
     data = discord.download(bot, ctx.file.id)
@@ -357,7 +361,7 @@ caps = discord.capabilities(bot)
 
 This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-This library sends and receives messages via the Discord Bot API using the bot token that the script passes to `client()`. Go registration is `Register(p, logger)`: it supplies logging only and does not supply or retain credentials. The script, its configuration source, and anyone able to inspect that execution context may therefore have access to the token. Keep it out of source control and logs, inject it from an appropriate secret source, and restrict who can run or modify the script. An omitted or empty `allowed_users` list installs no default user restriction; provide an allowlist or a custom `auth()` handler for exposed bots. The Discord client is a separate networking surface and is not governed by the `requests` URL policy. Treat the token as a secret because anyone who obtains it can act as the bot. See [Security Considerations](/docs/security/#network-security) for broader network guidance.
+This library sends and receives messages via the Discord Bot API using the bot token that the script passes to `client()`. Go registration is `Register(p, logger, policy...)`, where the optional `*netsecurity.Config` is the network policy, or `RegisterConfigured(p, logger, allowedPaths, policy...)`, which also confines the local files `send_file()` reads to `allowedPaths`; neither supplies or retains credentials. The script, its configuration source, and anyone able to inspect that execution context may therefore have access to the token. Keep it out of source control and logs, inject it from an appropriate secret source, and restrict who can run or modify the script. An omitted or empty `allowed_users` list installs no default user restriction; provide an allowlist or a custom `auth()` handler for exposed bots. Under a [network policy](/docs/cli/network-policy/) every request and the gateway connection go through the policy, calls to Discord itself included, and raise a `network policy: …` error when denied: a script supplies the token, so Discord is an egress channel like any other host. Under a strict `allow_hosts`, list `discord.com` and `gateway.discord.gg` (and `.discordapp.com` / `.discordapp.net` for media). A URL a script passes to `download()` that is not on a Discord host never receives the bot token. Treat the token as a secret because anyone who obtains it can act as the bot. See [Security Considerations](/docs/security/#network-security) for broader network guidance.
 
 ## See Also
 

@@ -196,9 +196,9 @@ Common capabilities:
 
 ## Credential and Access-Control Security
 
-Telegram and Discord scripts pass one bot token to `client()`; Slack scripts pass bot and app tokens. The Go `Register(p, logger)` calls register each library with a logger only: they do not receive or hold those credentials. A script must obtain the token values before constructing a client, so treat the script and its configuration source as credential-bearing. Keep tokens out of source control and logs and inject them from an appropriate secret source.
+Telegram and Discord scripts pass one bot token to `client()`; Slack scripts pass bot and app tokens. The Go `Register(p, logger, policy...)` and `RegisterConfigured(p, logger, allowedPaths, policy...)` calls register each library with a logger, an optional network policy and, for `RegisterConfigured`, the allowed paths for `send_file()`: they do not receive or hold those credentials. A script must obtain the token values before constructing a client, so treat the script and its configuration source as credential-bearing. Keep tokens out of source control and logs and inject them from an appropriate secret source.
 
-An omitted or empty `allowed_users` list installs no default restriction. For an exposed bot, provide an allowlist or a custom `auth()` handler and verify authorization for every privileged action. These platform clients are separate networking surfaces and are not governed by the `requests` URL policy; use host-level egress controls when required.
+An omitted or empty `allowed_users` list installs no default restriction. For an exposed bot, provide an allowlist or a custom `auth()` handler and verify authorization for every privileged action. Under a [network policy](/docs/cli/network-policy/) every request and gateway connection these clients make goes through the policy, the platforms' own hosts included, so under a strict `allow_hosts` list the platform hosts you use; without one they connect without restriction.
 
 ## See Also
 

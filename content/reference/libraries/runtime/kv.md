@@ -48,6 +48,8 @@ Opens or reuses a named KV store. If a store with the given name is already open
 **Parameters:**
 - `name` (`str`): Store name. Use `":memory:name"` for an in-memory store shared by that name, or a filesystem path (e.g. `"/data/agent.db"`) for a persistent store. Empty string is not permitted.
 
+A filesystem path must lie within `--allowed-paths` when that is set (symlinks are resolved first; `-` denies every path but still allows `":memory:"` stores), otherwise an error is raised. Different spellings of the same directory (relative segments, symlinks) open the same store.
+
 **Returns:** Store object: with `set()`, `get()`, `incr()`, `delete()`, `exists()`, `ttl()`, `keys()`, `clear()`, and `close()` methods.
 
 ```python
@@ -263,7 +265,7 @@ runtime.background("b", "task_b")
 
 This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-`scriptling.runtime.kv` has no network or filesystem access implications of its own (a persistent store's on-disk path is the only filesystem touchpoint, and that's an explicit, caller-chosen path). The practical risk is unbounded memory growth from named in-memory stores that are never cleared or closed: size keys and TTLs accordingly rather than treating this as an access-control concern.
+`scriptling.runtime.kv` has no network access. A persistent store's on-disk path is its only filesystem touchpoint: opening one creates the directory and writes snapshot files there, so the path must lie within the host's allowed paths (`--allowed-paths` in the CLI, `allowedPaths` for `RegisterRuntimeLibraryAll` and `RegisterRuntimeKVLibraryWithSecurity` in Go; `RegisterRuntimeKVLibrary` is unrestricted). The other practical risk is unbounded memory growth from named in-memory stores that are never cleared or closed: size keys and TTLs accordingly rather than treating this as an access-control concern.
 
 ## See Also
 

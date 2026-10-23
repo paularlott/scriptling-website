@@ -491,6 +491,35 @@ message = {
 }
 ```
 
+`content` can also be a list of parts, for images:
+
+```python
+message = {
+    "role": "user",
+    "content": [
+        {"type": "text", "text": "What is in this picture?"},
+        {"type": "image_url", "image_url": {"url": "https://example.com/cat.png"}},
+    ],
+}
+```
+
+OpenAI, Claude and Gemini fetch an image URL themselves, on the provider's side. Ollama only accepts inline images, so for `ai.OLLAMA` every `image_url` must be a `data:` URI; any other URL is refused with an error and nothing is fetched. To send a remote image to Ollama, fetch it yourself (through `requests`, which applies the network policy) and inline it:
+
+```python
+import base64
+import requests
+
+resp = requests.get("https://example.com/cat.png")
+image = "data:image/png;base64," + base64.b64encode(resp.content).decode()
+message = {
+    "role": "user",
+    "content": [
+        {"type": "text", "text": "What is in this picture?"},
+        {"type": "image_url", "image_url": {"url": image}},
+    ],
+}
+```
+
 ## Error Handling
 
 ```python
@@ -508,7 +537,7 @@ except Exception as e:
 
 This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-`ai.Client` makes outbound HTTP requests to the configured AI provider endpoint (and to any `remote_servers` MCP servers configured on it). API keys and base URLs are supplied by the embedder when constructing the client: scripts only see them if the embedder explicitly passes them in. For a full risk breakdown, see the [Security Guide](/docs/security/#library-security) and [Library Registration](/docs/go-integration/library-registration/#ai--agent).
+`ai.Client` makes outbound HTTP requests to the configured AI provider endpoint (and to any `remote_servers` MCP servers configured on it). API keys and base URLs are supplied by the embedder when constructing the client: scripts only see them if the embedder explicitly passes them in. Responses are held to the interpreter's [value and memory limits](/docs/go-integration/basics/#value-limit) as they are read, so an endpoint returning an oversized answer raises `MemoryError` rather than exhausting memory; streams are limited per chunk, and `ai.collect_stream()` as it grows. For a full risk breakdown, see the [Security Guide](/docs/security/#library-security) and [Library Registration](/docs/go-integration/library-registration/#ai--agent).
 
 ## See Also
 

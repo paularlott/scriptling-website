@@ -5,7 +5,7 @@ tags: [cli, security]
 weight: 3
 ---
 
-`--network-policy` restricts where the `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.ai`, and `scriptling.mcp` libraries may connect — the tool for letting scripts reach the internet without letting them reach your private network or cloud metadata endpoints. Enforcement happens at connect time: hostnames are resolved through the configured DNS servers, every resolved address is checked, and the connection is made to the validated address — so DNS rebinding, redirects, and IP-notation tricks don't get through.
+`--network-policy` restricts where the `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.net.unicast`, `scriptling.net.multicast`, `scriptling.net.gossip`, `scriptling.nomad`, `scriptling.ai`, `scriptling.mcp`, and `scriptling.provision.fetch` libraries, the Slack, Discord and Telegram libraries, and container endpoints a script supplies may connect — the tool for letting scripts reach the internet without letting them reach your private network or cloud metadata endpoints. Enforcement happens at connect time: hostnames are resolved through the configured DNS servers, every resolved address is checked, and the connection is made to the validated address — so DNS rebinding, redirects, and IP-notation tricks don't get through.
 
 For `scriptling.ai`, the policy also covers `remote_servers` — the MCP servers an AI client can attach for tool use — so a script cannot reach an internal MCP endpoint by routing through `ai.Client(..., remote_servers=[...])` instead of `mcp.Client(...)` directly.
 
@@ -13,7 +13,7 @@ For `scriptling.ai`, the policy also covers `remote_servers` — the MCP servers
 scriptling --network-policy=policy.toml --disable-lib subprocess script.py
 ```
 
-A missing or invalid policy file aborts startup rather than running scripts unrestricted. Combine the policy with `--disable-lib subprocess` in any mode so code cannot bypass it by shelling out to `curl`; `scriptling.nomad`, `scriptling.provision.fetch`, and the raw-socket `scriptling.net.unicast` / `scriptling.net.gossip` libraries are likewise not wired to the policy, and within `scriptling.wait_for` only `http()` is policy-checked — `port()` dials TCP directly. A network policy constrains only the libraries wired to it; it is not a process-level network sandbox.
+A missing or invalid policy file aborts startup rather than running scripts unrestricted. Combine the policy with `--disable-lib subprocess` in any mode so code cannot bypass it by shelling out to `curl`; `scriptling.container` checks only endpoints a script passes as `socket=`; the configured `--docker-host` / `--podman-host` endpoints are trusted. The Slack, Discord and Telegram libraries send every request and gateway connection through the policy, their platforms' own hosts included, since a script supplies the bot token and could otherwise post data to a bot it controls; the bot token itself is only ever sent to the platform's hosts. Under a strict `allow_hosts`, list the hosts of the platforms you use: `api.telegram.org`; `slack.com` and its subdomains (for example `.slack.com`, which covers `wss-primary.slack.com` and `files.slack.com`); `discord.com` plus `gateway.discord.gg` (and `.discordapp.com` / `.discordapp.net` for media). `scriptling.net.gossip` checks every connection a cluster makes, to joined peers and to peers it learns from the cluster, and carries all traffic over TCP; grant a private cluster with `allow_cidrs`. With `allow_hosts` set, gossip peers are limited to the listed names, and a peer given by IP must be granted by `allow_cidrs` or `allow_ip_literals`. `scriptling.provision.fetch` downloads through the policy. A connection the policy denies raises a `network policy: …` error, including from `wait_for.http()` and `wait_for.port()`, which fail immediately rather than waiting out their timeout. A network policy constrains only the libraries wired to it; it is not a process-level network sandbox, and plugin processes are outside it.
 
 With a policy active, these address categories are blocked by default:
 
@@ -35,6 +35,8 @@ https_only = false
 # Permit URLs that name an IP directly (http://1.2.3.4/). Blocked by
 # default unless the address is already granted by allow_cidrs; every
 # literal still faces the address-category and deny_cidrs rules.
+# Non-canonical forms count as literals too: a host whose last label is a
+# number (2130706433, 0x7f.1, 127.1) or that contains a colon.
 allow_ip_literals = false
 
 # Permit loopback addresses (e.g. for local testing)
@@ -50,8 +52,14 @@ allow_private_ips = false
 allow_reserved_ips = false
 
 # Host allowlist: when set, ONLY these hosts may be contacted. Listed
-# hosts are trusted — they may resolve to internal addresses. An exact
-# name matches itself; a leading dot matches the domain and all subdomains.
+# hosts are trusted — they may resolve to loopback, private and reserved
+# addresses. deny_cidrs still applies to them, and a link-local answer
+# (169.254.0.0/16, fe80::/10 — where cloud metadata lives) still needs an
+# allow_cidrs entry: a suffix entry trusts every name under it, and
+# wildcard-DNS names can be pointed at any address. An exact name matches
+# itself; a leading dot matches the domain and all subdomains.
+# Matching ignores case and a trailing dot ("api.example.com." is the
+# same host as "api.example.com"), in entries and in requests alike.
 allow_hosts = ["api.example.com", ".internal.corp"]
 
 # Host denylist: always wins, even over the allowlist. Same syntax.
@@ -59,7 +67,8 @@ deny_hosts = ["tracker.example"]
 
 # Address range exceptions. allow_cidrs overrides the built-in address
 # blocks (how you grant one slice of your LAN); deny_cidrs wins over
-# everything.
+# everything, allowlisted hosts included. Multicast is always denied unless granted here, e.g. SSDP
+# for scriptling.net.multicast: "239.255.255.250/32".
 allow_cidrs = ["10.1.0.0/16"]
 deny_cidrs  = ["10.66.0.0/16"]
 

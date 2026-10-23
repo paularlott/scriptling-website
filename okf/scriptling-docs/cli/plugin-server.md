@@ -92,6 +92,11 @@ For HTTP, start an HTTP server explicitly:
 scriptling --server :8000 --json-rpc setup.py
 ```
 
+Over HTTP the plugin is held to the same batch and concurrency limits as a
+plain JSON-RPC server (`--json-rpc-max-batch`, `--json-rpc-concurrency`; see
+[Concurrency](https://scriptling.dev/okf/scriptling-docs/cli/jsonrpc-server.md#concurrency)). Over stdio it serves only the
+host that started it and is not limited.
+
 Then load that endpoint:
 
 ```python

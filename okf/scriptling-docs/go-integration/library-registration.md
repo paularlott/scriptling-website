@@ -142,6 +142,8 @@ extlibs.RegisterSecretLibrary(p, registry)
 
 // wait_for, websocket, templates
 extlibs.RegisterWaitForLibrary(p)
+// or confine file(), dir() and file_content() to allowed paths, with a network policy:
+// extlibs.RegisterWaitForLibraryConfigured(p, []string{"/tmp"}, policy)
 extlibs.RegisterWebSocketLibrary(p)
 extlibs.RegisterTemplateHTMLLibrary(p)
 extlibs.RegisterTemplateTextLibrary(p)
@@ -152,10 +154,12 @@ extlibs.RegisterTemplateTextLibrary(p)
 | `sys` | `RegisterSysLibrary(p, argv []string, stdin io.Reader)` |
 | `logging` | `RegisterLoggingLibrary(p, logger)` or `RegisterLoggingLibraryDefault(p)` |
 | `scriptling.secret` | `RegisterSecretLibrary(p, registry *secretprovider.Registry)` |
-| `scriptling.wait_for` | `RegisterWaitForLibrary(p)` |
+| `scriptling.wait_for` | `RegisterWaitForLibrary(p)` or `RegisterWaitForLibraryConfigured(p, allowedPaths, policy)` |
 | `scriptling.net.websocket` | `RegisterWebSocketLibrary(p)` |
 | `scriptling.template.html` | `RegisterTemplateHTMLLibrary(p)` |
 | `scriptling.template.text` | `RegisterTemplateTextLibrary(p)` |
+
+Plain `RegisterWaitForLibrary` leaves the `file()`, `dir()` and `file_content()` checks unconfined; hosts with allowed paths use `RegisterWaitForLibraryConfigured` (nil = unrestricted, empty = deny all).
 
 ## Runtime Libraries
 
@@ -237,9 +241,11 @@ mcp.RegisterToon(p)         // scriptling.toon
 
 | Namespace | Call |
 |-----------|------|
-| `scriptling.mcp` | `mcp.Register(p)` |
+| `scriptling.mcp` | `mcp.Register(p)` or `mcp.RegisterConfigured(p, policy, allowProcesses)` |
 | `scriptling.mcp.tool` | `mcp.RegisterToolHelpers(p)` |
 | `scriptling.toon` | `mcp.RegisterToon(p)` |
+
+`mcp.Register` allows stdio servers, which `mcp.Client()` starts as subprocesses. Hosts that disable subprocesses use `mcp.RegisterConfigured(p, policy, false)`, which refuses any target that is not an `http(s)` URL.
 
 ### Networking
 
@@ -252,9 +258,9 @@ import (
 )
 
 resolve.Register(p, myResolver) // scriptling.net.resolve (requires a Resolver implementation)
-multicast.Register(p)       // scriptling.net.multicast
-unicast.Register(p)         // scriptling.net.unicast
-gossip.Register(p, nil)     // scriptling.net.gossip (nil = null logger)
+multicast.Register(p)       // scriptling.net.multicast (optional *netsecurity.Config)
+unicast.Register(p)         // scriptling.net.unicast (optional *netsecurity.Config)
+gossip.Register(p, nil)     // scriptling.net.gossip (nil = null logger; optional *netsecurity.Config)
 ```
 
 | Namespace | Import Path | Call |
@@ -266,7 +272,7 @@ gossip.Register(p, nil)     // scriptling.net.gossip (nil = null logger)
 
 ### Network Policy
 
-The outbound networking libraries — `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.ai`, and `scriptling.mcp` — accept an optional `*netsecurity.Config` that restricts where scripts may connect. Pass `nil` (or omit the argument) for no restrictions; a non-nil policy blocks loopback, link-local (cloud metadata), private, unspecified, and multicast addresses, and IP-literal URLs, by default.
+The outbound networking libraries — `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.net.unicast`, `scriptling.net.multicast`, `scriptling.net.gossip`, `scriptling.nomad`, `scriptling.ai`, `scriptling.mcp`, and the Slack, Discord and Telegram messaging libraries — accept an optional `*netsecurity.Config` that restricts where scripts may connect. `scriptling.container` takes one through `container.RegisterConfigured` or `container.Options.Policy` (it checks the endpoints a script supplies), and `scriptling.provision.fetch` takes a `*netsecurity.Guard` through `fetch.RegisterConfigured`. Pass `nil` (or omit the argument) for no restrictions; a non-nil policy blocks loopback, link-local (cloud metadata), private, unspecified, and multicast addresses, and IP-literal URLs, by default.
 
 ```go
 import (
@@ -304,7 +310,7 @@ if err != nil {
 | `AllowLoopback` | `bool` | `false` | Permit `127.0.0.0/8` and `::1` |
 | `AllowPrivateIPs` | `bool` | `false` | Permit RFC1918 and IPv6 unique-local ranges |
 | `AllowReservedIPs` | `bool` | `false` | Permit reserved ranges that are neither private nor publicly routable — CGNAT `100.64.0.0/10`, `0.0.0.0/8`, documentation and benchmarking ranges, `240.0.0.0/4`, IPv4-compatible/NAT64/6to4/Teredo IPv6 and more; the full list is `netsecurity.ReservedCIDRs`. Policy files set it as `allow_reserved_ips = true` |
-| `AllowHosts` | `[]string` | `nil` | Host allowlist; when set, only these hosts may be contacted. Listed hosts are trusted — they may resolve to internal addresses. Exact names match themselves; a leading dot (`.corp.example.com`) matches the domain and all subdomains |
+| `AllowHosts` | `[]string` | `nil` | Host allowlist; when set, only these hosts may be contacted. Listed hosts are trusted — they may resolve to loopback, private and reserved addresses; `DeniedCIDRs` still applies to them, and a link-local answer still needs an `AllowedCIDRs` entry. Exact names match themselves; a leading dot (`.corp.example.com`) matches the domain and all subdomains |
 | `DenyHosts` | `[]string` | `nil` | Host denylist; always wins, even over `AllowHosts`. Same syntax |
 | `AllowedCIDRs` | `[]string` | `nil` | Address ranges permitted explicitly, overriding the built-in blocks (how you grant one slice of a LAN) |
 | `DeniedCIDRs` | `[]string` | `nil` | Address ranges blocked explicitly; wins over everything, including `AllowedCIDRs` |
@@ -325,9 +331,9 @@ import (
 )
 
 console.Register(p)          // scriptling.messaging.console
-telegram.Register(p, nil)   // scriptling.messaging.telegram
-discord.Register(p, nil)    // scriptling.messaging.discord
-slack.Register(p, nil)      // scriptling.messaging.slack
+telegram.Register(p, nil)   // scriptling.messaging.telegram (optional *netsecurity.Config)
+discord.Register(p, nil)    // scriptling.messaging.discord (optional *netsecurity.Config)
+slack.Register(p, nil)      // scriptling.messaging.slack (optional *netsecurity.Config)
 ```
 
 | Namespace | Import Path | Call |
@@ -336,6 +342,8 @@ slack.Register(p, nil)      // scriptling.messaging.slack
 | `scriptling.messaging.telegram` | `extlibs/messaging/telegram` | `telegram.Register(p, logger)` |
 | `scriptling.messaging.discord` | `extlibs/messaging/discord` | `discord.Register(p, logger)` |
 | `scriptling.messaging.slack` | `extlibs/messaging/slack` | `slack.Register(p, logger)` |
+
+Each of `telegram`, `discord` and `slack` also has `RegisterConfigured(p, logger, allowedPaths, policy...)`, which confines the local files `send_file()` reads to `allowedPaths`; plain `Register` leaves them unconfined.
 
 ### Utilities
 
@@ -350,8 +358,8 @@ import (
 )
 
 console.Register(p)                        // scriptling.console
-container.Register(p, "", "")              // scriptling.container (empty = default sockets)
-nomad.Register(p)                          // scriptling.nomad
+container.Register(p, "", "")              // scriptling.container (empty = default sockets; RegisterWithOptions adds path/network checks and DenyPrivileged)
+nomad.Register(p)                          // scriptling.nomad (optional *netsecurity.Config)
 similarity.Register(p)                     // scriptling.similarity
 file.Register(p)                           // scriptling.provision.file
 fetch.Register(p)                          // scriptling.provision.fetch
@@ -361,7 +369,7 @@ extlibs.RegisterMarkdownLibrary(p)         // scriptling.markdown
 | Namespace | Import Path | Call |
 |-----------|-------------|------|
 | `scriptling.console` | `extlibs/console` | `console.Register(p)` |
-| `scriptling.container` | `extlibs/container` | `container.Register(p, dockerSock, podmanSock)` |
+| `scriptling.container` | `extlibs/container` | `container.Register(p, dockerSock, podmanSock)` or `container.RegisterWithOptions(p, opts)` |
 | `scriptling.nomad` | `extlibs/nomad` | `nomad.Register(p)` |
 | `scriptling.similarity` | `extlibs/similarity` | `similarity.Register(p)` |
 | `scriptling.provision.file` | `extlibs/provision/file` | `file.Register(p)` |
@@ -390,7 +398,9 @@ plugin.RegisterLibraries(p, manager)  // scriptling.plugin, plus plugin.<name> f
 
 | Namespace | Import Path | Call |
 |-----------|-------------|------|
-| `scriptling.plugin` | `plugin` | `plugin.RegisterLibraries(p, manager)` |
+| `scriptling.plugin` | `plugin` | `plugin.RegisterLibraries(p, manager)` or `plugin.RegisterLibrariesConfigured(p, manager, policy, allowProcesses)` |
+
+A plugin whose name the interpreter already has, a registered library or a module its library loader supplies, is skipped with a manager warning rather than shadowing it, so set the library loader before calling `plugin.RegisterLibraries`. `plugin.RegisterLibrariesConfigured` with `allowProcesses` false refuses script-driven `load()` of an executable while HTTP(S) plugins still load; `plugin.ProcessesAllowed(disabledLibs)` derives the flag from your disabled-library list, as the CLI's `--no-subprocess` does.
 
 See [Plugin Manager](https://scriptling.dev/okf/scriptling-docs/plugins/host-integration.md) for the full plugin embedding guide.
 

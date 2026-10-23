@@ -85,6 +85,8 @@ Starts a background task in a goroutine. Returns a `Promise` that can be used to
 
 **Returns:** `Promise`: in script mode, with `get()` and `wait()` methods. Returns `None` in server mode, where tasks are fire-and-forget.
 
+**Raises:** `RuntimeError`: if the interpreter already has as many tasks queued or running as its background task limit allows (`--max-background-tasks`, off by default). Under a memory limit each live task counts about 48 KiB against it, and starting one that would go over stops the script with `memory limit exceeded`.
+
 **Argument cloning:** arguments must be transferable types and are deep-copied before the task starts to prevent data races:
 
 - Scalars (`None`, `bool`, `int`, `float`, `str`) are passed by value.

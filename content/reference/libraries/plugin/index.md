@@ -100,6 +100,8 @@ Calls multiple functions on one loaded JSON-RPC peer by sending a JSON-RPC batch
 
 For `scriptling=True` clients, each item is sent as a typed plugin `function.call` request. For `scriptling=False` clients, each `name` is sent directly as the raw JSON-RPC method. Callback arguments are not supported in `batch_call`. If any item returns a JSON-RPC error, `batch_call` raises an error for the whole batch and includes the failing item index and method name.
 
+A peer may limit batch size: a scriptling JSON-RPC or plugin server refuses a batch of more than 1,000 calls by default (`--json-rpc-max-batch`), so split larger lists into several `batch_call`s.
+
 **Parameters:**
 - `library` (`str`): Library name returned by `load()`, short or normalised form.
 - `calls` (`list` of `dict`): Each dict supports:
@@ -154,7 +156,7 @@ HTTP(S) transport is request/response only. It supports calls, objects, generate
 Identity is by absolute path for executables and by URL for HTTP endpoints. A second `load()` of the same path or URL with the same name is a no-op (returns the existing client, ignoring `scriptling`/`args`/`insecure_skip_tls`/`headers`). Loading an already-loaded peer under a different name, or loading a new peer under a name already in use, raises an error.
 
 **Parameters:**
-- `name` (`str`): Library name to register under. Normalised into the `plugin.*` namespace (e.g. `"widgets"` becomes `"plugin.widgets"`). Must not collide with an existing plugin library name.
+- `name` (`str`): Library name to register under. A bare name goes in the `plugin.*` namespace (`"widgets"` becomes `"plugin.widgets"`); a dotted name is used verbatim. Plugin names are global, shared by every interpreter, and a name already registered on the interpreter (a built-in, stdlib or host library, a module the library loader supplies from disk, or another plugin) is refused, so a plugin cannot replace one.
 - `path` (`str`): Filesystem path to the executable, or `http://` / `https://` JSON-RPC endpoint.
 - `scriptling` (`bool`, optional): If `True`, perform the plugin protocol handshake, register an importable `plugin.*` proxy library, and fill `describe()` / `list()` from peer metadata. If `False`, the handshake and proxy registration are skipped; `transport` is still reported as `"json"`. Default: `False`.
 - `args` (`list`, optional): Command-line arguments passed to executable peers, e.g. `["--json-rpc", "./setup.py"]`. Ignored for HTTP endpoints. Default: `None`.
@@ -163,7 +165,7 @@ Identity is by absolute path for executables and by URL for HTTP endpoints. A se
 
 **Returns:** `str`: the normalised library name (e.g. `"plugin.widgets"`).
 
-**Raises:** `Error`: if `name` collides with an existing plugin under a different path/URL, or the peer's handshake fails.
+**Raises:** `Error`: if `name` is already registered on the interpreter (`load(): library <name> is already registered`), collides with an existing plugin under a different path/URL, or the peer's handshake fails; or if `path` is an executable where the host has disabled the `subprocess` library (`--no-subprocess` or `--disable-lib subprocess`), which allows only `http://` / `https://` peers.
 
 ```python
 import scriptling.plugin

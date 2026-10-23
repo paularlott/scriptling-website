@@ -46,7 +46,7 @@ When unpacking a zip archive, `fetch.UPDATED` takes precedence over `fetch.CREAT
 - `max_bytes` (`int`, optional): Maximum response size in bytes, or `0` for no cap. Default: `0`.
 - `mode` (`int`, optional): File permission mode for written files. Default: `0o644`.
 - `dir_mode` (`int`, optional): Directory permission mode for created directories. Default: `0o755`.
-- `provides` (`list`, optional): List of file paths. If all paths exist, returns `fetch.UNCHANGED` without downloading or extracting. Default: `None`.
+- `provides` (`list`, optional): List of file paths. If all paths exist, returns `fetch.UNCHANGED` without downloading or extracting. A path that cannot be checked (for example, permission denied) counts as missing. Default: `None`.
 
 **Returns:** `dict`: with keys:
 
@@ -59,7 +59,7 @@ When unpacking a zip archive, `fetch.UPDATED` takes precedence over `fetch.CREAT
 | `unpacked` | `True` when `unpack_zip=True` |
 | `files` | Written or checked file paths |
 
-**Raises:** `Error`: if the URL scheme isn't `http`/`https`, the request fails or times out, the response exceeds `max_bytes`, or a zip entry would escape the destination directory or is not a regular file.
+**Raises:** `Error`: if the URL scheme isn't `http`/`https`, the request fails or times out, the response exceeds `max_bytes`, or a zip entry would escape the destination directory or is not a regular file. `PermissionError`, which the script cannot catch, if `dest`, any `provides` path, or an unpacked entry is outside `--allowed-paths`; `dest` and `provides` are checked before anything is downloaded.
 
 ```python
 import scriptling.provision.fetch as fetch
@@ -121,7 +121,7 @@ if result["status"] == fetch.UNCHANGED:
 
 This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-`scriptling.provision.fetch` makes outbound HTTP/HTTPS requests to arbitrary URLs and writes the downloaded bytes (or unpacked zip contents) to the local filesystem: so it combines network access with filesystem writes. Setting `insecure=True` disables HTTPS certificate verification entirely; only use it for trusted internal endpoints or bootstrap scenarios where certificate validation is genuinely impossible: passing it carelessly exposes downloads to interception and tampering. Zip extraction rejects absolute paths, `..` traversal, and non-regular entries (symlinks, device files), but the library otherwise writes wherever the host process has permission. Neither jail applies to it: it is not covered by `--network-policy` (the script chooses the URL, including loopback and private addresses) and its writes are not subject to `--allowed-paths`, so keep it unregistered for untrusted scripts and confine it at the process level where that matters. For a full risk breakdown across all libraries, see the [Security Guide](/docs/security/).
+`scriptling.provision.fetch` makes outbound HTTP/HTTPS requests to arbitrary URLs and writes the downloaded bytes (or unpacked zip contents) to the local filesystem: so it combines network access with filesystem writes. Setting `insecure=True` disables HTTPS certificate verification entirely; only use it for trusted internal endpoints or bootstrap scenarios where certificate validation is genuinely impossible: passing it carelessly exposes downloads to interception and tampering. Zip extraction rejects absolute paths, `..` traversal, and non-regular entries (symlinks, device files). Under `--allowed-paths` (or the embedder's allowed paths), `dest`, every `provides` path and every unpacked entry must lie inside them; anything else raises a `PermissionError` before it is touched. Under `--network-policy` (or a guard passed to `RegisterConfigured`), downloads go through the policy like `requests`. Without either, the script chooses the URL (including loopback and private addresses) and the library writes wherever the host process has permission, so keep it unregistered for untrusted scripts unless both are configured. For a full risk breakdown across all libraries, see the [Security Guide](/docs/security/).
 
 ## See Also
 

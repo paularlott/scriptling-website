@@ -40,6 +40,8 @@ Waits for a file to exist.
 
 **Returns:** `bool`: `True` if the file exists, `False` if the timeout was exceeded.
 
+**Raises:** `PermissionError` if the path is outside `--allowed-paths` (checked on every poll), which the script cannot catch.
+
 ```python
 import scriptling.wait_for as wait_for
 
@@ -61,6 +63,8 @@ Waits for a directory to exist.
 
 **Returns:** `bool`: `True` if the directory exists, `False` if the timeout was exceeded.
 
+**Raises:** `PermissionError` if the path is outside `--allowed-paths` (checked on every poll), which the script cannot catch.
+
 ```python
 import scriptling.wait_for as wait_for
 
@@ -80,6 +84,8 @@ Waits for a TCP port to accept connections. Each connection attempt uses a 1-sec
 - `poll_rate` (`float`, optional): Time between checks in seconds. Default: `1`.
 
 **Returns:** `bool`: `True` if the port is open, `False` if the timeout was exceeded.
+
+**Raises:** an error if a configured network policy denies the address.
 
 ```python
 import scriptling.wait_for as wait_for
@@ -102,6 +108,8 @@ Waits for an HTTP endpoint to respond with the expected status code.
 - `status_code` (`int`, optional): Expected HTTP status code. Default: `200`.
 
 **Returns:** `bool`: `True` if the endpoint responds with the expected status, `False` if the timeout was exceeded.
+
+**Raises:** an error if a configured network policy denies the URL.
 
 ```python
 import scriptling.wait_for as wait_for
@@ -126,6 +134,8 @@ Waits for a file to exist and contain specific content.
 - `poll_rate` (`float`, optional): Time between checks in seconds. Default: `1`.
 
 **Returns:** `bool`: `True` if the file contains the content, `False` if the timeout was exceeded.
+
+**Raises:** `PermissionError` if the path is outside `--allowed-paths` (checked on every poll), which the script cannot catch.
 
 ```python
 import scriptling.wait_for as wait_for
@@ -210,7 +220,9 @@ print("All services are healthy!")
 
 This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.wait_for` can be used to probe network reachability and timing: `port()` and `http()` make outbound TCP/HTTP connections to any host or URL the script provides. `http()` honors a configured network policy; `port()` dials TCP directly and is not policy-checked, so it can reach addresses the policy denies and acts as a reachability oracle for them. There is no allowlist parameter for this library; if network access should be restricted for untrusted scripts, control it at the network/sandbox level rather than relying on this library. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
+`file()`, `dir()` and `file_content()` honor `--allowed-paths` (or the embedder's allowed paths) like the `os` library: a path that resolves outside them, including through a symlink or `..`, raises a `PermissionError` before anything is read, so they cannot be used to probe for files or test their contents outside the jail.
+
+`scriptling.wait_for` can be used to probe network reachability and timing: `port()` and `http()` make outbound TCP/HTTP connections to any host or URL the script provides. Both honor a configured [network policy](https://scriptling.dev/okf/scriptling-docs/cli/network-policy.md): a denied host or URL raises a `network policy: …` error immediately rather than polling until the timeout. Without a policy there is no restriction on which hosts or ports a script can probe, so register one where scripts are untrusted. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 
 ## See Also
 

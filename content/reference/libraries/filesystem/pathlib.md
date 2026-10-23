@@ -189,7 +189,7 @@ Read the contents of the file as a string.
 
 **Returns:** `str`: the file's contents.
 
-**Raises:** `Error`: if the path is outside the allowed paths, or the file cannot be read.
+**Raises:** `PermissionError`, which the script cannot catch, if the path is outside the allowed paths; `Error` if the file cannot be read.
 
 ```python
 p = pathlib.Path("/home/user/file.txt")
@@ -206,7 +206,7 @@ Write a string to the file, creating or overwriting it.
 
 **Returns:** `None`
 
-**Raises:** `Error`: if the path is outside the allowed paths.
+**Raises:** `PermissionError`, which the script cannot catch, if the path is outside the allowed paths.
 
 ```python
 p = pathlib.Path("/home/user/newfile.txt")
@@ -219,7 +219,7 @@ Read the contents of the file as bytes.
 
 **Returns:** [`bytes`](../../data-formats/bytes/): the file's raw bytes.
 
-**Raises:** `Error`: if the path is outside the allowed paths, or the file cannot be read.
+**Raises:** `PermissionError`, which the script cannot catch, if the path is outside the allowed paths; `Error` if the file cannot be read.
 
 ```python
 p = pathlib.Path("/home/user/data.bin")
@@ -235,7 +235,7 @@ Write bytes to the file, creating or overwriting it.
 
 **Returns:** `None`
 
-**Raises:** `Error`: if the path is outside the allowed paths.
+**Raises:** `PermissionError`, which the script cannot catch, if the path is outside the allowed paths.
 
 ```python
 p = pathlib.Path("/home/user/data.bin")
@@ -253,7 +253,7 @@ Create a directory at this path. The `mode` argument uses permission bits such a
 
 **Returns:** `None`
 
-**Raises:** `Error`: if the path is outside the allowed paths, or the directory already exists and `exist_ok` is `False`.
+**Raises:** `PermissionError`, which the script cannot catch, if the path is outside the allowed paths; `Error` if the directory already exists and `exist_ok` is `False`.
 
 ```python
 # Create a single directory
@@ -274,7 +274,7 @@ Change the permissions of the file or directory.
 
 **Returns:** `None`
 
-**Raises:** `Error`: if the path is outside the allowed paths.
+**Raises:** `PermissionError`, which the script cannot catch, if the path is outside the allowed paths.
 
 ```python
 p = pathlib.Path("/home/user/script.sh")
@@ -287,7 +287,7 @@ Remove the empty directory.
 
 **Returns:** `None`
 
-**Raises:** `Error`: if the path is outside the allowed paths, or the directory is not empty.
+**Raises:** `PermissionError`, which the script cannot catch, if the path is outside the allowed paths; `Error` if the directory is not empty.
 
 ```python
 p = pathlib.Path("/home/user/emptyfolder")
@@ -303,7 +303,7 @@ Remove this file or symbolic link.
 
 **Returns:** `None`
 
-**Raises:** `Error`: if the path is outside the allowed paths, or the file does not exist and `missing_ok` is `False`.
+**Raises:** `PermissionError`, which the script cannot catch, if the path is outside the allowed paths; `Error` if the file does not exist and `missing_ok` is `False`.
 
 ```python
 p = pathlib.Path("/home/user/file.txt")
@@ -322,7 +322,7 @@ Copy this file or directory to the target path.
 
 **Returns:** `Path`: a new `Path` pointing to `target`.
 
-**Raises:** `Error`: if either path is outside the allowed paths.
+**Raises:** `PermissionError`, which the script cannot catch, if either path is outside the allowed paths.
 
 ```python
 p = pathlib.Path("/home/user/file.txt")
@@ -343,7 +343,7 @@ Rename or move this file or directory to the target path.
 
 **Returns:** `Path`: a new `Path` pointing to `target`.
 
-**Raises:** `Error`: if either path is outside the allowed paths.
+**Raises:** `PermissionError`, which the script cannot catch, if either path is outside the allowed paths.
 
 ```python
 p = pathlib.Path("/home/user/old_name.txt")
@@ -357,7 +357,7 @@ Return a list of `Path` objects for the contents of this directory. The path mus
 
 **Returns:** `list`: `Path` objects for each directory entry.
 
-**Raises:** `Error`: if the path is outside the allowed paths, or cannot be read.
+**Raises:** `PermissionError`, which the script cannot catch, if the path is outside the allowed paths; `Error` if it cannot be read.
 
 ```python
 p = pathlib.Path("/home/user/documents")
@@ -377,7 +377,7 @@ Return a list of `Path` objects matching the given pattern in this directory. Su
 
 **Returns:** `list`: matching `Path` objects.
 
-**Raises:** `Error`: if the path is outside the allowed paths.
+**Raises:** `PermissionError`, which the script cannot catch, if the path is outside the allowed paths.
 
 ```python
 p = pathlib.Path("/home/user/documents")

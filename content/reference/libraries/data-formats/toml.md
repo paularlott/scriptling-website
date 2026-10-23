@@ -29,7 +29,7 @@ Parses a TOML string and returns the corresponding Scriptling object.
 
 **Returns:** `dict`, `list`, `str`, `int`, `float`, `bool`, or `None`: depending on the parsed TOML value. Datetimes are returned as ISO-formatted strings.
 
-**Raises:** `Error`: if `toml_string` is not valid TOML.
+**Raises:** `Error`: if `toml_string` is not valid TOML, or if it nests more than 100 levels deep. The depth cap is a safeguard: the underlying decoder's memory grows sharply with nesting, far faster than the input, so a small but deeply nested document could otherwise exhaust the host before any memory limit applies. Real configuration files nest only a few levels. The same cap applies to the TOML the host reads: network policy and secret config files, script metadata, package manifests, and MCP tool, resource and prompt metadata.
 
 ```python
 import toml
@@ -58,6 +58,8 @@ Converts a Scriptling object to a TOML-formatted string.
 - `obj` (`dict`, `list`, `str`, `int`, `float`, `bool`, or `None`): Value to serialize.
 
 **Returns:** `str`: the TOML-formatted output.
+
+**Raises:** `RecursionError`: if `obj` nests more than 10,000 levels deep. The value would otherwise be cut short and the output silently corrupt.
 
 ```python
 import toml

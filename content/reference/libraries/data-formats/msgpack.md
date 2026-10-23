@@ -33,6 +33,8 @@ Converts a Scriptling value (`dict`, `list`, `tuple`, `str`, `int`, `float`, `bo
 
 **Returns:** [`bytes`](../bytes/): the MessagePack-encoded payload.
 
+**Raises:** `RecursionError`: if `obj` nests more than 10,000 levels deep. The value would otherwise be cut short and the output silently corrupt.
+
 ```python
 import msgpack
 

@@ -85,7 +85,7 @@ Use `--disable-lib` (repeatable) to prevent specific built-in libraries from loa
 # Disable a single library
 scriptling --disable-lib subprocess script.py
 
-# Disable multiple libraries
+# Disable multiple libraries, and also stop scripts loading executable plugins
 scriptling --disable-lib subprocess --disable-lib os script.py
 
 # Via environment variable
@@ -96,7 +96,7 @@ If a script attempts to import a disabled library, it raises `ImportError`, whic
 
 ## Script Filesystem Controls
 
-`--allowed-paths` constrains filesystem operations made through participating Scriptling libraries. It is not a complete filesystem sandbox: subprocesses, plugin processes, module/package loading, setup scripts, TLS files, static assets, and other host-side operations are outside this library-level allowlist.
+`--allowed-paths` constrains filesystem operations made through participating Scriptling libraries. It is not a complete filesystem sandbox: subprocesses, plugin processes, setup scripts, TLS files, `--web-root` static assets, and other host-side operations are outside this library-level allowlist. Library loading is covered in one respect: the directories you name with `--libpath` (and the script's own directory) are trusted, but a library reached through a **symlink** in one of them is only loaded if the resolved file lies inside a library directory or an allowed path, so a link planted in a library directory cannot pull in a file from elsewhere. With no `--allowed-paths` the loader follows symlinks as it always has.
 
 | Mode                 | Flag                            | Participating library access |
 | -------------------- | ------------------------------- | ---------------------------- |
@@ -120,12 +120,14 @@ Participating library filesystem operations are restricted to specified paths:
 # Restrict to specific directories
 scriptling --allowed-paths "/tmp/data,./uploads" script.py
 
-# With relative paths
+# Relative paths resolve from the working directory, not the script's directory
 scriptling --allowed-paths "./data,../shared" script.py
 
 # Via environment variable
 SCRIPTLING_ALLOWED_PATHS="/var/www,./public" scriptling script.py
 ```
+
+Paths are checked the way the kernel opens them: symlinks are resolved, dangling ones and ones that climb out with `..` included, so a link inside an allowed directory cannot reach a file outside it. `os.symlink()` also refuses a target outside the allowed paths, resolving a relative target from the link's directory.
 
 ### Deny Participating Library File Access
 
@@ -135,18 +137,20 @@ Deny filesystem access through the libraries wired to the allowlist:
 scriptling --allowed-paths - script.py
 ```
 
-This denies operations such as `os.read_file`, `os.write_file`, `pathlib`, `glob`, and `sandbox.exec_file`; it does not prevent an enabled `subprocess` from reading files with host commands. Disable that capability explicitly with `--disable-lib subprocess` in every mode.
+This denies operations such as `os.read_file`, `os.write_file`, `pathlib`, `glob`, and `sandbox.exec_file`, along with `scriptling.wait_for` `file()`, `dir()` and `file_content()`, messaging `send_file()`, `scriptling.container` bind mounts, `runtime.http.static`, `runtime.kv.open`, `scriptling.provision.fetch` and `scriptling.provision.file`; it does not prevent an enabled `subprocess` from reading files with host commands. Disable that capability explicitly with `--disable-lib subprocess` in every mode.
 
 When a script tries to access a path outside the allowed directories:
 
 ```python
 import os
-# This will raise an error if /etc/passwd is not in allowed paths
-try:
-    content = os.read_file("/etc/passwd")
-except Exception as e:
-    print(f"Access denied: {e}")
-    # Output: Access denied: access denied: path '/etc/passwd' is outside allowed directories
+# Stops the script if /etc/passwd is not in the allowed paths
+content = os.read_file("/etc/passwd")
+```
+
+The denial is a `PermissionError` that no `try`/`except` or `with` block can catch, so the run stops (after any `finally` blocks) with:
+
+```
+Error: access denied: path '/etc/passwd' is outside allowed directories
 ```
 
 **Common libraries (not an exhaustive inventory):**

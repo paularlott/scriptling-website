@@ -23,7 +23,7 @@ finally:
     print("Cleanup code here")
 ```
 
-`except` catches both runtime errors raised by the interpreter (type errors, missing names, bad indexes, division by zero), whose exception type is [inferred from the error message](#automatic-exception-type-inference), and exceptions raised explicitly with `raise`. The one exception is `SystemExit`, which bypasses `except` handlers (see [SystemExit Exception](#systemexit-exception)).
+`except` catches both runtime errors raised by the interpreter (type errors, missing names, bad indexes, division by zero), whose exception type is [inferred from the error message](#automatic-exception-type-inference), and exceptions raised explicitly with `raise`. The exceptions are `SystemExit` (see [SystemExit Exception](#systemexit-exception)), a `PermissionError` from a host security restriction (such as a path outside `--allowed-paths`), and the host stopping the script (an execution timeout, a cancellation or the memory limit): these pass every `except` clause, and a `with` block cannot suppress them, even when `__exit__` returns `True` or the block is `contextlib.suppress(...)`. `finally` blocks still run.
 
 ### Try/Except/Else
 
@@ -108,6 +108,7 @@ BaseException
     ├── AttributeError    - Attribute not found on object
     ├── OSError           - OS-level errors
     └── RuntimeError      - General runtime errors
+        └── RecursionError - Nesting or recursion too deep
 ```
 
 An `except` clause catches its type and the types below it, so `except LookupError:` catches both `KeyError` and `IndexError`. The type can also come from a variable, including a tuple of types:
@@ -137,6 +138,7 @@ except retryable:
 | `AttributeError` | Attribute not found on object |
 | `OSError` | OS-level errors (file not found, permission denied, etc.) |
 | `RuntimeError` | General runtime errors |
+| `RecursionError` | Function calls, including generators resuming generators, nested more than 1,000 deep (`call depth exceeded`); a value nested too deeply to render, serialize or compare (more than 10,000 levels); or comparing two different self-containing containers |
 
 ### Automatic Exception Type Inference
 

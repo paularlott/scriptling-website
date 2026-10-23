@@ -29,6 +29,10 @@ for i in range(3): n = i; print(n)
 
 Because the call is part of the body, `def f(): return 1; f()` defines `f` but never calls it. Put the call on its own line.
 
+### Nesting Limits
+
+As in Python, nesting is limited: brackets (`(`, `[`, `{`) can nest 200 deep, blocks 99 deep, and an expression tree 20,000 deep, which leaves room for chains such as `a + b + ...` or `a.b.c...` of 10,000 terms. A program that goes further is rejected with a parse error (`too many nested parentheses`, `too many levels of indentation` or `expression too complex`) rather than run.
+
 ## Comments
 
 ```python

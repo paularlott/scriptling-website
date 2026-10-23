@@ -69,6 +69,12 @@ for i in range(1000000):
 result, err := p.CallFunctionWithContext(ctx, "process_data", data)
 ```
 
+When the context's deadline passes or it is cancelled, the script stops at its
+next statement with `execution timeout` or `execution cancelled`. The script
+cannot catch either with `try`/`except` or suppress it with a `with` block, so
+it cannot keep running after the host has stopped it; `finally` blocks still
+run.
+
 ## Executing Code
 
 ### Simple Execution
@@ -349,7 +355,7 @@ pipeline or batch is created.
 
 ### Per-Interpreter Limits
 
-Every interpreter has two limits. Each follows a process-wide default
+Every interpreter has three limits. Each follows a process-wide default
 unless the interpreter sets its own. Nothing is limited until a limit is set:
 every default is off.
 
@@ -357,6 +363,7 @@ every default is off.
 | --- | --- | --- |
 | Memory: estimated memory the interpreter holds | none | Garbage is collected; if still over, the interpreter's running calls are cancelled with `memory limit exceeded` |
 | Value: largest single string, bytes value, list, tuple, dict or set | none | The operation raises `MemoryError`, which the script can catch |
+| Background tasks: `runtime.background` tasks queued or running at once | none | `background()` raises `RuntimeError`, which the script can catch |
 
 Set the defaults once at startup. They apply to each interpreter separately,
 never to the process as a whole:
@@ -364,6 +371,7 @@ never to the process as a whole:
 ```go
 scriptling.SetMemoryLimit(64 << 20)   // 64 MiB per interpreter
 scriptling.SetMaxValueBytes(8 << 20)  // 8 MiB per value
+scriptling.SetMaxBackgroundTasks(100) // 100 live background tasks per interpreter
 ```
 
 An interpreter can set its own limits when it is created, or later. `0` means
@@ -374,6 +382,7 @@ no limit for that interpreter whatever the default, and
 p := scriptling.New(
     scriptling.WithMemoryLimit(256 << 20),
     scriptling.WithMaxValueBytes(0), // no value limit for this one
+    scriptling.WithMaxBackgroundTasks(1000),
 )
 
 p.SetMemoryLimit(scriptling.InheritLimit) // back to the default
@@ -416,19 +425,36 @@ they are given; the context the host passed in is not cancelled. The
 cancellation is seen at the script's next statement rather than through
 the context's `Done` channel, which stays the host's, so a library call
 blocked on the network finishes its current operation before the script is
-stopped. The interpreter can be used again afterwards.
+stopped. The script cannot catch the cancellation with `try`/`except` or
+suppress it with a `with` block (`finally` blocks still run). The interpreter
+can be used again afterwards.
+
+The estimate covers strings, bytes values and container storage, and the
+objects a script can link together outside any container: class instances,
+functions and lambdas, classes, iterators, exceptions, `functools.partial`
+objects and `property`/`staticmethod`/`classmethod` wrappers.
+
+Each live background task is also charged `object.TaskBytes` (48 KiB): its
+cloned environment, evaluator state and goroutine stack, which no allocation
+point reports. The charge is held from the moment `background()` queues or
+starts the task until it finishes, so a script cannot start tasks until the
+process runs out of memory; once the charge takes the interpreter over its
+limit, `background()` stops the script with `memory limit exceeded`. A task
+blocked in a call such as `time.sleep` sees the cancellation when the call
+returns, and keeps its charge until then.
 
 `p.ResourceUsage()` reports the interpreter's estimated memory in use, its
-peak, the total allocated and how many calls the limit has cancelled:
+peak, the total allocated, how many calls the limit has cancelled and how many
+background tasks are queued or running:
 
 ```go
 usage := p.ResourceUsage()
-fmt.Println(usage.MemoryBytes, usage.PeakMemoryBytes, usage.AllocatedBytes, usage.MemoryLimitCancellations)
+fmt.Println(usage.MemoryBytes, usage.PeakMemoryBytes, usage.AllocatedBytes, usage.MemoryLimitCancellations, usage.BackgroundTasks)
 ```
 
 Memory is only measured while accounting is on, which it is once any memory
-limit has been set in the process. From then on each string and bytes value
-created costs a few nanoseconds more; with no memory limit set anywhere the
+limit has been set in the process. From then on each string, bytes value and
+accounted object created costs a few nanoseconds more; with no memory limit set anywhere the
 cost is one atomic load. A value limit is similar: once one has been set
 anywhere, values larger than the smallest limit ever set take the checking
 path for the rest of the process, in every interpreter.
@@ -458,7 +484,9 @@ The value limit stops a single operation asking for a huge allocation:
 `"x" * n`, `"x".center(n)`, `f"{x:>{n}}"`, `bytes(n)`, `str.join`,
 `str.replace`, `str.split`, `list(range(n))`, list, dict and set growth,
 literals (checked before their elements are evaluated), `*args`,
-`secrets.token_bytes(n)`, HTTP response bodies, file and archive reads,
+`secrets.token_bytes(n)`, HTTP response bodies, `scriptling.ai` model
+responses (see below), file and archive reads, archive members extracted to
+disk,
 `sys.stdin.read()`, `io.StringIO` buffers, rendered templates and captured
 `print` output. The results of library functions and string and bytes methods
 (`base64.b64encode`, `json.dumps` and so on) are also checked as they are
@@ -484,6 +512,15 @@ script values, such as `scriptling.grep`, `scriptling.sed`, `scriptling.find`,
 `os.listdir` and `csv.loads`, build their results under the limits as they
 go: a call whose result would not fit stops with `MemoryError` rather than
 gathering everything first.
+
+`scriptling.ai` clients a script creates with `ai.Client()` hold every
+response to the limits of the interpreter that created them, as it is read:
+an answer over the value limit, or beyond the memory left, fails with
+`MemoryError` before it is held whole. A streamed answer is read chunk by
+chunk, so it is limited per line rather than in total, and
+`ai.collect_stream()` holds what it gathers to the limits as it grows.
+Clients the host builds itself and passes in with `ai.WrapClient()` use the
+host's own HTTP transport and are not covered.
 
 Constant expressions folded when the script is parsed, such as `"ab" * 3`,
 are checked against the value limit when they are evaluated, like the same
@@ -611,6 +648,30 @@ if err != nil {
     return
 }
 ```
+
+### Panics
+
+A Go panic while script code runs (a bug in a library or builtin) is recovered by every entry point: `Eval`/`EvalWithContext`, `CallFunction`/`CallFunctionWithContext`, `CallMethod`/`CallMethodWithContext`, `CreateInstance`/`CreateInstanceWithContext`, `Import`/`ImportWithContext` and `LoadLibraryIntoEnvWithContext`. The interpreter stays usable, and the call returns a `*scriptling.PanicError`. Its message is only the panic value, such as `script panic: runtime error: index out of range [3] with length 0`, so it is safe to show to users or return to clients. The Go stack trace is kept in its `Stack` field:
+
+```go
+import "errors"
+
+_, err := p.CallFunctionWithContext(ctx, "handler", req)
+var panicErr *scriptling.PanicError
+if errors.As(err, &panicErr) {
+    log.Printf("script panic: %v\n%s", panicErr.Value, panicErr.Stack)
+}
+```
+
+To log every panic in one place, wherever its error ends up, set a panic handler. It is called with each `PanicError` before the call returns it, and clones keep it:
+
+```go
+p.SetPanicHandler(func(e *scriptling.PanicError) {
+    log.Printf("script panic: %v\n%s", e.Value, e.Stack)
+})
+```
+
+The CLI and its server modes log the stack trace this way at debug level (`--log-level debug`); the one-line error is reported as before.
 
 ## Complete Example
 

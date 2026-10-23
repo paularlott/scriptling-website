@@ -42,7 +42,7 @@ When `recursive=True`, the directory walk runs as a bounded parallel search usin
 
 **Returns:** `list`: matching pathnames as strings.
 
-**Raises:** `Error`: if `root_dir` is outside the allowed paths (see [Security Considerations](#security-considerations)).
+**Raises:** `PermissionError`, which the script cannot catch, if `root_dir` is outside the allowed paths (see [Security Considerations](#security-considerations)).
 
 ```python
 import glob

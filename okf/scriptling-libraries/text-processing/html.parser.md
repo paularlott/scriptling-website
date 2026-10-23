@@ -85,6 +85,10 @@ parser.feed("<html><body><p>Hello World!</p></body></html>")
 
 Feeds a chunk of HTML to the parser. The data is parsed immediately and the appropriate `handle_*` methods are invoked as elements are recognized.
 
+Parsing follows Python 3.14's `html.parser`, including how it recovers from malformed markup: an unclosed comment, a stray `<` or `&`, an empty comment such as `<!-->` and so on produce the same handler calls Python makes. An exception raised in a handler stops parsing and propagates out of `feed()`.
+
+Each call is parsed as a complete document: unlike Python, markup split across two `feed()` calls (for example `feed("<a hr")` then `feed('ef="x">')`) is not joined, so feed a whole document at once.
+
 **Parameters:**
 - `data` (`str`): HTML markup to parse.
 
@@ -116,7 +120,7 @@ parser.feed("<p>Second document</p>")
 
 ### `close()`
 
-Forces processing of any data still buffered. Call this once you've fed all available data.
+Forces processing of any data still buffered. Call this once you've fed all available data. Since `feed()` parses each chunk completely, there is never buffered data, but calling `close()` keeps code portable to Python.
 
 **Parameters:** None
 
@@ -178,7 +182,7 @@ Called when a start tag is encountered, such as `<div id="main">`.
 
 **Parameters:**
 - `tag` (`str`): Tag name, lowercased (e.g. `"div"`, `"p"`).
-- `attrs` (`list`): List of `(name, value)` tuples for the tag's attributes.
+- `attrs` (`list`): List of `(name, value)` tuples for the tag's attributes. Names are lowercased; character references in values are decoded, and an attribute written without a value (`<input disabled>`) has the value `None`.
 
 **Returns:** `None`
 
@@ -235,7 +239,7 @@ def handle_data(self, data):
 
 ### `handle_comment(data)`
 
-Called when an HTML comment is encountered.
+Called when an HTML comment is encountered. Malformed markup that HTML treats as a comment is reported here too, such as `<!x>` (content `x`) or `</1>` (content `1`).
 
 **Parameters:**
 - `data` (`str`): Comment content, without the surrounding `<!--` and `-->`.
@@ -266,7 +270,7 @@ def handle_decl(self, decl):
 Called for processing instructions, such as `<?xml ...?>`.
 
 **Parameters:**
-- `data` (`str`): Processing instruction content.
+- `data` (`str`): Processing instruction content: everything between `<?` and the first `>`, so `<?xml version="1.0"?>` gives `xml version="1.0"?`, as in Python.
 
 **Returns:** `None`
 
@@ -305,10 +309,10 @@ def handle_charref(self, name):
 
 ### `unknown_decl(data)`
 
-Called for unrecognized declaration types that are not handled by `handle_decl`, `handle_comment`, or as CDATA. The default implementation is a no-op.
+Called for CDATA sections. The default implementation is a no-op.
 
 **Parameters:**
-- `data` (`str`): Declaration content.
+- `data` (`str`): Declaration content, from after `<!` to before the closing `]]>`: `<![CDATA[x]]>` gives `CDATA[x`.
 
 **Returns:** `None`
 
@@ -377,7 +381,9 @@ for link in parser.links:
 ## Python Compatibility
 
 - `super().__init__()` is not required (or available): the parent class `__init__` is called automatically.
-- The `from X import Y` syntax is not supported: use `import html.parser` then `html.parser.HTMLParser`.
+- Each `feed()` is parsed as a complete document; Python buffers a construct left incomplete at the end of one `feed()` until the next.
+- The content of `script`, `style` and the other raw-text elements (`xmp`, `iframe`, `noembed`, `noframes`, `plaintext`, `textarea`, `title`) is parsed as markup rather than passed to `handle_data` as text.
+- `getpos()` always returns `(1, 0)`.
 
 ## See Also
 

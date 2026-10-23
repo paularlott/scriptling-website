@@ -258,7 +258,7 @@ Get the size of a file in bytes.
 
 **Returns:** `int`: file size in bytes.
 
-**Raises:** `Error`: if `path` is outside the allowed paths, or does not exist.
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths; `Error` if it does not exist.
 
 ```python
 import os.path
@@ -276,7 +276,7 @@ Get the time of last modification of a file.
 
 **Returns:** `float`: modification time as a Unix timestamp (seconds since epoch).
 
-**Raises:** `Error`: if `path` is outside the allowed paths, or does not exist.
+**Raises:** `PermissionError`, which the script cannot catch, if `path` is outside the allowed paths; `Error` if it does not exist.
 
 ```python
 import os.path
@@ -306,7 +306,7 @@ if os.path.islink("node_modules/.bin/eslint"):
 
 This is an extended library, requiring registration in Go (registered together with the `os` library by `RegisterOSLibrary`, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries)).
 
-`os.path` provides read access to filesystem metadata (`exists`, `isfile`, `isdir`, `getsize`, `getmtime`). Access is restricted to the `allowedPaths` passed to `RegisterOSLibrary(p, allowedPaths)`, path traversal (`../`) is blocked automatically. See the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
+`os.path` provides read access to filesystem metadata (`exists`, `isfile`, `isdir`, `getsize`, `getmtime`). Access is restricted to the `allowedPaths` passed to `RegisterOSLibrary(p, allowedPaths)`, path traversal (`../`) is blocked automatically. A path outside them raises a `PermissionError` the script cannot catch, from `exists`, `isfile` and `isdir` too, rather than returning `False`. See the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
 
 ## Python Compatibility
 

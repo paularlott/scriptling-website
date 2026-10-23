@@ -123,6 +123,24 @@ loader := libloader.NewFilesystem("/app/libs",
 )
 ```
 
+#### Confining a loader's symlinks
+
+Library directories are trusted, but a symlink inside one can point anywhere. To keep untrusted scripts from pulling in files from outside the places you chose, restrict the loader to its library directories plus the paths you allow. A library reached through a symlink that resolves anywhere else is treated as not found:
+
+```go
+// One directory, plus an allowed data directory
+loader := libloader.NewFilesystem("/app/libs",
+    libloader.WithAllowedPaths([]string{"/app/data"}),
+)
+
+// Several directories: every library directory is trusted, so a link from
+// one into another still works
+multi := libloader.NewMultiFilesystem("/home/user/libs", "/app/system/libs")
+multi.RestrictTo([]string{"/app/data"}) // []string{} confines to the library directories
+```
+
+Symlinks are resolved the way the kernel resolves them, including links whose target does not exist yet. Passing `nil` (the default) leaves the loader unrestricted and adds no work to a load. The CLI does this for you: `--allowed-paths` restricts its library loader.
+
 Sources read from disk are cached for the whole process and shared by every `FilesystemLoader`, so creating a new interpreter (and loader) per request does not re-read unchanged files. Each import revalidates its file with a single `stat`: a file that has been edited, replaced or deleted is read again, and a file modified in the last two seconds is never cached. The cache holds at most 32 MiB of source by default; once full, further files are simply read from disk on each import. Change the limit with `libloader.SetSourceCacheMaxBytes(n)` (0 removes it), and call `libloader.ClearSourceCache()` to drop every cached source.
 
 ### MemoryLoader

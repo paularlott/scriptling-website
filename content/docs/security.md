@@ -75,7 +75,7 @@ These libraries extend functionality but require explicit registration:
 | `sys`         | **SYSTEM ACCESS** - Provides access to system internals                     |
 | `secrets`     | Cryptographically secure random generation                                  |
 | `logging`     | File and console logging - may write to disk                                |
-| `scriptling.wait_for` | Network/resource polling - may access network                               |
+| `scriptling.wait_for` | Network/resource polling - may access network; file checks controlled by allowed paths |
 | `scriptling.provision.fetch` | HTTP/HTTPS downloads and filesystem writes; `insecure=True` skips TLS verification |
 | `yaml`        | YAML parsing - safe but watch for large files                               |
 | `toml`        | TOML parsing - safe but watch for large files                               |
@@ -117,7 +117,7 @@ extlibs.RegisterOSLibrary(p, nil)        // Nil = no restriction (full read/writ
 extlibs.RegisterOSLibrary(p, []string{}) // Empty = deny all (no paths allowed)
 ```
 
-All filesystem libraries (`os`, `pathlib`, `fs`, `glob`, `tempfile`, `shutil`, `zipfile`, `tarfile`, `scriptling.grep`, `scriptling.find`, `scriptling.sed`) accept `allowedPaths` and enforce the same path traversal and symlink protections. Archive libraries (`zipfile`, `tarfile`) additionally block zip-slip / tar-slip attacks (path traversal via crafted entry names).
+All filesystem libraries (`os`, `pathlib`, `fs`, `glob`, `tempfile`, `shutil`, `zipfile`, `tarfile`, `scriptling.grep`, `scriptling.find`, `scriptling.sed`) accept `allowedPaths` and enforce the same path traversal and symlink protections. A path is resolved the way the kernel resolves it when the file is opened: every symlink component is followed before any `..` is applied, so a symlink inside an allowed directory cannot lead outside it — **including a dangling symlink**, one whose target does not exist yet (a script cannot plant `allowed/link -> ../../etc/x` and then create the file through it). `os.symlink()` likewise refuses to create a link whose target, resolved against the link's own directory, falls outside the allowed set. Archive libraries (`zipfile`, `tarfile`) additionally block zip-slip / tar-slip attacks (path traversal via crafted entry names).
 
 ### Path Traversal Protection
 
@@ -165,9 +165,9 @@ extlibs.RegisterRequestsLibrary(p)
 
 ### Network Policies
 
-For scripts that *should* reach the internet but must never reach your private network, register a network policy. A policy governs the `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.ai`, and `scriptling.mcp` libraries and is enforced at connect time: the hostname is resolved through the configured DNS servers, every resolved address is checked against the policy, and the connection is made to the validated address directly. That closes the usual bypasses — DNS rebinding (the answer changing between check and connect), redirects to internal hosts, and IP-notation tricks.
+For scripts that *should* reach the internet but must never reach your private network, register a network policy. A policy governs the `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.net.unicast`, `scriptling.net.multicast`, `scriptling.net.gossip`, `scriptling.nomad`, `scriptling.ai`, `scriptling.mcp`, and `scriptling.provision.fetch` libraries, the Slack, Discord and Telegram messaging libraries, and the container endpoints a script passes to `scriptling.container`, and is enforced at connect time: the hostname is resolved through the configured DNS servers, every resolved address is checked against the policy, and the connection is made to the validated address directly. That closes the usual bypasses — DNS rebinding (the answer changing between check and connect), redirects to internal hosts, and IP-notation tricks.
 
-With a policy active, loopback, link-local (including cloud metadata endpoints like `169.254.169.254`), private, reserved (CGNAT `100.64.0.0/10`, documentation and benchmarking ranges, NAT64/6to4 and other non-public ranges), unspecified, and multicast addresses are all blocked by default, as are URLs that name an IP directly. Host allow/deny lists, CIDR exceptions, https-only, and custom DNS servers grant exactly the access you intend — allowlisted hosts are trusted to resolve internally, and deny rules always win.
+With a policy active, loopback, link-local (including cloud metadata endpoints like `169.254.169.254`), private, reserved (CGNAT `100.64.0.0/10`, documentation and benchmarking ranges, NAT64/6to4 and other non-public ranges), unspecified, and multicast addresses are all blocked by default, as are URLs that name an IP directly. Host allow/deny lists, CIDR exceptions, https-only, and custom DNS servers grant exactly the access you intend — allowlisted hosts are trusted to resolve internally (still subject to `deny_cidrs`, and a link-local answer still needs `allow_cidrs`), and deny rules always win.
 
 - **CLI**: `--network-policy=policy.toml` — the full policy file reference is in the [network policy guide](/docs/cli/network-policy/). Combine it with `--disable-lib subprocess` in any mode so code cannot bypass the policy by shelling out.
 - **Embedding**: pass a `*netsecurity.Config` (or load the same TOML file with `netsecurity.LoadConfig`) when registering the governed libraries — the `Config` options are documented in the [library registration guide](/docs/go-integration/library-registration/#network-policy). No policy means no restrictions.
@@ -184,7 +184,7 @@ ai.Register(p, policy)
 scriptlingmcp.Register(p, policy)
 ```
 
-The policy governs the five libraries above, including `ai.Client()`'s `remote_servers` (the MCP servers it can attach for tool use) and `mcp.Client()`'s HTTP transport — a script cannot bypass the policy by reaching a blocked endpoint through the AI or MCP client instead of `requests`. Within `scriptling.wait_for`, `http()` honors the policy but `port()` dials TCP directly and does not, so it can probe addresses the policy denies. Stdio-transport `mcp.Client()` instances (a local subprocess) are unaffected, since the policy only governs network access. `scriptling.provision.fetch` and `scriptling.nomad` are not wired to the policy either — `fetch.file()` fetches whatever URL the script supplies and `nomad.Client(addr)` connects to any address the script names — and neither are the raw-socket `scriptling.net.unicast` and `scriptling.net.gossip` primitives, whose outbound connections reach any address, including loopback and private ranges. Keep all of these unregistered where scripts are untrusted.
+The policy governs the libraries above, including `ai.Client()`'s `remote_servers` (the MCP servers it can attach for tool use) and `mcp.Client()`'s HTTP transport — a script cannot bypass the policy by reaching a blocked endpoint through the AI or MCP client instead of `requests`. Both `scriptling.wait_for` probes, `http()` and `port()`, honor the policy and raise a `network policy: …` error for a denied address instead of polling until the timeout. `scriptling.net.unicast` checks `connect()` and a UDP listener's `send_to()` destinations; `listen()` is unaffected. `scriptling.net.multicast` refuses every group in `join()` unless `allow_cidrs` grants it. `scriptling.net.gossip` checks every outbound connection, including to peers learned from the cluster, and sends everything over TCP; with `allow_hosts` set, peers are limited to the listed names, and a peer given by IP must be granted by `allow_cidrs` or `allow_ip_literals`. The Slack, Discord and Telegram libraries also confine the local files `send_file()` (and Telegram rich-message images) read to `--allowed-paths`. They send every request and gateway connection through the policy, their platforms' own hosts included (under a strict `allow_hosts`, list those hosts), and send the bot token only to the platform's hosts. `nomad.Client(addr)` requests, including redirects and `insecure=True` clients, go through the same checks, as do TCP/HTTPS endpoints a script passes to `container.Client(socket=...)` (the operator's configured container endpoints are trusted; a script-supplied Unix socket path must lie within `--allowed-paths`). Stdio-transport `mcp.Client()` instances launch a local subprocess, which the network policy does not govern; they are refused wherever the subprocess library is disabled. `scriptling.provision.fetch` downloads through the same policy as `requests`, and confines `dest`, `provides` and unpacked files to `--allowed-paths`. Keep any of these unregistered where scripts are untrusted and no policy is configured. HTTP clients an embedding application builds itself and plugin processes are outside the policy (a plugin only enforces what it is handed; see [Database Drivers](#database-drivers)).
 
 ## Database Drivers
 
@@ -219,6 +219,8 @@ allow_hosts = ["db.internal.corp"]
 ## Plugin Loading
 
 Registering `scriptling.plugin` against an unrestricted manager gives scripts `load(name, path)` — and `path` is **script-supplied**, not host-supplied: a filesystem path is resolved and executed directly (no `--allowed-paths` check), and an `http(s)://` URL is fetched over a plain transport with no network policy involved. This is a materially bigger capability than either `subprocess` or an unrestricted `requests` alone, since it combines arbitrary local execution with arbitrary outbound fetch in one call. "The host chose which plugins to trust" is only true until the first script calls `load`.
+
+In the CLI this is handled for you when process execution is disabled: `--no-subprocess` and `--disable-lib subprocess` also stop a script loading an **executable** plugin (a subprocess), while plugins the operator supplied with `--plugin` / `--plugin-dir` stay loaded and callable, and HTTP(S) plugins — which are not subprocesses — can still be loaded. Embedders get the same effect with `plugin.RegisterLibrariesConfigured(p, manager, policy, allowProcesses)` (pass `false` to refuse script-driven executable loads).
 
 Use [`plugin.WithTransport(plugin.TransportNone)`](/docs/plugins/host-integration/#exposing-admin-trusted-plugins-without-letting-scripts-load-their-own) on the scope you register for scripts to close this off while keeping the host's own pre-loaded plugins fully usable — `list`, `describe`, `call_function`, `batch_call`, and `call_method` all keep working; `load` and `unload` always fail. This is the pattern that actually makes admin-supplied plugins trusted-and-safe to expose.
 
@@ -270,14 +272,24 @@ Both are off until set, so set them for untrusted code, along with a timeout:
    estimated memory it holds stays over the limit after a garbage collection.
    An interpreter that keeps going over, within a call or between calls,
    forces at most one collection every 100 ms, so a script catching
-   `MemoryError` in a loop cannot stall the process.
+   `MemoryError` in a loop cannot stall the process. The cancellation stops
+   the script at its next statement and cannot be caught with `try`/`except`
+   or suppressed by a `with` block. The same holds for execution timeouts and
+   cancellations, and for a `PermissionError` from the filesystem jail or
+   other host restrictions.
 2. **Value limit**: a single string, bytes value, list, tuple, dict, set,
    read body or captured output larger than the limit raises `MemoryError`.
 3. **Recursion depth** is limited to 1000 calls, including calls from Go
-   through `CallFunction`.
+   through `CallFunction`. **Source nesting** is limited as in Python (200
+   nested brackets, 99 nested blocks, expressions 20,000 deep), so a deeply
+   nested program, including one run through the sandbox, is a parse error
+   rather than a stack overflow that would end the process.
 
 Memory is estimated, not measured exactly, and every interpreter shares the
-host's process. For untrusted code that must not affect anything else, run the
+host's process. The limits govern memory, not disk: a single extracted
+archive member or file read is held to the value limit, but a script can still
+write many files, so bound disk use with operating-system quotas or a
+size-limited filesystem where it matters. For untrusted code that must not affect anything else, run the
 interpreters in a separate process with an operating-system memory limit as
 well.
 

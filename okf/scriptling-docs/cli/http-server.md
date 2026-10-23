@@ -55,7 +55,9 @@ scriptling --server :8000 --web-root ./public setup.py
 scriptling --server :8000 --web-root ./public.zip setup.py
 ```
 
-Requests for `/` automatically serve `index.html` from the web root if present.
+Requests for `/` automatically serve `index.html` from the web root if present, and a request for a directory serves that directory's `index.html`. Directories without one are not listed.
+
+A web root only ever serves files by their relative path inside it: requests containing `..` or an absolute path are never resolved. The same rule applies to a zip archive's member names. A member whose name is not a plain relative path (such as `/etc/passwd`, `../x` or `a/../b`) is never served, and the server logs a warning naming each one when it opens the archive.
 
 In your setup script, register a custom 404 handler for unmatched requests:
 
@@ -203,7 +205,11 @@ import scriptling.runtime as runtime
 runtime.http.middleware("auth.check")
 ```
 
+A server bound to loopback (`--server 127.0.0.1:8000`, `[::1]` or `localhost`) checks the request's `Host` header on every endpoint and refuses any name but a loopback one (`localhost`, `*.localhost` or a loopback IP) with `421 Misdirected Request`. That stops DNS rebinding, where a page on an attacker's domain re-points its name at your machine and so becomes same-origin with your local server; nothing else guards a loopback server, and you reach it by those names anyway. A server bound to all interfaces (`--server :8000`, `0.0.0.0:8000`) or another address answers every `Host` until you set `--allowed-hosts`, like every other restriction that is off until configured; it logs a note at startup saying so. Once set (`--allowed-hosts app.example.com`, or `.example.com` for a domain and its subdomains; a port on an entry is ignored), it answers loopback names, IP addresses, the machine's own host name as the OS reports it with its first label (`web01.corp.example` and `web01`), and the listed names, and refuses the rest with `421`. List every name the server is reached by: a DNS name that points at it, or the public name a reverse proxy forwards in `Host` (Caddy does by default; nginx does with `proxy_set_header Host $host`). The `421` body names the refused `Host`, and the first refusal of each name is logged as a warning, so a missing entry is visible from either end.
+
 WebSocket upgrades are same-origin by default, so a hostile page cannot open a WebSocket to your server from a browser on another site (non-browser clients send no origin and pass). Pass `--websocket-origin` to allowlist specific origins, or `--websocket-origin '*'` behind a trusted proxy to allow any.
+
+`/mcp` and `/json-rpc` are same-origin by default too: a browser request from another origin is refused with `403` before anything runs. Allowlist browser apps on other origins with `--mcp-cors-origin` and `--json-rpc-cors-origin`. Setting any of `--websocket-origin`, `--mcp-cors-origin` or `--json-rpc-cors-origin` replaces the same-origin default for that endpoint rather than adding to it: if the server's own pages also use the endpoint, list the server's own origin too. Script routes registered with `runtime.http` have no origin check; guard state-changing routes with a middleware or `--bearer-token`.
 
 Request bodies are capped at 32 MiB by default (`--max-request-body` to change, negative to disable) and the server enforces header, read, write and idle timeouts; an oversized body receives a deterministic `413 Request Entity Too Large` rather than reaching a handler truncated. MCP's SSE streams are exempt from the write timeout.
 
@@ -211,7 +217,7 @@ A configured `--bearer-token` wraps every endpoint, middleware or not: the middl
 
 ## Filesystem Restrictions
 
-`--allowed-paths` restricts filesystem operations made through participating Scriptling libraries; it does not constrain subprocesses, plugins, module/package loading, static assets, or other host-side I/O.
+`--allowed-paths` restricts filesystem operations made through participating Scriptling libraries; it does not constrain subprocesses, plugins, static assets, or other host-side I/O. Library loading is constrained only for symlinks: a library reached through a symlink in a library directory must resolve inside a library directory or an allowed path.
 
 ```bash
 # Restrict participating libraries to specific directories
@@ -221,7 +227,7 @@ scriptling --server :8000 --allowed-paths "/var/www,./uploads" setup.py
 scriptling --server :8000 --allowed-paths - setup.py
 ```
 
-For server modes, use `--disable-lib subprocess` when subprocess access must be removed.
+For server modes, use `--disable-lib subprocess` when subprocess access must be removed. This also stops scripts loading executable plugins via `scriptling.plugin.load()`; operator-supplied `--plugin` / `--plugin-dir` plugins and HTTP(S) plugins are unaffected.
 
 ## Defining Routes
 

@@ -110,7 +110,7 @@ group.close()
 
 This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
 
-`scriptling.net.multicast` opens a raw UDP socket and joins a multicast group, allowing scripts to send and receive data with any other host on the local network segment (or further, if `ttl` is increased) that joins the same group address and port. The library does not restrict which group addresses or ports a script can join: that is the embedder's responsibility, typically enforced with OS-level firewalling or network namespacing. See [Security Considerations](/docs/security/#network-security) for a full breakdown of network-enabled libraries.
+`scriptling.net.multicast` opens a raw UDP socket and joins a multicast group, allowing scripts to send and receive data with any other host on the local network segment (or further, if `ttl` is increased) that joins the same group address and port. Under a [network policy](/docs/cli/network-policy/), `join()` raises a `network policy: …` error for every group unless `allow_cidrs` grants it (for example `allow_cidrs = ["239.255.255.250/32"]` for SSDP), and `deny_cidrs` still wins. Without a policy the library does not restrict which groups or ports a script can join; restrict that with OS-level firewalling or network namespacing. See [Security Considerations](/docs/security/#network-security) for a full breakdown of network-enabled libraries.
 
 ## Examples
 

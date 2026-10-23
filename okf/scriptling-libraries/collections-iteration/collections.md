@@ -23,7 +23,7 @@ The `collections` library provides Python-compatible specialized container datat
 | `Counter([iterable_or_mapping], **kwargs)` | Create a counter of element occurrences. |
 | `most_common(counter[, n])` | Get the `n` most common elements from a `Counter`. |
 | `OrderedDict([items], **kwargs)` | Create an order-preserving dict with `move_to_end()` and `popitem(last=False)`. |
-| `deque([iterable[, maxlen]])` | Create a double-ended queue (with `appendleft()`, `popleft()`, `extendleft()`, `rotate()`, `maxlen`). |
+| `deque([iterable[, maxlen]])` | The double-ended queue class, as Python's: constant-time appends and pops at both ends, an optional `maxlen`. |
 | `namedtuple(typename, field_names)` | Create a class for named tuple instances. |
 | `defaultdict(default_factory)` | Create a dict that builds a default value for missing keys. |
 | `ChainMap(*maps)` | Group multiple dicts for a single lookup. |
@@ -110,19 +110,29 @@ Unlike Python, `move_to_end()` and `popitem(last=...)` are accepted on every dic
 
 ### `deque([iterable[, maxlen]])`
 
-Creates a double-ended queue object, like Python's `collections.deque`.
+The double-ended queue class, as Python's `collections.deque`: `isinstance(d, collections.deque)` works and it can be subclassed.
 
 **Parameters:**
-- `iterable` (`list`, `tuple`, or `str`, optional): Initial elements.
-- `maxlen` (`int` or `None`, optional): Maximum length. If the initial elements exceed it, only the last `maxlen` are kept. Available afterwards as `d.maxlen`.
+- `iterable` (any iterable, optional): Initial elements.
+- `maxlen` (`int` or `None`, optional): Maximum length. If the initial elements exceed it, only the last `maxlen` are kept. Available afterwards as `d.maxlen`. A negative value raises `ValueError`.
 
-**Returns:** `deque`. Supports `len()`, indexing, iteration, `list(d)`, and these methods:
+**Returns:** `deque`. Supports `len()`, `bool()`, `in`, iteration, `reversed()`, indexing, item assignment and `del d[i]`, and these methods:
 
 - `d.append(x)` / `d.appendleft(x)`: add to the right / left end.
 - `d.pop()` / `d.popleft()`: remove and return from the right / left end (`IndexError` if empty).
 - `d.extend(iterable)` / `d.extendleft(iterable)`: add several elements; `extendleft` adds them one at a time, so they end up in reverse order.
 - `d.rotate(n)`: rotate `n` steps to the right (negative `n` rotates left).
 - `d.clear()`: remove all elements.
+- `d.insert(i, x)`: insert `x` before index `i` (`IndexError` if the deque is at its `maxlen`).
+- `d.remove(x)`: remove the first element equal to `x` (`ValueError` if there is none).
+- `d.index(x[, start[, stop]])`: index of the first element equal to `x` (`ValueError` if there is none).
+- `d.count(x)`: how many elements equal `x`.
+- `d.reverse()`: reverse in place.
+- `d.copy()`: a shallow copy; `copy.copy()` and `copy.deepcopy()` work too.
+
+Deques compare element-wise with `==`, `!=`, `<`, `<=`, `>` and `>=` against other deques (`maxlen` is ignored; a deque never equals a list). `d1 + d2` concatenates two deques, `d * n` and `n * d` repeat one, and `d += iterable` and `d *= n` update it in place. Methods take positional arguments only, and `maxlen` is read-only. A deque is mutable and so, as in Python, unhashable: `hash(d)` raises `TypeError: unhashable type: 'deque'`, and a deque cannot be a dict key or set member.
+
+As in Python, adding or removing at either end takes constant time, so a deque works well as a queue, a stack or a sliding window; inserting or removing in the middle takes time proportional to the length. Changing a deque's length or order while iterating over it raises `RuntimeError: deque mutated during iteration`. A deque is held to the interpreter's memory and value limits like a list: growing one past them raises `MemoryError` or stops the script.
 
 ```python
 import collections

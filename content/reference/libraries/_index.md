@@ -69,7 +69,7 @@ There is no universal extended-library `RegisterAll`. `stdlib.RegisterAll` cover
 Registration grants scripts the host process's authority for that surface. In particular:
 
 - filesystem, subprocess, environment, secret, and provisioning libraries can read, write, execute, or disclose host data according to their configured restrictions;
-- `requests` can use an embedding `netsecurity.Config` or the CLI network-policy file, but raw networking, messaging, Nomad, container, plugin, and some provisioning clients are separate surfaces and must not be assumed to inherit that HTTP policy;
+- the outbound libraries (`requests`, `wait_for`, WebSocket, unicast, multicast, gossip, Nomad, AI, MCP, `provision.fetch`, the Slack, Discord and Telegram libraries, and container endpoints a script supplies) obey an embedding `netsecurity.Config` or the CLI network-policy file when one is passed at registration, but HTTP clients the embedding application builds itself and plugin processes are separate surfaces and do not inherit it;
 - container and Nomad libraries can control available local runtimes or remote cluster workloads;
 - runtime HTTP/JSON-RPC/MCP/plugin servers and messaging handlers create remotely reachable entry points; authentication and authorization remain the application's responsibility;
 - plugin loading and package bundles add host-selected code and content, while provisioning can change files or fetch remote content.

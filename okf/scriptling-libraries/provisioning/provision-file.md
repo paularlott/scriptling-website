@@ -212,7 +212,7 @@ if status == file.REMOVED:
 
 This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
 
-`scriptling.provision.file` writes, modifies, and deletes files and directories on the local filesystem wherever the embedding process's own OS-level permissions allow. Unlike `os`, `fs`, or `pathlib`, it does not take an `allowedPaths` restriction: there is no per-library sandboxing of which paths it can touch. If you need to confine where provisioning writes can land, restrict it at the OS/process level (e.g. running under a dedicated user, container, or chroot) rather than relying on library-level controls. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
+`scriptling.provision.file` writes, modifies, and deletes files and directories on the local filesystem. Like `os` and `pathlib`, it honors `--allowed-paths` (or the allowed paths an embedder passes to `RegisterConfigured`): every function raises a `PermissionError`, which the script cannot catch, for a path outside them. Without allowed paths it can touch anything the embedding process's own OS-level permissions allow, so where that matters, also confine it at the OS/process level (a dedicated user, container, or chroot). For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 
 ## See Also
 

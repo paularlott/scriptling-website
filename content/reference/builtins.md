@@ -86,6 +86,10 @@ str({"a": 1}) # '{"a": 1}'
 str()         # "" (no argument gives the empty string)
 ```
 
+A list, tuple, dict or set nested more than 10,000 levels deep raises `RecursionError` when rendered, by `str()`, `repr()`, `print()`, f-strings or `format()`, as Python does, rather than exhausting the stack.
+
+Comparing containers follows Python too. Elements that are the same object count as equal without being compared, so a list that contains itself equals itself (`x == x` is `True`) and `[n] == [n]` is `True` when both hold the same NaN `n`. `in`, `count()`, `index()` and `remove()` match the same way. Two different values nested more than 10,000 levels deep, including two different self-containing lists, raise `RecursionError` from `==`, `!=`, `<`, `>`, `<=`, `>=`, `in`, `count()`, `index()`, `remove()`, `sorted()`, `min()` and `max()`.
+
 ### int()
 
 Convert to integer:
@@ -353,6 +357,8 @@ max([], default=None)     # None: default is returned for an empty iterable
                           # (single iterable only, not multiple arguments)
 min([True, False])        # False: booleans order as 0 and 1 (False < True),
                           # against each other and mixed with numbers, like Python
+max([1, "a"])             # TypeError: values that cannot be ordered raise,
+                          # as in sorted() and Python
 round(3.7)                # 4
 round(2.5)                # 2 (ties go to the even digit, like Python)
 round(3.14159, 2)         # 3.14

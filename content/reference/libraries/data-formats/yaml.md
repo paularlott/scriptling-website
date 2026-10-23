@@ -75,6 +75,8 @@ Converts a Scriptling object to a YAML-formatted string.
 
 **Returns:** `str`: the YAML-formatted output.
 
+**Raises:** `RecursionError`: if `obj` nests more than 10,000 levels deep. The value would otherwise be cut short and the output silently corrupt.
+
 ```python
 import yaml
 

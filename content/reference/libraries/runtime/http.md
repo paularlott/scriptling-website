@@ -186,6 +186,10 @@ Registers static file serving under a URL path prefix.
 
 **Returns:** `None`
 
+**Raises:** `PermissionError` when `--allowed-paths` (or the embedder's allowed paths) is set and `directory` lies outside it.
+
+Under `--allowed-paths` the route also serves only files that resolve inside the allowed paths, so a symlink in the directory cannot lead outside them, and it does not serve dotfiles (`.env`, `.git/…`) or directory listings: a directory is served only through its `index.html`. All of these answer 404. Without `--allowed-paths` the directory is served as is, symlinks, dotfiles and listings included.
+
 ```python
 import scriptling.runtime as runtime
 

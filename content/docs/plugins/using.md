@@ -79,9 +79,12 @@ conn = sqlite.connect()
 
 Because verbatim names can collide, registration guards them: a plugin whose
 dotted name matches a library the host already has (a built-in, a stdlib
-library, or a compiled-in driver) is skipped with a warning at load instead
-of shadowing it. A plugin can never take over `json`, `scriptling.runtime`,
-or a compiled-in driver's name. Bare names cannot collide with built-ins by
+library, a compiled-in driver, or a module the library loader supplies from
+disk) is skipped with a warning at load instead of shadowing it, and a
+script's `scriptling.plugin.load()` of such a name raises
+`load(): library <name> is already registered`. A plugin can never take over
+`json`, `scriptling.runtime`, a compiled-in driver's name, or a library on
+the library path. Bare names cannot collide with built-ins by
 construction, since built-in names are single words.
 
 ## Inspecting Plugins
@@ -247,9 +250,14 @@ callbacks back to the client. Use stdio plugins when host callbacks or
 - Loading a **new** path or URL under a name already in use raises an error. The
   name must not collide with any existing plugin library, including ones
   discovered via `--plugin-dir`.
-- A dotted (verbatim) name that matches a library already registered on the
-  interpreter is refused at registration with a warning, so plugins cannot
-  shadow built-in or compiled-in libraries.
+- A name that matches a library already registered on the interpreter, or a
+  module its library loader supplies from disk, is refused: `load()` raises
+  `load(): library <name> is already registered`, and a plugin the host loads
+  with `--plugin` or `--plugin-dir` under such a name is skipped with a
+  warning. Plugins cannot shadow built-in, compiled-in or on-disk libraries.
+- Where the `subprocess` library is disabled (`--no-subprocess` or
+  `--disable-lib subprocess`), `load()` of an executable is refused; HTTP(S)
+  plugins still load, and plugins the host loaded stay usable.
 - `unload(name)` sends a best-effort shutdown, closes the process, removes the
   client, and removes any dynamic `plugin.*` proxy registered for that peer.
   The same name+path can be `load()`-ed again afterwards.
