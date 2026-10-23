@@ -25,7 +25,7 @@ Creates a streaming chat completion using this client's configuration.
 - `extra_body` (`dict`, optional): Provider-specific fields to merge into the request body.
 - `timeout` (`int`, optional): Overall request timeout in seconds.
 
-**Returns:** `ChatStream`: a stream object with `next()`, `next_timeout()`, `err()`, and `retry()` methods.
+**Returns:** `ChatStream`: a stream object with `next()`, `next_timeout()`, `err()`, `close()`, and `retry()` methods.
 
 ```python
 client = ai.Client("", api_key="sk-...")
@@ -100,6 +100,16 @@ Returns the error that caused the stream to stop, or `None` if there was no erro
 err = stream.err()
 if err:
     print("Stream error:", err)
+```
+
+### `stream.close()`
+
+Stops the stream and releases its connection by cancelling the request behind it. Call it when a script stops reading a stream before the end, so the connection is not held open until the stream object is collected. Afterwards `next()` returns `None`, and `err()` does not report the cancellation itself. A stream read to the end, or stopped by an error (including a line over the interpreter's limits), releases itself; `collect_stream()` releases a stream it fails on.
+
+```python
+stream = client.completion_stream("gpt-4", "Write a long story")
+first = stream.next()
+stream.close()  # only wanted the first chunk
 ```
 
 ### `stream.retry()`

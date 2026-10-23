@@ -29,54 +29,49 @@ _This release hardens scriptling against hostile scripts and input; read the bre
 - **Breaking:** Apply `deny_cidrs` and the link-local block to `allow_hosts` entries, and require `allow_cidrs` for `multicast` groups under a policy
 - **Breaking:** Confine `runtime.http.static` and `runtime.kv.open` to `--allowed-paths`, hiding dotfiles and directory listings when restricted
 - **Breaking:** Confine `wait_for` `file`, `dir` and `file_content` checks, messaging `send_file` local files, `provision.fetch` paths and `container.run()` bind mounts to `--allowed-paths`; jail denials raise uncatchable `PermissionError`s, `provision.file`'s included (they were catchable errors), and `network="host"` is refused under a network policy
-- **Breaking for loopback binds:** Check the `Host` header on every endpoint of a server bound to loopback (`127.0.0.1`, `[::1]`, `localhost`), blocking DNS rebinding against local servers, and answer any name but a loopback one with `421`. A server bound to any other address (`:8000`, `0.0.0.0`) still answers every `Host` until the new `--allowed-hosts` is set; once set, it answers loopback names, IP addresses, the machine's own host name and the listed names, refusing the rest with `421` ([docs](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md#authentication))
-- **Breaking:** Require `--bearer-token` for `--mcp-exec-script` over HTTP, and answer browser requests to `/json-rpc` from other origins with `403`, as `/mcp` does; allowlist browser apps with `--json-rpc-cors-origin`
+- **Breaking:** Check the `Host` header on every endpoint of a server bound to loopback (`127.0.0.1`, `[::1]`, `localhost`), blocking DNS rebinding against local servers, and answer any name but a loopback one with `421`. A server bound to any other address (`:8000`, `0.0.0.0`) still answers every `Host` until the new `--allowed-hosts` is set; once set, it answers loopback names, IP addresses, the machine's own host name and the listed names, refusing the rest with `421` ([docs](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md#authentication))
+- **Breaking:** Require `--bearer-token` for `--mcp-exec-script` over HTTP, and answer browser requests to `/json-rpc` from other origins with `403`; allowlist browser apps with `--json-rpc-cors-origin`
 - **Breaking:** Limit JSON-RPC servers, and plugin servers over HTTP, to batches of 1,000 elements and 4 × CPUs handlers at once; change with `--json-rpc-max-batch` and `--json-rpc-concurrency`
 - **Breaking:** Refuse `image_url` values other than `data:` URIs for the Ollama provider instead of fetching them from the host outside the network policy
 - **Breaking:** Match Python 3.14 in `html.parser`: valueless attributes are `None`, CDATA goes to `unknown_decl`, and handler exceptions, `sys.exit` and timeouts propagate out of `feed()`; parsing is about 40% faster
 - **Breaking:** Return Go panics from `Eval` and every other entry point (`CallFunction`, `CallMethod`, `CreateInstance`, `Import` and `LoadLibraryIntoEnv`) as a `*scriptling.PanicError` reported as `script panic: <value>`, with the Go stack trace in its `Stack` field; `Eval`'s message used to include the stack, and the other entry points did not recover panics
 - **Breaking:** Raise `RecursionError` from `msgpack.packb`, `yaml.dump`, `toml.dumps` and `toon.encode` for values nested more than 10,000 levels instead of truncating them, and reject TOML nested more than 100 levels, in `toml.loads` and in network policy and secret config files, script metadata, package manifests and MCP tool metadata
-- **Breaking:** Raise `RecursionError` past the call-depth limit, as Python does, instead of a plain `Exception`; `except Exception` still catches it
-- **Breaking:** Raise `TypeError` from `min()` and `max()` for values that cannot be ordered and `ValueError` for a negative `collections.deque` `maxlen`, as Python does
+- **Breaking:** Raise `RecursionError` past the call-depth limit instead of a plain `Exception` (`except Exception` still catches it), `TypeError` from `min()` and `max()` for unorderable values, and `ValueError` for a negative `collections.deque` `maxlen`, as Python does
 - **Breaking:** Run the Apple `container` CLI from `/usr/local/bin/container` instead of `PATH`, refuse option values that start with `-`, pass script-supplied names, IDs and images after `--`, and list `runtimes()` without starting any process
-- Treat container elements that are the same object as equal, as Python does, so `[n] == [n]`, `[n].count(n)` and `[n].index(n)` find a NaN held twice
+- Treat container elements that are the same object as equal, as Python does, so a NaN held twice is found by `count()` and `index()`
 - Enforce memory limits mid-run and count Go-built lists, tuples, itertools and random results and `lru_cache` growth towards them
-- Resolve `--allowed-paths` the way the kernel opens paths so dangling and parent-escaping symlinks cannot leave them, confine library-loader symlinks to library dirs and allowed paths, and resolve relative library dirs and allowed paths from the working directory
-- Send messaging bot tokens only to their platform's hosts and apply the network policy to script-supplied Slack and Discord URLs
+- Resolve `--allowed-paths` the way the kernel opens paths so dangling and parent-escaping symlinks cannot leave them, and confine library-loader symlinks to library dirs and allowed paths
+- Send messaging bot tokens only to their platform's hosts
 - Answer a panic in an HTTP handler with a 500 and log panic stack traces at debug level
-- Bump `gossip` from 0.23.0 to 0.28.0 and `mcp` from 0.32.4 to 0.33.1, with smaller bumps to `logger`, `cli`, `jsonrpc`, `modernc.org/sqlite` and `valkey-go`
 
 
 **added**
 
 - Add `--max-background-tasks` to cap an interpreter's queued or running background tasks at once (env `SCRIPTLING_MAX_BACKGROUND_TASKS`, config `limits.max_background_tasks`); off by default. Go hosts use `scriptling.SetMaxBackgroundTasks`, `WithMaxBackgroundTasks` or `p.SetMaxBackgroundTasks`, and `ResourceUsage.BackgroundTasks` counts the live tasks
-- Add `--container-deny-privileged` to refuse privileged containers (env and config forms too, `container.Options.DenyPrivileged` in Go); off by default
+- Add `--container-deny-privileged` to refuse privileged containers (env and config forms too); off by default
 - Complete `collections.deque` as in Python: a real class (`isinstance()` and subclassing work) with `insert()`, `remove()`, `index()`, `reverse()`, item assignment and deletion, comparisons, `+` and `*`, `reversed()` and a read-only `maxlen`
 - Add reflected and in-place operator methods (`__radd__`, `__iadd__` and the rest), and `__reversed__` for `reversed()`; as in Python, `str % obj` formats `obj` and never calls `obj.__rmod__`
 - Add `object.Equal`, `object.Compare` and `object.SetCompareHooks` so Go-backed classes compare their elements as scripts do
-- Add `scriptling.PanicError` and `Scriptling.SetPanicHandler`
 - Add `netsecurity` policy guards (`Guard.CheckHost`, `Guard.Dial`, `Guard.ResolveIPs`, `ErrPolicy`) and `fssecurity` path checks (`Config.CheckPath`, `DeniedError`, `ErrPathNotAllowed`)
-- Add Go-integration counterparts to the new restrictions: `extlibs.RegisterWaitForLibraryConfigured`, messaging `RegisterConfigured`/`NewLibraryConfigured`, a network policy argument to `unicast.Register`, `multicast.Register`, `gossip.Register`, `nomad.Register`, `telegram.Register`, `discord.Register` and `slack.Register`, `scriptlingmcp.RegisterConfigured`, `plugin.RegisterLibrariesConfigured` and `plugin.ProcessesAllowed`, `container.RegisterWithOptions`, `container.Options` (with `DenyPrivileged` and `AppleCLI`) and `container.RegisterConfigured`, `libloader.WithAllowedPaths` and `MultiFilesystemLoader.RestrictTo`, `conversion.ToGoChecked`, the `ServerConfig` fields for the new server options, and `plugin.Server.SetHTTPLimits` ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md))
+- Add Go-integration counterparts to the new restrictions: `extlibs.RegisterWaitForLibraryConfigured`, messaging `RegisterConfigured`/`NewLibraryConfigured`, a network policy argument to `unicast.Register`, `multicast.Register`, `gossip.Register`, `nomad.Register`, `telegram.Register`, `discord.Register` and `slack.Register`, `scriptlingmcp.RegisterConfigured`, `plugin.RegisterLibrariesConfigured` and `plugin.ProcessesAllowed`, `container.RegisterWithOptions`, `container.Options` (with `DenyPrivileged` and `AppleCLI`) and `container.RegisterConfigured`, `libloader.WithAllowedPaths` and `MultiFilesystemLoader.RestrictTo`, `Scriptling.SetPanicHandler`, `conversion.ToGoChecked`, the `ServerConfig` fields for the new server options, and `plugin.Server.SetHTTPLimits` ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md))
 
 
 **fixed**
 
-- Fix whole-process crashes from deeply nested or self-referential values: over-deep `msgpack`, `yaml`, `toml` and `toon` output, cyclic containers, comparing or `repr()` of over-deep values, and generators that resume generators now raise `RecursionError`; `xml.loads()` and `xml.dumps()` past 1,000 levels and TOML input past 100 levels raise an error; and over-deep source is a parse error
+- Fix whole-process crashes from deeply nested or self-referential values: comparing or `repr()` of over-deep values, cyclic containers, and generators that resume generators now raise `RecursionError`; `xml.loads()` and `xml.dumps()` past 1,000 levels raise an error; and over-deep source is a parse error
 - Fix `html.parser` panics on `<!-->`, `<!--->`, `<?>` and `&;`
 - Fix zip web roots serving members with absolute or `..` names
-- Fix `ZipFile`/`TarFile` `extract()` and `extractall()` writing members of any size under a value limit; an oversized member now raises `MemoryError`, as `read()` does, and leaves nothing on disk
+- Fix `ZipFile`/`TarFile` `extract()` and `extractall()` writing members of any size under a value limit; an oversized member now raises `MemoryError` and leaves nothing on disk
 - Fix network-policy host matching for trailing-dot hosts, bare domains under suffix rules and non-canonical numeric hosts
 - Fix the Gemini provider exposing its API key in `models()` and `embedding()` error messages
 - Fix `scriptling.ai` responses and `ai.collect_stream()` bypassing the interpreter's value and memory limits, and error messages repeating the provider's prefix
 - Fix `runtime.background` tasks escaping the memory limit; each live task is now charged `object.TaskBytes` (48 KiB) against it
 - Fix `collections.deque` ignoring the memory and value limits, `appendleft()` and `extendleft()` copying the whole deque on every element, and `str()` showing string elements unquoted
 - Fix `setattr()` on an instance bypassing property setters, read-only properties and frozen dataclasses
-- Fix an error raised by a Go-backed `__eq__` inside a container reading as `False` instead of propagating
 - Fix an exception raised inside a `+` chain that starts with a variable reaching the caller as `TypeError` instead (since 0.20.0)
 - Fix `scriptling help` ignoring `--no-subprocess`, so a module it imported to document could run processes
 - Fix `scriptling.plugin.load()` registering a plugin over a library already registered under the same name, or over a module the library loader supplies from disk, letting a script replace a host library; it now raises `load(): library <name> is already registered`, and a `--plugin` or `--plugin-dir` plugin under such a name is skipped with a warning
-- Fix `os.symlink()` under `--allowed-paths` creating a link whose target lies outside them; the target is resolved from the link's directory, as the kernel does, and refused with a `PermissionError`
-- Fix `nomad.Client` accepting a query or fragment in its address
+- Fix `os.symlink()` under `--allowed-paths` creating a link whose target lies outside them; the target is resolved from the link's directory and refused with a `PermissionError`
 
 
 ---
