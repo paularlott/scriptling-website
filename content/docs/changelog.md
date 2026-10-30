@@ -8,6 +8,12 @@ nav-skip: true
 
 ## October 2026
 
+{{< version "v0.33.1" >}}
+
+{{< changelog-item "added" >}}
+- Add `verify` to `requests`: `False` accepts any certificate, a path trusts a CA bundle
+{{< /changelog-item >}}
+
 {{< version "v0.33.0" >}}
 
 _This release hardens scriptling against hostile scripts and input; read the breaking changes before upgrading._

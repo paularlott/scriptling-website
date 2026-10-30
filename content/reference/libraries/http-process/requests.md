@@ -34,6 +34,7 @@ Send an HTTP GET request to the specified URL.
   - `headers` (`dict`): HTTP headers to send.
   - `params` (`dict`): Query parameters to append to the URL.
   - `auth` (`tuple`/`list`): Basic authentication as `(username, password)`.
+  - `verify` (`bool` or `str`): Verify the server's TLS certificate. Default: `True` (`None` too). `False` accepts any certificate, for a development server only; a path names a PEM bundle file of CA certificates to trust instead of the system's.
 
 **Returns:** `Response`: see [Response Object](#response-object).
 
@@ -58,6 +59,7 @@ Send an HTTP POST request to the specified URL with the given data.
   - `params` (`dict`): Query parameters to append to the URL.
   - `json` (`dict`/`list`): Data to JSON-encode as the request body (sets `Content-Type`). Use either `data` or `json`, not both.
   - `auth` (`tuple`/`list`): Basic authentication as `(username, password)`.
+  - `verify` (`bool` or `str`): Verify the server's TLS certificate. Default: `True` (`None` too). `False` accepts any certificate, for a development server only; a path names a PEM bundle file of CA certificates to trust instead of the system's.
 
 **Returns:** `Response`: see [Response Object](#response-object).
 
@@ -86,6 +88,7 @@ Send an HTTP PUT request to the specified URL with the given data.
   - `params` (`dict`): Query parameters to append to the URL.
   - `json` (`dict`/`list`): Data to JSON-encode as the request body (sets `Content-Type`). Use either `data` or `json`, not both.
   - `auth` (`tuple`/`list`): Basic authentication as `(username, password)`.
+  - `verify` (`bool` or `str`): Verify the server's TLS certificate. Default: `True` (`None` too). `False` accepts any certificate, for a development server only; a path names a PEM bundle file of CA certificates to trust instead of the system's.
 
 **Returns:** `Response`: see [Response Object](#response-object).
 
@@ -106,6 +109,7 @@ Send an HTTP DELETE request to the specified URL.
   - `headers` (`dict`): HTTP headers to send.
   - `params` (`dict`): Query parameters to append to the URL.
   - `auth` (`tuple`/`list`): Basic authentication as `(username, password)`.
+  - `verify` (`bool` or `str`): Verify the server's TLS certificate. Default: `True` (`None` too). `False` accepts any certificate, for a development server only; a path names a PEM bundle file of CA certificates to trust instead of the system's.
 
 **Returns:** `Response`: see [Response Object](#response-object).
 
@@ -128,6 +132,7 @@ Send an HTTP PATCH request to the specified URL with the given data.
   - `params` (`dict`): Query parameters to append to the URL.
   - `json` (`dict`/`list`): Data to JSON-encode as the request body (sets `Content-Type`). Use either `data` or `json`, not both.
   - `auth` (`tuple`/`list`): Basic authentication as `(username, password)`.
+  - `verify` (`bool` or `str`): Verify the server's TLS certificate. Default: `True` (`None` too). `False` accepts any certificate, for a development server only; a path names a PEM bundle file of CA certificates to trust instead of the system's.
 
 **Returns:** `Response`: see [Response Object](#response-object).
 
@@ -151,6 +156,7 @@ Execute multiple HTTP requests concurrently with a configurable concurrency limi
   - `params` (`dict`, optional): Query parameters to append to the URL.
   - `auth` (`list`/`tuple`, optional): Basic authentication as `[username, password]`.
   - `timeout` (`int`, optional): Request timeout in seconds. Default: `30`.
+  - `verify` (`bool` or `str`, optional): Verify the server's TLS certificate. Default: `True`. A path names a CA bundle; one outside `--allowed-paths` raises `PermissionError` for the whole batch.
 - `max_parallel` (`int`, optional): Maximum number of concurrent requests. Default: `4`. The host may cap this (see [Script Resource Limits](/docs/go-integration/basics/#script-resource-limits)); a larger request is reduced to the cap.
 
 **Returns:** `list`: `Response` objects in the same order as the input list. A request that fails for any reason, a malformed spec (missing `url` or un-encodable `json`), a transport failure (timeout, DNS, connection refused) or a response over the interpreter's limits, yields a `Response` with `status_code=0` and the error message in `text` in the corresponding position, so one failure never stops the batch.
@@ -226,11 +232,13 @@ This is an extended library, requiring registration in Go, see [Library Registra
 
 The CLI configures the same guard through its `--network-policy` TOML file and passes that policy to `requests`; scripts do not configure it through request arguments. This policy is specific to participating clients, not a blanket process firewall, so do not assume raw networking, messaging, container, Nomad, plugin, or provisioning clients inherit it. See the [Security Guide](/docs/security/#network-security).
 
+`verify` changes only which certificates are trusted (`False`: any); under a network policy every other rule still applies. A CA bundle path is read like any file: under `--allowed-paths` it must lie within them, else an uncatchable `PermissionError`.
+
 ## Notes
 
 - HTTP/2 support with automatic fallback to HTTP/1.1.
 - Connection pooling (100 connections per host).
-- Self-signed certificates are rejected by default; the embedder can opt in via `InsecureSkipVerify` on the HTTP client.
+- Self-signed certificates are rejected by default. To trust one, pass `verify="ca.pem"`, a PEM bundle of the CA certificates to trust instead of the system's (as in Python's `requests`, it replaces them: include the system's own to reach other sites too); `verify=False` accepts any certificate, for a development server only.
 - Default timeout: 5 seconds (30 seconds for `parallel()`).
 
 ## See Also

@@ -16,6 +16,14 @@ type: Guide
 
 ## October 2026
 
+### v0.33.1
+
+
+**added**
+
+- Add `verify` to `requests`: `False` accepts any certificate, a path trusts a CA bundle
+
+
 ### v0.33.0
 
 

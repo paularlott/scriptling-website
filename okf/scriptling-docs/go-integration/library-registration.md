@@ -126,6 +126,12 @@ extlibs.RegisterSedLibrary(p, []string{"/tmp"})
 | `scriptling.find` | `RegisterFindLibrary(p, allowedPaths)` |
 | `scriptling.sed` | `RegisterSedLibrary(p, allowedPaths)` |
 
+`requests` reads a file too: the CA bundle a script names with `verify="path"`. `RegisterRequestsLibrary` lets it be any file; `RegisterRequestsLibraryConfigured` confines it to allowed paths (outside them it raises an uncatchable `PermissionError`, as in `os`) and takes the network policy too. The CLI registers it this way with `--allowed-paths` and `--network-policy`.
+
+```go
+extlibs.RegisterRequestsLibraryConfigured(p, fssecurity.Config{AllowedPaths: []string{"/tmp", "/data"}}, policy) // policy may be nil
+```
+
 ### Custom Configuration
 
 ```go

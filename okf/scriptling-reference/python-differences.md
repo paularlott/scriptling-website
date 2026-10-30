@@ -109,6 +109,14 @@ Imports work as in Python, but a library is only importable if the host has made
 response = requests.get("https://slow-api.com", timeout=30)
 ```
 
+### TLS Verification
+
+`requests` takes `verify` as Python's does: `False` accepts any certificate, and a path names a PEM bundle of CA certificates to trust. The bundle must be a file, not a directory of certificates; Python's `REQUESTS_CA_BUNDLE` and `CURL_CA_BUNDLE` environment variables are not read; and the path is held to `--allowed-paths`.
+
+```python
+response = requests.get("https://dev.example.local/", verify="dev-ca.pem")
+```
+
 ### File System Access
 
 There is no built-in `open()`; files are read and written through libraries such as `os` (`os.read_file()`, `os.write_file()`) and `pathlib`. Whether those libraries exist, and what they can reach, depends on the host: a bare embedded interpreter has no filesystem libraries unless the Go host registers them with allowed paths, while the `scriptling` CLI registers them with full filesystem access unless `--allowed-paths` restricts it. See the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
