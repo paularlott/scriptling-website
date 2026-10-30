@@ -50,6 +50,7 @@ These libraries provide Scriptling-specific functionality. This is a capability 
 | `scriptling.messaging.*` | **NETWORK + REMOTE INPUT** - Bot clients receive events and send messages using script-supplied credentials |
 | `scriptling.container` | **INFRASTRUCTURE CONTROL** - Manages Docker, Podman, and Apple Containers |
 | `scriptling.nomad`    | **INFRASTRUCTURE CONTROL** - Registers/stops jobs and manages Nomad resources |
+| `scriptling.oauth`    | **NETWORK ACCESS** - Signs in to identity providers and handles access tokens |
 | `scriptling.plugin`   | **PROCESS OR NETWORK ACCESS** - Starts executable peers or connects to plugin servers |
 | `scriptling.provision.*` | **FILESYSTEM + NETWORK ACCESS** - Changes files and can download remote content |
 | `scriptling.secret`   | Host-controlled secret access; scripts see aliases, not provider credentials |
@@ -174,7 +175,7 @@ extlibs.RegisterRequestsLibrary(p)
 
 ### Network Policies
 
-For scripts that *should* reach the internet but must never reach your private network, register a network policy. A policy governs the `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.net.unicast`, `scriptling.net.multicast`, `scriptling.net.gossip`, `scriptling.nomad`, `scriptling.ai`, `scriptling.mcp`, and `scriptling.provision.fetch` libraries, the Slack, Discord and Telegram messaging libraries, and the container endpoints a script passes to `scriptling.container`, and is enforced at connect time: the hostname is resolved through the configured DNS servers, every resolved address is checked against the policy, and the connection is made to the validated address directly. That closes the usual bypasses — DNS rebinding (the answer changing between check and connect), redirects to internal hosts, and IP-notation tricks.
+For scripts that *should* reach the internet but must never reach your private network, register a network policy. A policy governs the `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.net.unicast`, `scriptling.net.multicast`, `scriptling.net.gossip`, `scriptling.nomad`, `scriptling.oauth`, `scriptling.ai`, `scriptling.mcp`, and `scriptling.provision.fetch` libraries, the Slack, Discord and Telegram messaging libraries, and the container endpoints a script passes to `scriptling.container`, and is enforced at connect time: the hostname is resolved through the configured DNS servers, every resolved address is checked against the policy, and the connection is made to the validated address directly. That closes the usual bypasses — DNS rebinding (the answer changing between check and connect), redirects to internal hosts, and IP-notation tricks.
 
 With a policy active, loopback, link-local (including cloud metadata endpoints like `169.254.169.254`), private, reserved (CGNAT `100.64.0.0/10`, documentation and benchmarking ranges, NAT64/6to4 and other non-public ranges), unspecified, and multicast addresses are all blocked by default, as are URLs that name an IP directly. Host allow/deny lists, CIDR exceptions, https-only, and custom DNS servers grant exactly the access you intend — allowlisted hosts are trusted to resolve internally (still subject to `deny_cidrs`, and a link-local answer still needs `allow_cidrs`), and deny rules always win.
 

@@ -22,7 +22,7 @@ Modules that mirror Python's standard library, grouped by subject:
 - [Collections & Iteration](collections-iteration/): collections, itertools, functools, contextlib
 - [Time & System](time-system/): time, datetime, platform, sys, logging
 - [File System](filesystem/): os, os.path, pathlib, glob, fs, shutil, tempfile, tarfile, zipfile
-- [HTTP & Process](http-process/): requests, urllib.parse, subprocess
+- [HTTP & Process](http-process/): requests, scriptling.oauth, urllib.parse, subprocess
 
 The *standard* set (json, re, time, datetime, math, random, statistics, base64, hashlib, hmac, uuid, string, html, textwrap, difflib, io, platform, urllib.parse, collections, itertools, functools, contextlib, msgpack) has no access to the host and is registered together by `stdlib.RegisterAll`. The rest are *extended* libraries, registered one by one because they reach the file system, network, processes or host: see [Availability](#availability).
 
@@ -69,7 +69,7 @@ There is no universal extended-library `RegisterAll`. `stdlib.RegisterAll` cover
 Registration grants scripts the host process's authority for that surface. In particular:
 
 - filesystem, subprocess, environment, secret, and provisioning libraries can read, write, execute, or disclose host data according to their configured restrictions;
-- the outbound libraries (`requests`, `wait_for`, WebSocket, unicast, multicast, gossip, Nomad, AI, MCP, `provision.fetch`, the Slack, Discord and Telegram libraries, and container endpoints a script supplies) obey an embedding `netsecurity.Config` or the CLI network-policy file when one is passed at registration, but HTTP clients the embedding application builds itself and plugin processes are separate surfaces and do not inherit it;
+- the outbound libraries (`requests`, `scriptling.oauth`, `wait_for`, WebSocket, unicast, multicast, gossip, Nomad, AI, MCP, `provision.fetch`, the Slack, Discord and Telegram libraries, and container endpoints a script supplies) obey an embedding `netsecurity.Config` or the CLI network-policy file when one is passed at registration, but HTTP clients the embedding application builds itself and plugin processes are separate surfaces and do not inherit it;
 - container and Nomad libraries can control available local runtimes or remote cluster workloads;
 - runtime HTTP/JSON-RPC/MCP/plugin servers and messaging handlers create remotely reachable entry points; authentication and authorization remain the application's responsibility;
 - plugin loading and package bundles add host-selected code and content, while provisioning can change files or fetch remote content.

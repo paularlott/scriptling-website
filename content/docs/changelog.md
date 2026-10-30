@@ -12,6 +12,7 @@ nav-skip: true
 
 {{< changelog-item "added" >}}
 - Add `verify` to `requests`: `False` accepts any certificate, a path trusts a CA bundle
+- Add `scriptling.oauth` for OAuth 2.0 sign-in, tokens and token verification ([docs](/reference/libraries/http-process/oauth/))
 {{< /changelog-item >}}
 
 {{< version "v0.33.0" >}}

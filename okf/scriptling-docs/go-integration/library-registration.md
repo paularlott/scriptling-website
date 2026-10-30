@@ -278,7 +278,7 @@ gossip.Register(p, nil)     // scriptling.net.gossip (nil = null logger; optiona
 
 ### Network Policy
 
-The outbound networking libraries — `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.net.unicast`, `scriptling.net.multicast`, `scriptling.net.gossip`, `scriptling.nomad`, `scriptling.ai`, `scriptling.mcp`, and the Slack, Discord and Telegram messaging libraries — accept an optional `*netsecurity.Config` that restricts where scripts may connect. `scriptling.container` takes one through `container.RegisterConfigured` or `container.Options.Policy` (it checks the endpoints a script supplies), and `scriptling.provision.fetch` takes a `*netsecurity.Guard` through `fetch.RegisterConfigured`. Pass `nil` (or omit the argument) for no restrictions; a non-nil policy blocks loopback, link-local (cloud metadata), private, unspecified, and multicast addresses, and IP-literal URLs, by default.
+The outbound networking libraries — `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.net.unicast`, `scriptling.net.multicast`, `scriptling.net.gossip`, `scriptling.nomad`, `scriptling.oauth`, `scriptling.ai`, `scriptling.mcp`, and the Slack, Discord and Telegram messaging libraries — accept an optional `*netsecurity.Config` that restricts where scripts may connect. `scriptling.container` takes one through `container.RegisterConfigured` or `container.Options.Policy` (it checks the endpoints a script supplies), and `scriptling.provision.fetch` takes a `*netsecurity.Guard` through `fetch.RegisterConfigured`. Pass `nil` (or omit the argument) for no restrictions; a non-nil policy blocks loopback, link-local (cloud metadata), private, unspecified, and multicast addresses, and IP-literal URLs, by default.
 
 ```go
 import (
@@ -358,6 +358,7 @@ import (
     "github.com/paularlott/scriptling/extlibs/console"
     "github.com/paularlott/scriptling/extlibs/container"
     "github.com/paularlott/scriptling/extlibs/nomad"
+    "github.com/paularlott/scriptling/extlibs/oauth"
     "github.com/paularlott/scriptling/extlibs/similarity"
     "github.com/paularlott/scriptling/extlibs/provision/fetch"
     "github.com/paularlott/scriptling/extlibs/provision/file"
@@ -366,6 +367,7 @@ import (
 console.Register(p)                        // scriptling.console
 container.Register(p, "", "")              // scriptling.container (empty = default sockets; RegisterWithOptions adds path/network checks and DenyPrivileged)
 nomad.Register(p)                          // scriptling.nomad (optional *netsecurity.Config)
+oauth.Register(p)                          // scriptling.oauth (optional *netsecurity.Config; RegisterConfigured adds allowed paths for CA bundles)
 similarity.Register(p)                     // scriptling.similarity
 file.Register(p)                           // scriptling.provision.file
 fetch.Register(p)                          // scriptling.provision.fetch
@@ -377,6 +379,7 @@ extlibs.RegisterMarkdownLibrary(p)         // scriptling.markdown
 | `scriptling.console` | `extlibs/console` | `console.Register(p)` |
 | `scriptling.container` | `extlibs/container` | `container.Register(p, dockerSock, podmanSock)` or `container.RegisterWithOptions(p, opts)` |
 | `scriptling.nomad` | `extlibs/nomad` | `nomad.Register(p)` |
+| `scriptling.oauth` | `extlibs/oauth` | `oauth.Register(p)` or `oauth.RegisterConfigured(p, paths, policy)` |
 | `scriptling.similarity` | `extlibs/similarity` | `similarity.Register(p)` |
 | `scriptling.provision.file` | `extlibs/provision/file` | `file.Register(p)` |
 | `scriptling.provision.fetch` | `extlibs/provision/fetch` | `fetch.Register(p)` |

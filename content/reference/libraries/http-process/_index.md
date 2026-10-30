@@ -5,10 +5,11 @@ tags: [libraries, http]
 weight: 8
 ---
 
-`requests` and `subprocess` are extended libraries and require registration when embedding; `urllib.parse` is a standard library.
+`requests`, `scriptling.oauth` and `subprocess` are extended libraries and require registration when embedding; `urllib.parse` is a standard library.
 
 | Library | Description |
 |---------|-------------|
 | [requests](requests/) | HTTP library for sending requests |
+| [scriptling.oauth](oauth/) | OAuth 2.0 / OpenID Connect sign-in, tokens and token verification |
 | [urllib.parse](urllib/) | URL parsing, joining, and percent-encoding |
 | [subprocess](subprocess/) | Spawn and manage subprocesses |

@@ -22,6 +22,7 @@ type: Guide
 **added**
 
 - Add `verify` to `requests`: `False` accepts any certificate, a path trusts a CA bundle
+- Add `scriptling.oauth` for OAuth 2.0 sign-in, tokens and token verification ([docs](https://scriptling.dev/okf/scriptling-libraries/http-process/oauth.md))
 
 
 ### v0.33.0

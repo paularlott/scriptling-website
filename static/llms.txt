@@ -4,7 +4,7 @@
 
 Docs: https://scriptling.dev/docs/
 
-All 190 OKF 0.2 concepts below are plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
+All 191 OKF 0.2 concepts below are plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
 
 ## Essential
 
@@ -149,6 +149,7 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [tempfile](https://scriptling.dev/okf/scriptling-libraries/filesystem/tempfile.md): Temporary file and directory creation with security restrictions.
 - [zipfile](https://scriptling.dev/okf/scriptling-libraries/filesystem/zipfile.md): Read and write ZIP archives.
 - [File System](https://scriptling.dev/okf/scriptling-libraries/filesystem.md): File and directory access libraries. All require registration when embedding.
+- [scriptling.oauth](https://scriptling.dev/okf/scriptling-libraries/http-process/oauth.md): OAuth 2.0 and OpenID Connect - device sign-in, client credentials, refresh tokens and access token verification.
 - [requests](https://scriptling.dev/okf/scriptling-libraries/http-process/requests.md): HTTP client for making GET, POST, PUT, DELETE, and PATCH requests.
 - [subprocess](https://scriptling.dev/okf/scriptling-libraries/http-process/subprocess.md): Spawn and manage subprocesses, similar to Python's subprocess module.
 - [urllib.parse](https://scriptling.dev/okf/scriptling-libraries/http-process/urllib.md): Parse, split, join, and percent-encode/decode URLs and query strings without network access.

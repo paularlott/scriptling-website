@@ -14,10 +14,11 @@ type: API Reference
 ---
 # HTTP & Process
 
-`requests` and `subprocess` are extended libraries and require registration when embedding; `urllib.parse` is a standard library.
+`requests`, `scriptling.oauth` and `subprocess` are extended libraries and require registration when embedding; `urllib.parse` is a standard library.
 
 | Library | Description |
 |---------|-------------|
 | [requests](https://scriptling.dev/okf/scriptling-libraries/http-process/requests.md) | HTTP library for sending requests |
+| [scriptling.oauth](https://scriptling.dev/okf/scriptling-libraries/http-process/oauth.md) | OAuth 2.0 / OpenID Connect sign-in, tokens and token verification |
 | [urllib.parse](https://scriptling.dev/okf/scriptling-libraries/http-process/urllib.md) | URL parsing, joining, and percent-encoding |
 | [subprocess](https://scriptling.dev/okf/scriptling-libraries/http-process/subprocess.md) | Spawn and manage subprocesses |
