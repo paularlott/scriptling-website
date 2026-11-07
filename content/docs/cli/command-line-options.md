@@ -37,10 +37,17 @@ Give these options before the script file: everything after it is passed to the 
 | `--web-root`          | `SCRIPTLING_WEB_ROOT`      | `server.web_root`            | Directory to serve static files from                 | (disabled)       |
 | `--json-rpc`          | `SCRIPTLING_JSONRPC`       | -                            | JSON-RPC server mode: stdio by default, HTTP `/json-rpc` with `--server` | false            |
 | `--mcp-tools`         | `SCRIPTLING_MCP_TOOLS`     | `mcp.tools`                  | Directory containing MCP tools                       | (disabled)       |
-| `--mcp-exec-script`   | `SCRIPTLING_MCP_EXEC_SCRIPT` | `mcp.exec_script`          | Enable MCP script execution tool; over HTTP requires `--bearer-token` | false            |
+| `--mcp-exec-script`   | `SCRIPTLING_MCP_EXEC_SCRIPT` | `mcp.exec_script`          | Enable MCP script execution tool; over HTTP requires `--bearer-token` or `--oidc-issuer` | false            |
 | `--mcp-resources`     | `SCRIPTLING_MCP_RESOURCES` | `mcp.resources`              | Directory containing MCP resources                   | (disabled)       |
 | `--mcp-prompts`       | `SCRIPTLING_MCP_PROMPTS`   | `mcp.prompts`                | Directory containing MCP prompts                     | (disabled)       |
 | `--bearer-token`      | `SCRIPTLING_BEARER_TOKEN`  | `server.bearer_token`        | Bearer token for authentication                      | none             |
+| `--oidc-issuer`       | `SCRIPTLING_OIDC_ISSUER`   | `server.oidc_issuer`         | Accept OAuth JWT access tokens from this identity provider (issuer URL); with `--bearer-token`, either is accepted | none |
+| `--oidc-jwks-url`     | `SCRIPTLING_OIDC_JWKS_URL` | `server.oidc_jwks_url`       | Identity provider JWKS URL                           | discovered from the issuer |
+| `--oidc-audience`     | `SCRIPTLING_OIDC_AUDIENCE` | `server.oidc_audience`       | This server's resource identifier: the public URL of its `/mcp` endpoint, which tokens' `aud` must name (required with `--oidc-issuer`) | none |
+| `--oidc-required-scopes` | `SCRIPTLING_OIDC_REQUIRED_SCOPES` | `server.oidc_required_scopes` | Scopes every identity-provider token must grant (comma or space separated) | none |
+| `--oidc-require-at-jwt` | `SCRIPTLING_OIDC_REQUIRE_AT_JWT` | `server.oidc_require_at_jwt` | Require RFC 9068 access tokens (JWT `typ` `at+jwt`), refusing ID tokens | false |
+| `--oidc-ca-file` | `SCRIPTLING_OIDC_CA_FILE` | `server.oidc_ca_file` | PEM file of CA certificates trusted (with the system roots) for the identity provider's discovery and JWKS fetches | none |
+| `--oidc-tls-insecure` | `SCRIPTLING_OIDC_TLS_INSECURE` | `server.oidc_tls_insecure` | Skip TLS certificate verification for the identity provider's discovery and JWKS fetches (development only) | false |
 | `--max-request-body`  | `SCRIPTLING_MAX_REQUEST_BODY` | `server.max_request_body` | Maximum HTTP request body in bytes (0 = 32MiB, negative = unlimited) | 0 (32MiB)        |
 | `--json-rpc-max-batch` | `SCRIPTLING_JSONRPC_MAX_BATCH` | `server.json_rpc_max_batch` | Maximum elements in one JSON-RPC batch; a larger batch gets one Invalid Request error (0 = 1000, negative = unlimited, e.g. `--json-rpc-max-batch=-1`) | 0 (1000) |
 | `--json-rpc-concurrency` | `SCRIPTLING_JSONRPC_CONCURRENCY` | `server.json_rpc_concurrency` | Maximum JSON-RPC handlers running at once across all batches, requests and streams (0 = 4 × CPUs, negative = unlimited) | 0 (4 × CPUs) |
@@ -220,6 +227,9 @@ insecure = ["https://plugins.internal:8443"]
 address = ":8000"
 web_root = "./public"
 bearer_token = "secret"
+# oidc_issuer = "https://idp.example.com/realms/acme"
+# oidc_audience = "https://mcp.example.com/mcp"
+# oidc_required_scopes = "mcp:use"
 allowed_hosts = ["app.example.com", ".internal.example.com"]
 json_rpc_cors_origins = ["https://app.example.com"]
 json_rpc_max_batch = 0       # 0 = 1000, negative = unlimited

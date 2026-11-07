@@ -55,6 +55,8 @@ Decodes a raw MCP tool response into scriptling objects.
 
 **Returns:** `object`: decoded response (parsed JSON or string).
 
+**Raises:** an error (`MCP tool error: <text>`) when the dict has `isError` (or `is_error`) set to `True`.
+
 ```python
 import scriptling.mcp as mcp
 
@@ -174,6 +176,8 @@ Executes a tool by name with the provided arguments.
 
 **Returns:** `dict`: decoded tool response.
 
+**Raises:** an error when the server answers with a JSON-RPC error, and also when the tool reports a tool execution error (an `isError` result); the message is `MCP tool error: ` followed by the tool's error text. A failed tool is never returned as if it were a successful result.
+
 ```python
 client = mcp.Client("https://api.example.com/mcp")
 
@@ -232,7 +236,7 @@ Executes multiple tools concurrently and returns results in the same order as th
 
 - `calls` (`list`): List of dicts, each with `name` (`str`) and `arguments` (`dict`) keys.
 
-**Returns:** `list`: result dicts with `name`, `result`, and `error` keys. `error` is an empty string on success.
+**Returns:** `list`: result dicts with `name`, `result`, and `error` keys. `error` is an empty string on success; for a JSON-RPC error or a tool execution error (`isError`) it holds the message (`MCP tool error: …` for the latter) and `result` is `None`. One failed call does not raise.
 
 ```python
 client = mcp.Client("https://api.example.com/mcp")
@@ -260,6 +264,8 @@ Executes a tool by name using the `execute_tool` MCP tool. This is the only way 
 
 **Returns:** `dict`: tool response.
 
+**Raises:** an error on a JSON-RPC error or a tool execution error (`isError`), as `call_tool()` does.
+
 ```python
 client = mcp.Client("https://api.example.com/mcp")
 
@@ -281,7 +287,7 @@ Executes multiple discovered tools concurrently and returns results in the same 
 
 - `calls` (`list`): List of dicts, each with `name` (`str`) and `arguments` (`dict`) keys.
 
-**Returns:** `list`: result dicts with `name`, `result`, and `error` keys. `error` is an empty string on success.
+**Returns:** `list`: result dicts with `name`, `result`, and `error` keys. `error` is an empty string on success; for a JSON-RPC error or a tool execution error (`isError`) it holds the message (`MCP tool error: …` for the latter) and `result` is `None`. One failed call does not raise.
 
 ```python
 client = mcp.Client("https://api.example.com/mcp")
@@ -558,6 +564,10 @@ try:
 except Exception as e:
     print("Tool execution failed:", e)
 ```
+
+A tool that fails reports it as an `isError` result rather than a protocol error; `call_tool()` and `execute_discovered()` raise it as `MCP tool error: <text>`, so the same `except` handles both. The parallel methods put the message in each result's `error` instead.
+
+The client speaks MCP protocol 2025-03-26 and later; servers that only support 2024-11-05 are no longer supported.
 
 ## Security Considerations
 

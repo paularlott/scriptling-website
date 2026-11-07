@@ -131,7 +131,7 @@ The `--mcp-exec-script` flag enables a built-in MCP tool that allows AI assistan
 scriptling --server 127.0.0.1:8000 --mcp-exec-script --bearer-token my-secret-token setup.py
 ```
 
-Over HTTP the tool requires `--bearer-token`: without one the server refuses to start, because any web page the user visits can reach a server on their machine. Over stdio (no `--server`) no token is needed.
+Over HTTP the tool requires `--bearer-token` or `--oidc-issuer`: without one the server refuses to start, because any web page the user visits can reach a server on their machine. Over stdio (no `--server`) no token is needed.
 
 ### Tool Details
 
@@ -410,7 +410,7 @@ The `--mcp-exec-script` flag allows AI assistants to execute arbitrary code. Con
 
 - Use `--allowed-paths` to restrict participating library filesystem I/O; it is not a complete sandbox
 - Use `--disable-lib subprocess` to remove shell access
-- Over HTTP, `--bearer-token` is required (the server refuses to start without it); add script middleware for per-user keys (see [Per-User Keys](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md#per-user-keys)). The token wraps every endpoint including `/mcp` and the built-in `/health`; middleware guards `/mcp` and script routes but not the built-in `/health` or static routes (a route claiming `GET /health` replaces the built-in — see [Health Checks](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md#health-checks)).
+- Over HTTP, `--bearer-token` or `--oidc-issuer` is required (the server refuses to start without one; see [Identity Provider](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md#identity-provider-oauth--oidc)); add script middleware for per-user keys (see [Per-User Keys](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md#per-user-keys)). The token wraps every endpoint including `/mcp` and the built-in `/health`; middleware guards `/mcp` and script routes but not the built-in `/health` or static routes (a route claiming `GET /health` replaces the built-in — see [Health Checks](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md#health-checks)).
 - Run in a sandboxed environment for untrusted AI systems
 
 ```bash

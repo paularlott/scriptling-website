@@ -277,6 +277,7 @@ Local tools, remote tools and `get_skill` all live in the same registry, so `bot
 - A server without the Skills extension (or with none) simply contributes no skills; its tools still work and no skills section is added.
 - If you registered your own `get_skill` tool, the agent keeps it and does not add its own.
 - MCP Apps tools (tools linked to a `ui://` resource) come along as ordinary tools: an agent loop has no UI host, so their results are plain text.
+- A remote tool that fails (an `isError` result, which `call_tool()` raises as `MCP tool error: …`) reaches the model as an `Error: …` tool result, like any raising handler; the loop continues and the model can retry or route around it.
 - Creating the agent contacts every server once (`tools/list` plus `skills/list`); an unreachable server raises at `Agent()` construction rather than being silently skipped.
 - The skills listing lives in the system message, so it survives auto-compaction.
 

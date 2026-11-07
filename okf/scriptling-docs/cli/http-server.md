@@ -37,6 +37,13 @@ The setup script is executed when the server starts and typically registers rout
 | `--json-rpc`        | `SCRIPTLING_JSONRPC`      | Mount JSON-RPC at `/json-rpc`    | false      |
 | `--web-root`        | `SCRIPTLING_WEB_ROOT`     | Directory or zip to serve static files from | none       |
 | `--bearer-token`    | `SCRIPTLING_BEARER_TOKEN` | Bearer token for authentication  | none       |
+| `--oidc-issuer`     | `SCRIPTLING_OIDC_ISSUER`  | Accept OAuth JWT access tokens from this identity provider (issuer URL); with `--bearer-token`, either is accepted | none |
+| `--oidc-jwks-url`   | `SCRIPTLING_OIDC_JWKS_URL` | Identity provider JWKS URL      | discovered from the issuer |
+| `--oidc-audience`   | `SCRIPTLING_OIDC_AUDIENCE` | This server's resource identifier: the public URL of its `/mcp` endpoint, which tokens' `aud` must name (required with `--oidc-issuer`) | none |
+| `--oidc-required-scopes` | `SCRIPTLING_OIDC_REQUIRED_SCOPES` | Scopes every identity-provider token must grant (comma or space separated) | none |
+| `--oidc-require-at-jwt` | `SCRIPTLING_OIDC_REQUIRE_AT_JWT` | Require RFC 9068 access tokens (JWT `typ` `at+jwt`), refusing ID tokens | false |
+| `--oidc-ca-file` | `SCRIPTLING_OIDC_CA_FILE` | PEM file of CA certificates trusted (with the system roots) for the identity provider's discovery and JWKS fetches | none |
+| `--oidc-tls-insecure` | `SCRIPTLING_OIDC_TLS_INSECURE` | Skip TLS certificate verification for the identity provider's discovery and JWKS fetches (development only) | false |
 | `--allowed-paths`   | `SCRIPTLING_ALLOWED_PATHS`| Restrict participating library filesystem I/O; `-` denies it | (none)     |
 | `--disable-lib`     | `SCRIPTLING_DISABLE_LIB`  | Disable a built-in library by name (repeatable) | (none) |
 | `--tls-cert`        | `SCRIPTLING_TLS_CERT`     | TLS certificate file             | none       |
@@ -131,8 +138,8 @@ Two things to know before claiming the path:
   `/health` through in the middleware, or keep the built-in and expose
   dependency status on a separate authenticated route. The built-in `/health`
   itself never runs middleware.
-- `--bearer-token` wraps `/health` whichever responder is active (see
-  [Authentication](#authentication)); probes must carry the token.
+- `--bearer-token` (and `--oidc-issuer`) wraps `/health` whichever responder is active (see
+  [Authentication](#authentication)); probes must carry a token.
 
 ## TLS/HTTPS
 
@@ -174,6 +181,38 @@ Clients must include the token in the `Authorization` header:
 curl -H "Authorization: Bearer my-secret-token" http://localhost:8000/api/hello
 ```
 
+A request without a valid token gets `401 Unauthorized` with a `WWW-Authenticate: Bearer` challenge (RFC 6750), and an identity-provider token missing a required scope gets `403` with `error="insufficient_scope"`.
+
+### Identity Provider (OAuth / OIDC)
+
+To accept access tokens from an OAuth identity provider (Keycloak, Auth0, Okta, Entra ID and the like) instead of, or alongside, a static token, name its issuer and this server's own `/mcp` URL:
+
+```bash
+scriptling --server :8000 \
+  --oidc-issuer https://idp.example.com/realms/acme \
+  --oidc-audience https://mcp.example.com/mcp \
+  --oidc-required-scopes mcp:use setup.py
+```
+
+The server then follows the MCP authorization spec:
+
+- It verifies each JWT access token's issuer, signature (keys from the provider's JWKS, discovered from the issuer unless `--oidc-jwks-url` is set), expiry, audience (`aud` must name `--oidc-audience`) and any `--oidc-required-scopes`. Add `--oidc-require-at-jwt` to refuse ID tokens and accept only RFC 9068 access tokens.
+- Discovery and JWKS fetches verify the provider's TLS certificate against the system roots. For a provider with a private or self-signed CA, pass `--oidc-ca-file ca.pem` to trust that PEM file's certificates as well; `--oidc-tls-insecure` skips verification altogether (development only; a warning is logged at startup).
+- It publishes OAuth protected resource metadata (RFC 9728) at `/.well-known/oauth-protected-resource/mcp` (and `/.well-known/oauth-protected-resource`), naming the issuer, without requiring a token; the `401` challenge points clients at it, so MCP clients can discover where to sign in.
+- With `--bearer-token` also set, either credential is accepted.
+
+Every flag has a `SCRIPTLING_OIDC_*` environment variable and a `server.oidc_*` config key (see [Command-Line Options](https://scriptling.dev/okf/scriptling-docs/cli/command-line-options.md)).
+
+Handlers see who is calling as `request.auth`: a dict with `subject`, `audience`, `scopes`, `expiry` and `claims` (the token's JWT claims), or `None` when no credential is configured. A request authenticated with the static `--bearer-token` has the subject `"bearer"` and no claims. MCP tools and JSON-RPC methods read it through `get_request()`.
+
+```python
+import scriptling.runtime as runtime
+
+def whoami(request):
+    who = request.auth
+    return runtime.http.json(200, {"subject": who["subject"], "scopes": who["scopes"]})
+```
+
 ### Per-User Keys
 
 For more than one key, skip the static token and register a script middleware
@@ -213,7 +252,7 @@ WebSocket upgrades are same-origin by default, so a hostile page cannot open a W
 
 Request bodies are capped at 32 MiB by default (`--max-request-body` to change, negative to disable) and the server enforces header, read, write and idle timeouts; an oversized body receives a deterministic `413 Request Entity Too Large` rather than reaching a handler truncated. MCP's SSE streams are exempt from the write timeout.
 
-A configured `--bearer-token` wraps every endpoint, middleware or not: the middleware guards script routes, WebSocket handlers, `/mcp`, and `/json-rpc`, while the token also covers what the middleware never sees — `/health`, registered static routes, and `--web-root` fallback files. With both configured the token applies first and the middleware layers on top, so the middleware sees only token-bearing requests.
+A configured `--bearer-token` or `--oidc-issuer` wraps every endpoint, middleware or not: the middleware guards script routes, WebSocket handlers, `/mcp`, and `/json-rpc`, while the token also covers what the middleware never sees — `/health`, registered static routes, and `--web-root` fallback files. With both configured the token applies first and the middleware layers on top, so the middleware sees only token-bearing requests.
 
 ## Filesystem Restrictions
 

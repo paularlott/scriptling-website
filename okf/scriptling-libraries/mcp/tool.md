@@ -224,7 +224,7 @@ When the MCP server is served over HTTP, these give tool scripts a look at the H
 
 ### `mcp.tool.get_request()`
 
-Returns the HTTP request this tool call is being served for: a [Request object](https://scriptling.dev/okf/scriptling-libraries/runtime/http.md#request-object) with `method`, `path`, `headers`, `query`, `remote_addr` and `context`. Returns `None` over stdio or anywhere else outside a served request.
+Returns the HTTP request this tool call is being served for: a [Request object](https://scriptling.dev/okf/scriptling-libraries/runtime/http.md#request-object) with `method`, `path`, `headers`, `query`, `remote_addr`, `context` and `auth` (the authenticated caller, or `None`). Returns `None` over stdio or anywhere else outside a served request.
 
 **Returns:** `Request` or `None`
 
@@ -323,7 +323,7 @@ tool.return_toon({"result": data})
 
 ### `mcp.tool.return_error(message)`
 
-Returns an error message and stops execution with error code 1.
+Returns an error message and stops execution with error code 1. The client receives a tool result with `isError` set and the message as its text (a tool execution error, not a JSON-RPC error), so the model can see what went wrong and retry.
 
 **Parameters:**
 

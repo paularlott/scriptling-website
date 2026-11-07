@@ -80,6 +80,11 @@ Each type emits a valid JSON Schema type in the tool definition sent to the LLM.
 Unknown type strings cause the tool to fail to register at server startup with
 a clear error message.
 
+Arguments are checked against the declared types before the script runs: an
+argument whose JSON type doesn't match (a string for an `int` parameter, a
+number for a `string` one) is refused with a JSON-RPC `-32602` (Invalid params)
+error and the script is never started.
+
 ### Parameter Fields
 
 | Field         | Required | Description                                               |
@@ -390,7 +395,7 @@ curl -X POST http://127.0.0.1:8000/mcp \
 | `tool.return_object(obj)`    | Return object as JSON text content                    |
 | `tool.return_structured(obj)`| Return a dict as `structuredContent` (+ text fallback) |
 | `tool.return_toon(obj)`      | Return object as TOON format                          |
-| `tool.return_error(msg)`     | Return error message                                  |
+| `tool.return_error(msg)`     | Return error message as an `isError` tool result      |
 
 ## See Also
 

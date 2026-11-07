@@ -6,6 +6,26 @@ layout: changelog
 nav-skip: true
 ---
 
+## November 2026
+
+{{< version "v0.34.0" >}}
+
+{{< changelog-item "changed" >}}
+- **Breaking:** Return MCP tool failures as results with `isError` instead of JSON-RPC errors
+- **Breaking:** Raise `MCP tool error: <text>` from `call_tool()`, `execute_discovered()` and `mcp.decode_response()` for an `isError` result; the parallel variants put it in `error` ([docs](/reference/libraries/mcp/client/))
+- **Breaking:** Refuse MCP tool arguments of the wrong JSON type with `-32602` before the script runs; the `params={"n": "Description"}` shorthand declares a string ([docs](/reference/libraries/runtime/mcp/#parameter-metadata-params))
+- **Breaking:** Drop MCP protocol 2024-11-05 from the `scriptling.mcp` client
+- Answer refused requests with a `WWW-Authenticate: Bearer` challenge (`401`, or `403` `insufficient_scope`)
+- Report the build version in the MCP server's `serverInfo`
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+- Add identity-provider (OAuth / OIDC) authentication to the HTTP server with `--oidc-issuer`, `--oidc-audience`, `--oidc-jwks-url`, `--oidc-required-scopes` and `--oidc-require-at-jwt`; with `--bearer-token`, either credential is accepted ([docs](/docs/cli/http-server/#identity-provider-oauth--oidc))
+- Add `--oidc-ca-file` and `--oidc-tls-insecure` for an identity provider with a private or self-signed certificate
+- Publish protected resource metadata at `/.well-known/oauth-protected-resource/mcp` when an identity provider is configured
+- Add `request.auth` with the caller's `subject`, `audience`, `scopes`, `expiry` and `claims` ([docs](/reference/libraries/runtime/http/#request-object))
+{{< /changelog-item >}}
+
 ## October 2026
 
 {{< version "v0.33.1" >}}

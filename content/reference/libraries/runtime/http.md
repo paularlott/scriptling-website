@@ -329,6 +329,7 @@ Handlers receive a Request object with these fields:
 - `path_params` (`dict`): Path parameters captured from route wildcards.
 - `remote_addr` (`str`): Remote address of the client.
 - `context` (`dict`): Starts empty on every request; middleware can write to it (e.g. `request.context["user"] = name` after authenticating) and the handler reads it back. Per-request only — not related to the persistent KV store.
+- `auth` (`dict` or `None`): The authenticated caller when the server requires a credential (`--bearer-token` / `--oidc-issuer`): a dict with `subject`, `audience` (list), `scopes` (list), `expiry` (Unix seconds, or `None` when the token does not expire) and `claims` (the access token's JWT claims; empty for the static `--bearer-token`, whose `subject` is `"bearer"`). `None` when the server has no credential configured. See [Authentication](/docs/cli/http-server/#authentication).
 
 **Methods:**
 

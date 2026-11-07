@@ -53,7 +53,7 @@ def tool_name(param1, param2=default):
 
 Each key in the `params` dict must match a function parameter name. The value can be:
 
-- **A string** — treated as the description; type is inferred from the default value or defaults to `"string"`.
+- **A string** — treated as the description; type is inferred from the default value or defaults to `"string"`. A parameter with no default is therefore a string: `params={"n": "Number"}` on `def f(n)` declares `n` a string, and a client sending `5` is refused. Use the dict form, `{"type": "int", "description": "Number"}`, for a number.
 - **A dict** — full control over `type`, `description`, and optionally `required`.
 
 ```python
@@ -77,6 +77,8 @@ def example(name, count=1, force=False):
 
 A `params` key that doesn't match any function parameter produces a registration error at startup.
 
+Arguments are checked against the declared types before the function runs: an argument whose JSON type doesn't match (a string for an `int` parameter, a number for a `string` one) is refused with a JSON-RPC `-32602` (Invalid params) error and the function is never called.
+
 ### Parameter Types
 
 | Type           | Aliases         | Description            |
@@ -99,7 +101,7 @@ The function's return value is mapped to the MCP tool response:
 | `str`            | Text content           |
 | `dict` or `list` | JSON content           |
 | `None` (or no return) | Empty text content |
-| Exception raised | Error response         |
+| Exception raised | Tool result with `isError` set, carrying the exception message |
 
 ### Complete Example
 

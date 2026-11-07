@@ -115,7 +115,7 @@ def divide(params):
 
 ### `get_request()`
 
-Returns the HTTP request this call is being served for, when the JSON-RPC server is mounted over HTTP (`POST /json-rpc`): the same [Request object](/reference/libraries/runtime/http/#request-object) the middleware saw, with `method`, `path`, `headers`, `query`, `remote_addr` and `context`. Over the stdio transport there is no HTTP request, so it returns `None`.
+Returns the HTTP request this call is being served for, when the JSON-RPC server is mounted over HTTP (`POST /json-rpc`): the same [Request object](/reference/libraries/runtime/http/#request-object) the middleware saw, with `method`, `path`, `headers`, `query`, `remote_addr`, `context` and `auth` (the authenticated caller, or `None`). Over the stdio transport there is no HTTP request, so it returns `None`.
 
 **Returns:** `Request` or `None`
 
