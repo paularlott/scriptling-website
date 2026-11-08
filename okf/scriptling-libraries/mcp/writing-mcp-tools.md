@@ -65,6 +65,11 @@ description = "Number of times to repeat the greeting"
 | `description` | Yes      | Tool description shown to the AI                          |
 | `keywords`    | No       | Keywords for search (array of strings)                    |
 | `discoverable`| No       | Registration mode (default: `false`)                      |
+| `title`       | No       | Human-readable display name ([Title and behaviour hints](#title-and-behaviour-hints)) |
+| `read_only`   | No       | Behaviour hint: doesn't modify its environment (bool)     |
+| `destructive` | No       | Behaviour hint: may delete or overwrite data (bool)       |
+| `idempotent`  | No       | Behaviour hint: repeating a call has no further effect (bool) |
+| `open_world`  | No       | Behaviour hint: talks to external systems (bool)          |
 | `[ui]`        | No       | Links a companion UI resource ([MCP Apps](#linking-a-ui-resource-ui)) |
 | `[[icons]]`   | No       | Visual identifiers shown on the tool's `tools/list` descriptor ([Icons](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md#icons); generate the block from an image file with `scriptling tools/make_icon/make_icon.py`) |
 
@@ -88,8 +93,13 @@ a clear error message.
 
 Arguments are checked against the declared types before the script runs: an
 argument whose JSON type doesn't match (a string for an `int` parameter, a
-number for a `string` one) is refused with a JSON-RPC `-32602` (Invalid params)
-error and the script is never started.
+number for a `string` one), or a missing required argument, comes back as a
+tool result with `isError` set and a message such as `parameter n must be of
+type integer`, so the model can read it and retry; the script is never
+started. Unambiguous quoted numbers and booleans (`"10"`, `"true"`) are
+accepted for `int`, `float` and `bool` parameters and converted to the
+declared type first. An `int` parameter then reaches the script as an int
+and a `float` one as a float, whatever JSON the client sent.
 
 ### Parameter Fields
 
@@ -104,6 +114,36 @@ error and the script is never started.
 
 - **Native mode** (default, `discoverable = false`): Tool appears in `tools/list` and can be called directly
 - **Discovery mode** (`discoverable = true`): Tool is hidden from `tools/list`, searchable via `tool_search`, and callable via `execute_tool`
+
+`tool_search` and `execute_tool` are only listed, and only callable, when the
+server has discoverable tools to find; otherwise calling them is an unknown-tool
+error.
+
+### Title and Behaviour Hints
+
+`title` gives the tool a display name. `read_only`, `destructive`,
+`idempotent` and `open_world` become the tool's `annotations` in `tools/list`
+(`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`),
+telling clients how careful to be with it: a client may run a read-only tool
+without asking, and ask the user before a destructive one.
+
+```toml
+description = "Delete a note by ID"
+title = "Delete Note"
+destructive = true    # may delete or overwrite data (false: only adds)
+idempotent = true     # deleting the same note twice has no further effect
+open_world = false    # works on the local notes store, not external systems
+```
+
+Leave a hint out and it isn't sent, so clients assume the spec default: not
+read-only, possibly destructive, not idempotent, open world. `destructive` and
+`idempotent` only mean something when `read_only` isn't `true`. A value of the
+wrong type (`read_only = "yes"`) fails the tool's registration.
+
+Hints are not access control: a client may ignore them, and nothing stops a
+tool marked `read_only` from writing. Enforce what a tool may do in the script
+itself. Decorated and request-scoped tools take the same options as keyword
+arguments — see [`scriptling.runtime.mcp`](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md#title-and-behaviour-hints).
 
 ### Linking a UI Resource (`[ui]`)
 
@@ -185,6 +225,25 @@ tool.return_toon(data)
 # Return error
 tool.return_error("Something went wrong")
 ```
+
+### Reporting Progress
+
+A tool that takes a while can tell the client how far it has got with
+`tool.progress(progress, total=None, message=None)`. The client gets a
+`notifications/progress` message for each call when it asked for progress
+(sent a `progressToken`); otherwise the call does nothing.
+
+```python
+import scriptling.mcp.tool as tool
+
+items = tool.get_string_list("items")
+for i, item in enumerate(items):
+    process(item)
+    tool.progress(i + 1, total=len(items), message="Processed " + item)
+tool.return_string("done")
+```
+
+See [`mcp.tool.progress()`](https://scriptling.dev/okf/scriptling-libraries/mcp/tool.md#mcptoolprogressprogress-totalnone-messagenone).
 
 `return_object` and `return_structured` both accept a dict, but only
 `return_structured` sets the MCP result's `structuredContent` field — the
@@ -367,6 +426,10 @@ curl -X POST http://127.0.0.1:8000/mcp \
 
 ### Execute a Discoverable Tool
 
+Pass the tool's arguments in `parameters`, as an object or a string holding a
+JSON object. Any other key is refused with an `isError` result saying what to
+send.
+
 ```bash
 curl -X POST http://127.0.0.1:8000/mcp \
   -H "Content-Type: application/json" \
@@ -376,7 +439,7 @@ curl -X POST http://127.0.0.1:8000/mcp \
     "method":"tools/call",
     "params":{
       "name":"execute_tool",
-      "arguments":{"name":"add","arguments":{"a":5,"b":3}}
+      "arguments":{"name":"add","parameters":{"a":5,"b":3}}
     }
   }'
 ```

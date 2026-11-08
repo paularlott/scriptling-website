@@ -16,6 +16,30 @@ type: Guide
 
 ## November 2026
 
+### v0.35.0
+
+
+**changed**
+
+- **Breaking:** Offer `tool_search` and `execute_tool` only when there are discoverable tools to find
+- Report invalid MCP tool arguments to the model as a tool error it can correct, and accept quoted numbers and booleans ([docs](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md#parameter-resolution-rules))
+- Validate `register_request_tool` arguments before the handler runs, like `@mcp.tool`
+
+
+**added**
+
+- Add tool titles and behaviour hints (`read_only`, `destructive`, `idempotent`, `open_world`) so clients know when to ask before calling a tool ([docs](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md#title-and-behaviour-hints))
+- Add argument completion for prompts and resource templates ([docs](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md#argument-completion))
+- Add `mcp.tool.progress()` to report progress from long-running handlers ([docs](https://scriptling.dev/okf/scriptling-libraries/mcp/tool.md#progress))
+- Add `mcp.notify_resource_updated()` to notify clients subscribed to a resource ([docs](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md#resource-update-notifications))
+- Add `complete()` to the MCP client ([docs](https://scriptling.dev/okf/scriptling-libraries/mcp/client.md#clientcompleteref-argument-value-contextnone))
+
+
+**fixed**
+
+- Pass `int` and `float` tool arguments to handlers with the declared type
+
+
 ### v0.34.0
 
 

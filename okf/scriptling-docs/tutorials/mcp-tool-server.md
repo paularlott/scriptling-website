@@ -43,6 +43,9 @@ Create `my-tools/time_now.toml`:
 ```toml
 description = "Get the current date and time"
 keywords = ["time", "date", "now"]
+title = "Current Time"
+read_only = true
+open_world = false
 
 [[parameters]]
 name = "format"
@@ -61,6 +64,8 @@ def call(args, kwargs):
     return time.strftime(fmt, time.localtime())
 ```
 
+`title` is the name clients show for the tool. `read_only` and `open_world` are behaviour hints: they tell the client this tool changes nothing and talks to no external system, so it can call it without asking the user first. A tool that deletes or overwrites data would set `destructive = true` instead, so the client knows to be careful. Hints are not access control; the tool itself decides what it does. See [Title and behaviour hints](https://scriptling.dev/okf/scriptling-libraries/mcp/writing-mcp-tools.md#title-and-behaviour-hints) for all four.
+
 ## Step 3: Define the data_summary Tool
 
 Create `my-tools/data_summary.toml`:
@@ -68,6 +73,9 @@ Create `my-tools/data_summary.toml`:
 ```toml
 description = "Calculate summary statistics for a list of numbers"
 keywords = ["statistics", "stats", "average", "mean", "data"]
+title = "Data Summary"
+read_only = true
+open_world = false
 
 [[parameters]]
 name = "numbers"
@@ -109,6 +117,9 @@ Create `my-tools/format_report.toml`:
 ```toml
 description = "Format a dictionary of data as a structured text report"
 keywords = ["format", "report", "text", "display"]
+title = "Format Report"
+read_only = true
+open_world = false
 
 [[parameters]]
 name = "title"
@@ -213,7 +224,7 @@ description = "SQL-like query string"
 required = true
 ```
 
-No registration code is needed: discoverable tools live in the tools directory like any other. For tools that should only exist for some callers or depend on runtime state, register them per request from middleware with [`mcp.register_request_tool()`](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md#request-scoped-registration).
+No registration code is needed: discoverable tools live in the tools directory like any other. `tool_search` and `execute_tool` only appear once the server has a discoverable tool; `execute_tool` takes the tool's `name` and its arguments in `parameters`. For tools that should only exist for some callers or depend on runtime state, register them per request from middleware with [`mcp.register_request_tool()`](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md#request-scoped-registration).
 
 ## Tool Directory Structure
 
@@ -237,6 +248,7 @@ my-tools/
 - Configuring Claude Desktop to use custom tools
 - Testing tools from the command line
 - Native vs discoverable tools
+- Giving tools a title and behaviour hints
 
 ## See Also
 

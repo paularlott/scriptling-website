@@ -48,6 +48,7 @@ MCP tool helpers read and write environment variables set by the MCP tool execut
 | `return_structured(obj)` | Return an object as `structuredContent` (plus the same JSON as text) and stop execution |
 | `return_toon(obj)` | Return an object as TOON and stop execution |
 | `return_error(message)` | Return an error message and stop execution |
+| `progress(progress, total=None, message=None)` | Report progress to the client (no-op unless it asked for progress) |
 
 ## Parameter Access Functions
 
@@ -334,6 +335,30 @@ if not customer_id:
     # Code here will not execute
 
 tool.return_error("Customer not found")
+```
+
+## Progress
+
+### `mcp.tool.progress(progress, total=None, message=None)`
+
+Sends a `notifications/progress` message for the MCP request the tool, prompt or resource handler is serving, so the client can show how far a long-running call has got. It does nothing when the client didn't ask for progress (it sent no `progressToken`), and nothing after the request has been answered, so it is always safe to call. Unlike the `return_*` functions it doesn't stop execution.
+
+**Parameters:**
+
+- `progress` (`int` | `float`): Work done so far. It must increase with every call; a value that doesn't raises `ValueError`.
+- `total` (`int` | `float`, optional): Total amount of work, when known.
+- `message` (`str`, optional): Human-readable status.
+
+Calls closer together than 10ms are dropped, except the one that reaches `total`.
+
+```python
+import scriptling.mcp.tool as tool
+
+files = tool.get_string_list("files")
+for i, name in enumerate(files):
+    convert(name)
+    tool.progress(i + 1, total=len(files), message="Converted " + name)
+tool.return_string("Converted " + str(len(files)) + " files")
 ```
 
 ## Complete Tool Example

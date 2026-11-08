@@ -8,6 +8,26 @@ nav-skip: true
 
 ## November 2026
 
+{{< version "v0.35.0" >}}
+
+{{< changelog-item "changed" >}}
+- **Breaking:** Offer `tool_search` and `execute_tool` only when there are discoverable tools to find
+- Report invalid MCP tool arguments to the model as a tool error it can correct, and accept quoted numbers and booleans ([docs](/reference/libraries/runtime/mcp/#parameter-resolution-rules))
+- Validate `register_request_tool` arguments before the handler runs, like `@mcp.tool`
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+- Add tool titles and behaviour hints (`read_only`, `destructive`, `idempotent`, `open_world`) so clients know when to ask before calling a tool ([docs](/reference/libraries/runtime/mcp/#title-and-behaviour-hints))
+- Add argument completion for prompts and resource templates ([docs](/reference/libraries/runtime/mcp/#argument-completion))
+- Add `mcp.tool.progress()` to report progress from long-running handlers ([docs](/reference/libraries/mcp/tool/#progress))
+- Add `mcp.notify_resource_updated()` to notify clients subscribed to a resource ([docs](/reference/libraries/runtime/mcp/#resource-update-notifications))
+- Add `complete()` to the MCP client ([docs](/reference/libraries/mcp/client/#clientcompleteref-argument-value-contextnone))
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+- Pass `int` and `float` tool arguments to handlers with the declared type
+{{< /changelog-item >}}
+
 {{< version "v0.34.0" >}}
 
 {{< changelog-item "changed" >}}

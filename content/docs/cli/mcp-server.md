@@ -348,7 +348,7 @@ curl -X POST http://127.0.0.1:8000/mcp \
     "method":"tools/call",
     "params":{
       "name":"execute_tool",
-      "arguments":{"name":"add","arguments":{"a":5,"b":3}}
+      "arguments":{"name":"add","parameters":{"a":5,"b":3}}
     }
   }'
 ```
@@ -370,6 +370,10 @@ as tools.
   dynamic `.toml` uses **the same format as a tool's `.toml`** — `description`
   plus an array of tables — but `[[arguments]]` instead of `[[parameters]]`,
   and prompt arguments are string-only (no `type`).
+- **Completion**: a prompt argument's `complete = "module.function"`, or a
+  `[complete]` table in a resource template's `_stem.toml`, names a function
+  that suggests values as the user types — see
+  [Argument completion](../../../reference/libraries/runtime/mcp/#argument-completion).
 
 There's no built-in resource or prompt bundled in automatically — if you want
 a tool-source resource or a "write me a script" prompt, define it yourself

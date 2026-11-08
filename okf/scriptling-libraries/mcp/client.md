@@ -41,6 +41,7 @@ For MCP integration with AI clients, see the `remote_servers` parameter on [scri
 | `client.read_resource(uri)` | Read a resource by URI (static or expanded from a template) |
 | `client.list_prompts()` | List prompts exposed by the server |
 | `client.get_prompt(name, arguments)` | Render a prompt by name into messages |
+| `client.complete(ref, argument, value="", context=None)` | Ask the server to suggest values for a prompt argument or template variable |
 | `client.close()` | Close the client (shuts a stdio subprocess down) |
 
 ## Functions
@@ -395,6 +396,36 @@ out = client.get_prompt("review", {"code": "print(1)", "language": "python"})
 for m in out.messages:
     print(m.role, m.content)
 ```
+
+### `client.complete(ref, argument, value="", context=None)`
+
+Asks the server to suggest values for a prompt argument or a resource template
+variable (the spec's `completion/complete`), for example to autocomplete input.
+
+**Parameters:**
+
+- `ref` (`str` | `dict`): What to complete. A prompt name, a resource template
+  URI (anything containing `://`), or the spec's dict:
+  `{"type": "ref/prompt", "name": ...}` or `{"type": "ref/resource", "uri": ...}`.
+- `argument` (`str`): The argument or template variable to complete.
+- `value` (`str`): The partial value typed so far.
+- `context` (`dict`, optional): Arguments already filled in, name to value.
+
+**Returns:** `dict` with `values` (a list of at most 100 strings), `total`
+(`int` or `None`) and `hasMore` (`bool`). Raises an error for an unknown
+prompt, template or argument, or a server without completion.
+
+```python
+client = mcp.Client("https://api.example.com/mcp")
+
+out = client.complete("review", "language", "py")
+print(out["values"])        # ["python"]
+
+out = client.complete("review", "framework", context={"language": "python"})
+out = client.complete("docs://{page}", "page", "in")
+```
+
+Scriptling's own MCP server answers these from the [completers](https://scriptling.dev/okf/scriptling-libraries/runtime/mcp.md#argument-completion) its prompts and templates declare.
 
 ### `client.close()`
 

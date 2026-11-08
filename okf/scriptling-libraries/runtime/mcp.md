@@ -39,7 +39,8 @@ Registers a function as an MCP tool. The function's parameters become the tool's
 ### Signature
 
 ```python
-@mcp.tool(description, params=None, keywords=None, discoverable=False, ui=None, icons=None)
+@mcp.tool(description, params=None, keywords=None, discoverable=False, ui=None, icons=None,
+          title=None, read_only=None, destructive=None, idempotent=None, open_world=None)
 def tool_name(param1, param2=default):
     ...
 ```
@@ -54,12 +55,17 @@ def tool_name(param1, param2=default):
 | `discoverable` | bool   | No       | If `True`, hidden from `tools/list`, searchable via `tool_search` (default: `False`) |
 | `ui`           | dict   | No       | Links this tool to a companion UI resource — see [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md) |
 | `icons`        | list   | No       | Visual identifiers shown on the tool's `tools/list` descriptor — see [Icons](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md#icons) |
+| `title`        | str    | No       | Human-readable display name, shown by clients in place of the function name |
+| `read_only`    | bool   | No       | Behaviour hint: the tool doesn't modify its environment — see [Title and behaviour hints](#title-and-behaviour-hints) |
+| `destructive`  | bool   | No       | Behaviour hint: the tool may delete or overwrite data (`False`: it only adds) |
+| `idempotent`   | bool   | No       | Behaviour hint: calling it again with the same arguments has no further effect |
+| `open_world`   | bool   | No       | Behaviour hint: the tool talks to external systems (`False`: a closed domain, such as a local database) |
 
 ### Parameter Metadata (`params`)
 
 Each key in the `params` dict must match a function parameter name. The value can be:
 
-- **A string** — treated as the description; type is inferred from the default value or defaults to `"string"`. A parameter with no default is therefore a string: `params={"n": "Number"}` on `def f(n)` declares `n` a string, and a client sending `5` is refused. Use the dict form, `{"type": "int", "description": "Number"}`, for a number.
+- **A string** — treated as the description; type is inferred from the default value or defaults to `"string"`. A parameter with no default is therefore a string: `params={"n": "Number"}` on `def f(n)` declares `n` a string, and a client sending `5` gets an `isError` result. Use the dict form, `{"type": "int", "description": "Number"}`, for a number.
 - **A dict** — full control over `type`, `description`, and optionally `required`.
 
 ```python
@@ -83,7 +89,26 @@ def example(name, count=1, force=False):
 
 A `params` key that doesn't match any function parameter produces a registration error at startup.
 
-Arguments are checked against the declared types before the function runs: an argument whose JSON type doesn't match (a string for an `int` parameter, a number for a `string` one) is refused with a JSON-RPC `-32602` (Invalid params) error and the function is never called.
+Arguments are checked against the declared types before the function runs: an argument whose JSON type doesn't match (a string for an `int` parameter, a number for a `string` one), or a missing required argument, comes back as a tool result with `isError` set and a message such as `parameter n must be of type integer`, so the model can read it and retry; the function is never called. Unambiguous quoted numbers and booleans (`"10"`, `"true"`) are accepted for `int`, `float` and `bool` parameters and converted to the declared type first. An `int` parameter then reaches the function as an int and a `float` one as a float, whatever JSON the client sent (`7` or `"7"` is `7`; `2` for a `float` is `2.0`); arrays convert element by element.
+
+### Title and Behaviour Hints
+
+`title` gives the tool a display name. The four hints become the tool's `annotations` in `tools/list` (`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`), telling clients how careful to be with it: a client may run a read-only tool without asking, and ask the user before a destructive one.
+
+```python
+@mcp.tool("Delete a note by ID", title="Delete Note",
+          destructive=True, idempotent=True, open_world=False)
+def delete_note(id):
+    ...
+
+@mcp.tool("Search notes", title="Search Notes", read_only=True, open_world=False)
+def search_notes(query):
+    ...
+```
+
+Leave a hint out (or pass `None`) and it isn't sent, so clients assume the spec default: not read-only, possibly destructive, not idempotent, open world. `destructive` and `idempotent` only mean something when `read_only` isn't `True`. A `title` that isn't a string or a hint that isn't a bool is a registration error.
+
+Hints are not access control: a client may ignore them, and nothing stops a tool marked `read_only` from writing. Enforce what a tool may do in the tool itself, and with [request-scoped registration](#request-scoped-registration) for who may call it.
 
 ### Parameter Types
 
@@ -149,6 +174,7 @@ def catalog(category):
 - `description` (`str`, optional): Resource description.
 - `mime_type` (`str`, optional): Content type. Default `text/plain`, or `application/json` for dict/list results. Ignored for a `ui://` URI: the [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md) extension MUSTs that exact mimeType, so it is always set for you.
 - `template` (`bool`, optional): Treat `uri` as a `{var}` URI template. Default: `False`.
+- `complete` (`dict`, optional): Completers for the template's variables, keyed by variable name — see [Argument completion](#argument-completion). Templates only.
 
 The function runs on every `resources/read`, in a fresh interpreter, so its content can change between reads. A string return is the text content; a dict or list return is JSON encoded. Only the template variables are passed as parameters — the function's signature is the contract (there is no `__uri` parameter unless the template itself declares one). `mcp.tool.return_string()` / `return_object()` work too: they set the content the same way a return value does.
 
@@ -180,8 +206,112 @@ def review(language, code):
 
 - `description` (`str`, optional): Prompt description.
 - `arguments` (`list`, optional): Argument metadata dicts with `name`, `description` and `required`. When omitted, the arguments are inferred from the function signature (a parameter without a default is required).
+- `complete` (`dict`, optional): Completers for the prompt's arguments, keyed by argument name — see [Argument completion](#argument-completion).
 
 A string return is a single user message; a dict with a `"messages"` list of `{"role": "user"|"assistant", "content": "..."}` (or a plain list of them) builds a multi-message prompt. `mcp.tool.return_*()` is honoured like a return value, and explicit `arguments` names are cross-checked against the function signature at startup.
+
+## Argument Completion
+
+A client can ask the server to suggest values for a prompt argument or a resource template variable as the user types (the spec's `completion/complete`). Give the prompt or template a `complete` dict naming a **completer** for each argument you want to suggest values for:
+
+```python
+import scriptling.runtime.mcp as mcp
+
+def complete_language(argument, value, context):
+    return [l for l in ["go", "python", "rust"] if l.startswith(value)]
+
+def complete_framework(argument, value, context):
+    if context.get("language") == "python":
+        return ["django", "flask"]
+    return []
+
+@mcp.prompt(description="Review code", complete={
+    "language": complete_language,
+    "framework": complete_framework,
+})
+def review(language, framework="", code=""):
+    return "Review this " + language + " code:\n" + code
+
+@mcp.resource("docs://{page}", template=True, complete={"page": "doctools.pages"})
+def doc(page):
+    return load_page(page)
+```
+
+A completer is called as `fn(argument, value, context)`:
+
+- `argument` (`str`): the name of the argument or template variable being completed.
+- `value` (`str`): the partial value typed so far (may be empty).
+- `context` (`dict`): the arguments the client has already filled in, so one argument's suggestions can depend on another.
+
+It returns a list of strings, best match first; the client gets the first 100, with `total` and `hasMore` telling it there were more. An argument without a completer gets an empty list. If the completer raises, or returns something other than a list of strings, that completion request gets a JSON-RPC error; the server carries on.
+
+In a decorated file, a completer is a function defined in the same file (or its name as a string). A dotted string such as `"doctools.pages"` is a `"module.function"` reference imported through the library dirs, like a handler reference. Each call runs in a fresh interpreter. The server declares the `completions` capability whenever something has a completer.
+
+The other ways of defining prompts and resources take the same completers, as `"module.function"` references:
+
+- [`register_request_prompt`](#mcpregister_request_promptname-handler-) and [`register_request_resource`](#mcpregister_request_resourceuri-handler-name-) take the same `complete` dict.
+- A `.toml` prompt in the prompts folder sets `complete` on an argument:
+
+  ```toml
+  description = "Review code"
+
+  [[arguments]]
+  name = "language"
+  required = true
+  complete = "completers.languages"
+  ```
+
+- A resource template's `_{stem}.toml` sidecar has a `[complete]` table keyed by variable:
+
+  ```toml
+  name = "Documentation"
+
+  [complete]
+  page = "completers.pages"
+  ```
+
+Completion requests come from the client, so treat `value` and `context` as untrusted input, and don't suggest values the caller isn't allowed to see.
+
+## Progress Notifications
+
+A tool, prompt or resource handler that takes a while can report progress with [`mcp.tool.progress()`](https://scriptling.dev/okf/scriptling-libraries/mcp/tool.md#mcptoolprogressprogress-totalnone-messagenone):
+
+```python
+import scriptling.runtime.mcp as mcp
+import scriptling.mcp.tool as tool
+
+@mcp.tool("Import records", params={"source": "Where to import from"})
+def import_records(source):
+    rows = fetch(source)
+    for i, row in enumerate(rows):
+        save(row)
+        tool.progress(i + 1, total=len(rows), message="Imported " + str(i + 1))
+    return "Imported " + str(len(rows)) + " records"
+```
+
+The client gets a `notifications/progress` message for each call, over HTTP and stdio. It only does so when the client asked for progress by sending a `progressToken` with the request; otherwise `progress()` does nothing, so it is always safe to call.
+
+## Resource Update Notifications
+
+A client can subscribe to a resource to hear when it changes. The server can't see a resource's content change by itself, so call `mcp.notify_resource_updated(uri)` after changing the data a resource serves, from a tool, an HTTP handler, a background task or the setup script:
+
+```python
+import scriptling.runtime.mcp as mcp
+
+@mcp.resource("notes://{id}", template=True)
+def note(id):
+    return load_note(id)
+
+@mcp.tool("Save a note", params={"id": "Note ID", "text": "Note text"})
+def save_note(id, text):
+    store_note(id, text)
+    mcp.notify_resource_updated("notes://" + id)
+    return "saved"
+```
+
+Every client subscribed to that exact URI gets `notifications/resources/updated` and can read it again; clients that didn't subscribe get nothing. For a template, pass the expanded URI the client subscribed to (`notes://42`), not the template. The call returns `True` when an MCP server is running to send it, and `False` otherwise (for example, when the script isn't being served).
+
+Subscriptions work over stdio, and over HTTP for clients on the 2026-07-28 protocol, which subscribe with `subscriptions/listen`. Scriptling's HTTP server doesn't keep sessions, so a client on an older protocol revision can't subscribe over HTTP: the server advertises `resources.subscribe: false` and answers `resources/subscribe` with `-32601`.
 
 ## `@mcp.skill()` Decorator
 
@@ -231,15 +361,15 @@ def auth(request):
     return None
 ```
 
-`handler` is a `"module.function"` reference invoked per call with the tool arguments as keyword parameters — the same conventions as any other handler reference. Inside the handler, `mcp.tool.get_string()` reads the arguments and `mcp.tool.request_context()` reads the middleware's context (who is calling). `params` uses the same metadata vocabulary as `@mcp.tool`: a string per parameter (its description) or a dict with `type`, `description` and `required`. `keywords` and `discoverable` feed tool search, and `ui` links the tool to a companion UI resource, exactly as on `@mcp.tool` — see [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md).
+`handler` is a `"module.function"` reference invoked per call with the tool arguments as keyword parameters — the same conventions as any other handler reference. Inside the handler, `mcp.tool.get_string()` reads the arguments and `mcp.tool.request_context()` reads the middleware's context (who is calling). `params` uses the same metadata vocabulary as `@mcp.tool`: a string per parameter (its description) or a dict with `type`, `description` and `required`. `keywords` and `discoverable` feed tool search, `ui` links the tool to a companion UI resource, and `title`, `read_only`, `destructive`, `idempotent` and `open_world` set the [title and behaviour hints](#title-and-behaviour-hints), exactly as on `@mcp.tool` — see [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md) for `ui`. Arguments are checked against `params` before the handler runs, as for `@mcp.tool`: a wrong type or a missing required argument is an `isError` result and the handler is never called.
 
 ### `mcp.register_request_resource(uri, handler, name, ...)`
 
-Exposes a resource (or, with `template=True`, a URI template like `"user://docs/{path}"`). `resources/list` and `resources/templates/list` show it; `resources/read` runs the handler with the template variables as keyword parameters (and `__uri` holding the full URI). A string return is the content; a dict or list is JSON encoded. `mime_type` defaults to `text/plain`, or `application/json` for structured results — except for a `"ui://"` uri, where it's always `text/html;profile=mcp-app` (the [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md) extension MUSTs that exact mimeType), overriding whatever `mime_type` was passed.
+Exposes a resource (or, with `template=True`, a URI template like `"user://docs/{path}"`). For a template, `complete` names [completers](#argument-completion) for its variables as `"module.function"` strings. `resources/list` and `resources/templates/list` show it; `resources/read` runs the handler with the template variables as keyword parameters (and `__uri` holding the full URI). A string return is the content; a dict or list is JSON encoded. `mime_type` defaults to `text/plain`, or `application/json` for structured results — except for a `"ui://"` uri, where it's always `text/html;profile=mcp-app` (the [MCP Apps](https://scriptling.dev/okf/scriptling-libraries/mcp/mcp-apps.md) extension MUSTs that exact mimeType), overriding whatever `mime_type` was passed.
 
 ### `mcp.register_request_prompt(name, handler, ...)`
 
-Exposes a prompt. `prompts/get` runs the handler with the prompt arguments as keyword parameters: a string return is a single user message, a dict with a `"messages"` list of `{"role": "user"|"assistant", "content": "..."}` builds a multi-message prompt. `arguments` is a list of metadata dicts with `name`, `description` and `required`.
+Exposes a prompt. `prompts/get` runs the handler with the prompt arguments as keyword parameters: a string return is a single user message, a dict with a `"messages"` list of `{"role": "user"|"assistant", "content": "..."}` builds a multi-message prompt. `arguments` is a list of metadata dicts with `name`, `description` and `required`, and `complete` names [completers](#argument-completion) for them as `"module.function"` strings.
 
 ### `mcp.transport()`
 
