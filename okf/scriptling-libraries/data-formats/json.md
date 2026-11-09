@@ -20,7 +20,7 @@ The `json` library parses JSON strings into Scriptling objects and serializes Sc
 
 | Function | Description |
 |----------|-------------|
-| `loads(string)` | Parse a JSON string into `dict`, `list`, `str`, `int`, `float`, `bool` or `None`; objects keep the document's key order; raises on invalid JSON. |
+| `loads(string)` | Parse a JSON string into `dict`, `list`, `str`, `int`, `float`, `bool` or `None`; objects keep the document's key order; raises on invalid JSON, or on anything but whitespace after the value. |
 | `dumps(object, indent=None, separators=None, sort_keys=False, ensure_ascii=True)` | Serialise to a JSON string, matching Python's `json.dumps`: keys in dict insertion order, `", "` / `": "` separators, non-ASCII escaped. |
 | `parse(string)` | Alias for `loads()`. |
 | `stringify(object, indent=None)` | Alias for `dumps()`. |

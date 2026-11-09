@@ -8,6 +8,22 @@ nav-skip: true
 
 ## November 2026
 
+{{< version "v0.36.0" >}}
+
+{{< changelog-item "changed" >}}
+- **Breaking:** Raise `JSONDecodeError` from `json.loads()` and `response.json()` when text follows the JSON value, as Python does; `json.loads("1 2")` used to return `1` ([docs](/reference/libraries/data-formats/json/))
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+- Add each tool's `title` and behaviour hints (`read_only`, `destructive`, `idempotent`, `open_world`) to the MCP client's `tools()`, so scripts can tell which calls to confirm first ([docs](/reference/libraries/mcp/client/#clienttools))
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+- Return an MCP tool's plain-text reply in full when it only starts like JSON; `2 notes mention milk` came back as the number `2`
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.35.0" >}}
 
 {{< changelog-item "changed" >}}
@@ -27,6 +43,8 @@ nav-skip: true
 {{< changelog-item "fixed" >}}
 - Pass `int` and `float` tool arguments to handlers with the declared type
 {{< /changelog-item >}}
+
+---
 
 {{< version "v0.34.0" >}}
 
@@ -54,6 +72,8 @@ nav-skip: true
 - Add `verify` to `requests`: `False` accepts any certificate, a path trusts a CA bundle
 - Add `scriptling.oauth` for OAuth 2.0 sign-in, tokens and token verification ([docs](/reference/libraries/http-process/oauth/))
 {{< /changelog-item >}}
+
+---
 
 {{< version "v0.33.0" >}}
 

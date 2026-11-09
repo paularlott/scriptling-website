@@ -118,9 +118,20 @@ The client exposes its namespace (without the `__` suffix, `""` when created wit
 
 Lists all tools available from this MCP server.
 
-**Returns:** `list`: tool dicts with `name`, `description`, `inputSchema`, and `is_app`.
+**Returns:** `list`: tool dicts with `name`, `title`, `description`, `inputSchema`, `is_app`, and the behaviour hints `read_only`, `destructive`, `idempotent`, and `open_world`.
 
 `is_app` is `true` when the tool is an [MCP Apps](../mcp-apps/) view — linked to a `ui://` resource via `_meta.ui.resourceUri`, so a host UI renders its view when the tool is called instead of showing plain text. Useful for filtering: an app tool is meant for interactive hosts, not for scripts.
+
+`title` is the tool's display name (`""` when the server gives none). The hints are named as [`mcp.tool`](/reference/libraries/runtime/mcp/) declares them and tell you what the server says a tool does:
+
+| Key | `True` means |
+|-----|--------------|
+| `read_only` | the tool changes nothing |
+| `destructive` | the tool may delete or overwrite, not only add |
+| `idempotent` | calling it again with the same arguments has no further effect |
+| `open_world` | the tool reaches outside systems, such as the web |
+
+Each is `True`, `False`, or `None` when the server did not state it. The MCP spec has clients treat a missing `destructive` or `open_world` as `True`, and a missing `read_only` or `idempotent` as `False`. Hints are the server's claims, not guarantees: use them to decide when to ask a person first, not to enforce anything.
 
 ```python
 client = mcp.Client("https://api.example.com/mcp")
@@ -130,6 +141,8 @@ for tool in tools:
     print(f"{tool.name}: {tool.description}")
     if tool.is_app:
         print("  (MCP Apps view — renders a UI when called)")
+    if tool.destructive != False and not tool.read_only:
+        print("  may make destructive changes")
     if "inputSchema" in tool:
         print(f"  Schema: {tool.inputSchema}")
 ```
