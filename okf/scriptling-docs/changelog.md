@@ -16,6 +16,16 @@ type: Guide
 
 ## November 2026
 
+### v0.36.1
+
+
+**added**
+
+- macOS binaries are now signed and notarized.
+
+
+---
+
 ### v0.36.0
 
 

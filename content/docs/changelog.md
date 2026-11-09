@@ -8,6 +8,14 @@ nav-skip: true
 
 ## November 2026
 
+{{< version "v0.36.1" >}}
+
+{{< changelog-item "added" >}}
+- macOS binaries are now signed and notarized.
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.36.0" >}}
 
 {{< changelog-item "changed" >}}
