@@ -23,7 +23,7 @@ The `scriptling.provision.fetch` library downloads remote files to local paths i
 
 | Function | Description |
 |----------|-------------|
-| `file(url, dest, insecure=False, unpack_zip=False, timeout=30, max_bytes=0, mode=0o644, dir_mode=0o755, provides=None)` | Download a file, or download and unpack a zip archive |
+| `file(url, dest, insecure=False, unpack_zip=False, timeout=30, max_bytes=0, mode=0o644, dir_mode=0o755, provides=None, owner=None, group=None, become=False)` | Download a file, or download and unpack a zip archive |
 
 ## Constants
 
@@ -35,7 +35,7 @@ The `scriptling.provision.fetch` library downloads remote files to local paths i
 
 ## Functions
 
-### `file(url, dest, insecure=False, unpack_zip=False, timeout=30, max_bytes=0, mode=0o644, dir_mode=0o755, provides=None)`
+### `file(url, dest, insecure=False, unpack_zip=False, timeout=30, max_bytes=0, mode=0o644, dir_mode=0o755, provides=None, owner=None, group=None, become=False)`
 
 Downloads `url` using HTTP GET. The URL must use `http://` or `https://`.
 
@@ -53,6 +53,9 @@ When unpacking a zip archive, `fetch.UPDATED` takes precedence over `fetch.CREAT
 - `mode` (`int`, optional): File permission mode for written files. Default: `0o644`.
 - `dir_mode` (`int`, optional): Directory permission mode for created directories. Default: `0o755`.
 - `provides` (`list`, optional): List of file paths. If all paths exist, returns `fetch.UNCHANGED` without downloading or extracting. A path that cannot be checked (for example, permission denied) counts as missing. Default: `None`.
+- `owner` (`str` or `int`, optional): Owner of the written files, and of `dest` and the directories unpacked into it, by name or uid. Default: new files belong to whoever writes them; existing ones keep their owner.
+- `group` (`str` or `int`, optional): Their group, by name or gid. Default: as for `owner`.
+- `become` (`bool`, optional): Write as root. The download itself always runs as the script's user; only the write is done as root. See [Running as Root](https://scriptling.dev/okf/scriptling-libraries/provisioning.md#running-as-root). Default: `False`.
 
 **Returns:** `dict`: with keys:
 
@@ -65,7 +68,7 @@ When unpacking a zip archive, `fetch.UPDATED` takes precedence over `fetch.CREAT
 | `unpacked` | `True` when `unpack_zip=True` |
 | `files` | Written or checked file paths |
 
-**Raises:** `Error`: if the URL scheme isn't `http`/`https`, the request fails or times out, the response exceeds `max_bytes`, or a zip entry would escape the destination directory or is not a regular file. `PermissionError`, which the script cannot catch, if `dest`, any `provides` path, or an unpacked entry is outside `--allowed-paths`; `dest` and `provides` are checked before anything is downloaded.
+**Raises:** `Error`: if the URL scheme isn't `http`/`https`, the request fails or times out, the response exceeds `max_bytes`, or a zip entry would escape the destination directory or is not a regular file. `PermissionError`, which the script cannot catch, if `dest`, any `provides` path, or an unpacked entry is outside `--allowed-paths`; `dest` and `provides` are checked before anything is downloaded. It is also raised for `become=True` where running as root is not allowed.
 
 ```python
 import scriptling.provision.fetch as fetch
@@ -80,6 +83,14 @@ if result["status"] != fetch.UNCHANGED:
     print("Fetched " + result["path"])
 ```
 
+Install a tool for everyone:
+
+```python
+import scriptling.provision.fetch as fetch
+
+fetch.file("https://example.com/releases/tool-linux-amd64", "/usr/local/bin/tool", mode=0o755, become=True)
+```
+
 Fetch and unpack a zip archive:
 
 ```python
@@ -89,6 +100,7 @@ result = fetch.file(
     "https://example.com/site.zip",
     "/srv/site",
     unpack_zip=True,
+    become=True,
 )
 
 print("Extracted " + str(len(result["files"])) + " files")
@@ -104,6 +116,7 @@ fetch.file(
     "/opt/bootstrap",
     insecure=True,
     unpack_zip=True,
+    become=True,
 )
 ```
 
@@ -117,6 +130,7 @@ result = fetch.file(
     "/srv/site",
     unpack_zip=True,
     provides=["/srv/site/bin/app", "/srv/site/config.yaml"],
+    become=True,
 )
 
 if result["status"] == fetch.UNCHANGED:

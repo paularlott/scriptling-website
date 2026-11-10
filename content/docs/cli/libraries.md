@@ -129,7 +129,7 @@ Deny filesystem access through the libraries wired to the allowlist:
 scriptling --allowed-paths - script.py
 ```
 
-This denies operations such as `os.read_file`, `os.write_file`, `pathlib`, `glob`, and `sandbox.exec_file`, along with `scriptling.wait_for` `file()`, `dir()` and `file_content()`, messaging `send_file()`, `scriptling.container` bind mounts, `runtime.http.static`, `runtime.kv.open`, `scriptling.provision.fetch` and `scriptling.provision.file`; it does not prevent an enabled `subprocess` from reading files with host commands. Disable that capability explicitly with `--disable-lib subprocess` in every mode.
+This denies operations such as `os.read_file`, `os.write_file`, `pathlib`, `glob`, and `sandbox.exec_file`, along with `scriptling.wait_for` `file()`, `dir()` and `file_content()`, messaging `send_file()`, `scriptling.container` bind mounts, `runtime.http.static`, `runtime.kv.open`, `scriptling.provision.fetch` and `scriptling.provision.file`; it does not prevent an enabled `subprocess`, `scriptling.provision.command` or `scriptling.provision.package` from reading files with host commands. Disable that capability explicitly with `--disable-lib subprocess` in every mode, which removes all three.
 
 When a script tries to access a path outside the allowed directories:
 

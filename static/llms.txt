@@ -4,7 +4,7 @@
 
 Docs: https://scriptling.dev/docs/
 
-All 191 OKF 0.2 concepts below are plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
+All 194 OKF 0.2 concepts below are plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
 
 ## Essential
 
@@ -176,16 +176,19 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [Messaging](https://scriptling.dev/okf/scriptling-libraries/messaging.md): Platform-agnostic bot framework for Telegram, Discord, Slack, and Console.
 - [Node Groups & Leader Election](https://scriptling.dev/okf/scriptling-libraries/networking/gossip/coordination.md): Metadata-criteria node groups and quorum-based leader election on a scriptling.net.gossip cluster.
 - [scriptling.net.gossip](https://scriptling.dev/okf/scriptling-libraries/networking/gossip.md): Gossip protocol cluster membership and messaging with failure detection and routing.
+- [scriptling.mercure](https://scriptling.dev/okf/scriptling-libraries/networking/mercure.md): Mercure hub client - publish updates to topics and subscribe to them over Server-Sent Events.
 - [scriptling.net.multicast](https://scriptling.dev/okf/scriptling-libraries/networking/multicast.md): UDP multicast group messaging for one-to-many communication on local networks.
 - [scriptling.net.resolve](https://scriptling.dev/okf/scriptling-libraries/networking/resolve.md): DNS resolution for hostname lookup, SRV records, and srv+http(s):// URLs.
 - [scriptling.net.unicast](https://scriptling.dev/okf/scriptling-libraries/networking/unicast.md): UDP and TCP point-to-point messaging for direct host-to-host communication.
 - [scriptling.net.websocket](https://scriptling.dev/okf/scriptling-libraries/networking/websocket.md): WebSocket client for sending and receiving text or binary messages.
-- [Networking Libraries](https://scriptling.dev/okf/scriptling-libraries/networking.md): Networking libraries for cluster membership, multicast, point-to-point messaging, and WebSocket communication.
+- [Networking Libraries](https://scriptling.dev/okf/scriptling-libraries/networking.md): Networking libraries for cluster membership, multicast, point-to-point messaging, WebSocket communication, and Mercure publish/subscribe.
 - [scriptling.package](https://scriptling.dev/okf/scriptling-libraries/package.md): Read metadata and files from app and plugin bundles loaded by the host.
 - [scriptling.plugin](https://scriptling.dev/okf/scriptling-libraries/plugin.md): Control library for listing, inspecting, calling, and loading executable plugins at runtime.
+- [scriptling.provision.command](https://scriptling.dev/okf/scriptling-libraries/provisioning/provision-command.md): Run commands while provisioning a machine, as the script's user or as root.
 - [scriptling.provision.fetch](https://scriptling.dev/okf/scriptling-libraries/provisioning/provision-fetch.md): Download files over HTTP/HTTPS and optionally unpack zip archives, idempotently.
 - [scriptling.provision.file](https://scriptling.dev/okf/scriptling-libraries/provisioning/provision-file.md): Create, update, and remove files and directories idempotently, including marker-delimited managed blocks.
-- [Provisioning Libraries](https://scriptling.dev/okf/scriptling-libraries/provisioning.md): File and directory provisioning libraries for Scriptling.
+- [scriptling.provision.package](https://scriptling.dev/okf/scriptling-libraries/provisioning/provision-package.md): Install and remove system packages with apt, dnf, yum, apk or Homebrew, skipping those already in place.
+- [Provisioning Libraries](https://scriptling.dev/okf/scriptling-libraries/provisioning.md): Set up a machine from a script - files, downloads, commands and packages, as the user or as root.
 - [scriptling.runtime.http](https://scriptling.dev/okf/scriptling-libraries/runtime/http.md): Register HTTP routes, middleware, and response helpers for a Scriptling-backed server.
 - [scriptling.runtime.jsonrpc](https://scriptling.dev/okf/scriptling-libraries/runtime/jsonrpc.md): Register JSON-RPC 2.0 server methods and notifications served over stdio or HTTP.
 - [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/runtime/kv.md): Thread-safe key-value store for sharing state across requests and background tasks.

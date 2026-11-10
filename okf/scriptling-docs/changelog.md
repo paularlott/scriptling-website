@@ -16,6 +16,26 @@ type: Guide
 
 ## November 2026
 
+### v0.37.0
+
+
+**changed**
+
+- **Breaking:** Refuse code Python refuses: two statements on one line without `;` (`a = 1b = 2`), and a line indented where no block starts. A script embedded in Go source must start at column 0 ([docs](https://scriptling.dev/okf/scriptling-reference/syntax.md))
+- Apply an explicit `mode` in `scriptling.provision.file` to a file whose content is already right, and give the parent directories `ensure_directory()` creates the default mode instead of the one asked for ([docs](https://scriptling.dev/okf/scriptling-libraries/provisioning/provision-file.md))
+
+
+**added**
+
+- Add `scriptling.mercure` to publish to and subscribe at Mercure hubs; given the hub's key, clients renew their own tokens so long-running subscriptions never expire ([docs](https://scriptling.dev/okf/scriptling-libraries/networking/mercure.md))
+- Add `become=True` to the provisioning libraries to run a step as root through sudo, asked once per script and not at all where sudo needs no password; the CLI refuses it with `--deny-become` or a disabled `subprocess` library ([docs](https://scriptling.dev/okf/scriptling-libraries/provisioning.md#running-as-root))
+- Add `scriptling.provision.command` to run commands and `scriptling.provision.package` to install packages with apt, dnf, yum, apk or Homebrew ([docs](https://scriptling.dev/okf/scriptling-libraries/provisioning.md))
+- Add `owner` and `group` to `scriptling.provision.file` and `scriptling.provision.fetch`
+- Add `OnReset()` and `mercure.WithLifetime()` for embedders, so a pooled interpreter can close what a script left open ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#interpreter-lifecycle))
+
+
+---
+
 ### v0.36.1
 
 

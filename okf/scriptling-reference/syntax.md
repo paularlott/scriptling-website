@@ -28,6 +28,15 @@ if x > 5:
 
 Indentation determines which statements belong to which block. Consistent indentation is required throughout a file.
 
+As in Python, a script starts at column 0, and a line is indented only to start a block. Anywhere else an indented line is an error (`unexpected indent`), as is a script embedded in Go source that keeps its Go indentation: dedent it. Blank lines, comment lines, continuation lines and lines inside brackets may be indented freely.
+
+Statements on one line are separated by `;`. Run together, they are an error (`invalid syntax`):
+
+```python
+a = 1; b = 2      # two statements
+a = 1 b = 2       # invalid syntax
+```
+
 A block can also sit on the same line as its header, and `;` separates several statements on that line. All of them belong to the block, as in Python:
 
 ```python

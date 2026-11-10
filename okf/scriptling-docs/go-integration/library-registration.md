@@ -261,12 +261,14 @@ import (
     "github.com/paularlott/scriptling/extlibs/net/multicast"
     "github.com/paularlott/scriptling/extlibs/net/unicast"
     "github.com/paularlott/scriptling/extlibs/net/gossip"
+    "github.com/paularlott/scriptling/extlibs/mercure"
 )
 
 resolve.Register(p, myResolver) // scriptling.net.resolve (requires a Resolver implementation)
 multicast.Register(p)       // scriptling.net.multicast (optional *netsecurity.Config)
 unicast.Register(p)         // scriptling.net.unicast (optional *netsecurity.Config)
 gossip.Register(p, nil)     // scriptling.net.gossip (nil = null logger; optional *netsecurity.Config)
+mercure.Register(p)         // scriptling.mercure (optional *netsecurity.Config; RegisterConfigured adds allowed paths for CA bundles)
 ```
 
 | Namespace | Import Path | Call |
@@ -275,10 +277,11 @@ gossip.Register(p, nil)     // scriptling.net.gossip (nil = null logger; optiona
 | `scriptling.net.multicast` | `extlibs/net/multicast` | `multicast.Register(p)` |
 | `scriptling.net.unicast` | `extlibs/net/unicast` | `unicast.Register(p)` |
 | `scriptling.net.gossip` | `extlibs/net/gossip` | `gossip.Register(p, logger)` |
+| `scriptling.mercure` | `extlibs/mercure` | `mercure.Register(p)` or `mercure.RegisterConfigured(p, paths, policy, opts...)`; `mercure.WithLifetime(fn)` closes a script's clients when the context `fn` returns ends ([lifecycle](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#interpreter-lifecycle)) |
 
 ### Network Policy
 
-The outbound networking libraries — `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.net.unicast`, `scriptling.net.multicast`, `scriptling.net.gossip`, `scriptling.nomad`, `scriptling.oauth`, `scriptling.ai`, `scriptling.mcp`, and the Slack, Discord and Telegram messaging libraries — accept an optional `*netsecurity.Config` that restricts where scripts may connect. `scriptling.container` takes one through `container.RegisterConfigured` or `container.Options.Policy` (it checks the endpoints a script supplies), and `scriptling.provision.fetch` takes a `*netsecurity.Guard` through `fetch.RegisterConfigured`. Pass `nil` (or omit the argument) for no restrictions; a non-nil policy blocks loopback, link-local (cloud metadata), private, unspecified, and multicast addresses, and IP-literal URLs, by default.
+The outbound networking libraries — `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.net.unicast`, `scriptling.net.multicast`, `scriptling.net.gossip`, `scriptling.nomad`, `scriptling.oauth`, `scriptling.mercure`, `scriptling.ai`, `scriptling.mcp`, and the Slack, Discord and Telegram messaging libraries — accept an optional `*netsecurity.Config` that restricts where scripts may connect. `scriptling.container` takes one through `container.RegisterConfigured` or `container.Options.Policy` (it checks the endpoints a script supplies), and `scriptling.provision.fetch` takes a `*netsecurity.Guard` through `fetch.RegisterConfigured`. Pass `nil` (or omit the argument) for no restrictions; a non-nil policy blocks loopback, link-local (cloud metadata), private, unspecified, and multicast addresses, and IP-literal URLs, by default.
 
 ```go
 import (
@@ -360,8 +363,10 @@ import (
     "github.com/paularlott/scriptling/extlibs/nomad"
     "github.com/paularlott/scriptling/extlibs/oauth"
     "github.com/paularlott/scriptling/extlibs/similarity"
+    "github.com/paularlott/scriptling/extlibs/provision/command"
     "github.com/paularlott/scriptling/extlibs/provision/fetch"
     "github.com/paularlott/scriptling/extlibs/provision/file"
+    "github.com/paularlott/scriptling/extlibs/provision/packages"
 )
 
 console.Register(p)                        // scriptling.console
@@ -371,6 +376,8 @@ oauth.Register(p)                          // scriptling.oauth (optional *netsec
 similarity.Register(p)                     // scriptling.similarity
 file.Register(p)                           // scriptling.provision.file
 fetch.Register(p)                          // scriptling.provision.fetch
+command.Register(p)                        // scriptling.provision.command
+packages.Register(p)                       // scriptling.provision.package
 extlibs.RegisterMarkdownLibrary(p)         // scriptling.markdown
 ```
 
@@ -383,7 +390,32 @@ extlibs.RegisterMarkdownLibrary(p)         // scriptling.markdown
 | `scriptling.similarity` | `extlibs/similarity` | `similarity.Register(p)` |
 | `scriptling.provision.file` | `extlibs/provision/file` | `file.Register(p)` |
 | `scriptling.provision.fetch` | `extlibs/provision/fetch` | `fetch.Register(p)` |
+| `scriptling.provision.command` | `extlibs/provision/command` | `command.Register(p)` |
+| `scriptling.provision.package` | `extlibs/provision/packages` | `packages.Register(p)` |
 | `scriptling.markdown` | root `extlibs` | `extlibs.RegisterMarkdownLibrary(p)` |
+
+### Provisioning as Root
+
+The provisioning libraries run `become=True` steps as root only when you give them a `become.Become`. Without one, such a step fails with a `PermissionError` (unless the process already runs as root). The first root step starts your own program again through `sudo` as a helper, so your program must serve it: call `become.ServeIfHelper()` first thing in `main`.
+
+```go
+import "github.com/paularlott/scriptling/extlibs/provision/become"
+
+func main() {
+    become.ServeIfHelper() // started as the root helper: serve it and exit
+
+    // ...
+    b := become.New(become.Config{Paths: paths}) // the same allowed paths as the libraries
+    defer b.Close()
+
+    file.RegisterConfigured(p, paths, file.WithBecome(b))
+    fetch.RegisterConfigured(p, paths, guard, fetch.WithBecome(b))
+    command.RegisterConfigured(p, command.WithBecome(b))
+    packages.RegisterConfigured(p, packages.WithBecome(b))
+}
+```
+
+`become.Config` also takes `Command`, the helper's command line (default: this program with `become.HelperArg`), and `Sudo` (default `sudo`; `doas` works too). One helper serves every interpreter that shares the `Become`.
 
 ### Executable Plugins
 

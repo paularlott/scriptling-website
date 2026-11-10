@@ -577,6 +577,17 @@ if _, err := p.Eval(nextJob); err != nil {
 
 Use `ResetEnv("name", "config")` when selected bindings should survive; the injected `import` builtin is always retained. Use `Clone()` when each request, tenant, or concurrent job needs a fresh environment based on the same registrations.
 
+A script can leave things open that clearing its bindings does not close, such as a Mercure subscription. `OnReset` runs your code at the start of every `Reset()`, so a pooled interpreter can close them before the next job gets it:
+
+```go
+life, end := context.WithCancel(context.Background())
+mercure.RegisterConfigured(p, paths, policy, mercure.WithLifetime(func() context.Context { return life }))
+p.OnReset(func() {
+    end() // closes the clients the last job made
+    life, end = context.WithCancel(context.Background())
+})
+```
+
 ### Cloning Interpreters
 
 Create an isolated interpreter that shares library registrations but has a fresh environment. Useful for per-request or multi-tenant isolation:
