@@ -1,5 +1,5 @@
 ---
-description: Networking libraries for cluster membership, multicast, point-to-point messaging, and WebSocket communication.
+description: Networking libraries for cluster membership, multicast, point-to-point messaging, WebSocket communication, and Mercure publish/subscribe.
 generated:
     by: scriptling-website/okf.py
 resource: https://scriptling.dev/reference/libraries/networking/
@@ -14,7 +14,7 @@ type: API Reference
 ---
 # Networking Libraries
 
-Networking libraries for distributed communication patterns using the `scriptling.net` namespace.
+Networking libraries for distributed communication patterns using the `scriptling.net` namespace, and `scriptling.mercure` for publishing and subscribing through Mercure hubs.
 
 ## Libraries
 
@@ -25,6 +25,7 @@ Networking libraries for distributed communication patterns using the `scriptlin
 | [scriptling.net.resolve](https://scriptling.dev/okf/scriptling-libraries/networking/resolve.md) | DNS resolution for IP, SRV, and srv+http URLs |
 | [scriptling.net.unicast](https://scriptling.dev/okf/scriptling-libraries/networking/unicast.md) | UDP and TCP point-to-point messaging |
 | [scriptling.net.websocket](https://scriptling.dev/okf/scriptling-libraries/networking/websocket.md) | WebSocket client for connecting to WebSocket servers |
+| [scriptling.mercure](https://scriptling.dev/okf/scriptling-libraries/networking/mercure.md) | Mercure hub client: publish updates and subscribe to topics over Server-Sent Events |
 
 ## Quick Start
 
@@ -44,6 +45,7 @@ conn.close()
 
 ## See Also
 
+- [scriptling.mercure](https://scriptling.dev/okf/scriptling-libraries/networking/mercure.md) - Publish/subscribe through Mercure hubs
 - [scriptling.runtime](https://scriptling.dev/okf/scriptling-libraries/runtime.md) - HTTP and JSON-RPC server libraries
 - [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/ai.md) - AI agents that can drive networked tools
 - [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Full library reference index

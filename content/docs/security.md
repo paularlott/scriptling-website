@@ -37,13 +37,14 @@ These libraries provide Scriptling-specific functionality. This is a capability 
 | `scriptling.ai`       | **NETWORK ACCESS** - Makes HTTP requests to AI APIs           |
 | `scriptling.ai.agent` | **NETWORK + CODE EXECUTION** - Agentic AI with tool execution |
 | `scriptling.mcp`      | **NETWORK ACCESS** - MCP protocol communication               |
+| `scriptling.mercure`  | **NETWORK ACCESS** - Publishes to and subscribes at Mercure hubs |
 | `scriptling.net.*`    | **NETWORK ACCESS** - DNS, UDP/TCP, gossip, multicast, and WebSocket clients |
 | `scriptling.messaging.*` | **NETWORK + REMOTE INPUT** - Bot clients receive events and send messages using script-supplied credentials |
 | `scriptling.container` | **INFRASTRUCTURE CONTROL** - Manages Docker, Podman, and Apple Containers |
 | `scriptling.nomad`    | **INFRASTRUCTURE CONTROL** - Registers/stops jobs and manages Nomad resources |
 | `scriptling.oauth`    | **NETWORK ACCESS** - Signs in to identity providers and handles access tokens |
 | `scriptling.plugin`   | **PROCESS OR NETWORK ACCESS** - Starts executable peers or connects to plugin servers |
-| `scriptling.provision.*` | **FILESYSTEM + NETWORK ACCESS** - Changes files and can download remote content |
+| `scriptling.provision.*` | **FILESYSTEM + NETWORK + COMMAND ACCESS** - Changes files, downloads remote content, runs commands and installs packages; as root through `sudo` unless `--deny-become` |
 | `scriptling.secret`   | Host-controlled secret access; scripts see aliases, not provider credentials |
 | `scriptling.console`  | Console I/O, including interactive input                       |
 
@@ -78,6 +79,8 @@ These libraries extend functionality but require explicit registration:
 | `logging`     | File and console logging - may write to disk                                |
 | `scriptling.wait_for` | Network/resource polling - may access network; file checks controlled by allowed paths |
 | `scriptling.provision.fetch` | HTTP/HTTPS downloads and filesystem writes; `insecure=True` skips TLS verification |
+| `scriptling.provision.command` | **CRITICAL RISK** - Runs commands, as root with `become=True`; registered only where `subprocess` is |
+| `scriptling.provision.package` | **CRITICAL RISK** - Installs and removes system packages as root; registered only where `subprocess` is |
 | `yaml`        | YAML parsing - safe but watch for large files                               |
 | `toml`        | TOML parsing - safe but watch for large files                               |
 | `html.parser` | HTML parsing - safe but watch for large files                               |
@@ -149,6 +152,7 @@ These libraries can make network requests:
 - `scriptling.ai` - AI API client
 - `scriptling.ai.agent` - Agentic AI with tool execution
 - `scriptling.mcp` - MCP protocol client
+- `scriptling.mercure` - Mercure hub client (publish and subscribe)
 - `scriptling.wait_for` - Resource polling (may check network endpoints)
 - `scriptling.provision.fetch` - HTTP/HTTPS downloads and optional zip unpacking
 
@@ -166,7 +170,7 @@ extlibs.RegisterRequestsLibrary(p)
 
 ### Network Policies
 
-For scripts that *should* reach the internet but must never reach your private network, register a network policy. A policy governs the `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.net.unicast`, `scriptling.net.multicast`, `scriptling.net.gossip`, `scriptling.nomad`, `scriptling.oauth`, `scriptling.ai`, `scriptling.mcp`, and `scriptling.provision.fetch` libraries, the Slack, Discord and Telegram messaging libraries, and the container endpoints a script passes to `scriptling.container`, and is enforced at connect time: the hostname is resolved through the configured DNS servers, every resolved address is checked against the policy, and the connection is made to the validated address directly. That closes the usual bypasses — DNS rebinding (the answer changing between check and connect), redirects to internal hosts, and IP-notation tricks.
+For scripts that *should* reach the internet but must never reach your private network, register a network policy. A policy governs the `requests`, `scriptling.wait_for`, `scriptling.net.websocket`, `scriptling.net.unicast`, `scriptling.net.multicast`, `scriptling.net.gossip`, `scriptling.nomad`, `scriptling.oauth`, `scriptling.mercure`, `scriptling.ai`, `scriptling.mcp`, and `scriptling.provision.fetch` libraries, the Slack, Discord and Telegram messaging libraries, and the container endpoints a script passes to `scriptling.container`, and is enforced at connect time: the hostname is resolved through the configured DNS servers, every resolved address is checked against the policy, and the connection is made to the validated address directly. That closes the usual bypasses — DNS rebinding (the answer changing between check and connect), redirects to internal hosts, and IP-notation tricks.
 
 With a policy active, loopback, link-local (including cloud metadata endpoints like `169.254.169.254`), private, reserved (CGNAT `100.64.0.0/10`, documentation and benchmarking ranges, NAT64/6to4 and other non-public ranges), unspecified, and multicast addresses are all blocked by default, as are URLs that name an IP directly. Host allow/deny lists, CIDR exceptions, https-only, and custom DNS servers grant exactly the access you intend — allowlisted hosts are trusted to resolve internally (still subject to `deny_cidrs`, and a link-local answer still needs `allow_cidrs`), and deny rules always win.
 
@@ -345,6 +349,7 @@ Use this checklist when deploying Scriptling in production:
 - [ ] `subprocess` library is NOT registered
 - [ ] `sys` and `os` are omitted or carefully controlled for untrusted code
 - [ ] Container, Nomad, plugin, messaging, and provisioning libraries are omitted unless explicitly required
+- [ ] `--deny-become` (or `--disable-lib subprocess`) is set where scripts must not use sudo
 - [ ] `scriptling.runtime.sandbox` is NOT registered for untrusted code
 - [ ] `scriptling.ai.agent` is NOT registered for untrusted code
 - [ ] Environment variables are filtered

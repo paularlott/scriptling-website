@@ -39,10 +39,10 @@ The `scriptling.*` libraries provide functionality beyond Python's standard libr
 - [Databases](https://scriptling.dev/okf/scriptling-libraries/databases.md): SQLite, SQL, Valkey, BadgerDB, and the ORM
 - [MCP](https://scriptling.dev/okf/scriptling-libraries/mcp.md): MCP clients and tool authoring
 - [Messaging](https://scriptling.dev/okf/scriptling-libraries/messaging.md): Telegram, Discord, Slack, console
-- [Networking](https://scriptling.dev/okf/scriptling-libraries/networking.md): Gossip, multicast, unicast, DNS, WebSocket
+- [Networking](https://scriptling.dev/okf/scriptling-libraries/networking.md): Gossip, multicast, unicast, DNS, WebSocket, Mercure
 - [Packages](https://scriptling.dev/okf/scriptling-libraries/package.md): Read files and metadata from loaded app/plugin bundles
 - [Plugins](https://scriptling.dev/okf/scriptling-libraries/plugin.md): Control library for executable plugins
-- [Provisioning](https://scriptling.dev/okf/scriptling-libraries/provisioning.md): File and fetch provisioning
+- [Provisioning](https://scriptling.dev/okf/scriptling-libraries/provisioning.md): Files, downloads, commands and packages, as the user or as root
 - [Runtime](https://scriptling.dev/okf/scriptling-libraries/runtime.md): Background tasks, HTTP, JSON-RPC, MCP, KV, sync, sandbox
 - [Templates](https://scriptling.dev/okf/scriptling-libraries/template.md): Go-powered HTML and text templates
 - [Utilities](https://scriptling.dev/okf/scriptling-libraries/utilities.md): Console, containers, Nomad, grep, find, CSV, XML, secrets, and more
@@ -74,7 +74,7 @@ There is no universal extended-library `RegisterAll`. `stdlib.RegisterAll` cover
 Registration grants scripts the host process's authority for that surface. In particular:
 
 - filesystem, subprocess, environment, secret, and provisioning libraries can read, write, execute, or disclose host data according to their configured restrictions;
-- the outbound libraries (`requests`, `scriptling.oauth`, `wait_for`, WebSocket, unicast, multicast, gossip, Nomad, AI, MCP, `provision.fetch`, the Slack, Discord and Telegram libraries, and container endpoints a script supplies) obey an embedding `netsecurity.Config` or the CLI network-policy file when one is passed at registration, but HTTP clients the embedding application builds itself and plugin processes are separate surfaces and do not inherit it;
+- the outbound libraries (`requests`, `scriptling.oauth`, `scriptling.mercure`, `wait_for`, WebSocket, unicast, multicast, gossip, Nomad, AI, MCP, `provision.fetch`, the Slack, Discord and Telegram libraries, and container endpoints a script supplies) obey an embedding `netsecurity.Config` or the CLI network-policy file when one is passed at registration, but HTTP clients the embedding application builds itself and plugin processes are separate surfaces and do not inherit it;
 - container and Nomad libraries can control available local runtimes or remote cluster workloads;
 - runtime HTTP/JSON-RPC/MCP/plugin servers and messaging handlers create remotely reachable entry points; authentication and authorization remain the application's responsibility;
 - plugin loading and package bundles add host-selected code and content, while provisioning can change files or fetch remote content.

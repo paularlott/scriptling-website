@@ -1,7 +1,7 @@
 ---
 title: Networking Libraries
 linkTitle: Networking
-description: Networking libraries for cluster membership, multicast, point-to-point messaging, and WebSocket communication.
+description: Networking libraries for cluster membership, multicast, point-to-point messaging, WebSocket communication, and Mercure publish/subscribe.
 tags: [libraries, networking]
 weight: 14
 
@@ -9,7 +9,7 @@ aliases:
   - /reference/libraries/scriptling/networking/
 ---
 
-Networking libraries for distributed communication patterns using the `scriptling.net` namespace.
+Networking libraries for distributed communication patterns using the `scriptling.net` namespace, and `scriptling.mercure` for publishing and subscribing through Mercure hubs.
 
 ## Libraries
 
@@ -20,6 +20,7 @@ Networking libraries for distributed communication patterns using the `scriptlin
 | [scriptling.net.resolve](resolve/) | DNS resolution for IP, SRV, and srv+http URLs |
 | [scriptling.net.unicast](unicast/) | UDP and TCP point-to-point messaging |
 | [scriptling.net.websocket](websocket/) | WebSocket client for connecting to WebSocket servers |
+| [scriptling.mercure](mercure/) | Mercure hub client: publish updates and subscribe to topics over Server-Sent Events |
 
 ## Quick Start
 
@@ -39,6 +40,7 @@ conn.close()
 
 ## See Also
 
+- [scriptling.mercure](mercure/) - Publish/subscribe through Mercure hubs
 - [scriptling.runtime](../runtime/) - HTTP and JSON-RPC server libraries
 - [scriptling.ai](../ai/) - AI agents that can drive networked tools
 - [Libraries](../) - Full library reference index

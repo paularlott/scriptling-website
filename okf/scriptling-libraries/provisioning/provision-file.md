@@ -23,19 +23,19 @@ The `scriptling.provision.file` library writes files only when their content dif
 
 | Function | Description |
 |----------|-------------|
-| `ensure(path, content, mode=0o644, create_only=False)` | Ensure a file exists with the given content |
-| `absent(path)` | Remove a file if it exists |
-| `ensure_directory(path, mode=0o755)` | Ensure a directory exists |
-| `absent_directory(path)` | Remove an empty directory if it exists |
-| `ensure_block(path, content, id="managed", comment="#", position="end", insert_after="", mode=0o644, create_only=False)` | Maintain a marker-delimited block within a file |
-| `absent_block(path, id="managed", comment="#")` | Remove a managed block |
+| `ensure(path, content, mode=0o644, create_only=False, owner=None, group=None, become=False)` | Ensure a file exists with the given content |
+| `absent(path, become=False)` | Remove a file if it exists |
+| `ensure_directory(path, mode=0o755, owner=None, group=None, become=False)` | Ensure a directory exists |
+| `absent_directory(path, become=False)` | Remove an empty directory if it exists |
+| `ensure_block(path, content, id="managed", comment="#", position="end", insert_after="", mode=0o644, create_only=False, owner=None, group=None, become=False)` | Maintain a marker-delimited block within a file |
+| `absent_block(path, id="managed", comment="#", become=False)` | Remove a managed block |
 
 ## Constants
 
 | Constant | Description |
 |----------|-------------|
 | `file.CREATED` | File or directory was newly created (`"created"`) |
-| `file.UPDATED` | File existed but content differed (`"updated"`) |
+| `file.UPDATED` | File existed but its content, mode or owner differed; or a directory's mode or owner was changed (`"updated"`) |
 | `file.UNCHANGED` | File existed with identical content (`"unchanged"`) |
 | `file.REMOVED` | File or directory was deleted (`"removed"`) |
 | `file.ABSENT` | File or directory did not exist (`"absent"`) |
@@ -43,9 +43,11 @@ The `scriptling.provision.file` library writes files only when their content dif
 
 ## Functions
 
-### `ensure(path, content, mode=0o644, create_only=False)`
+### `ensure(path, content, mode=0o644, create_only=False, owner=None, group=None, become=False)`
 
 Ensures a file exists with the given content. Creates parent directories if needed. If the file already exists with the same content, it is left unchanged; otherwise the file is written with the specified mode.
+
+When `mode`, `owner` or `group` is given, an existing file with the right content gets them too, and the call returns `file.UPDATED` if that changed anything. Without them, an unchanged file is left exactly as it is.
 
 When `create_only=True`, an existing file is never modified: the call returns `file.UNCHANGED` without writing, even if the content on disk differs. New files are still written normally. This is useful for seeding configuration files that should only be created once and left alone on subsequent runs.
 
@@ -54,6 +56,9 @@ When `create_only=True`, an existing file is never modified: the call returns `f
 - `content` (`str`): File contents.
 - `mode` (`int`, optional): File permission mode. Default: `0o644`.
 - `create_only` (`bool`, optional): If `True`, never modify an existing file. Default: `False`.
+- `owner` (`str` or `int`, optional): Owner, by name or uid. Default: a new file belongs to whoever writes it (root with `become=True`); an existing one keeps its owner.
+- `group` (`str` or `int`, optional): Group, by name or gid. Default: as for `owner`.
+- `become` (`bool`, optional): Run as root. See [Running as Root](https://scriptling.dev/okf/scriptling-libraries/provisioning.md#running-as-root). Default: `False`.
 
 **Returns:** `str`: one of `file.CREATED`, `file.UPDATED`, `file.UNCHANGED`.
 
@@ -80,12 +85,21 @@ import scriptling.provision.file as file
 status = file.ensure("~/.config/myapp/defaults.toml", DEFAULTS, create_only=True)
 ```
 
-### `absent(path)`
+Write a file only root may write, owned by the service that reads it:
+
+```python
+import scriptling.provision.file as file
+
+file.ensure("/etc/myapp/secret.conf", SECRET_CONF, mode=0o640, owner="root", group="myapp", become=True)
+```
+
+### `absent(path, become=False)`
 
 Removes a file if it exists. Does nothing if the file is already absent.
 
 **Parameters:**
 - `path` (`str`): Path to the file (supports `~` expansion).
+- `become` (`bool`, optional): Run as root. Default: `False`.
 
 **Returns:** `str`: `file.REMOVED` or `file.ABSENT`.
 
@@ -97,15 +111,18 @@ if status == file.REMOVED:
     print("File removed")
 ```
 
-### `ensure_directory(path, mode=0o755)`
+### `ensure_directory(path, mode=0o755, owner=None, group=None, become=False)`
 
-Creates a directory and all parent directories if needed.
+Creates a directory and all parent directories if needed. When `mode`, `owner` or `group` is given, the directory gets exactly them, new or not. Parent directories it creates get the defaults (`0o755`, owned by whoever creates them), as with `mkdir -p -m`, so a restrictive mode never locks the owner out of the way to their directory.
 
 **Parameters:**
 - `path` (`str`): Path to the directory (supports `~` expansion).
 - `mode` (`int`, optional): Directory permission mode. Default: `0o755`.
+- `owner` (`str` or `int`, optional): Owner, by name or uid. Default: a new file belongs to whoever writes it (root with `become=True`); an existing one keeps its owner.
+- `group` (`str` or `int`, optional): Group, by name or gid. Default: as for `owner`.
+- `become` (`bool`, optional): Run as root. See [Running as Root](https://scriptling.dev/okf/scriptling-libraries/provisioning.md#running-as-root). Default: `False`.
 
-**Returns:** `str`: `file.CREATED` or `file.EXISTS`.
+**Returns:** `str`: `file.CREATED`, `file.UPDATED` (it existed and its mode or owner was changed), or `file.EXISTS`.
 
 **Raises:** `Error`: if the path exists but is not a directory.
 
@@ -117,12 +134,19 @@ if status == file.CREATED:
     print("Directory created")
 ```
 
-### `absent_directory(path)`
+```python
+import scriptling.provision.file as file
+
+file.ensure_directory("/srv/myapp/data", mode=0o750, owner="myapp", group="myapp", become=True)
+```
+
+### `absent_directory(path, become=False)`
 
 Removes an empty directory if it exists.
 
 **Parameters:**
 - `path` (`str`): Path to the directory (supports `~` expansion).
+- `become` (`bool`, optional): Run as root. Default: `False`.
 
 **Returns:** `str`: `file.REMOVED` or `file.ABSENT`.
 
@@ -136,7 +160,7 @@ if status == file.REMOVED:
     print("Directory removed")
 ```
 
-### `ensure_block(path, content, id="managed", comment="#", position="end", insert_after="", mode=0o644, create_only=False)`
+### `ensure_block(path, content, id="managed", comment="#", position="end", insert_after="", mode=0o644, create_only=False, owner=None, group=None, become=False)`
 
 Maintains a **managed block** inside a file. The block is wrapped in distinctive markers and only the text between them is replaced on each run: everything outside the markers is left byte-for-byte untouched. If the markers are not present, the block is inserted at the chosen position.
 
@@ -167,8 +191,11 @@ A single trailing newline in `content` is normalized, so `"foo\n"` and `"foo"` p
 - `comment` (`str`, optional): Comment prefix used to build the markers. Default: `"#"`.
 - `position` (`str`, optional): Where to insert a new block: `"end"` or `"start"`. Default: `"end"`.
 - `insert_after` (`str`, optional): Substring anchor; new block inserted after first match (overrides `position`). Default: `""`.
-- `mode` (`int`, optional): File permission mode used when creating the file. Default: `0o644`.
+- `mode` (`int`, optional): File permission mode used when writing the file. Default: `0o644`.
 - `create_only` (`bool`, optional): If `True`, never modify an existing block. Default: `False`.
+- `owner` (`str` or `int`, optional): Owner, by name or uid. Default: a new file belongs to whoever writes it (root with `become=True`); an existing one keeps its owner.
+- `group` (`str` or `int`, optional): Group, by name or gid. Default: as for `owner`.
+- `become` (`bool`, optional): Run as root. See [Running as Root](https://scriptling.dev/okf/scriptling-libraries/provisioning.md#running-as-root). Default: `False`.
 
 **Returns:** `str`: one of `file.CREATED`, `file.UPDATED`, `file.UNCHANGED`.
 
@@ -181,13 +208,13 @@ import scriptling.provision.file as file
 status = file.ensure_block("~/.bashrc", "export EDITOR=vim\n", id="editor")
 
 # Insert after a specific anchor line
-file.ensure_block("/etc/hosts", "127.0.0.1 myapp\n", insert_after="localhost")
+file.ensure_block("/etc/hosts", "127.0.0.1 myapp\n", insert_after="localhost", become=True)
 
 # Multiple independent blocks in the same file
 file.ensure_block("~/.bashrc", "alias ll='ls -la'\n", id="aliases")
 ```
 
-### `absent_block(path, id="managed", comment="#")`
+### `absent_block(path, id="managed", comment="#", become=False)`
 
 Removes the managed block (both markers and all content between them) for the given `id`. Everything else in the file is left untouched. The existing file's permission mode is preserved. If no such block exists, nothing happens.
 
@@ -195,6 +222,7 @@ Removes the managed block (both markers and all content between them) for the gi
 - `path` (`str`): Path to the file (supports `~` expansion).
 - `id` (`str`, optional): Block identifier embedded in the markers. Default: `"managed"`.
 - `comment` (`str`, optional): Comment prefix used to build the markers. Default: `"#"`.
+- `become` (`bool`, optional): Run as root. Default: `False`.
 
 **Returns:** `str`: `file.REMOVED` if the block was deleted, `file.UNCHANGED` if the block was not present.
 
