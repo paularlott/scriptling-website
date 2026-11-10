@@ -23,6 +23,7 @@ type: Guide
 
 - **Breaking:** Refuse code Python refuses: two statements on one line without `;` (`a = 1b = 2`), and a line indented where no block starts. A script embedded in Go source must start at column 0 ([docs](https://scriptling.dev/okf/scriptling-reference/syntax.md))
 - Apply an explicit `mode` in `scriptling.provision.file` to a file whose content is already right, and give the parent directories `ensure_directory()` creates the default mode instead of the one asked for ([docs](https://scriptling.dev/okf/scriptling-libraries/provisioning/provision-file.md))
+- Upgrade `scriptling.net.gossip` to gossip v0.31.0: a node takes a reply only from the node it asked and only as the answer to its own request, so a captured reply can't answer a later one. Nodes on v0.36 and earlier send replies it refuses, so upgrade a cluster's nodes together ([docs](https://scriptling.dev/okf/scriptling-libraries/networking/gossip.md))
 
 
 **added**
