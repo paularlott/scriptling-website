@@ -324,7 +324,9 @@ hub.set_token(issued.access_token)
 
 ### `Client.close()`
 
-Closes the client, its subscriptions and its publish stream. Publishing on a closed client is an error.
+Closes the client, its subscriptions and its publish stream. Publishing on a closed client is an error. A client
+the script does not close is closed for it when the script's interpreter is reset or done with (a pooled or
+per-request interpreter, a finished background task), or once the script no longer holds it.
 
 **Returns:** `None`
 

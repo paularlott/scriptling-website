@@ -267,7 +267,7 @@ mercure.Register(p)         // scriptling.mercure (optional *netsecurity.Config;
 | `scriptling.net.multicast` | `extlibs/net/multicast` | `multicast.Register(p)` |
 | `scriptling.net.unicast` | `extlibs/net/unicast` | `unicast.Register(p)` |
 | `scriptling.net.gossip` | `extlibs/net/gossip` | `gossip.Register(p, logger)` |
-| `scriptling.mercure` | `extlibs/mercure` | `mercure.Register(p)` or `mercure.RegisterConfigured(p, paths, policy, opts...)`; `mercure.WithLifetime(fn)` closes a script's clients when the context `fn` returns ends ([lifecycle](../basics/#interpreter-lifecycle)) |
+| `scriptling.mercure` | `extlibs/mercure` | `mercure.Register(p)` or `mercure.RegisterConfigured(p, paths, policy)`; the interpreter closes the clients a script leaves open ([lifecycle](../basics/#what-a-script-leaves-open)) |
 
 ### Network Policy
 

@@ -577,16 +577,22 @@ if _, err := p.Eval(nextJob); err != nil {
 
 Use `ResetEnv("name", "config")` when selected bindings should survive; the injected `import` builtin is always retained. Use `Clone()` when each request, tenant, or concurrent job needs a fresh environment based on the same registrations.
 
-A script can leave things open that clearing its bindings does not close, such as a Mercure subscription. `OnReset` runs your code at the start of every `Reset()`, so a pooled interpreter can close them before the next job gets it:
+#### What a script leaves open
+
+A script can open things that clearing its bindings would not close: Mercure clients and subscriptions, WebSocket connections, stdio MCP servers (child processes) and zip and tar archives. The interpreter that ran the script owns them, and closes whatever the script left open:
+
+- `Reset()` and `ResetEnv(...)` close them first, kept bindings or not, so the next job starts with nothing open.
+- `Close()` closes them for an interpreter you are done with, such as one made for a single request. The interpreter stays usable.
+- A background task closes what it opened when its function returns.
+- Anything a script no longer holds is closed once it is garbage collected, but that is not prompt: call `Close()` rather than rely on it.
 
 ```go
-life, end := context.WithCancel(context.Background())
-mercure.RegisterConfigured(p, paths, policy, mercure.WithLifetime(func() context.Context { return life }))
-p.OnReset(func() {
-    end() // closes the clients the last job made
-    life, end = context.WithCancel(context.Background())
-})
+p := template.Clone()
+defer p.Close() // whatever the handler script left open
+result, err := p.EvalFile("handler.py")
 ```
+
+What a script library's functions open belongs to the interpreter that imported the library.
 
 ### Cloning Interpreters
 
@@ -601,6 +607,7 @@ template.RegisterScriptLibrary("mylib", myLibScript)
 // Per-request: clone gives a fresh env with the same libraries available
 handler := func(w http.ResponseWriter, r *http.Request) {
     p := template.Clone()
+    defer p.Close()
     p.SetVar("request_id", r.Header.Get("X-Request-ID"))
     result, err := p.EvalFile("handler.py")
     // ...

@@ -15,6 +15,31 @@ type: Guide
 ---
 # GC Release Hooks
 
+## Resources a Script Opens
+
+A library that opens something for a script, a client, a connection, a child process or a file handle, registers it with `evaluator.TrackResource` so it does not outlive the script's use of it. The interpreter running the script then closes it on `Reset()`, `ResetEnv()` and `Close()`, and once the object the script holds is garbage collected:
+
+```go
+func connect(ctx context.Context, url string) object.Object {
+    conn := dial(url)
+    inst := object.NewInstanceWithData(connClass, nil, conn)
+    conn.release = evaluator.TrackResource(ctx, inst, conn.Close)
+    return inst
+}
+
+// close() from the script: forget it, then close it.
+func (c *Conn) Close() {
+    c.once.Do(func() {
+        c.release()
+        c.raw.Close()
+    })
+}
+```
+
+`close` must be safe to call more than once and from any goroutine, and neither it nor `release` may hold on to the object the script holds (`inst`), or that object could never be collected. Pass a `nil` owner to have only the interpreter close it.
+
+## GC Release Hooks
+
 Scriptling exposes a small Go utility for attaching best-effort release hooks to heap objects:
 
 ```go

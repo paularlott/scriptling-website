@@ -16,6 +16,28 @@ type: Guide
 
 ## November 2026
 
+### v0.38.0
+
+
+**changed**
+
+- **Breaking:** Close what a script leaves open, Mercure clients and subscriptions, WebSocket connections, stdio MCP servers and zip and tar archives, when its interpreter is done with it: `Reset()` and `ResetEnv()` close them, a background task closes its own when it returns, and anything a script no longer holds closes once collected. They used to stay open until the process exited ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#what-a-script-leaves-open))
+- Keep a Mercure subscription open until it or its client is closed; it used to end with the call that made it
+- Close what each call left open in MCP tool, resource and prompt handlers and in the server's request handlers, and what the setup script left open when the server stops
+
+
+**added**
+
+- Add `Close()` to close what scripts left open in an interpreter you are done with, and `evaluator.TrackResource()` for libraries that open things for scripts ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/gc-release-hooks.md#resources-a-script-opens))
+
+
+**removed**
+
+- **Breaking:** Remove `OnReset()` and `mercure.WithLifetime()`, which the interpreter now does for you; `mercure.RegisterConfigured()` takes no options
+
+
+---
+
 ### v0.37.0
 
 
