@@ -306,10 +306,20 @@ resuming from its last event ID, until it is closed.
 **Returns:** `Subscription`. The open subscription.
 
 **Raises:** An error naming the hub's status when it refuses the subscription (400 for parameters of a revision it
-does not take, 401, 403).
+does not take, 401, 403). `RuntimeError` when the host lets scripts publish only
+([Security Considerations](#security-considerations)).
 
 ```python
 sub = hub.subscribe(match_urlpattern="https://example.com/books/:id", last_event_id=saved_id)
+```
+
+A script meant for hosts of both kinds can carry on without the subscription:
+
+```python
+try:
+    sub = hub.subscribe("https://example.com/news")
+except RuntimeError:
+    sub = None  # publish-only host: send updates, don't listen
 ```
 
 ### `Client.set_token(token)`
@@ -407,8 +417,8 @@ This is an extended library, requiring registration in Go, see
   certificate being checked.
 - A CA bundle named with `verify="path"` must lie within `--allowed-paths`, else an uncatchable `PermissionError`.
 - Requests never follow redirects: the token goes to the hub's URL and nowhere else.
-- A host can let scripts publish but not receive (`mercure.WithoutSubscribe()` in Go): `subscribe()` then raises an
-  uncatchable `PermissionError`, and everything else works as before.
+- A host can let scripts publish but not receive (`mercure.WithoutSubscribe()` in Go): `subscribe()` then raises
+  `RuntimeError`, which a script can catch to carry on without it, and everything else works as before.
 - `key=` and `create_token()` need the hub's signing key, which can mint tokens for any topic: `publish=` and
   `subscribe=` limit what the client's own tokens allow, not what the key can do. A script that should never hold
   the key is given a token made elsewhere (`token=`), with just the topics it needs, and `set_token()` before it

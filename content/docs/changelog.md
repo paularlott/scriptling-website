@@ -11,7 +11,7 @@ nav-skip: true
 {{< version "v0.39.0" >}}
 
 {{< changelog-item "added" >}}
-- Add `mercure.WithoutSubscribe()` for `mercure.RegisterConfigured()`, to let scripts publish but not receive: `subscribe()` raises an uncatchable `PermissionError` ([docs](/reference/libraries/networking/mercure/#security-considerations))
+- Add `mercure.WithoutSubscribe()` for `mercure.RegisterConfigured()`, to let scripts publish but not receive: `subscribe()` raises `RuntimeError`, which a script can catch to carry on without it ([docs](/reference/libraries/networking/mercure/#security-considerations))
 {{< /changelog-item >}}
 
 ---
