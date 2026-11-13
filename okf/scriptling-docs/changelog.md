@@ -16,6 +16,16 @@ type: Guide
 
 ## November 2026
 
+### v0.40.1
+
+
+**changed**
+
+- Dependencies updated
+
+
+---
+
 ### v0.40.0
 
 

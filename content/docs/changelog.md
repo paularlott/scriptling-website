@@ -8,6 +8,14 @@ nav-skip: true
 
 ## November 2026
 
+{{< version "v0.40.1" >}}
+
+{{< changelog-item "changed" >}}
+- Dependencies updated
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.40.0" >}}
 
 {{< changelog-item "changed" >}}
