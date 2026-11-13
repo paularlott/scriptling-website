@@ -399,6 +399,8 @@ This is an extended library, requiring registration in Go, see
   certificate being checked.
 - A CA bundle named with `verify="path"` must lie within `--allowed-paths`, else an uncatchable `PermissionError`.
 - Requests never follow redirects: the token goes to the hub's URL and nowhere else.
+- A host can let scripts publish but not receive (`mercure.WithoutSubscribe()` in Go): `subscribe()` then raises an
+  uncatchable `PermissionError`, and everything else works as before.
 - `key=` and `create_token()` need the hub's signing key, which can mint tokens for any topic: `publish=` and
   `subscribe=` limit what the client's own tokens allow, not what the key can do. A script that should never hold
   the key is given a token made elsewhere (`token=`), with just the topics it needs, and `set_token()` before it

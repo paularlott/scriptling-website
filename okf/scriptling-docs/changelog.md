@@ -16,6 +16,16 @@ type: Guide
 
 ## November 2026
 
+### v0.39.0
+
+
+**added**
+
+- Add `mercure.WithoutSubscribe()` for `mercure.RegisterConfigured()`, to let scripts publish but not receive: `subscribe()` raises an uncatchable `PermissionError` ([docs](https://scriptling.dev/okf/scriptling-libraries/networking/mercure.md#security-considerations))
+
+
+---
+
 ### v0.38.0
 
 
