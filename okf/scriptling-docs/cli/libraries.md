@@ -69,7 +69,7 @@ Use `--list-libs` to print the CLI's built-in library inventory and exit:
 scriptling --list-libs
 ```
 
-The current inventory is not exhaustive: it omits some helper and contextual libraries that CLI setup registers. In particular, `msgpack` is available in the default no-disable CLI setup but is currently omitted from `--list-libs`. Supplying any `--disable-lib` also takes a selective registration path that currently omits `msgpack`.
+The list covers the standard libraries (including `msgpack`) and the top-level extension libraries, but it is not exhaustive: some libraries the CLI registers are not printed. They include the `scriptling.runtime` sub-libraries (`scriptling.runtime.http`, `.kv`, `.sync`, `.sandbox`, `.jsonrpc`, `.mcp`, `.plugin`), `tempfile`, `shutil`, `zipfile`, `tarfile`, `scriptling.find` and `scriptling.ai.memory`. Each of these can still be disabled by name.
 
 When combined with `--disable-lib`, named libraries are excluded from the reported inventory:
 
@@ -93,6 +93,18 @@ SCRIPTLING_DISABLE_LIB=subprocess scriptling script.py
 ```
 
 If a script attempts to import a disabled library, it raises `ImportError`, which can be caught with `try` / `except`.
+
+The runtime sub-libraries can be disabled one at a time, leaving the rest of the runtime family in place. A disabled sub-library is also absent as an attribute of the parent, so `hasattr(scriptling.runtime, "kv")` is `False`:
+
+```bash
+# Keep background tasks and the HTTP server, but no key-value store
+scriptling --disable-lib scriptling.runtime.kv script.py
+
+# Remove scriptling.runtime and its http, kv, sync, sandbox, jsonrpc and mcp sub-libraries
+scriptling --disable-lib scriptling.runtime script.py
+```
+
+`scriptling.runtime.plugin` is registered separately and is disabled only by its own name.
 
 ## Script Filesystem Controls
 

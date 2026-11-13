@@ -18,6 +18,6 @@ type: API Reference
 |---------|-------------|
 | [time](https://scriptling.dev/okf/scriptling-libraries/time-system/time.md) | Time access and conversions |
 | [datetime](https://scriptling.dev/okf/scriptling-libraries/time-system/datetime.md) | Date and time formatting |
-| [platform](https://scriptling.dev/okf/scriptling-libraries/time-system/platform.md) | Platform identifying data |
-| [sys](https://scriptling.dev/okf/scriptling-libraries/time-system/sys.md) | System-specific parameters: argv, stdin, exit (extended; requires registration when embedding) |
-| [logging](https://scriptling.dev/okf/scriptling-libraries/time-system/logging.md) | Logging functionality (extended; requires registration when embedding) |
+| [platform](https://scriptling.dev/okf/scriptling-libraries/time-system/platform.md) | Platform identifying data (extension; requires registration when embedding) |
+| [sys](https://scriptling.dev/okf/scriptling-libraries/time-system/sys.md) | System-specific parameters: argv, stdin, exit (extension; requires registration when embedding) |
+| [logging](https://scriptling.dev/okf/scriptling-libraries/time-system/logging.md) | Logging functionality (extension; requires registration when embedding) |

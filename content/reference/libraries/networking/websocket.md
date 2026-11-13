@@ -166,7 +166,7 @@ The remote address of the connection.
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extension-libraries).
 
 `scriptling.net.websocket` opens outbound WebSocket connections to any URL a script supplies, and can send and receive arbitrary data over that connection, including any headers (such as bearer tokens) the script passes in. The library does not restrict which hosts a script can connect to: that is the embedder's responsibility, typically enforced with OS-level firewalling or network namespacing around the process. See [Security Considerations](/docs/security/#network-security) for a full breakdown of network-enabled libraries.
 

@@ -171,12 +171,12 @@ Directory operations use the same concurrent worker pool as `scriptling.grep`: b
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extension-libraries).
 
-`scriptling.sed` has filesystem read-write access, restricted via the `allowedPaths` parameter to `RegisterSedLibrary(p, allowedPaths)`. Any path outside the allowed directories returns a permission error, and symlinks are only followed if `follow_links=True` **and** the resolved target is within the allowed paths. See [Library Registration](/docs/go-integration/library-registration/#filesystem-libraries) for configuration details.
+`scriptling.sed` has filesystem read-write access, restricted via the `allowedPaths` parameter to `filesystem.RegisterSed(p, allowedPaths)`. Any path outside the allowed directories returns a permission error, and symlinks are only followed if `follow_links=True` **and** the resolved target is within the allowed paths. See [Library Registration](/docs/go-integration/library-registration/#filesystem-libraries) for configuration details.
 
 ## See Also
 
 - [scriptling.grep](../grep/) - Pair with sed to find-then-transform file content
-- [Library Registration](/docs/go-integration/library-registration/) - Registering extended libraries when embedding in Go
+- [Library Registration](/docs/go-integration/library-registration/) - Registering extension libraries when embedding in Go
 - [Security Guide](/docs/security/) - Security guidance for host-provided libraries

@@ -121,9 +121,9 @@ print(f"{du['used'] / du['total'] * 100:.1f}% used")
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
-All operations are subject to the `allowedPaths` passed to `RegisterShutilLibrary(p, allowedPaths)`. Both `src` and `dst` (or `path`) must be within the allowed directories; path traversal (`../`) is blocked automatically and symlinks resolving outside the allowed set are rejected. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
+All operations are subject to the `allowedPaths` passed to `filesystem.RegisterShutil(p, allowedPaths)`. Both `src` and `dst` (or `path`) must be within the allowed directories; path traversal (`../`) is blocked automatically and symlinks resolving outside the allowed set are rejected. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
 
 ## See Also
 

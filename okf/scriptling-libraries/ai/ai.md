@@ -307,7 +307,7 @@ See [scriptling.ai.tools](https://scriptling.dev/okf/scriptling-libraries/ai/too
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
 `scriptling.ai` and its submodules make outbound HTTP requests to AI provider APIs (and, via `agent`, can drive multi-step tool-calling loops). API keys and endpoints are supplied by the embedder when creating a client: scripts don't see them directly unless explicitly passed. For a full risk breakdown, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#library-security) and [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#ai--agent).
 

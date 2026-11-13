@@ -42,7 +42,7 @@ Registration status is a one-line tag in the body (see below), not front matter.
    once. The only exception: a library with filesystem/network/process/secrets implications gets
    one sentence folded into the opening of its **Security Considerations** section (see step 5),
    because that's the one place registration mechanics and risk are the same reader's concern at
-   the same time. Everything else (standard libraries, and extended libraries with no security
+   the same time. Everything else (standard libraries, and extension libraries with no security
    angle) gets no registration mention in the body at all.
 
 3. **Available Functions**: a table, always, even for a 2-function library:
@@ -102,15 +102,15 @@ Registration status is a one-line tag in the body (see below), not front matter.
 5. **Security Considerations** (only if the library has any of: filesystem access, network
    access, process execution, secrets/credential access, or arbitrary code execution): one
    short paragraph naming the specific risk, plus a link to the relevant mitigation. If the
-   library is extended, open with that one-line registration mention (see step 2):
+   library is an extension, open with that one-line registration mention (see step 2):
 
    ```markdown
    ## Security Considerations
 
-   This is an extended library, requiring registration in Go (see [Library Registration](/docs/go-integration/library-registration/#filesystem-libraries)).
+   This is an extension library, requiring registration in Go (see [Library Registration](/docs/go-integration/library-registration/#filesystem-libraries)).
 
    `os` provides read/write access to the host filesystem. Access is restricted to the
-   `allowedPaths` passed to `RegisterOSLibrary`. For a full risk breakdown across all
+   `allowedPaths` passed to `filesystem.RegisterOS`. For a full risk breakdown across all
    libraries, see the [Security Guide](/docs/security/).
    ```
 

@@ -218,7 +218,7 @@ print("All services are healthy!")
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
 `file()`, `dir()` and `file_content()` honor `--allowed-paths` (or the embedder's allowed paths) like the `os` library: a path that resolves outside them, including through a symlink or `..`, raises a `PermissionError` before anything is read, so they cannot be used to probe for files or test their contents outside the jail.
 

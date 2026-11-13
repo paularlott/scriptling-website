@@ -225,7 +225,7 @@ HTTP/1.1 204 No Content
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+This is an extension library, requiring registration in Go with `runtime.RegisterJSONRPC(p)` (package `extlibs/runtime`), see [Library Registration](/docs/go-integration/library-registration/#runtime-libraries).
 
 `scriptling.runtime.jsonrpc` is server-only: it registers method/notification handlers for an incoming JSON-RPC stream and never issues outbound JSON-RPC calls itself. The risk shape matches `runtime.http`: registering a method exposes that handler to any peer that can reach the stdio stream or `POST /json-rpc` endpoint, so treat every registered method as a network-reachable entry point and validate `params` defensively. For a full risk breakdown across all libraries, see the [Security Guide](/docs/security/).
 

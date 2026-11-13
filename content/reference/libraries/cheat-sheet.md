@@ -425,4 +425,4 @@ for batch in itertools.batched(items, 100):
 ## See Also
 
 - [Language Guide](/reference/) - Complete language reference
-- [Libraries](/reference/libraries/) - Standard and extended library reference
+- [Libraries](/reference/libraries/) - Standard and extension library reference

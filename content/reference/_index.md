@@ -166,7 +166,7 @@ if __name__ == "__main__":
 {{< card link="classes" title="Classes" description="Class definition, inheritance, super()" >}}
 {{< card link="builtins" title="Built-in Functions" description="Type conversions, math, string, list, dict functions" >}}
 {{< card link="slicing" title="Indexing & Slicing" description="Single index, slice notation, slice() builtin" >}}
-{{< card link="libraries/" title="Libraries" description="Standard, Scriptling, and extended library reference" >}}
+{{< card link="libraries/" title="Libraries" description="Standard, Scriptling, and extension library reference" >}}
 {{< card link="python-differences" title="Python Differences" description="What's NOT supported, key differences from Python" >}}
 {{< card link="performance" title="Performance Guide" description="String concatenation, recursion vs iteration, benchmarking" >}}
 {{< /cards >}}

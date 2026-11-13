@@ -220,14 +220,14 @@ print(env2.get("result"))  # 600
 - Errors in `exec()` and `exec_file()` are **captured internally**, not propagated to the caller. Always check `exit_code()` to detect failures.
 - Libraries imported inside a sandbox are resolved through the same import paths configured by the factory (e.g. the `--libpath` flag in CLI mode).
 - `SystemExit` exceptions (e.g. from `scriptling.mcp.tool.return_string()`) are captured and reported via `exit_code()`: they do not terminate the parent script.
-- The same factory is used by both `scriptling.runtime.sandbox` and `scriptling.runtime.background()`. Call `extlibs.SetSandboxFactory()` to configure both at once.
-- Path restrictions for `exec_file()` are configured via `SetSandboxAllowedPaths()`. By default, no restrictions are applied.
+- The same factory is used by both `scriptling.runtime.sandbox` and `scriptling.runtime.background()`. Call `runtime.SetSandboxFactory()` (package `extlibs/runtime`) to configure both at once.
+- Path restrictions for `exec_file()` come from the `allowedPaths` passed to `runtime.RegisterSandbox(p, allowedPaths)`. `nil` applies no restrictions; `[]string{}` denies every path.
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#runtime-libraries).
+This is an extension library, requiring registration in Go with `runtime.RegisterSandbox(p, allowedPaths)` (package `extlibs/runtime`), see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#runtime-libraries).
 
-`scriptling.runtime.sandbox` executes arbitrary Scriptling code strings: a significant risk, even though execution stays inside an isolated sub-environment within the **same OS process** (it is not a separate process or VM boundary). Filesystem access via `exec_file()` is restricted to the `allowedPaths` passed to `RegisterRuntimeSandboxLibrary(p, allowedPaths)`; by default no restrictions are applied, so an unconfigured embedder gets unrestricted file reads. Never pass untrusted or unvalidated input directly to `exec()` or `exec_file()`. See [Library Registration: Runtime Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#runtime-libraries) and [Code Injection Prevention](https://scriptling.dev/okf/scriptling-docs/security.md#code-injection-prevention).
+`scriptling.runtime.sandbox` executes arbitrary Scriptling code strings: a significant risk, even though execution stays inside an isolated sub-environment within the **same OS process** (it is not a separate process or VM boundary). Filesystem access via `exec_file()` is restricted to the `allowedPaths` passed to `runtime.RegisterSandbox(p, allowedPaths)`; passing `nil` applies no restrictions, so file reads are unrestricted. Never pass untrusted or unvalidated input directly to `exec()` or `exec_file()`. See [Library Registration: Runtime Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#runtime-libraries) and [Code Injection Prevention](https://scriptling.dev/okf/scriptling-docs/security.md#code-injection-prevention).
 
 ## See Also
 

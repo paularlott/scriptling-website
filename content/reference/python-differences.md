@@ -88,7 +88,7 @@ Everything not listed on this page behaves as in Python 3; see the [Language Gui
 
 ### Library Import
 
-Imports work as in Python, but a library is only importable if the host has made it available. The CLI provides the standard and extended libraries; an embedding Go program registers the ones it wants.
+Imports work as in Python, but a library is only importable if the host has made it available. The CLI provides the standard and extension libraries; an embedding Go program registers the ones it wants.
 
 `from module import *` is not supported. Python 3.15's `lazy import` is accepted but imports immediately. See [Imports](../syntax/#imports).
 

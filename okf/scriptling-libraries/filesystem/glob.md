@@ -108,9 +108,9 @@ pattern = glob.escape("file*.txt")
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
-`glob` provides read access to the host filesystem (directory listings and path matching). When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterGlobLibrary(p, allowedPaths)`: path traversal (`../`) is blocked automatically. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
+`glob` provides read access to the host filesystem (directory listings and path matching). When embedding in Go, access is restricted to the `allowedPaths` passed to `filesystem.RegisterGlob(p, allowedPaths)`: path traversal (`../`) is blocked automatically. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
 
 ## See Also
 

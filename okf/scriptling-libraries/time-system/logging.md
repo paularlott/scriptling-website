@@ -164,12 +164,12 @@ Each Scriptling environment gets its own logger instance:
 // Environment 1
 p1 := scriptling.New()
 logger1 := logslog.New(logslog.Config{Writer: os.Stdout}).WithGroup("app1")
-extlibs.RegisterLoggingLibrary(p1, logger1)
+logging.Register(p1, logger1)
 
 // Environment 2 (different logger)
 p2 := scriptling.New()
 logger2 := logslog.New(logslog.Config{Writer: someOtherWriter}).WithGroup("app2")
-extlibs.RegisterLoggingLibrary(p2, logger2)
+logging.Register(p2, logger2)
 ```
 
 ## Configuration

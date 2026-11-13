@@ -182,7 +182,7 @@ if __name__ == "__main__":
 
 - [Indexing & Slicing](https://scriptling.dev/okf/scriptling-reference/slicing.md) - Single index, slice notation, slice() builtin
 
-- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Standard, Scriptling, and extended library reference
+- [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Standard, Scriptling, and extension library reference
 
 - [Python Differences](https://scriptling.dev/okf/scriptling-reference/python-differences.md) - What's NOT supported, key differences from Python
 

@@ -238,12 +238,12 @@ if status == file.REMOVED:
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
 `scriptling.provision.file` writes, modifies, and deletes files and directories on the local filesystem. Like `os` and `pathlib`, it honors `--allowed-paths` (or the allowed paths an embedder passes to `RegisterConfigured`): every function raises a `PermissionError`, which the script cannot catch, for a path outside them. Without allowed paths it can touch anything the embedding process's own OS-level permissions allow, so where that matters, also confine it at the OS/process level (a dedicated user, container, or chroot). For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 
 ## See Also
 
 - [scriptling.provision.fetch](https://scriptling.dev/okf/scriptling-libraries/provisioning/provision-fetch.md): download remote files and unpack zip archives to disk
-- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries)
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries)
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md)

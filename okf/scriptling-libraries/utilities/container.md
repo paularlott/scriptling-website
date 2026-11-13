@@ -384,7 +384,7 @@ c.image_remove("ubuntu:24.04")
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
 `scriptling.container` controls Docker/Podman containers over the socket paths passed to `Register(p, dockerSock, podmanSock)`, effectively granting the ability to run arbitrary containers and images on the host: this is a significant risk, on par with direct process execution. Never register this library for untrusted code.
 
@@ -407,5 +407,5 @@ container.RegisterWithOptions(p, container.Options{
 
 ## See Also
 
-- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - Registering extended libraries when embedding in Go
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - Registering extension libraries when embedding in Go
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security guidance for host-provided libraries

@@ -482,17 +482,16 @@ myapp/
 
 ## Go Registration
 
-`scriptling.runtime.mcp` is part of the runtime aggregate:
+`scriptling.runtime.mcp` is in the core runtime package, `extlibs/runtime`, and is registered on its own:
 
 ```go
-extlibs.RegisterRuntimeLibraryAll(p, allowedPaths)
+import scriptlingruntime "github.com/paularlott/scriptling/extlibs/runtime"
+
+scriptlingruntime.RegisterMCP(p) // scriptling.runtime.mcp
+scriptlingruntime.Register(p)    // scriptling.runtime, optional: also exposes it as runtime.mcp
 ```
 
-That call registers the sub-library independently and also exposes it as `scriptling.runtime.mcp` through the parent `scriptling.runtime` object. An embedder that needs only this namespace can call:
-
-```go
-extlibs.RegisterRuntimeMCPLibrary(p)
-```
+With `scriptling.runtime` registered on the same interpreter (before or after), the library is also reachable as an attribute of the parent: `import scriptling.runtime as rt; rt.mcp`. The CLI registers it in ordinary CLI and server modes unless disabled with `--disable-lib scriptling.runtime.mcp` (or `--disable-lib scriptling.runtime`, which also removes the parent and the other runtime sub-libraries). See [Runtime Libraries](/docs/go-integration/library-registration/#runtime-libraries).
 
 This server/decorator namespace is distinct from `scriptling.mcp`, which is an MCP client library.
 

@@ -208,6 +208,6 @@ An omitted or empty `allowed_users` list installs no default restriction. For an
 
 ## See Also
 
-- [scriptling libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Parent namespace for all scriptling extended libraries
+- [scriptling libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Parent namespace for all scriptling extension libraries
 - [scriptling.console](https://scriptling.dev/okf/scriptling-libraries/utilities/console.md) - Terminal console the console messaging client is built on
-- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - How to register these extended libraries in Go
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - How to register these extension libraries in Go

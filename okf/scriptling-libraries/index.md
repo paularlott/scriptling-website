@@ -3,7 +3,7 @@ okf_version: "0.2"
 ---
 # scriptling-libraries
 
-API reference for every standard, Scriptling, and extended library.
+API reference for every standard, Scriptling, and extension library.
 
 ## Concepts
 

@@ -29,7 +29,7 @@ Modules that mirror Python's standard library, grouped by subject:
 - [File System](https://scriptling.dev/okf/scriptling-libraries/filesystem.md): os, os.path, pathlib, glob, fs, shutil, tempfile, tarfile, zipfile
 - [HTTP & Process](https://scriptling.dev/okf/scriptling-libraries/http-process.md): requests, scriptling.oauth, urllib.parse, subprocess
 
-The *standard* set (json, re, time, datetime, math, random, statistics, base64, hashlib, hmac, uuid, string, html, textwrap, difflib, io, platform, urllib.parse, collections, itertools, functools, contextlib, msgpack) has no access to the host and is registered together by `stdlib.RegisterAll`. The rest are *extended* libraries, registered one by one because they reach the file system, network, processes or host: see [Availability](#availability).
+Libraries come in two tiers. The *standard* libraries (json, re, time, datetime, math, random, statistics, base64, hashlib, hmac, secrets, uuid, string, html, html.parser, shlex, textwrap, difflib, io, urllib and urllib.parse, collections, itertools, functools, contextlib, copy, enum, dataclasses, typing, msgpack, and csv and xml, also importable as scriptling.csv and scriptling.xml) have no access to the host and are registered together by `stdlib.RegisterAll`. Everything else, `platform` included because it reveals the host name, is an *extension* library: each lives in its own Go package and is registered one by one, because it reaches the file system, network, processes or host, or is heavy enough (`yaml`, `toml`, templates) to be opt-in. See [Availability](#availability).
 
 ## Scriptling Libraries
 
@@ -60,14 +60,14 @@ A bare `scriptling.New()` environment has no libraries; embedders register every
 | Library group | Default CLI and server setup | Bare embedding |
 |---------------|------------------------------|----------------|
 | Standard libraries | Registered together | `stdlib.RegisterAll(p)` |
-| Core extended and `scriptling.*` libraries | Registered unless disabled; the exact set varies by mode | Register each required library explicitly |
+| Extension libraries, including `scriptling.*` | Registered unless disabled; the exact set varies by mode | Register each required library explicitly |
 | `scriptling.ai.tools` | The standalone namespace is not registered by normal setup; use `scriptling.ai.ToolRegistry` when `scriptling.ai` is present | Register the standalone tools library explicitly if needed |
 | `scriptling.ai.agent.interact` | Added on the ordinary non-server CLI execution path; evaluator factories and server modes omit it | Register it explicitly together with its console dependency |
 | Database libraries | Compiled into the default `scriptling` build, matching custom build tags, or discovered external database plugins | Register compiled plugins or load external plugins; see [Database availability](https://scriptling.dev/okf/scriptling-libraries/databases.md#availability) |
 | `scriptling.package` | Present only when a non-nil app/plugin bundle loader is available, including ordinary CLI or server execution | Register it with a non-nil package loader |
-| `scriptling.runtime.mcp` | Included wherever CLI setup registers the runtime aggregate, in ordinary CLI and server modes, unless disabled | `RegisterRuntimeLibraryAll(...)` includes it; `RegisterRuntimeMCPLibrary(p)` registers only this sub-library |
+| `scriptling.runtime` and its sub-libraries | Registered in ordinary CLI and server modes; each sub-library can be disabled on its own (`--disable-lib scriptling.runtime.kv`), and disabling `scriptling.runtime` removes all of them except `scriptling.runtime.plugin` | One call per library: `runtime.Register(p)`, `runtime.RegisterMCP(p)`, `kv.Register(p, allowedPaths)`, `http.Register(p, allowedPaths)` and so on |
 
-There is no universal extended-library `RegisterAll`. `stdlib.RegisterAll` covers only the standard libraries; CLI composition and plugin discovery are separate from the embedding API. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) for individual calls.
+There is no `RegisterAll` across the extension libraries, by design: each one is a capability, and an application links only the extension packages it imports. `stdlib.RegisterAll` covers only the standard libraries (`filesystem.RegisterAll` covers the filesystem family; the runtime libraries have no such call and are registered one at a time); CLI composition and plugin discovery are separate from the embedding API. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) for individual calls.
 
 ## Security and Capability Boundaries
 

@@ -535,7 +535,7 @@ except Exception as e:
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extension-libraries).
 
 `ai.Client` makes outbound HTTP requests to the configured AI provider endpoint (and to any `remote_servers` MCP servers configured on it). API keys and base URLs are supplied by the embedder when constructing the client: scripts only see them if the embedder explicitly passes them in. Responses are held to the interpreter's [value and memory limits](/docs/go-integration/basics/#value-limit) as they are read, so an endpoint returning an oversized answer raises `MemoryError` rather than exhausting memory; streams are limited per chunk, and `ai.collect_stream()` as it grows. For a full risk breakdown, see the [Security Guide](/docs/security/#library-security) and [Library Registration](/docs/go-integration/library-registration/#ai--agent).
 

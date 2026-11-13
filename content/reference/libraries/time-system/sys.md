@@ -64,7 +64,7 @@ finally:
 
 ### `input(prompt=None)`
 
-Read a line from stdin, stripping the trailing newline. Only available when the environment is configured with a stdin reader (piped input via the CLI, or an `io.Reader` passed to `RegisterSysLibrary` in Go). The optional `prompt` argument is accepted but not printed: there is no interactive terminal in remote/server environments.
+Read a line from stdin, stripping the trailing newline. Only available when the environment is configured with a stdin reader (piped input via the CLI, or an `io.Reader` passed to `sys.Register` in Go). The optional `prompt` argument is accepted but not printed: there is no interactive terminal in remote/server environments.
 
 **Parameters:**
 - `prompt` (`str`, optional): Ignored placeholder for Python compatibility. Default: `None`.
@@ -183,12 +183,14 @@ for i in range(len(sys.argv) - 1):
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extension-libraries).
 
 `sys` exposes whatever `argv` and `stdin` the embedder passes during registration: if those contain secrets, a script can read them. The actual Go signature requires both values:
 
 ```go
-extlibs.RegisterSysLibrary(p, argv, stdin)
+import "github.com/paularlott/scriptling/extlibs/sys"
+
+sys.Register(p, argv, stdin)
 ```
 
 Pass `nil` for `stdin` when input should not be available. Never register this library (or pass sensitive argv/stdin) for untrusted code. See the [Security Guide](/docs/security/#environment-variables).

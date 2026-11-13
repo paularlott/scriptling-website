@@ -409,7 +409,7 @@ for event in sub:
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see
+This is an extension library, requiring registration in Go, see
 [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#networking). The CLI registers it, under
 `--network-policy` and `--allowed-paths`.
 

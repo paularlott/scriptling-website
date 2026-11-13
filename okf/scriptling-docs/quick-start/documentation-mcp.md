@@ -41,7 +41,7 @@ This gives three bundles under `bundles/`:
 |--------|----------|
 | `bundles/scriptling-docs/` | Guides and tutorials, including CLI use and Go integration. |
 | `bundles/scriptling-reference/` | Language syntax, types, operators, control flow, functions, and classes. |
-| `bundles/scriptling-libraries/` | Standard, Scriptling, and extended library API reference. |
+| `bundles/scriptling-libraries/` | Standard, Scriptling, and extension library API reference. |
 
 The `latest/download` URL always fetches the newest release. To pin a specific version, replace it with `releases/download/v0.18.0/scriptling-okf-bundles.zip`.
 

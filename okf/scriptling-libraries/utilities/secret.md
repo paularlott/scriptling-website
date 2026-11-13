@@ -118,7 +118,38 @@ Run a script with the config file:
 scriptling --secret-config ./secrets.toml script.py
 ```
 
-The built-in CLI loader currently supports `vault` and `onepassword` (1Password Connect, or a service account in the `-onepassword` builds). Embedded applications can construct and register providers directly in Go.
+The built-in CLI loader currently supports `vault` and `onepassword` (1Password Connect, or a service account in the `-onepassword` builds).
+
+## Registering Providers in Go
+
+An embedded application builds the `*secretprovider.Registry` itself and passes it to `secret.Register(p, registry)`. The core package, `extlibs/secretprovider`, contains no concrete provider, so it links no HTTP client; each built-in provider type lives in its own package and is enabled by calling its `Register()` before `secretprovider.RegisterConfigs` or `secretprovider.NewProvider`:
+
+```go
+import (
+	"github.com/paularlott/scriptling/extlibs/secret"
+	"github.com/paularlott/scriptling/extlibs/secretprovider"
+	"github.com/paularlott/scriptling/extlibs/secretprovider/onepassword"
+	"github.com/paularlott/scriptling/extlibs/secretprovider/vault"
+)
+
+if err := vault.Register(); err != nil { // provider = "vault"
+	return err
+}
+if err := onepassword.Register(); err != nil { // provider = "onepassword" (Connect)
+	return err
+}
+
+registry := secretprovider.NewRegistry()
+err := secretprovider.RegisterConfigs(registry, []secretprovider.Config{
+	{Provider: "vault", Alias: "prod_vault", Address: "https://vault.internal:8200", Token: vaultToken},
+})
+if err != nil {
+	return err
+}
+secret.Register(p, registry)
+```
+
+Register only the provider types you use. A config block whose type was not registered fails with an error that names the type and lists the registered ones; `secretprovider.RegisteredTypes()` returns them. To build a provider without the factory table, call `vault.New(cfg)` or `onepassword.New(cfg)`, or implement the `secretprovider.Provider` interface yourself, and add it with `registry.Register(provider, alias, cacheTTL)`.
 
 ### Service accounts in embedded applications and custom builds
 
@@ -128,7 +159,7 @@ An embedded application enables service accounts by importing the extension for 
 import _ "github.com/paularlott/scriptling-onepassword"
 ```
 
-Every `secretprovider.Config` with `ServiceAccountToken` then builds a service account provider. Set `onepassword.IntegrationName` and `IntegrationVersion` before first use to identify your application to 1Password.
+Every `secretprovider.Config` with `ServiceAccountToken` then builds a service account provider; this does not need `onepassword.Register()`, which enables 1Password Connect. Set `onepassword.IntegrationName` and `IntegrationVersion` before first use to identify your application to 1Password.
 
 A CLI with service accounts is a module whose `main.go` calls `scriptlingcmd.Main()` with the extension imported:
 
@@ -147,12 +178,12 @@ Build it with `go mod tidy && go build`. To include the database drivers too, bu
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#secret-providers).
 
-`scriptling.secret` grants access to credentials, but the risk is mitigated by design: scripts only ever see a provider alias and a logical path/field name, never the actual secret value's source, provider URL, or access token. The host application owns the real `secretprovider.Registry` passed to `RegisterSecretLibrary(p, registry)`, and resolution fails closed when an alias is missing or the provider errors. See [Secret Provider Security](https://scriptling.dev/okf/scriptling-docs/security.md#secret-provider-security) for the full model.
+`scriptling.secret` grants access to credentials, but the risk is mitigated by design: scripts only ever see a provider alias and a logical path/field name, never the actual secret value's source, provider URL, or access token. The host application owns the real `secretprovider.Registry` passed to `secret.Register(p, registry)`, and resolution fails closed when an alias is missing or the provider errors. See [Secret Provider Security](https://scriptling.dev/okf/scriptling-docs/security.md#secret-provider-security) for the full model.
 
 ## See Also
 
 - [CLI Guide](https://scriptling.dev/okf/scriptling-docs/cli.md) - Command-line flags and runtime behavior
-- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - Registering extended libraries when embedding in Go
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) - Registering extension libraries when embedding in Go
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Security guidance for host-provided libraries

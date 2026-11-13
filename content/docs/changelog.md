@@ -8,6 +8,25 @@ nav-skip: true
 
 ## November 2026
 
+{{< version "v0.40.0" >}}
+
+{{< changelog-item "changed" >}}
+- **Breaking:** Split the Go package `extlibs` into one package per library or family, so an application links only what it registers: registering only YAML used to give a 13.7 MB binary and now gives 6.83 MB. There is no compatibility layer; the old and new names are listed in the [migration table](/docs/go-integration/library-registration/#migrating-from-v039)
+- **Breaking:** Make `csv`, `xml`, `html.parser`, `shlex` and `secrets` standard libraries, and move `platform` out to an extension because it reveals the host name ([docs](/docs/security/#standard-libraries))
+- **Breaking:** Split `scriptling.runtime.kv` and `scriptling.runtime.http` into their own packages; register each runtime library you want. Both take `allowedPaths`, and `kv.open()` outside them raises the same uncatchable `PermissionError` as the filesystem libraries ([docs](/docs/go-integration/library-registration/#runtime-libraries))
+- **Breaking:** Register the Vault and 1Password Connect secret providers explicitly with `vault.Register()` and `onepassword.Register()`, and load policy files with `policyfile.LoadConfig` ([docs](/docs/go-integration/library-registration/#secret-providers))
+{{< /changelog-item >}}
+
+{{< changelog-item "added" >}}
+- Let the CLI disable each runtime sub-library on its own, for example `--disable-lib scriptling.runtime.kv` ([docs](/docs/cli/libraries/#disable-specific-libraries))
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+- Keep a Mercure client alive while one of its subscriptions is open; an unnamed client's subscription could end when the client was garbage-collected
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.39.0" >}}
 
 {{< changelog-item "added" >}}

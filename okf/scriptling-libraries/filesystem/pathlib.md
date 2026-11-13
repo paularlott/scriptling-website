@@ -397,9 +397,9 @@ all_py = p.glob("**/*.py")
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
-`pathlib` provides read/write access to the host filesystem. When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterPathlibLibrary(p, allowedPaths)`: path traversal (`../`) is blocked automatically. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
+`pathlib` provides read/write access to the host filesystem. When embedding in Go, access is restricted to the `allowedPaths` passed to `filesystem.RegisterPathlib(p, allowedPaths)`: path traversal (`../`) is blocked automatically. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
 
 ## See Also
 

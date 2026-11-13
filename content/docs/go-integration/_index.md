@@ -17,7 +17,7 @@ New to embedding? The [Go embedding quick start](/docs/quick-start/embedding/) r
 ## Reading Order
 
 1. [Basics](basics/): create interpreters, exchange variables, call script functions, capture output, set resource limits.
-2. [Library Registration](library-registration/): register standard and extended libraries, and set filesystem and [network policy](library-registration/#network-policy) before untrusted scripts run.
+2. [Library Registration](library-registration/): register standard and extension libraries, and set filesystem and [network policy](library-registration/#network-policy) before untrusted scripts run.
 3. [Script Extensions](scripts/): extend the host with libraries written in Scriptling itself.
 4. Extending in Go: pick an API (see below), then follow its pages.
    - **Native API**: [overview](native/), [functions](native-functions/), [classes](native-classes/), [libraries](native-libraries/).

@@ -133,9 +133,9 @@ for e in find.entries("/project", include_symlinks=True):
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
-`find` provides read access to the host filesystem (directory listings and `stat` calls). When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterFindLibrary(p, allowedPaths)`: path traversal (`../`) is blocked automatically and symlinks resolving outside the allowed paths are skipped. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
+`find` provides read access to the host filesystem (directory listings and `stat` calls). When embedding in Go, access is restricted to the `allowedPaths` passed to `filesystem.RegisterFind(p, allowedPaths)`: path traversal (`../`) is blocked automatically and symlinks resolving outside the allowed paths are skipped. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
 
 ## See Also
 

@@ -47,6 +47,10 @@ store.set("key", "value")
 print(store.get("key"))
 ```
 
+## Registration
+
+The runtime libraries are registered one at a time. `scriptling.runtime.kv` (package `extlibs/runtime/kv`) and `scriptling.runtime.http` (package `extlibs/runtime/http`) have packages of their own; the rest are in `extlibs/runtime`. Each sub-library registered on the same interpreter is also an attribute of `scriptling.runtime`, so `import scriptling.runtime as rt; rt.kv` works when `scriptling.runtime.kv` is registered. The CLI registers all of them; disable one with `--disable-lib scriptling.runtime.kv` (and so on), or the parent and all of its sub-libraries except `scriptling.runtime.plugin` (disabled by its own name) with `--disable-lib scriptling.runtime`. See [Runtime Libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#runtime-libraries).
+
 ## See Also
 
 - [scriptling.runtime.kv](https://scriptling.dev/okf/scriptling-libraries/runtime/kv.md) - Thread-safe key-value store

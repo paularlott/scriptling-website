@@ -202,6 +202,6 @@ An omitted or empty `allowed_users` list installs no default restriction. For an
 
 ## See Also
 
-- [scriptling libraries](../) - Parent namespace for all scriptling extended libraries
+- [scriptling libraries](../) - Parent namespace for all scriptling extension libraries
 - [scriptling.console](../utilities/console/) - Terminal console the console messaging client is built on
-- [Library Registration](/docs/go-integration/library-registration/) - How to register these extended libraries in Go
+- [Library Registration](/docs/go-integration/library-registration/) - How to register these extension libraries in Go

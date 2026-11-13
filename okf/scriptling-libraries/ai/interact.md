@@ -116,7 +116,7 @@ Commands are registered with the TUI palette when `interact()` is called. Type `
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
 `scriptling.ai.agent.interact` inherits the network and agentic-execution risk of `scriptling.ai.agent`: it streams completions from the configured AI provider and runs the same tool-calling loop, just with a terminal UI on top. Never register it for untrusted code. See [Security Considerations](https://scriptling.dev/okf/scriptling-libraries/ai/agent.md#security-considerations) on the `ai.agent` page, the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#library-security), and [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#ai--agent).
 

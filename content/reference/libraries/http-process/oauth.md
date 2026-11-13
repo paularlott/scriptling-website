@@ -248,7 +248,7 @@ What a JWT access token says, **not verified**: for showing or debugging. An API
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#utilities).
+This is an extension library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#utilities).
 The CLI registers it, under `--network-policy` and `--allowed-paths`.
 
 - Every request to the IdP goes through the network policy when one is set; `verify=False` only stops the

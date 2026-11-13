@@ -20,7 +20,7 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 
 - [scriptling-docs](https://scriptling.dev/okf/scriptling-docs/index.md): Guides: quick start, CLI usage, Go integration, plugins, security, and tutorials.
 - [scriptling-reference](https://scriptling.dev/okf/scriptling-reference/index.md): Language reference: syntax, types, operators, control flow, functions, classes, and error handling.
-- [scriptling-libraries](https://scriptling.dev/okf/scriptling-libraries/index.md): API reference for every standard, Scriptling, and extended library.
+- [scriptling-libraries](https://scriptling.dev/okf/scriptling-libraries/index.md): API reference for every standard, Scriptling, and extension library.
 - [OKF catalog](https://scriptling.dev/okf/index.md): Markdown index of all bundles
 
 ## scriptling-docs
@@ -46,7 +46,7 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [Builder API](https://scriptling.dev/okf/scriptling-docs/go-integration/builder.md): Type-safe builder pattern for functions, classes, and libraries.
 - [Documenting Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/documentation.md): Add help text to functions, libraries, and classes for discoverability.
 - [GC Release Hooks](https://scriptling.dev/okf/scriptling-docs/go-integration/gc-release-hooks.md): Best-effort cleanup hooks for Go-owned Scriptling objects.
-- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md): How to register built-in libraries when embedding Scriptling in Go.
+- [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md): How to register standard and extension libraries when embedding Scriptling in Go.
 - [Linting](https://scriptling.dev/okf/scriptling-docs/go-integration/lint.md): Lex and parse Scriptling source without execution.
 - [Library Loader Chain](https://scriptling.dev/okf/scriptling-docs/go-integration/loader-chain.md): Flexible library loading from multiple sources.
 - [Dunder Methods & Properties](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes/special-methods.md): Give native Go classes special (dunder) methods such as __getitem__, and expose properties and static methods with object.Property and object.StaticMethod.
@@ -110,7 +110,7 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 
 ## scriptling-libraries
 
-> API reference for every standard, Scriptling, and extended library.
+> API reference for every standard, Scriptling, and extension library.
 
 - [scriptling.ai.agent](https://scriptling.dev/okf/scriptling-libraries/ai/agent.md): Agentic AI loop for building AI agents with automatic tool execution.
 - [scriptling.ai](https://scriptling.dev/okf/scriptling-libraries/ai/ai.md): AI and LLM functions for OpenAI-compatible APIs: clients, completions, embeddings, and tool-calling helpers.

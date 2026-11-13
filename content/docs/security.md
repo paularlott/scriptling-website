@@ -11,9 +11,9 @@ Scriptling's security boundary depends entirely on how it is configured. **You a
 
 ## Bare Embedding vs CLI Defaults
 
-A bare `scriptling.New()` interpreter starts without standard or extended libraries; the embedding host chooses what to register. It still provides the language runtime and `import` mechanism, but an import succeeds only after the host registers a library or configures a loader.
+A bare `scriptling.New()` interpreter starts without standard or extension libraries; the embedding host chooses what to register. It still provides the language runtime and `import` mechanism, but an import succeeds only after the host registers a library or configures a loader.
 
-The `scriptling` CLI is intentionally more permissive. Unless disabled, its setup registers the standard libraries plus extended capabilities including `requests`, `os`, and `subprocess`:
+The `scriptling` CLI is intentionally more permissive. Unless disabled, its setup registers the standard libraries plus extension capabilities including `requests`, `os`, and `subprocess`:
 
 - `requests` can reach the network unless `--network-policy` restricts it.
 - `os` can access the filesystem unless `--allowed-paths` restricts its filesystem operations.
@@ -24,9 +24,15 @@ Scriptling runs in a memory-safe Go environment without C extensions and does no
 
 ## Library Security
 
-### Pure Standard Libraries
+Libraries come in two tiers (see [Library Registration](/docs/go-integration/library-registration/)): **standard libraries**, which are safe by construction, and **extension libraries**, each of which is a capability the host grants deliberately.
 
-These libraries do pure computation with no filesystem, network, or process access, so embedding hosts can register them freely (the CLI includes them; a bare `scriptling.New()` does not): `math`, `json`, `datetime`, `time`, `string`, `base64`, `html`, `re`, `random`, `statistics`, `textwrap`, `functools`, `itertools`, `collections`, `hashlib`, `hmac`, and `uuid`. `platform` is read-only platform information, and `urllib` parses URLs without making network requests.
+### Standard Libraries
+
+The standard libraries (package `stdlib`, registered together by `stdlib.RegisterAll`) do pure computation. By rule they have no filesystem, network, process, environment or host access, so they are safe to expose to untrusted scripts as long as the [resource limits](#resource-limits) below are set; the risks that remain are CPU, memory and time, not host access. The CLI includes them; a bare `scriptling.New()` does not.
+
+The set is `base64`, `collections`, `contextlib`, `copy`, `csv` and `scriptling.csv`, `dataclasses`, `datetime`, `difflib`, `enum`, `functools`, `hashlib`, `hmac`, `html`, `html.parser`, `io`, `itertools`, `json`, `math`, `msgpack`, `random`, `re`, `secrets`, `shlex`, `statistics`, `string`, `textwrap`, `time`, `typing`, `urllib` and `urllib.parse`, `uuid`, and `xml` and `scriptling.xml`. `urllib` parses URLs without making network requests, `io` works on in-memory streams, and `secrets` draws from the operating system's cryptographic random source without revealing anything about the host.
+
+`platform` is **not** a standard library: it reveals the host name (along with the OS and architecture), so it is an extension the host must register with `platform.Register(p)`.
 
 ### Scriptling-Specific Libraries
 
@@ -58,13 +64,15 @@ These libraries provide server and concurrency functionality:
 | ---------------------------- | ----------------------------------------------------------- |
 | `scriptling.runtime`         | Background task execution (isolated and shared-env threads) |
 | `scriptling.runtime.http`    | **HTTP SERVER** - Registers HTTP routes and handlers        |
-| `scriptling.runtime.kv`      | In-memory key-value store - safe but unbounded memory       |
+| `scriptling.runtime.kv`      | Key-value store - unbounded memory; persistent stores write files within `allowedPaths` |
 | `scriptling.runtime.sync`    | Concurrency primitives - safe but can cause deadlocks       |
 | `scriptling.runtime.sandbox` | **CODE EXECUTION** - Executes code in isolated environments |
 
-### Extended Libraries (Require Explicit Registration)
+Each is registered on its own: `scriptling.runtime.kv` and `scriptling.runtime.http` live in their own packages (`extlibs/runtime/kv`, `extlibs/runtime/http`) and the rest in `extlibs/runtime`, so a host grants exactly the pieces it registers. `kv.Register`, `http.Register` and `runtime.RegisterSandbox` all take `allowedPaths` for `kv.open()`, `static()` and `exec_file()`: `nil` is unrestricted, `[]string{}` denies every path, and a refused path raises the same uncatchable `PermissionError` as the filesystem libraries. See [Runtime Libraries](/docs/go-integration/library-registration/#runtime-libraries).
 
-These libraries extend functionality but require explicit registration:
+### Extension Libraries (Require Explicit Registration)
+
+Every other library is an extension: it lives in its own Go package, is linked into the host only if the host imports it, and reaches scripts only if the host registers it. Treat each registration as a grant of the capability in the table, and attach a [path policy](/docs/go-integration/library-registration/#path-policy) or [network policy](#network-policies) where the library takes one:
 
 | Library       | Security Considerations                                                     |
 | ------------- | --------------------------------------------------------------------------- |
@@ -75,7 +83,7 @@ These libraries extend functionality but require explicit registration:
 | `glob`        | **FILE SYSTEM ACCESS** - Pattern matching, controlled by allowed paths      |
 | `subprocess`  | **CRITICAL RISK** - Allows arbitrary command execution                      |
 | `sys`         | **SYSTEM ACCESS** - Provides access to system internals                     |
-| `secrets`     | Cryptographically secure random generation                                  |
+| `platform`    | **HOST INFORMATION** - Reveals the host name, OS and architecture           |
 | `logging`     | File and console logging - may write to disk                                |
 | `scriptling.wait_for` | Network/resource polling - may access network; file checks controlled by allowed paths |
 | `scriptling.provision.fetch` | HTTP/HTTPS downloads and filesystem writes; `insecure=True` skips TLS verification |
@@ -83,7 +91,6 @@ These libraries extend functionality but require explicit registration:
 | `scriptling.provision.package` | **CRITICAL RISK** - Installs and removes system packages as root; registered only where `subprocess` is |
 | `yaml`        | YAML parsing - safe but watch for large files                               |
 | `toml`        | TOML parsing - safe but watch for large files                               |
-| `html.parser` | HTML parsing - safe but watch for large files                               |
 
 ### Never Register in Untrusted Environments
 
@@ -101,27 +108,31 @@ These libraries extend functionality but require explicit registration:
 When registering filesystem libraries, you **must** specify allowed paths:
 
 ```go
+import "github.com/paularlott/scriptling/extlibs/filesystem"
+
 // Safe: Only allows access to specific directories
-extlibs.RegisterOSLibrary(p, []string{
+filesystem.RegisterOS(p, []string{
     "/tmp/myapp/data",
     "/home/user/documents",
 })
-extlibs.RegisterPathlibLibrary(p, []string{
+filesystem.RegisterPathlib(p, []string{
     "/tmp/myapp/data",
     "/home/user/documents",
 })
-extlibs.RegisterTempfileLibrary(p, []string{"/tmp/myapp"})
-extlibs.RegisterShutilLibrary(p, []string{
+filesystem.RegisterTempfile(p, []string{"/tmp/myapp"})
+filesystem.RegisterShutil(p, []string{
     "/tmp/myapp/data",
     "/home/user/documents",
 })
 
 // Dangerous: Allows access to entire file system
-extlibs.RegisterOSLibrary(p, nil)        // Nil = no restriction (full read/write access)
-extlibs.RegisterOSLibrary(p, []string{}) // Empty = deny all (no paths allowed)
+filesystem.RegisterOS(p, nil) // Nil = no restriction (full read/write access)
+
+// Empty = deny all (no paths allowed)
+filesystem.RegisterOS(p, []string{})
 ```
 
-All filesystem libraries (`os`, `pathlib`, `fs`, `glob`, `tempfile`, `shutil`, `zipfile`, `tarfile`, `scriptling.grep`, `scriptling.find`, `scriptling.sed`) accept `allowedPaths` and enforce the same path traversal and symlink protections. A path is resolved the way the kernel resolves it when the file is opened: every symlink component is followed before any `..` is applied, so a symlink inside an allowed directory cannot lead outside it — **including a dangling symlink**, one whose target does not exist yet (a script cannot plant `allowed/link -> ../../etc/x` and then create the file through it). `os.symlink()` likewise refuses to create a link whose target, resolved against the link's own directory, falls outside the allowed set. Archive libraries (`zipfile`, `tarfile`) additionally block zip-slip / tar-slip attacks (path traversal via crafted entry names).
+All filesystem libraries (`os`, `pathlib`, `fs`, `glob`, `tempfile`, `shutil`, `zipfile`, `tarfile`, `scriptling.grep`, `scriptling.find`, `scriptling.sed`, registered individually or together with `filesystem.RegisterAll(p, allowedPaths)`) accept `allowedPaths` and enforce the same path traversal and symlink protections. A path is resolved the way the kernel resolves it when the file is opened: every symlink component is followed before any `..` is applied, so a symlink inside an allowed directory cannot lead outside it — **including a dangling symlink**, one whose target does not exist yet (a script cannot plant `allowed/link -> ../../etc/x` and then create the file through it). `os.symlink()` likewise refuses to create a link whose target, resolved against the link's own directory, falls outside the allowed set. Archive libraries (`zipfile`, `tarfile`) additionally block zip-slip / tar-slip attacks (path traversal via crafted entry names).
 
 ### Path Traversal Protection
 
@@ -164,8 +175,8 @@ To keep the sandbox network-free, don't register network-enabled libraries:
 // Safe: Only register standard libraries (no network access)
 stdlib.RegisterAll(p)
 
-// Unsafe: Registers network-enabled library
-extlibs.RegisterRequestsLibrary(p)
+// Unsafe: Registers network-enabled library with no policy
+requests.Register(p)
 ```
 
 ### Network Policies
@@ -175,16 +186,16 @@ For scripts that *should* reach the internet but must never reach your private n
 With a policy active, loopback, link-local (including cloud metadata endpoints like `169.254.169.254`), private, reserved (CGNAT `100.64.0.0/10`, documentation and benchmarking ranges, NAT64/6to4 and other non-public ranges), unspecified, and multicast addresses are all blocked by default, as are URLs that name an IP directly. Host allow/deny lists, CIDR exceptions, https-only, and custom DNS servers grant exactly the access you intend — allowlisted hosts are trusted to resolve internally (still subject to `deny_cidrs`, and a link-local answer still needs `allow_cidrs`), and deny rules always win.
 
 - **CLI**: `--network-policy=policy.toml` — the full policy file reference is in the [network policy guide](/docs/cli/network-policy/). Combine it with `--disable-lib subprocess` in any mode so code cannot bypass the policy by shelling out.
-- **Embedding**: pass a `*netsecurity.Config` (or load the same TOML file with `netsecurity.LoadConfig`) when registering the governed libraries — the `Config` options are documented in the [library registration guide](/docs/go-integration/library-registration/#network-policy). No policy means no restrictions.
+- **Embedding**: pass a `*netsecurity.Config` (or load the same TOML file with `policyfile.LoadConfig` from `extlibs/netsecurity/policyfile`) when registering the governed libraries — the `Config` options are documented in the [library registration guide](/docs/go-integration/library-registration/#network-policy). No policy means no restrictions.
 
 ```go
-policy, err := netsecurity.LoadConfig("policy.toml")
+policy, err := policyfile.LoadConfig("policy.toml")
 if err != nil {
     return err // an invalid policy must never degrade into an open one
 }
-extlibs.RegisterRequestsLibrary(p, policy)
-extlibs.RegisterWaitForLibrary(p, policy)
-extlibs.RegisterWebSocketLibrary(p, policy)
+requests.Register(p, policy)
+waitfor.Register(p, policy)
+websocket.Register(p, policy)
 ai.Register(p, policy)
 scriptlingmcp.Register(p, policy)
 ```
@@ -248,6 +259,8 @@ db_password = secret.get("prod_vault", "secret/data/app", "password")
 ```
 
 The script only sees `prod_vault`, the logical path, and the optional field name. The host owns the real provider configuration.
+
+The host also chooses which provider types exist at all: `extlibs/secretprovider` holds no concrete provider, and the Vault and 1Password Connect providers are enabled only by calling `vault.Register()` or `onepassword.Register()` (packages `extlibs/secretprovider/vault` and `extlibs/secretprovider/onepassword`). A config block naming a type that was not registered fails at startup. See [Secret Providers](/docs/go-integration/library-registration/#secret-providers).
 
 ## Resource Limits
 
@@ -406,7 +419,7 @@ secret = os.getenv("SECRET_TOKEN")
 
 ## Best Practices
 
-1. **Principle of Least Privilege**: Only register the libraries that are absolutely necessary
+1. **Principle of Least Privilege**: Start from `stdlib.RegisterAll` and register each extension library only if scripts need it
 2. **Validate All Input**: Never trust user-provided code or data
 3. **Use Timeouts**: Always set execution time limits
 4. **Restrict File Access**: Explicitly whitelist allowed directories for `os`, `pathlib`, `glob`

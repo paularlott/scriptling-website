@@ -192,7 +192,7 @@ Registers static file serving under a URL path prefix.
 
 **Returns:** `None`
 
-**Raises:** `PermissionError` when `--allowed-paths` (or the embedder's allowed paths) is set and `directory` lies outside it.
+**Raises:** `PermissionError` when `--allowed-paths` (or the embedder's allowed paths) is set and `directory` lies outside it. Like the filesystem libraries' path denials, it cannot be caught with `try`/`except`, so the setup script stops.
 
 Under `--allowed-paths` the route also serves only files that resolve inside the allowed paths, so a symlink in the directory cannot lead outside them, and it does not serve dotfiles (`.env`, `.git/…`) or directory listings: a directory is served only through its `index.html`. All of these answer 404. Without `--allowed-paths` the directory is served as is, symlinks, dotfiles and listings included.
 
@@ -387,7 +387,7 @@ Routes are registered during setup script execution. Use `--web-root <dir>` to s
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go with `http.Register(p, allowedPaths)` (package `extlibs/runtime/http`), see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#runtime-libraries). `allowedPaths` confines the directories `static()` may serve: `nil` leaves them unrestricted and `[]string{}` refuses every one.
 
 `scriptling.runtime.http` does not make outbound requests: it registers routes and handlers that turn the embedding process into (or adds to) an HTTP **server**, exposing a network listener. The risk shape is therefore about what gets exposed: every registered route, middleware, and static directory becomes reachable by anyone who can reach the listening address. Review handler logic for authorization, and be deliberate about what `static()` directories you expose. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 

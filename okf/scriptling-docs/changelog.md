@@ -16,6 +16,29 @@ type: Guide
 
 ## November 2026
 
+### v0.40.0
+
+
+**changed**
+
+- **Breaking:** Split the Go package `extlibs` into one package per library or family, so an application links only what it registers: registering only YAML used to give a 13.7 MB binary and now gives 6.83 MB. There is no compatibility layer; the old and new names are listed in the [migration table](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#migrating-from-v039)
+- **Breaking:** Make `csv`, `xml`, `html.parser`, `shlex` and `secrets` standard libraries, and move `platform` out to an extension because it reveals the host name ([docs](https://scriptling.dev/okf/scriptling-docs/security.md#standard-libraries))
+- **Breaking:** Split `scriptling.runtime.kv` and `scriptling.runtime.http` into their own packages; register each runtime library you want. Both take `allowedPaths`, and `kv.open()` outside them raises the same uncatchable `PermissionError` as the filesystem libraries ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#runtime-libraries))
+- **Breaking:** Register the Vault and 1Password Connect secret providers explicitly with `vault.Register()` and `onepassword.Register()`, and load policy files with `policyfile.LoadConfig` ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#secret-providers))
+
+
+**added**
+
+- Let the CLI disable each runtime sub-library on its own, for example `--disable-lib scriptling.runtime.kv` ([docs](https://scriptling.dev/okf/scriptling-docs/cli/libraries.md#disable-specific-libraries))
+
+
+**fixed**
+
+- Keep a Mercure client alive while one of its subscriptions is open; an unnamed client's subscription could end when the client was garbage-collected
+
+
+---
+
 ### v0.39.0
 
 

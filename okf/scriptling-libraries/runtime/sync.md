@@ -176,7 +176,7 @@ def worker():
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go with `runtime.RegisterSync(p)` (package `extlibs/runtime`), see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#runtime-libraries).
 
 `scriptling.runtime.sync` has no network or filesystem access: it's purely in-process concurrency primitives (locks, counters, queues). The risk here is misuse rather than access control: deadlocks from an unmatched `WaitGroup.add()`/`done()`, or a goroutine blocked forever on a full/empty `Queue`. Design coordination carefully rather than treating this as a security boundary.
 

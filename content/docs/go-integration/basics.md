@@ -327,15 +327,15 @@ context passed to `EvalWithContext` and the other `*WithContext` calls (see
 
 ```go
 import (
-    "github.com/paularlott/scriptling/extlibs"
     scriptlingai "github.com/paularlott/scriptling/extlibs/ai"
+    "github.com/paularlott/scriptling/extlibs/requests"
 )
 
 // client.Pipeline, completion_parallel and ask_parallel
 scriptlingai.SetMaxParallelLimit(10)
 
 // requests.parallel
-extlibs.SetRequestsMaxParallelLimit(10)
+requests.SetRequestsMaxParallelLimit(10)
 ```
 
 A script that asks for `max_parallel=50` under a ceiling of 10 gets 10; nothing
@@ -533,7 +533,7 @@ import "github.com/paularlott/scriptling/stdlib"
 stdlib.RegisterAll(p)
 ```
 
-Extended and `scriptling.*` libraries are registered individually, and filesystem libraries take an `allowedPaths` argument for access control. See [Library Registration](../library-registration/) for the complete list of libraries and their registration functions.
+The standard libraries have no filesystem, network, process or host access. Everything else is an extension library in its own Go package under `extlibs/`, registered individually (and linked into your binary only if you import it); filesystem libraries take an `allowedPaths` argument for access control. See [Library Registration](../library-registration/) for the complete list of libraries and their registration functions.
 
 ### Programmatic Import
 
@@ -691,8 +691,8 @@ import (
     "log"
 
     "github.com/paularlott/scriptling"
+    "github.com/paularlott/scriptling/extlibs/requests"
     "github.com/paularlott/scriptling/stdlib"
-    "github.com/paularlott/scriptling/extlibs"
 )
 
 func main() {
@@ -701,7 +701,7 @@ func main() {
 
     // Register libraries
     stdlib.RegisterAll(p)
-    extlibs.RegisterRequestsLibrary(p)
+    requests.Register(p)
 
     // Set configuration
     p.SetVar("api_base", "https://api.example.com")
@@ -713,8 +713,7 @@ import json
 import requests
 
 url = api_base + "/users"
-options = {"timeout": timeout}
-response = requests.get(url, options)
+response = requests.get(url, timeout=timeout)
 
 if response.status_code == 200:
     users = response.json()
@@ -741,7 +740,7 @@ else:
 
 ## See Also
 
-- [Library Registration](../library-registration/) - How to register built-in libraries
+- [Library Registration](../library-registration/) - How to register standard and extension libraries
 - [Native API](../native/) - Direct object-level control
 - [Builder API](../builder/) - Type-safe, cleaner syntax
 - [Security Guide](../../security/) - Security best practices for embedding

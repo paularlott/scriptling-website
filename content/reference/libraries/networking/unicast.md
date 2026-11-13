@@ -223,7 +223,7 @@ Closes the UDP listener.
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extension-libraries).
 
 `scriptling.net.unicast` opens raw UDP and TCP sockets, letting scripts initiate outbound connections to any reachable host/port (`connect()`) or bind a listening socket to accept inbound connections (`listen()`). A configured [network policy](/docs/cli/network-policy/) governs outbound destinations: `connect()` and a UDP listener's `send_to()` raise a `network policy: …` error for a denied host or address, applying the same IP-literal, host-list and address-range rules as `requests`. `listen()` is not restricted by the policy, and without a policy no destination is restricted; limit bind interfaces and ports with OS-level firewalling or network namespacing around the process. See [Security Considerations](/docs/security/#network-security) for a full breakdown of network-enabled libraries.
 

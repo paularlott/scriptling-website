@@ -53,7 +53,7 @@ Opens or reuses a named KV store. If a store with the given name is already open
 **Parameters:**
 - `name` (`str`): Store name. Use `":memory:name"` for an in-memory store shared by that name, or a filesystem path (e.g. `"/data/agent.db"`) for a persistent store. Empty string is not permitted.
 
-A filesystem path must lie within `--allowed-paths` when that is set (symlinks are resolved first; `-` denies every path but still allows `":memory:"` stores), otherwise an error is raised. Different spellings of the same directory (relative segments, symlinks) open the same store.
+A filesystem path must lie within `--allowed-paths` when that is set (symlinks are resolved first; `-` denies every path but still allows `":memory:"` stores), otherwise a `PermissionError` is raised that `try`/`except` cannot catch, as in the filesystem libraries. Different spellings of the same directory (relative segments, symlinks) open the same store.
 
 **Returns:** Store object: with `set()`, `get()`, `incr()`, `delete()`, `exists()`, `ttl()`, `keys()`, `clear()`, and `close()` methods.
 
@@ -268,9 +268,9 @@ runtime.background("b", "task_b")
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go with `kv.Register(p, allowedPaths)` (package `extlibs/runtime/kv`), see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#runtime-libraries).
 
-`scriptling.runtime.kv` has no network access. A persistent store's on-disk path is its only filesystem touchpoint: opening one creates the directory and writes snapshot files there, so the path must lie within the host's allowed paths (`--allowed-paths` in the CLI, `allowedPaths` for `RegisterRuntimeLibraryAll` and `RegisterRuntimeKVLibraryWithSecurity` in Go; `RegisterRuntimeKVLibrary` is unrestricted). The other practical risk is unbounded memory growth from named in-memory stores that are never cleared or closed: size keys and TTLs accordingly rather than treating this as an access-control concern.
+`scriptling.runtime.kv` has no network access. A persistent store's on-disk path is its only filesystem touchpoint: opening one creates the directory and writes snapshot files there, so the path must lie within the host's allowed paths (`--allowed-paths` in the CLI, the `allowedPaths` passed to `kv.Register` in Go, where `nil` is unrestricted and `[]string{}` denies every path; in-memory `:memory:` stores are always allowed). A path outside them raises the same `PermissionError` as the filesystem libraries, which `try`/`except` cannot catch, so the script stops. The other practical risk is unbounded memory growth from named in-memory stores that are never cleared or closed: size keys and TTLs accordingly rather than treating this as an access-control concern.
 
 ## See Also
 

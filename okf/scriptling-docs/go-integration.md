@@ -25,7 +25,7 @@ New to embedding? The [Go embedding quick start](https://scriptling.dev/okf/scri
 ## Reading Order
 
 1. [Basics](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md): create interpreters, exchange variables, call script functions, capture output, set resource limits.
-2. [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md): register standard and extended libraries, and set filesystem and [network policy](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#network-policy) before untrusted scripts run.
+2. [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md): register standard and extension libraries, and set filesystem and [network policy](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#network-policy) before untrusted scripts run.
 3. [Script Extensions](https://scriptling.dev/okf/scriptling-docs/go-integration/scripts.md): extend the host with libraries written in Scriptling itself.
 4. Extending in Go: pick an API (see below), then follow its pages.
    - **Native API**: [overview](https://scriptling.dev/okf/scriptling-docs/go-integration/native.md), [functions](https://scriptling.dev/okf/scriptling-docs/go-integration/native-functions.md), [classes](https://scriptling.dev/okf/scriptling-docs/go-integration/native-classes.md), [libraries](https://scriptling.dev/okf/scriptling-docs/go-integration/native-libraries.md).

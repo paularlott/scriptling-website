@@ -615,7 +615,7 @@ The client speaks MCP protocol 2025-03-26 and later; servers that only support 2
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
 `scriptling.mcp` makes outbound network connections to MCP servers (and via `client.call_tool()`, executes whatever tools that server exposes). The trust boundary is the MCP server itself: a malicious or compromised server can expose tools that do anything its own implementation allows. When `target` is a command rather than a URL, `mcp.Client()` also **launches a local subprocess** — treat the command and its arguments as trusted input, since they run with the same permissions as the interpreter. A stdio server is a subprocess, so it is refused wherever the subprocess library is disabled (`--no-subprocess`, `--disable-lib subprocess`); `--allowed-paths` and `--network-policy` do not constrain what the launched program does. For a full risk breakdown, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 

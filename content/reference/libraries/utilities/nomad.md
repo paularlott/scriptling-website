@@ -426,12 +426,12 @@ for v in c.csi_volumes_list(namespace="*"):
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extension-libraries).
 
 `scriptling.nomad` grants full control over the Nomad cluster reachable at the address and ACL token passed to `Client()`, including deregistering CSI volumes and stopping or registering jobs: this is a significant risk, comparable to direct infrastructure access. There is no allowlist parameter for this library; scope the ACL token to the minimum policy needed for the task, and never register this library for untrusted code. A configured [network policy](/docs/cli/network-policy/) governs where clients connect: a request to a denied address, directly or through a redirect, raises a `network policy: …` error, and `insecure=True` skips only certificate verification, not the policy. Without a policy, `Client(addr)` connects to whatever address the script supplies, including loopback and private ranges. For a full risk breakdown across all libraries, see the [Security Guide](/docs/security/).
 
 ## See Also
 
 - [scriptling.container](../container/) - Container lifecycle management for Docker, Podman, and Apple Containers
-- [Library Registration](/docs/go-integration/library-registration/) - Registering extended libraries when embedding in Go
+- [Library Registration](/docs/go-integration/library-registration/) - Registering extension libraries when embedding in Go
 - [Security Guide](/docs/security/) - Security guidance for host-provided libraries

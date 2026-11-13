@@ -402,7 +402,7 @@ bot.interact()
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
 `scriptling.ai.agent` makes outbound HTTP requests to the configured AI provider, and: when tools are registered: lets the model execute multi-step agentic loops by calling those tools automatically. Never register `scriptling.ai.agent` for untrusted code: a malicious script can supply a tool registry whose handlers do anything the host process allows. Passing `mcp_servers` extends that reach to the connected MCP servers: the model can call their tools and read their skills for the duration of the loop. For a full risk breakdown, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#library-security) and [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#ai--agent).
 

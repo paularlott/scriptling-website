@@ -492,7 +492,7 @@ func RunToolScript(
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
 `scriptling.mcp.tool` itself has no implicit network, filesystem, or process access: it only reads `__mcp_params` and writes `__mcp_response`. Risk depends entirely on what the tool script you write does with those parameters.
 

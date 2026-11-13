@@ -232,9 +232,9 @@ The `requests` library exposes the following exception types for error handling:
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
-`requests` uses an unrestricted pooled HTTP client when the embedder calls `RegisterRequestsLibrary` without a policy. Embedders can instead pass a non-nil `*netsecurity.Config`; this enables the built-in guard, including host allow/deny rules, address-category and CIDR controls, HTTPS/IP-literal settings, redirect checks, and DNS-rebinding-resistant validated-IP dialing. A non-nil zero-value config applies safe defaults, and an invalid config fails closed.
+`requests` uses an unrestricted pooled HTTP client when the embedder calls `requests.Register` (package `extlibs/requests`) without a policy. Embedders can instead pass a non-nil `*netsecurity.Config`; this enables the built-in guard, including host allow/deny rules, address-category and CIDR controls, HTTPS/IP-literal settings, redirect checks, and DNS-rebinding-resistant validated-IP dialing. A non-nil zero-value config applies safe defaults, and an invalid config fails closed.
 
 The CLI configures the same guard through its `--network-policy` TOML file and passes that policy to `requests`; scripts do not configure it through request arguments. This policy is specific to participating clients, not a blanket process firewall, so do not assume raw networking, messaging, container, Nomad, plugin, or provisioning clients inherit it. See the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#network-security).
 

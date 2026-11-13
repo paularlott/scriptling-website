@@ -284,7 +284,7 @@ SCRIPTLING_AI_MODEL=qwen3-8b \
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
 `scriptling.ai.memory` has no network access by itself: it stores conversation history and other memories in the KV store the embedder provides (in-memory or persistent), and only talks to an AI provider if you explicitly pass an `ai_client` for LLM-based deduplication. Risk is low; see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#library-security) for the general model.
 

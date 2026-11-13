@@ -101,7 +101,7 @@ except Exception:
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
 `subprocess` allows arbitrary OS command execution on the host. This is a **critical risk**: there is no built-in mitigation, sandboxing, or allowlisting. Never register this library when running untrusted scripts, and be careful with user-provided command strings or the `shell` option to avoid command injection. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#security-considerations) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 

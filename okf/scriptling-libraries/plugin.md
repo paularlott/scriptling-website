@@ -226,7 +226,7 @@ scriptling.plugin.release(cfg)
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
 `scriptling.plugin.load()` can register any executable on the filesystem (or any HTTP(S) endpoint) as a callable plugin, then run it as a child process via stdio JSON-RPC. If the `path` argument is influenced by untrusted input rather than controlled by the embedder, this is process-execution-adjacent: equivalent in risk to letting a script choose what to run on the host. Only allow `load()` with paths and URLs the host trusts. For a full risk breakdown across all libraries, see the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md).
 

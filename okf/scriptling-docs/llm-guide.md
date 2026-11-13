@@ -76,9 +76,9 @@ Two differences matter a lot:
 
 ## Libraries
 
-Built-in functions are intrinsic, but importable library modules depend on the runtime. The CLI registers its documented default libraries. When embedding in Go, the host must register the libraries scripts may import—for example, `stdlib.RegisterAll(p)` registers the standard library set, while extended libraries require their own registration. Prefer standard libraries for general scripting; use `scriptling.*` libraries only when the task depends on host runtime features such as MCP, AI agents, HTTP routes, or networking. When unsure what a host provides, use `help("modules")` or `help("library_name")` from inside a script.
+Built-in functions are intrinsic, but importable library modules depend on the runtime. The CLI registers its documented default libraries. When embedding in Go, the host must register the libraries scripts may import—for example, `stdlib.RegisterAll(p)` registers the standard library set (pure computation, no host access), while each extension library (filesystem, network, process and host access, plus heavier parsers such as `yaml`) is a separate Go package with its own registration call; the runtime sub-libraries (`scriptling.runtime.kv`, `scriptling.runtime.http` and so on) are each registered on their own, so a host may provide some and not others. Prefer standard libraries for general scripting; use `scriptling.*` libraries only when the task depends on host runtime features such as MCP, AI agents, HTTP routes, or networking. When unsure what a host provides, use `help("modules")` or `help("library_name")` from inside a script.
 
-For the complete standard, Scriptling, and extended library API, see the markdown bundle: https://scriptling.dev/okf/scriptling-libraries/index.md
+For the complete standard, Scriptling, and extension library API, see the markdown bundle: https://scriptling.dev/okf/scriptling-libraries/index.md
 
 ## HTTP and JSON
 

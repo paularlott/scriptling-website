@@ -195,6 +195,12 @@ print(platform.version())
 # Output: '1.0.0'
 ```
 
+## Security Considerations
+
+This is an extension library, requiring registration in Go with `platform.Register(p)` (package `extlibs/platform`), see [Library Registration](/docs/go-integration/library-registration/#utilities).
+
+`platform` is read-only, but `node()` and `uname()` reveal the host name, and the other functions report the operating system and architecture. That is information about the machine running the script, which is why `platform` is not one of the standard libraries. Leave it unregistered where scripts must not learn which host they run on. See the [Security Guide](/docs/security/).
+
 ## Python Compatibility
 
 This library implements a subset of Python's `platform` module, using the Scriptling version as a stand-in wherever Python would return real OS release/version strings that Go does not expose directly:

@@ -207,7 +207,7 @@ def increment_counter():
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+This is an extension library, requiring registration in Go with `runtime.Register(p)` (package `extlibs/runtime`), see [Library Registration](/docs/go-integration/library-registration/#runtime-libraries). Each sub-library needs its own registration call; those registered on the same interpreter are also reachable as attributes of `scriptling.runtime` (`runtime.kv`, `runtime.http`, …).
 
 Background task execution itself (`background()`, `start_server()`, `server_running()`) carries low direct risk: it schedules existing script functions concurrently rather than exposing new attack surface. The risk lives in the sub-libraries it groups: `runtime.http` turns the process into an HTTP listener, and `runtime.sandbox` executes arbitrary code strings within the same process. See their pages: [HTTP](../http/#security-considerations) and [Sandbox](../sandbox/#security-considerations): for the specifics.
 

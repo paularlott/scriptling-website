@@ -14,4 +14,4 @@ weight: 4
 | [hmac](hmac/) | Keyed-Hash Message Authentication Codes |
 | [base64](base64/) | Base64 encoding and decoding |
 | [uuid](uuid/) | UUID generation |
-| [secrets](secrets/) | Cryptographically strong random numbers (extended; requires registration when embedding) |
+| [secrets](secrets/) | Cryptographically strong random numbers |

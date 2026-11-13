@@ -402,9 +402,9 @@ content = os.read_file(data_file)
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
-`os` provides read/write access to the host filesystem and to the embedder's environment variables (via `os.environ`/`os.getenv`). When embedding in Go, file access is restricted to the `allowedPaths` passed to `RegisterOSLibrary(p, allowedPaths)`: path traversal (`../`) and symlink attacks are blocked automatically. Passing `nil` removes all restrictions, which is dangerous for untrusted scripts. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
+`os` provides read/write access to the host filesystem and to the embedder's environment variables (via `os.environ`/`os.getenv`). When embedding in Go, file access is restricted to the `allowedPaths` passed to `filesystem.RegisterOS(p, allowedPaths)`: path traversal (`../`) and symlink attacks are blocked automatically. Passing `nil` removes all restrictions, which is dangerous for untrusted scripts. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#filesystem-libraries) and the [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md#file-system-security).
 
 ## Python Compatibility
 

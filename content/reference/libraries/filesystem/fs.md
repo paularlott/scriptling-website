@@ -162,9 +162,9 @@ body = fs.slice(data, 4)         # Everything after
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extension-libraries).
 
-`fs` provides direct read/write access to the host filesystem at the byte level. When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterFSLibrary(p, allowedPaths)`: path traversal (`../`) is blocked automatically. See [Library Registration](/docs/go-integration/library-registration/#filesystem-libraries) and the [Security Guide](/docs/security/#file-system-security).
+`fs` provides direct read/write access to the host filesystem at the byte level. When embedding in Go, access is restricted to the `allowedPaths` passed to `filesystem.RegisterFS(p, allowedPaths)`: path traversal (`../`) is blocked automatically. See [Library Registration](/docs/go-integration/library-registration/#filesystem-libraries) and the [Security Guide](/docs/security/#file-system-security).
 
 ## See Also
 

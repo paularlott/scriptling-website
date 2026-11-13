@@ -90,7 +90,7 @@ print(url)  # "https://plain.example.com/path"
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#extension-libraries).
 
 `scriptling.net.resolve` performs DNS lookups against the system resolver, or against custom nameservers if the embedder injects one. DNS responses are not validated against any allowlist, so a script can trigger lookups for arbitrary hostnames, which can be used for network reconnaissance or to exfiltrate data via DNS queries. Host applications can restrict or monitor this by passing a custom resolver to `resolve.Register(env, resolver)`: see [Host Application Integration](#host-application-integration) below. See [Security Considerations](https://scriptling.dev/okf/scriptling-docs/security.md#network-security) for a full breakdown of network-enabled libraries.
 

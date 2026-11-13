@@ -74,9 +74,9 @@ Returns the default prefix used for temporary names.
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extension-libraries).
 
-Temporary files and directories are subject to the same `allowedPaths` restrictions as other filesystem libraries. When embedding in Go, access is restricted to the `allowedPaths` passed to `RegisterTempfileLibrary(p, allowedPaths)`:
+Temporary files and directories are subject to the same `allowedPaths` restrictions as other filesystem libraries. When embedding in Go, access is restricted to the `allowedPaths` passed to `filesystem.RegisterTempfile(p, allowedPaths)`:
 
 - If `dir` is specified and outside `allowedPaths`, the operation is denied.
 - If `dir` is omitted and the system temp directory is outside `allowedPaths`, the library falls back to the first allowed path.

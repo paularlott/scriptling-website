@@ -112,9 +112,9 @@ print(f"{du['used'] / du['total'] * 100:.1f}% used")
 
 ## Security Considerations
 
-This is an extended library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extended-libraries).
+This is an extension library, requiring registration in Go, see [Library Registration](/docs/go-integration/library-registration/#extension-libraries).
 
-All operations are subject to the `allowedPaths` passed to `RegisterShutilLibrary(p, allowedPaths)`. Both `src` and `dst` (or `path`) must be within the allowed directories; path traversal (`../`) is blocked automatically and symlinks resolving outside the allowed set are rejected. See [Library Registration](/docs/go-integration/library-registration/#filesystem-libraries) and the [Security Guide](/docs/security/#file-system-security).
+All operations are subject to the `allowedPaths` passed to `filesystem.RegisterShutil(p, allowedPaths)`. Both `src` and `dst` (or `path`) must be within the allowed directories; path traversal (`../`) is blocked automatically and symlinks resolving outside the allowed set are rejected. See [Library Registration](/docs/go-integration/library-registration/#filesystem-libraries) and the [Security Guide](/docs/security/#file-system-security).
 
 ## See Also
 

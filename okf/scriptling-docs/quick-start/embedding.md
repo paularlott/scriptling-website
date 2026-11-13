@@ -75,7 +75,7 @@ print("Sum:", x + len(numbers))
 
 ## Variable Exchange
 
-Pass data between Go and Scriptling. This complete example registers the extended `requests` library separately from the standard libraries:
+Pass data between Go and Scriptling. This complete example registers the `requests` extension library alongside the standard libraries:
 
 ```go
 package main
@@ -84,14 +84,14 @@ import (
     "fmt"
 
     "github.com/paularlott/scriptling"
-    "github.com/paularlott/scriptling/extlibs"
+    "github.com/paularlott/scriptling/extlibs/requests"
     "github.com/paularlott/scriptling/stdlib"
 )
 
 func main() {
     p := scriptling.New()
     stdlib.RegisterAll(p)
-    extlibs.RegisterRequestsLibrary(p)
+    requests.Register(p)
 
     if err := p.SetVar("api_base", "https://jsonplaceholder.typicode.com"); err != nil {
         fmt.Println("Set variable:", err)
@@ -125,11 +125,11 @@ result = len(data)
 }
 ```
 
-This registers unrestricted outbound HTTP access. For untrusted scripts, pass a `netsecurity.Config` to `RegisterRequestsLibrary` and restrict the destinations scripts may contact; see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#network-policy).
+This registers unrestricted outbound HTTP access. For untrusted scripts, pass a `*netsecurity.Config` to `requests.Register` and restrict the destinations scripts may contact; see [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md#network-policy).
 
 ## Registering Libraries
 
-Libraries are not available to scripts unless you register them. Register all standard libraries with a single call:
+Libraries are not available to scripts unless you register them. The standard libraries have no filesystem, network, process or host access, so they are safe to give any script; register them all with a single call:
 
 ```go
 import "github.com/paularlott/scriptling/stdlib"
@@ -138,7 +138,7 @@ import "github.com/paularlott/scriptling/stdlib"
 stdlib.RegisterAll(p)
 ```
 
-Extended and `scriptling.*` libraries are registered individually. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) for the complete list and signatures.
+Extension libraries (`requests`, `os`, `yaml`, `subprocess`, the `scriptling.*` libraries and so on) each live in their own Go package and are registered individually, so your binary links only the ones you use. See [Library Registration](https://scriptling.dev/okf/scriptling-docs/go-integration/library-registration.md) for the complete list and signatures.
 
 ## Next Steps
 
