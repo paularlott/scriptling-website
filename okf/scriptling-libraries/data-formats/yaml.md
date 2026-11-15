@@ -172,6 +172,10 @@ print(updated_yaml)
 - No YAML tags or anchors support.
 - `load()` and `safe_load()` are identical (both safe), unlike PyYAML where `load()` without a `Loader` is deprecated and unsafe by default.
 
+## Limits
+
+Under an interpreter's value or memory limit, `dump()` stops with `MemoryError` as soon as the document it is writing passes the limit, so a value that holds the same list many times over cannot make it build a huge document first.
+
 ## See Also
 
 - [json](https://scriptling.dev/okf/scriptling-libraries/data-formats/json.md): parse and generate JSON data.

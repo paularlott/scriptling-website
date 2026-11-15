@@ -171,6 +171,14 @@ if has_significant_change(old_content, new_content):
     print("Warning: large change detected")
 ```
 
+## Limits
+
+Comparing two texts takes time in proportion to the product of their lengths.
+Every function checks the call's deadline as it goes, so a comparison of very
+large texts stops with a timeout when the host's deadline passes; the table
+`ratio()`, `opcodes()` and `unified_diff()` work in is also held to the memory
+limit before it is built.
+
 ## See Also
 
 - [string](https://scriptling.dev/okf/scriptling-libraries/text-processing/string.md) - String constants for character classification

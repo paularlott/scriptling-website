@@ -75,6 +75,14 @@ cannot catch either with `try`/`except` or suppress it with a `with` block, so
 it cannot keep running after the host has stopped it; `finally` blocks still
 run.
 
+A single call that runs long inside one statement also stops at the deadline:
+`difflib`, `scriptling.similarity` and the template libraries check the context
+as they work (a template between loop iterations, whether or not it writes
+anything), as do comparisons and sorts of large or deeply shared values,
+`itertools` combinatorics, `re.sub` with a function, and any library function
+that calls back into the script. The checks are counted, so they cost almost
+nothing when the context can never be cancelled.
+
 ## Executing Code
 
 ### Simple Execution
@@ -530,6 +538,52 @@ format width (`"%*d"`) is still capped at 1 GiB and a list or tuple
 repetition at about 134 million elements, as before limits existed. Libraries that read data of
 unknown size can use `object.ReadAllLimited` and `object.ReadFileLimited`,
 and check a size up front with `object.CheckAlloc`.
+
+#### Output Built From a Value
+
+A list can hold the same list many times over: `a = [0] * 1000`,
+`b = [a] * 1000`, `c = [b] * 100` holds a few thousand slots but prints as
+200 MB, and a chain of `x = [x, x]` stands for more elements than any computer
+holds. Text and encodings built from a value are therefore held to the limit
+as they are written, and stop with `MemoryError` as soon as they pass it, so
+neither the memory nor the time spent can run past the limit first:
+
+- `str()`, `repr()`, `print()`, f-strings, `format()`, `str.format()`, `%`
+  formatting and `str.join()`
+- the reprs of `collections.deque`, `Counter`, named tuples and dataclasses
+- `json.dumps()` (indentation included, which grows with nesting depth),
+  `yaml.dump()`, `toml.dumps()`, `msgpack.packb()` and `csv` writers
+- `re.sub()` and `re.subn()` with a replacement template, which expands once
+  per match
+
+The limit for this output is the value limit, or the memory limit when that is
+lower or the only one set. With neither set, nothing changes. Tuples built
+from shared tuples are also cheap to use as dict keys and set members: each
+distinct tuple is keyed once, and a long key is replaced by a digest of it.
+
+Go code that renders or converts script values gets the same protection.
+`Inspect()` cannot fail, so under a limit it stops just past the limit and
+ends the text with `...`. `conversion.ToGoLimited` (and `ToGoChecked`, which
+the serializers use) counts the values it builds and the bytes of the strings
+among them, so a string shared by many containers counts once per reference,
+and stops with a `MemoryError` once the result passes the value limit or the
+memory left. The limits are those of the interpreter bound to the calling
+goroutine. During a call that is the running interpreter; to convert a result
+after the call has returned, bind its interpreter first:
+
+```go
+result, err := p.EvalWithContext(ctx, script)
+// ...
+release := object.BindGuard(p.ResourceGuard())
+value, limitErr := conversion.ToGoLimited(result)
+release()
+if limitErr != nil {
+    return fmt.Errorf("result too large: %s", limitErr.Message)
+}
+```
+
+Plain `conversion.ToGo` applies no limit. Use `ToGoLimited` for script data
+that may come from someone you do not trust.
 
 ## Library Management
 

@@ -16,6 +16,33 @@ type: Guide
 
 ## November 2026
 
+### v0.41.1
+
+
+**changed**
+
+- Speed up function calls and sorts again after v0.41.0's new deadline checks
+
+
+### v0.41.0
+
+
+**changed**
+
+- Stop scripts using a small value that refers to the same list many times over (such as `x = [x, x]` repeated) to exhaust memory or run past their deadline. Printing, formatting and serializing such values (`str()`, `print()`, f-strings, `json.dumps()`, `yaml.dump()`, `toml.dumps()` and others) now raise `MemoryError` at the value or memory limit, and long single calls such as `difflib`, `scriptling.similarity`, templates and large comparisons and sorts stop at the deadline ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#output-built-from-a-value))
+- For hosts: `conversion.ToGoLimited` and `ToGoChecked` hold strings to the limits too. To convert a script's result after `Eval` has returned, bind its guard first with `object.BindGuard(p.ResourceGuard())` ([docs](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#output-built-from-a-value))
+- `yaml.dump()` uses far less memory, and `json.dumps()` is faster
+
+
+**fixed**
+
+- Fix interpreters that run the same source interfering with each other's variables, which could leave a name unbound or give it another variable's value
+- Fix `json.dumps()` with `indent=` failing on `inf` and `nan`
+- Fix `textwrap` taking seconds to break very long words
+
+
+---
+
 ### v0.40.1
 
 

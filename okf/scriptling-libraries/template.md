@@ -87,6 +87,14 @@ tmpl.add(os.read_file("templates/page.html"))
 print(tmpl.render("page", {"Title": "Home"}))
 ```
 
+## Limits
+
+Rendering checks the call's deadline between loop iterations, whether or not
+the loop writes anything, and the rendered text is held to the interpreter's
+value and memory limits as it is written. Data passed to `render()` is
+converted under the same limits, so a value holding the same list many times
+over is refused rather than expanded in full.
+
 ## See Also
 
 - [Libraries](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) - Full library reference index

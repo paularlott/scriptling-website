@@ -50,6 +50,7 @@ except Exception as e:
 - `loads()` builds dicts in the document's key order (a repeated key keeps its first position and its last value), so `loads()` followed by `dumps()` round-trips key order. Integers beyond 64 bits become floats, since scriptling integers are 64-bit.
 - `dumps()` matches Python by default: dict keys keep the dict's insertion order, separators are `", "` and `": "`, and non-ASCII is `\u` escaped. `indent` accepts a number of spaces or a literal string; `indent=0` puts each item on its own line without indentation. `sort_keys=True`, `separators=(item, key)` and `ensure_ascii=False` are honoured.
 - `dumps()` writes non-finite floats as the bare tokens `NaN`, `Infinity` and `-Infinity`, exactly like Python. `loads()` cannot read those tokens back (strict JSON only), so round-trip non-finite values as strings or `null`.
+- Under an interpreter's value or memory limit, `dumps()` stops with `MemoryError` as soon as the text it is writing passes the limit, indentation included, so a value that holds the same list many times over cannot make it build a huge text first. `dumps(..., indent=...)` writes non-finite floats too; it used to fail on them.
 - `parse()` and `stringify()` are Scriptling aliases. There are no file-based `load()`/`dump()` functions: read the file to a string first.
 
 ## See Also

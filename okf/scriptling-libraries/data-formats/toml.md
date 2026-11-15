@@ -148,6 +148,10 @@ Compared to Python's `tomllib`/`tomli-w`:
 - No `TOMLDecodeError` exception class: parse errors raise a generic Scriptling error.
 - Datetime values are returned as ISO-formatted strings rather than datetime objects.
 
+## Limits
+
+Under an interpreter's value or memory limit, `dumps()` stops with `MemoryError` as soon as the document it is writing passes the limit, so a value that holds the same list many times over cannot make it build a huge document first.
+
 ## See Also
 
 - [json](https://scriptling.dev/okf/scriptling-libraries/data-formats/json.md): parse and generate JSON data.

@@ -280,6 +280,10 @@ if err == context.DeadlineExceeded {
 }
 ```
 
+Long single calls, such as `difflib`, `scriptling.similarity`, template
+rendering and sorts of large values, check the deadline as they work, so a
+timeout bounds them as it bounds a loop.
+
 ### Memory and Value Limits
 
 Each interpreter can have a memory limit and a value limit (see
@@ -297,6 +301,11 @@ Both are off until set, so set them for untrusted code, along with a timeout:
    other host restrictions.
 2. **Value limit**: a single string, bytes value, list, tuple, dict, set,
    read body or captured output larger than the limit raises `MemoryError`.
+   Text and encodings built from a value (`str()`, `print()`, f-strings,
+   `json.dumps()`, `yaml.dump()` and the like) are held to it as they are
+   written, so a small value holding the same list many times over cannot
+   make them spend memory or time past the limit first
+   ([details](/docs/go-integration/basics/#output-built-from-a-value)).
 3. **Recursion depth** is limited to 1000 calls, including calls from Go
    through `CallFunction`. **Source nesting** is limited as in Python (200
    nested brackets, 99 nested blocks, expressions 20,000 deep), so a deeply

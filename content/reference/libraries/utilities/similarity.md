@@ -254,6 +254,15 @@ log = sim.extract(pasted_log, max_sentences=40)
 - `minhash` uses 64 hashes by default, which is a good balance for lightweight similarity estimation.
 - `tokenize` and `minhash` are useful for memory stores, semantic recall, and approximate deduplication.
 
+## Limits
+
+`score()`, `search()` and `best()` compare strings in time proportional to the
+product of their lengths, and `extract()` compares every sentence with every
+other. They check the call's deadline as they work, so very long inputs stop
+with a timeout when the host's deadline passes, and `extract()`,
+`minhash()` and `vectorize()` check the memory they need against the
+interpreter's limits first.
+
 ## See Also
 
 - [scriptling.toon](../toon/) - Compact data encoding, often paired with similarity search over decoded records
