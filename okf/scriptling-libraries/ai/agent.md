@@ -23,6 +23,7 @@ Agentic AI loop for building AI agents with automatic tool execution. The `Agent
 |--------------|-------------|
 | `Agent(client, tools, system_prompt, model, memory, mcp_servers, max_tokens, compaction_threshold, request_timeout, extra_body)` | Create an AI agent |
 | `agent.trigger(message, max_iterations)` | One-shot trigger with response |
+| `agent.stop_reason` | Why the last `trigger()` stopped |
 | `interact.Agent(...).interact(max_iterations)` | Start an interactive session (subclass provided by `scriptling.ai.agent.interact`) |
 | `agent.get_messages()` | Get conversation history |
 | `agent.set_messages(messages)` | Set conversation history |
@@ -74,7 +75,7 @@ Creates an AI agent with automatic tool execution.
 - `model` (`str`, optional): Model to use. Default: `""`.
 - `memory` (memory object, optional): Memory store from `memory.new()`: see [Memory Integration](#memory-integration). Default: `None`.
 - `mcp_servers` (`list`, optional): MCP clients from `mcp.Client()` whose tools and skills the agent can use: see [MCP Server Integration](#mcp-server-integration). Each must be created with a distinct namespace. Default: `None`.
-- `max_tokens` (`int`, optional): Maximum token budget for the conversation. When estimated token usage reaches the compaction threshold, the conversation history is automatically compacted (summarized). Default: `32000`.
+- `max_tokens` (`int`, optional): Token budget for the conversation; set it to the model's context window. When estimated token usage reaches the compaction threshold, the older part of the conversation history is automatically compacted (summarized): see [Auto-Compaction](#auto-compaction). A single tool result is limited to a quarter of this budget. Default: `32000`.
 - `compaction_threshold` (`int`, optional): Percentage of `max_tokens` at which auto-compaction triggers (`0`-`100`). For example, with `max_tokens=32000` and `compaction_threshold=80`, compaction triggers at ~25600 tokens. Default: `80`.
 - `request_timeout` (`int`, optional): Timeout in seconds for each LLM completion request. LLM calls can be slow, especially with tool-calling loops or large contexts. Default: `300`.
 - `extra_body` (`dict`, optional): Provider-specific fields to merge into every request body. Default: `None`.
@@ -118,14 +119,16 @@ bot = agent.Agent(
 )
 ```
 
-### `agent.trigger(message, max_iterations=1)`
+### `agent.trigger(message, max_iterations=25)`
 
-Processes a message with the agent, executing tools as needed. Strips `<think>...</think>` blocks from responses, maintains conversation history, and stops after `max_iterations` or once the model stops calling tools. Uses the agent's configured `request_timeout` for each LLM call.
+Processes a message with the agent, executing tools as needed. Strips `<think>...</think>` blocks from responses, maintains conversation history, and stops once the model answers without calling a tool. Uses the agent's configured `request_timeout` for each LLM call.
+
+If the model is still calling tools after `max_iterations` rounds, the agent makes one more request, without tools, asking it to answer from what it has found so far and to say what is unfinished. That request and its answer are added to the conversation history, and `agent.stop_reason` is `"max_iterations"`.
 
 **Parameters:**
 
 - `message` (`str` or `dict`): User message to process.
-- `max_iterations` (`int`, optional): Maximum tool call rounds. Default: `1`.
+- `max_iterations` (`int`, optional): Maximum tool call rounds. Default: `25`.
 
 **Returns:** `dict`: the agent's response message.
 
@@ -135,6 +138,22 @@ print(response.content)
 
 response = bot.trigger("Reverse the word 'hello'", max_iterations=10)
 print(response.content)
+```
+
+### `agent.stop_reason`
+
+Why the last `trigger()` stopped, as a `str`:
+
+| Value | Meaning |
+|-------|---------|
+| `"done"` | The model answered without calling a tool. |
+| `"max_iterations"` | The tool call limit was reached and the model was asked for a final answer. |
+| `"no_response"` | The provider returned no choices. |
+
+```python
+response = bot.trigger("Audit every file in the project", max_iterations=10)
+if bot.stop_reason == "max_iterations":
+    print("Stopped early:", response.content)
 ```
 
 ### `agent.interact(max_iterations=25)`
@@ -295,16 +314,18 @@ The agent automatically compacts conversation history when it grows too large, p
 
 **How it works:**
 
-1. Before each completion call, the agent estimates the token count of the current messages.
-2. If the estimated tokens reach the compaction threshold (percentage of `max_tokens`), the conversation is compacted.
-3. Compaction asks the AI to summarize the conversation so far, preserving key facts and context.
-4. The history is rebuilt as: system prompt + summary + protected recent context.
-5. Active tool rounds are preserved so assistant tool calls remain paired with their tool results.
+1. Before each completion call, the agent estimates the token count of the current messages plus the tool schemas, which are sent with every request.
+2. If the estimate reaches the compaction threshold (percentage of `max_tokens`), the conversation is compacted.
+3. The most recent messages, up to half of the threshold, are kept exactly as they are: they are what the model is working from. A tool round is never split, so assistant tool calls stay paired with their tool results.
+4. The AI is asked to summarize everything older: what was asked, what has been done, what was learned (with file paths, names and values) and what is left to do.
+5. The history is rebuilt as: system prompt + summary + the kept recent messages. If the user's latest request was in the summarized part, it is repeated word for word after the summary.
 6. The agent continues normally with the compacted history.
+
+Set `max_tokens` to the context window of the model you are using. The default suits a 32k model; with a larger model a low value compacts sooner than needed and loses detail, and with a smaller one a high value lets the provider drop the start of the conversation.
 
 **Parameters:**
 
-- `max_tokens` (`int`): Maximum token budget. Default: `32000`.
+- `max_tokens` (`int`): Token budget, normally the model's context window. Default: `32000`.
 - `compaction_threshold` (`int`): Percentage of `max_tokens` at which compaction triggers. Default: `80`.
 
 ```python
@@ -338,6 +359,15 @@ Without an AI client, deduplication is rule-based only (MinHash similarity ≥ 8
 ## Tool Handler Interface
 
 Tool handlers receive a dict of arguments and can return any value: complex types are automatically JSON-encoded for the LLM.
+
+The agent looks after the model's mistakes so handlers do not have to:
+
+- **Missing parameters:** a call that leaves out a required parameter does not reach the handler. The model gets an `Error: …` result naming what is missing, any parameter names it sent that the tool does not have, and the parameters the tool accepts, so it can correct the call. Parameters are required unless marked optional with `?` (or left out of `required` in an `add_schema()` schema).
+- **Failing handlers:** an exception raised by a handler, or a call to a tool that does not exist, also reaches the model as an `Error: …` result and the loop continues.
+- **Oversized results:** a result longer than a quarter of `max_tokens` is shortened to its start and end, with a note saying how much was left out.
+- **Repeated calls:** when the same call returns the same result three times in one request, a note is added to the result telling the model that repeating it will not help.
+
+Models often send the conventional name for a parameter whatever the schema says (`command` for a shell tool, `path` for a file), so prefer those names.
 
 ```python
 def get_time(args):

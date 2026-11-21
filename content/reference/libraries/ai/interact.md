@@ -33,8 +33,10 @@ During each turn, the interactive loop:
 - Streams reasoning and assistant text into the main panel as it arrives.
 - Keeps the spinner running until the turn is fully complete.
 - Shows tool call and result messages with status and preview.
-- Uses `ai.collect_stream()` for streaming with configurable timeouts.
+- Uses `ai.collect_stream()` for streaming. The model has 120 seconds to send its first chunk, or the agent's `request_timeout` if that is longer, and 60 seconds for each chunk after that.
 - Preserves conversation state for follow-up requests.
+
+A turn that stops early (Esc, a failed request or a stalled stream) keeps the tool calls that already ran, with a closing note that it was cut short, so the model still knows what it changed. A turn that stops before any tool ran is dropped, and the request can simply be sent again.
 
 ## Functions
 
@@ -106,7 +108,7 @@ Commands are registered with the TUI palette when `interact()` is called. Type `
 | `/model <name>` | Switch model (`none` to reset to default) |
 | `/history` | Show conversation history |
 | `/exit` | Exit (registered by the CLI) |
-| Esc | Cancel the current request |
+| Esc | Interrupt the current request (tool calls already made stay in the history) |
 
 ## Security Considerations
 

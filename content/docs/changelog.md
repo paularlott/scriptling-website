@@ -8,6 +8,17 @@ nav-skip: true
 
 ## November 2026
 
+{{< version "v0.42.0" >}}
+
+{{< changelog-item "changed" >}}
+- **Behaviour change:** `agent.trigger()` runs up to 25 tool call rounds by default instead of 1; pass `max_iterations=1` for the old behaviour ([docs](/reference/libraries/ai/agent/#agenttriggermessage-max_iterations25))
+- **Behaviour change:** A tool call missing a required parameter no longer reaches its handler; the model is told what the tool accepts and can correct the call ([docs](/reference/libraries/ai/agent/#tool-handler-interface))
+- Agents hold up better on long tasks: compaction keeps recent work intact, and an agent that hits its tool call limit gives an answer instead of raw tool output ([docs](/reference/libraries/ai/agent/#auto-compaction))
+- The `scriptlingcoder` example can use MCP servers from a `.mcp.json`
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.41.1" >}}
 
 {{< changelog-item "changed" >}}

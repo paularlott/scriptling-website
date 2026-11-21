@@ -166,6 +166,8 @@ for tool_call in tool_calls:
 
 Executes normalized tool calls using handlers from a `ToolRegistry`.
 
+A call that leaves out a required parameter does not reach its handler: its result is an `Error: …` message naming the missing parameters and the ones the tool accepts, for the model to act on. A call to an unknown tool, or a handler that raises, gives an `Error: …` result in the same way.
+
 **Parameters:**
 
 - `registry` (`ToolRegistry`): Tool registry containing handlers.
