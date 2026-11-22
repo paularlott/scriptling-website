@@ -44,7 +44,7 @@ Connects to a WebSocket server.
 
 **Parameters:**
 - `url` (`str`): WebSocket URL, `ws://` or `wss://`.
-- `timeout` (`int`, optional): Connection timeout in seconds. Default: `10`.
+- `timeout` (`int` or `float`, optional): Connection timeout in seconds. Default: `10`.
 - `headers` (`dict`, optional): HTTP headers to send during the handshake. Default: `{}`.
 
 **Returns:** `Connection`: a connection object.
@@ -87,7 +87,7 @@ conn.send_binary([0x01, 0x02, 0x03, 0xFF])
 Receives a message from the server.
 
 **Parameters:**
-- `timeout` (`int`, optional): Timeout in seconds. Default: `30`.
+- `timeout` (`int`, `float` or `None`, optional): Timeout in seconds; `None` waits without one. Default: `30`.
 
 **Returns:** `str` for text messages, `list` of bytes for binary messages, or `None` on timeout or disconnect.
 

@@ -180,7 +180,7 @@ Creates a client of a Mercure hub. It connects when first used.
 - `verify` (`bool` or `str`, optional): Verify the hub's TLS certificate. `False` accepts any certificate
   (development only); a path names a PEM bundle of CA certificates to trust, such as a gossiper node's
   `self-signed.crt`. Default: `True`.
-- `timeout` (`float`, optional): Seconds to wait for the hub to answer a publish or accept a subscription.
+- `timeout` (`int` or `float`, optional): Seconds to wait for the hub to answer a publish or accept a subscription.
   Default: `30`.
 - `headers` (`dict`, optional): Headers added to every request. Default: `None`.
 - `host` (`str`, optional): The host name to ask for when it is not the URL's, for a hub node reached by its
@@ -349,7 +349,7 @@ hub.close()
 Returns the next event, waiting up to `timeout` seconds for one.
 
 **Parameters:**
-- `timeout` (`float`, optional): Seconds to wait. `None` waits until an event comes or the subscription is closed;
+- `timeout` (`int`, `float` or `None`, optional): Seconds to wait. `None` waits until an event comes or the subscription is closed;
   `0` takes only an event already received. Default: `30`.
 
 **Returns:** `Event` or `None`. `None` on a timeout, or once the subscription is closed.

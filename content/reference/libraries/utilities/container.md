@@ -251,7 +251,7 @@ Polls the container's running state until it stops or the timeout elapses. Usefu
 
 **Parameters:**
 - `name_or_id` (`str`): Container name or ID.
-- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
+- `timeout` (`int` or `float`, optional): Maximum time to wait in seconds. Default: `30`.
 
 **Returns:** `bool`: `True` if the container is stopped, `False` if the timeout was reached.
 

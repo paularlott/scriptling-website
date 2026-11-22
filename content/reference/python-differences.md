@@ -92,11 +92,15 @@ Imports work as in Python, but a library is only importable if the host has made
 
 ### Default Timeout
 
-`requests` calls time out after 5 seconds by default (Python's `requests` waits indefinitely). Pass `timeout=` for slower endpoints:
+`requests` calls time out after 5 seconds by default (Python's `requests` waits indefinitely). Pass `timeout=` in seconds for slower endpoints, a float for fractions, or `timeout=None` to wait without a limit as Python does:
 
 ```python
 response = requests.get("https://slow-api.com", timeout=30)
+response = requests.get("https://fast-api.com", timeout=0.5)
+response = requests.get("https://report.example.com", timeout=None)
 ```
+
+Under a network policy with `client_timeout`, that limit applies to every request whatever `timeout` says. Every other library takes timeouts the same way: seconds as an int or a float, and `None` where waiting without a limit makes sense.
 
 ### TLS Verification
 

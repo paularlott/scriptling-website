@@ -97,7 +97,7 @@ The `create()` function returns a cluster object with the following methods.
 
 ### `create(bind_addr="127.0.0.1:8000", ...)`
 
-Creates a gossip cluster node.
+Creates a gossip cluster node. Timeouts and intervals take a number of seconds (`1.5`) or a duration string (`"1.5s"`, `"500ms"`); anything else raises an error.
 
 **Parameters:**
 - `bind_addr` (`str`, optional): Address to bind to. Default: `"127.0.0.1:8000"`.
@@ -110,23 +110,23 @@ Creates a gossip cluster node.
 - `app_version` (`str`, optional): Application version for compatibility checks. Default: `""`.
 - `transport` (`str`, optional): Transport type, `"socket"` or `"http"`. Default: `"socket"`. With `"http"`, the node serves the gossip endpoint over HTTP on `bind_addr`; `advertise_addr` defaults to `http://<bind_addr>` (set it to an `https://` URL behind a TLS proxy; a value without a scheme gets `http://`), and peers join it by `host:port` as with sockets. When `bind_addr` listens on all interfaces (for example `0.0.0.0:8000`), set `advertise_addr` to the address peers should use.
 - `compress_min_size` (`int`, optional): Minimum message size for compression. Default: `256`.
-- `gossip_interval` (`str`, optional): Gossip interval duration. Default: `"5s"`.
-- `gossip_max_interval` (`str`, optional): Maximum gossip interval. Default: `"20s"`.
-- `metadata_gossip_interval` (`str`, optional): Metadata gossip interval. Default: `"500ms"`.
-- `state_gossip_interval` (`str`, optional): State exchange interval. Default: `"45s"`.
+- `gossip_interval` (`float` or `str`, optional): Gossip interval duration. Default: `"5s"`.
+- `gossip_max_interval` (`float` or `str`, optional): Maximum gossip interval. Default: `"20s"`.
+- `metadata_gossip_interval` (`float` or `str`, optional): Metadata gossip interval. Default: `"500ms"`.
+- `state_gossip_interval` (`float` or `str`, optional): State exchange interval. Default: `"45s"`.
 - `fan_out_multiplier` (`float`, optional): Fan-out scaling factor. Default: `1.0`.
 - `ttl_multiplier` (`float`, optional): TTL scaling factor. Default: `1.0`.
 - `state_exchange_multiplier` (`float`, optional): State exchange scaling. Default: `0.8`.
 - `force_reliable_transport` (`bool`, optional): Force TCP for all messages. Default: `False`; always on under a network policy.
 - `prefer_ipv6` (`bool`, optional): Prefer IPv6 for DNS resolution. Default: `False`.
-- `node_cleanup_interval` (`str`, optional): Dead node cleanup interval. Default: `"20s"`.
-- `node_retention_time` (`str`, optional): How long to keep dead nodes. Default: `"1h"`.
-- `leaving_node_timeout` (`str`, optional): Timeout before moving a leaving node to dead. Default: `"30s"`.
-- `health_check_interval` (`str`, optional): Health check interval. Default: `"2s"`.
-- `suspect_timeout` (`str`, optional): Time before marking a node suspect. Default: `"1.5s"`.
-- `suspect_retry_interval` (`str`, optional): Suspect node retry interval. Default: `"1s"`.
-- `dead_node_timeout` (`str`, optional): Time before marking a suspect node dead. Default: `"15s"`.
-- `peer_recovery_interval` (`str`, optional): Peer recovery check interval. Default: `"30s"`.
+- `node_cleanup_interval` (`float` or `str`, optional): Dead node cleanup interval. Default: `"20s"`.
+- `node_retention_time` (`float` or `str`, optional): How long to keep dead nodes. Default: `"1h"`.
+- `leaving_node_timeout` (`float` or `str`, optional): Timeout before moving a leaving node to dead. Default: `"30s"`.
+- `health_check_interval` (`float` or `str`, optional): Health check interval. Default: `"2s"`.
+- `suspect_timeout` (`float` or `str`, optional): Time before marking a node suspect. Default: `"1.5s"`.
+- `suspect_retry_interval` (`float` or `str`, optional): Suspect node retry interval. Default: `"1s"`.
+- `dead_node_timeout` (`float` or `str`, optional): Time before marking a suspect node dead. Default: `"15s"`.
+- `peer_recovery_interval` (`float` or `str`, optional): Peer recovery check interval. Default: `"30s"`.
 - `insecure_skip_verify` (`bool`, optional): Skip TLS verification for the `"http"` transport. Default: `False`.
 
 **Returns:** `Cluster`: a cluster node object.

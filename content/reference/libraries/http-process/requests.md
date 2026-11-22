@@ -30,7 +30,7 @@ Send an HTTP GET request to the specified URL.
 **Parameters:**
 - `url` (`str`): URL to request.
 - `**kwargs` (optional):
-  - `timeout` (`int`): Request timeout in seconds. Default: `5`.
+  - `timeout` (`int`, `float` or `None`): Request timeout in seconds, fractions allowed; `None` for no timeout. Default: `5`.
   - `headers` (`dict`): HTTP headers to send.
   - `params` (`dict`): Query parameters to append to the URL.
   - `auth` (`tuple`/`list`): Basic authentication as `(username, password)`.
@@ -54,7 +54,7 @@ Send an HTTP POST request to the specified URL with the given data.
 - `url` (`str`): URL to request.
 - `data` (`str` or [`bytes`](../../data-formats/bytes/), optional): Request body. Use `bytes` for binary payloads (msgpack, etc.). Default: `None`.
 - `**kwargs` (optional):
-  - `timeout` (`int`): Request timeout in seconds. Default: `5`.
+  - `timeout` (`int`, `float` or `None`): Request timeout in seconds, fractions allowed; `None` for no timeout. Default: `5`.
   - `headers` (`dict`): HTTP headers to send.
   - `params` (`dict`): Query parameters to append to the URL.
   - `json` (`dict`/`list`): Data to JSON-encode as the request body (sets `Content-Type`). Use either `data` or `json`, not both.
@@ -83,7 +83,7 @@ Send an HTTP PUT request to the specified URL with the given data.
 - `url` (`str`): URL to request.
 - `data` (`str` or [`bytes`](../../data-formats/bytes/), optional): Request body. Use `bytes` for binary payloads (msgpack, etc.). Default: `None`.
 - `**kwargs` (optional):
-  - `timeout` (`int`): Request timeout in seconds. Default: `5`.
+  - `timeout` (`int`, `float` or `None`): Request timeout in seconds, fractions allowed; `None` for no timeout. Default: `5`.
   - `headers` (`dict`): HTTP headers to send.
   - `params` (`dict`): Query parameters to append to the URL.
   - `json` (`dict`/`list`): Data to JSON-encode as the request body (sets `Content-Type`). Use either `data` or `json`, not both.
@@ -105,7 +105,7 @@ Send an HTTP DELETE request to the specified URL.
 **Parameters:**
 - `url` (`str`): URL to request.
 - `**kwargs` (optional):
-  - `timeout` (`int`): Request timeout in seconds. Default: `5`.
+  - `timeout` (`int`, `float` or `None`): Request timeout in seconds, fractions allowed; `None` for no timeout. Default: `5`.
   - `headers` (`dict`): HTTP headers to send.
   - `params` (`dict`): Query parameters to append to the URL.
   - `auth` (`tuple`/`list`): Basic authentication as `(username, password)`.
@@ -127,7 +127,7 @@ Send an HTTP PATCH request to the specified URL with the given data.
 - `url` (`str`): URL to request.
 - `data` (`str` or [`bytes`](../../data-formats/bytes/), optional): Request body. Use `bytes` for binary payloads (msgpack, etc.). Default: `None`.
 - `**kwargs` (optional):
-  - `timeout` (`int`): Request timeout in seconds. Default: `5`.
+  - `timeout` (`int`, `float` or `None`): Request timeout in seconds, fractions allowed; `None` for no timeout. Default: `5`.
   - `headers` (`dict`): HTTP headers to send.
   - `params` (`dict`): Query parameters to append to the URL.
   - `json` (`dict`/`list`): Data to JSON-encode as the request body (sets `Content-Type`). Use either `data` or `json`, not both.
@@ -155,7 +155,7 @@ Execute multiple HTTP requests concurrently with a configurable concurrency limi
   - `headers` (`dict`, optional): HTTP headers.
   - `params` (`dict`, optional): Query parameters to append to the URL.
   - `auth` (`list`/`tuple`, optional): Basic authentication as `[username, password]`.
-  - `timeout` (`int`, optional): Request timeout in seconds. Default: `30`.
+  - `timeout` (`int`, `float` or `None`, optional): Request timeout in seconds, fractions allowed; `None` for no timeout. Default: `30`.
   - `verify` (`bool` or `str`, optional): Verify the server's TLS certificate. Default: `True`. A path names a CA bundle; one outside `--allowed-paths` raises `PermissionError` for the whole batch.
 - `max_parallel` (`int`, optional): Maximum number of concurrent requests. Default: `4`. The host may cap this (see [Script Resource Limits](/docs/go-integration/basics/#script-resource-limits)); a larger request is reduced to the cap.
 
@@ -239,7 +239,7 @@ The CLI configures the same guard through its `--network-policy` TOML file and p
 - HTTP/2 support with automatic fallback to HTTP/1.1.
 - Connection pooling (100 connections per host).
 - Self-signed certificates are rejected by default. To trust one, pass `verify="ca.pem"`, a PEM bundle of the CA certificates to trust instead of the system's (as in Python's `requests`, it replaces them: include the system's own to reach other sites too); `verify=False` accepts any certificate, for a development server only.
-- Default timeout: 5 seconds (30 seconds for `parallel()`).
+- Default timeout: 5 seconds (30 seconds for `parallel()`). A longer timeout is honoured in full; under a network policy its `client_timeout` caps every request.
 
 ## See Also
 

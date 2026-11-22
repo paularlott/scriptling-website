@@ -211,8 +211,8 @@ Consumes a `ChatStream`, aggregates reasoning, content, tool calls, and finish s
 **Parameters:**
 
 - `stream` (`ChatStream`): Stream returned by `client.completion_stream()`.
-- `chunk_timeout` (`int`, optional): Per-chunk timeout in seconds. Default: `0`.
-- `first_chunk_timeout` (`int`, optional): Timeout for the first chunk only (models may need time to load). Falls back to `chunk_timeout`. Default: `0`.
+- `chunk_timeout` (`int`, `float` or `None`, optional): Per-chunk timeout in seconds; `None` or `0` for none. Default: `0`.
+- `first_chunk_timeout` (`int`, `float` or `None`, optional): Timeout for the first chunk only (models may need time to load). Falls back to `chunk_timeout`. Default: `0`.
 - `on_event` (`callable`, optional): Callback invoked with event dicts during collection.
 
 **Returns:** `dict`: aggregated result with `content`, `reasoning`, `tool_calls`, `finish_reason`, `timed_out`, `assistant_message`, and `error` (only present when `timed_out` is true).

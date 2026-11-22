@@ -42,7 +42,7 @@ When unpacking a zip archive, `fetch.UPDATED` takes precedence over `fetch.CREAT
 - `dest` (`str`): Destination file path, or destination directory when `unpack_zip=True`.
 - `insecure` (`bool`, optional): Skip HTTPS certificate verification. Default: `False`.
 - `unpack_zip` (`bool`, optional): Treat the response body as a zip archive and extract it. Default: `False`.
-- `timeout` (`int`, optional): Request timeout in seconds. Default: `30`.
+- `timeout` (`int` or `float`, optional): Request timeout in seconds. Default: `30`.
 - `max_bytes` (`int`, optional): Maximum response size in bytes, or `0` for no cap. Default: `0`.
 - `mode` (`int`, optional): File permission mode for written files. Default: `0o644`.
 - `dir_mode` (`int`, optional): Directory permission mode for created directories. Default: `0o755`.

@@ -35,8 +35,8 @@ Waits for a file to exist.
 
 **Parameters:**
 - `path` (`str`): Path to the file to wait for.
-- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
-- `poll_rate` (`float`, optional): Time between checks in seconds. Default: `1`.
+- `timeout` (`int` or `float`, optional): Maximum time to wait in seconds; `0` checks once. Default: `30`.
+- `poll_rate` (`int` or `float`, optional): Time between checks in seconds. Default: `1`.
 
 **Returns:** `bool`: `True` if the file exists, `False` if the timeout was exceeded.
 
@@ -58,8 +58,8 @@ Waits for a directory to exist.
 
 **Parameters:**
 - `path` (`str`): Path to the directory to wait for.
-- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
-- `poll_rate` (`float`, optional): Time between checks in seconds. Default: `1`.
+- `timeout` (`int` or `float`, optional): Maximum time to wait in seconds; `0` checks once. Default: `30`.
+- `poll_rate` (`int` or `float`, optional): Time between checks in seconds. Default: `1`.
 
 **Returns:** `bool`: `True` if the directory exists, `False` if the timeout was exceeded.
 
@@ -80,8 +80,8 @@ Waits for a TCP port to accept connections. Each connection attempt uses a 1-sec
 **Parameters:**
 - `host` (`str`): Hostname or IP address.
 - `port` (`int` or `str`): Port number.
-- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
-- `poll_rate` (`float`, optional): Time between checks in seconds. Default: `1`.
+- `timeout` (`int` or `float`, optional): Maximum time to wait in seconds; `0` checks once. Default: `30`.
+- `poll_rate` (`int` or `float`, optional): Time between checks in seconds. Default: `1`.
 
 **Returns:** `bool`: `True` if the port is open, `False` if the timeout was exceeded.
 
@@ -103,8 +103,8 @@ Waits for an HTTP endpoint to respond with the expected status code.
 
 **Parameters:**
 - `url` (`str`): URL to check.
-- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
-- `poll_rate` (`float`, optional): Time between checks in seconds. Default: `1`.
+- `timeout` (`int` or `float`, optional): Maximum time to wait in seconds; `0` checks once. Default: `30`.
+- `poll_rate` (`int` or `float`, optional): Time between checks in seconds. Default: `1`.
 - `status_code` (`int`, optional): Expected HTTP status code. Default: `200`.
 
 **Returns:** `bool`: `True` if the endpoint responds with the expected status, `False` if the timeout was exceeded.
@@ -130,8 +130,8 @@ Waits for a file to exist and contain specific content.
 **Parameters:**
 - `path` (`str`): Path to the file to check.
 - `content` (`str`): Content to search for in the file.
-- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
-- `poll_rate` (`float`, optional): Time between checks in seconds. Default: `1`.
+- `timeout` (`int` or `float`, optional): Maximum time to wait in seconds; `0` checks once. Default: `30`.
+- `poll_rate` (`int` or `float`, optional): Time between checks in seconds. Default: `1`.
 
 **Returns:** `bool`: `True` if the file contains the content, `False` if the timeout was exceeded.
 
@@ -155,8 +155,8 @@ Waits for a process with the specified name to be running. Process name matching
 
 **Parameters:**
 - `name` (`str`): Process name to search for.
-- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
-- `poll_rate` (`float`, optional): Time between checks in seconds. Default: `1`.
+- `timeout` (`int` or `float`, optional): Maximum time to wait in seconds; `0` checks once. Default: `30`.
+- `poll_rate` (`int` or `float`, optional): Time between checks in seconds. Default: `1`.
 
 **Returns:** `bool`: `True` if the process is running, `False` if the timeout was exceeded.
 

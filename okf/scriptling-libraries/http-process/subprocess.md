@@ -34,7 +34,7 @@ Run a command and return a `CompletedProcess` instance.
   - `capture_output` (`bool`): Capture stdout and stderr. Default: `False`.
   - `shell` (`bool`): Run the command through the shell. Default: `False`.
   - `cwd` (`str`): Working directory for the command.
-  - `timeout` (`int`/`float`): Timeout in seconds.
+  - `timeout` (`int`, `float` or `None`): Timeout in seconds. When it expires the command is stopped and `TimeoutError` raised.
   - `check` (`bool`): Raise an exception if `returncode` is non-zero. Default: `False`.
   - `text` (`bool`): Return stdout/stderr as strings. Default: `False`.
   - `encoding` (`str`): Encoding for stdout/stderr. Default: `"utf-8"`.

@@ -41,7 +41,7 @@ Runs `cmd` and waits for it. A list is a program and its arguments, run as they 
 - `cwd` (`str`, optional): Working directory (supports `~` expansion). Default: the current one.
 - `env` (`dict`, optional): Environment variables added to the inherited environment.
 - `input` (`str`, optional): Text for the command's standard input. Default: none.
-- `timeout` (`float`, optional): Seconds to allow. The command is stopped after that and an error raised.
+- `timeout` (`int`, `float` or `None`, optional): Seconds to allow. The command is stopped after that and an error raised.
 - `check` (`bool`, optional): Raise an error when the command exits with a non-zero status. Default: `True`.
 
 **Returns:** a `Result` with:

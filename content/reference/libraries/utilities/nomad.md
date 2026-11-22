@@ -50,7 +50,7 @@ Creates a `NomadClient` bound to a Nomad HTTP API endpoint.
 - `addr` (`str`): Nomad HTTP API address, e.g. `"http://127.0.0.1:4646"`. A path prefix is allowed (for Nomad behind a reverse proxy); a query string or fragment is rejected.
 - `token` (`str`, optional): ACL token, sent as the `X-Nomad-Token` header on every request. Default: `""`.
 - `insecure` (`bool`, optional): Skip TLS certificate verification. Default: `False`.
-- `timeout` (`float`, optional): Per-request HTTP timeout in seconds. Default: `10`.
+- `timeout` (`int` or `float`, optional): Per-request HTTP timeout in seconds. Default: `10`.
 
 **Returns:** `NomadClient`: a client bound to the given address.
 
@@ -344,7 +344,7 @@ Polls a job's status until it reaches `"dead"`, or the timeout elapses.
 **Parameters:**
 - `id` (`str`): Job ID.
 - `namespace` (`str`, optional): Namespace. Default: `""`: Nomad's default namespace.
-- `timeout` (`int`, optional): Maximum time to wait in seconds. Default: `30`.
+- `timeout` (`int` or `float`, optional): Maximum time to wait in seconds. Default: `30`.
 
 **Returns:** `bool`: `True` if the job is stopped, `False` if the timeout was reached.
 

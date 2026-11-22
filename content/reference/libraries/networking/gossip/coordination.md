@@ -72,8 +72,8 @@ workers.close()
 Creates a leader election manager with quorum-based election.
 
 **Parameters:**
-- `check_interval` (`str`, optional): Duration between leader checks. Default: `"1s"`.
-- `leader_timeout` (`str`, optional): Duration without a heartbeat before the leader is considered lost. Default: `"3s"`.
+- `check_interval` (`float` or `str`, optional): Duration between leader checks. Default: `"1s"`.
+- `leader_timeout` (`float` or `str`, optional): Duration without a heartbeat before the leader is considered lost. Default: `"3s"`.
 - `heartbeat_msg_type` (`int`, optional): Message type for heartbeats, from the reserved (`< 128`) range. Default: `65`.
 - `quorum_percentage` (`int`, optional): Percentage of nodes required for quorum, `1`-`100`. Default: `60`.
 - `metadata_criteria` (`dict`, optional): Metadata criteria to limit eligible nodes. Default: `None` (all nodes eligible).

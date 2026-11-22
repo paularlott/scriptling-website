@@ -74,7 +74,7 @@ Connects to a remote host.
 - `host` (`str`): Remote host address.
 - `port` (`int`): Remote port number.
 - `protocol` (`str`, optional): `"udp"` or `"tcp"`. Default: `"udp"`.
-- `timeout` (`number`, optional): Connection timeout in seconds. Default: `10`.
+- `timeout` (`int` or `float`, optional): Connection timeout in seconds. Default: `10`.
 
 **Returns:** `Connection`: connection object with `send()`, `receive()`, `close()`, `connected()` methods and `local_addr`, `remote_addr` properties.
 
@@ -121,7 +121,7 @@ conn.send({"action": "ping"})
 Receives a message.
 
 **Parameters:**
-- `timeout` (`number`, optional): Timeout in seconds. Default: `30`.
+- `timeout` (`int`, `float` or `None`, optional): Timeout in seconds; `None` waits without one. Default: `30`.
 
 **Returns:** `dict`: a dict with `"data"` ([`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) — call `.decode()` for text) and `"source"` (`str`) keys, or `None` on timeout.
 
@@ -161,7 +161,7 @@ if conn.connected():
 Accepts an incoming TCP connection.
 
 **Parameters:**
-- `timeout` (`number`, optional): Timeout in seconds. Default: `30`.
+- `timeout` (`int`, `float` or `None`, optional): Timeout in seconds; `None` waits without one. Default: `30`.
 
 **Returns:** `Connection`: a connection object, or `None` on timeout.
 
@@ -194,7 +194,7 @@ The local address the listener is bound to.
 Receives a message from any sender.
 
 **Parameters:**
-- `timeout` (`number`, optional): Timeout in seconds. Default: `30`.
+- `timeout` (`int`, `float` or `None`, optional): Timeout in seconds; `None` waits without one. Default: `30`.
 
 **Returns:** `dict`: a dict with `"data"` ([`bytes`](https://scriptling.dev/okf/scriptling-libraries/data-formats/bytes.md) — call `.decode()` for text) and `"source"` (`str`) keys, or `None` on timeout.
 

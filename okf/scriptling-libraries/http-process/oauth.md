@@ -172,7 +172,7 @@ again after an hour), which must name `issuer`.
 - `verify` (`bool` or `str`, optional): Verify the IdP's TLS certificate. Default: `True`. `False` accepts any
   certificate (a development IdP only); a path names a PEM bundle of CA certificates to trust instead of the
   system's.
-- `timeout` (`float`, optional): Per-request timeout in seconds. Default: `10`.
+- `timeout` (`int` or `float`, optional): Per-request timeout in seconds. Default: `10`.
 
 **Returns:** `OAuthClient`.
 

@@ -233,7 +233,7 @@ The object passed to a `websocket()` handler:
 | Member | Description |
 |--------|-------------|
 | `connected()` | Returns `True` while the connection is open. |
-| `receive(timeout=30)` | Receives the next message, blocking up to `timeout` seconds. |
+| `receive(timeout=30)` | Receives the next message, blocking up to `timeout` seconds (`int` or `float`; `None` waits without a limit). |
 | `send(text)` | Sends a text message. |
 | `send_binary(data)` | Sends a `list` of byte values (0-255) as a binary message. |
 | `close()` | Closes the connection. |

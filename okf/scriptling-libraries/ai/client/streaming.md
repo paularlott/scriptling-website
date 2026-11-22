@@ -32,7 +32,7 @@ Creates a streaming chat completion using this client's configuration.
 - `temperature` (`float`, optional): Sampling temperature (`0.0`-`2.0`).
 - `max_tokens` (`int`, optional): Maximum tokens to generate.
 - `extra_body` (`dict`, optional): Provider-specific fields to merge into the request body.
-- `timeout` (`int`, optional): Overall request timeout in seconds.
+- `timeout` (`int`, `float` or `None`, optional): Overall request timeout in seconds; `None` or `0` for none.
 
 **Returns:** `ChatStream`: a stream object with `next()`, `next_timeout()`, `err()`, `close()`, and `retry()` methods.
 
@@ -89,7 +89,7 @@ Advances to the next response chunk, but stops waiting after `timeout` seconds.
 
 **Parameters:**
 
-- `timeout` (`int`): Timeout in seconds.
+- `timeout` (`int`, `float` or `None`): Timeout in seconds; `None` or `0` waits without one.
 
 **Returns:** `dict`: the next response chunk, `{"timed_out": True}` if the timeout elapsed, or `None` if the stream is complete.
 

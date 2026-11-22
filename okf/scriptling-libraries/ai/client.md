@@ -144,7 +144,7 @@ Creates a chat completion using this client's configuration.
 - `temperature` (`float`, optional): Sampling temperature (`0.0`-`2.0`).
 - `max_tokens` (`int`, optional): Maximum tokens to generate.
 - `extra_body` (`dict`, optional): Provider-specific fields to merge into the request body.
-- `timeout` (`int`, optional): Request timeout in seconds.
+- `timeout` (`int`, `float` or `None`, optional): Request timeout in seconds; `None` or `0` for none.
 
 **Returns:** `dict`: response containing `id`, `choices`, `usage`, etc.
 
@@ -226,7 +226,7 @@ Includes **adaptive concurrency**: when a rate limit (429) is detected, the para
 - `top_p` (`float`, optional): Nucleus sampling threshold (`0.0`-`1.0`).
 - `max_tokens` (`int`, optional): Maximum tokens to generate.
 - `extra_body` (`dict`, optional): Provider-specific fields to merge into the request body.
-- `timeout` (`int`, optional): Request timeout in seconds.
+- `timeout` (`int`, `float` or `None`, optional): Request timeout in seconds; `None` or `0` for none.
 
 **Returns:** `list`: response dicts in the same order as `messages_list`. Each response may include a `retry` dict if the client retried the request: `{"attempts": 2, "rate_limit_hit": true, "total_backoff": 1.0}`.
 
@@ -258,7 +258,7 @@ Includes the same **adaptive concurrency** behavior as `completion_parallel()`.
 - `top_p` (`float`, optional): Nucleus sampling threshold (`0.0`-`1.0`).
 - `max_tokens` (`int`, optional): Maximum tokens to generate.
 - `extra_body` (`dict`, optional): Provider-specific fields to merge into the request body.
-- `timeout` (`int`, optional): Request timeout in seconds.
+- `timeout` (`int`, `float` or `None`, optional): Request timeout in seconds; `None` or `0` for none.
 
 **Returns:** `list`: response text strings in the same order as `messages_list`.
 
@@ -288,7 +288,7 @@ Includes the same **adaptive concurrency** as the parallel methods: on a rate li
 - `top_p` (`float`, optional): Nucleus sampling threshold (`0.0`-`1.0`).
 - `max_tokens` (`int`, optional): Maximum tokens to generate.
 - `extra_body` (`dict`, optional): Provider-specific fields merged into every request body.
-- `timeout` (`int`, optional): Request timeout in seconds.
+- `timeout` (`int`, `float` or `None`, optional): Request timeout in seconds; `None` or `0` for none.
 
 **Returns:** `Pipeline`: a pipeline object with `add()` and `complete()` methods.
 

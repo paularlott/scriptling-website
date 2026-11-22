@@ -71,7 +71,7 @@ Creates an AI agent with automatic tool execution.
 - `mcp_servers` (`list`, optional): MCP clients from `mcp.Client()` whose tools and skills the agent can use: see [MCP Server Integration](#mcp-server-integration). Each must be created with a distinct namespace. Default: `None`.
 - `max_tokens` (`int`, optional): Token budget for the conversation; set it to the model's context window. When estimated token usage reaches the compaction threshold, the older part of the conversation history is automatically compacted (summarized): see [Auto-Compaction](#auto-compaction). A single tool result is limited to a quarter of this budget. Default: `32000`.
 - `compaction_threshold` (`int`, optional): Percentage of `max_tokens` at which auto-compaction triggers (`0`-`100`). For example, with `max_tokens=32000` and `compaction_threshold=80`, compaction triggers at ~25600 tokens. Default: `80`.
-- `request_timeout` (`int`, optional): Timeout in seconds for each LLM completion request. LLM calls can be slow, especially with tool-calling loops or large contexts. Default: `300`.
+- `request_timeout` (`int` or `float`, optional): Timeout in seconds for each LLM completion request. LLM calls can be slow, especially with tool-calling loops or large contexts. Default: `300`.
 - `extra_body` (`dict`, optional): Provider-specific fields to merge into every request body. Default: `None`.
 
 **Returns:** `Agent`: an agent instance.

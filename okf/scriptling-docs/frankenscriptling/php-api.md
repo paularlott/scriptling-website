@@ -56,7 +56,8 @@ $result = json_decode($vm->getVarJSON('result'), true);   // ['subtotal' => 25.5
 $count  = $vm->getVarInt('count');
 ```
 
-Read lists and dicts with `getVarJSON()`; `getVar()` is for scalars.
+`getVar()` writes any value as `eval()` does, as Python's `str()`; read
+lists and dicts as data with `getVarJSON()`.
 `setVarList()` and `setVarDict()` take JSON like `setVarJSON()`, and check
 that it is an array or an object. `hasVar()`, `listVars()` (a JSON array of
 names) and `unsetVar()` manage variables, and `reset()` clears them all and

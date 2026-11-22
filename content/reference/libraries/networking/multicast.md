@@ -82,7 +82,7 @@ group.send({"type": "ping", "ts": 1234})
 Receives a message from the multicast group.
 
 **Parameters:**
-- `timeout` (`number`, optional): Timeout in seconds. Default: `30`.
+- `timeout` (`int`, `float` or `None`, optional): Timeout in seconds; `None` waits without one. Default: `30`.
 
 **Returns:** `dict`: a dict with `"data"` ([`bytes`](../../data-formats/bytes/) — call `.decode()` for text) and `"source"` (`str`) keys, or `None` on timeout.
 

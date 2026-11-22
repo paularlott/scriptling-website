@@ -92,7 +92,7 @@ for item in data:
 ```
 
 - `requests` supports keyword arguments such as `timeout`, `headers`, `params`, `auth`, and `json`.
-- The default HTTP timeout is 5 seconds if none is provided.
+- The default HTTP timeout is 5 seconds if none is provided. `timeout` is in seconds, int or float (`0.5` is half a second); `timeout=None` waits without a limit. A string such as `"10"` raises `TypeError`.
 - Response objects expose `status_code`, `text`, `body`, `headers`, and `url`; `body` and `text` are aliases.
 - `response.json()` and `response.raise_for_status()` are supported.
 - Send warnings and errors to stderr so stdout stays clean for the report: `import sys` then `sys.stderr.write("warning\n")` or `print("error", file=sys.stderr)`.

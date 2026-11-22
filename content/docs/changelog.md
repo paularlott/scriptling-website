@@ -8,6 +8,19 @@ nav-skip: true
 
 ## November 2026
 
+{{< version "v0.44.0" >}}
+
+{{< changelog-item "changed" >}}
+- **Behaviour change:** Every timeout takes seconds the same way: an int or a float, so `0.5` is half a second, and `None` for no limit wherever waiting without one makes sense. A string, a bool or a negative number raises `TypeError` or `ValueError`; such values used to be ignored or cut to a whole number, so `timeout=0.5` gave up at once. Gossip timeouts and intervals also accept a number of seconds as well as `"1.5s"`
+{{< /changelog-item >}}
+
+{{< changelog-item "fixed" >}}
+- Fix `requests` timeouts longer than 30 seconds being cut to 30: a `timeout=120` request now waits up to 120 seconds. A network policy's `client_timeout` still caps every request
+- Fix `subprocess.run()` returning normally with `returncode` `-1` when its timeout expired; it raises `TimeoutError`, as Python raises `TimeoutExpired`
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.43.0" >}}
 
 {{< changelog-item "changed" >}}
