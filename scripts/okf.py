@@ -52,7 +52,7 @@ BUNDLES = [
 ]
 
 BUNDLE_DESCRIPTIONS = {
-    "scriptling-docs": "Guides: quick start, CLI usage, Go integration, plugins, security, and tutorials.",
+    "scriptling-docs": "Guides: quick start, CLI usage, Go integration, plugins, security, FrankenScriptling (PHP), and tutorials.",
     "scriptling-reference": "Language reference: syntax, types, operators, control flow, functions, classes, and error handling.",
     "scriptling-libraries": "API reference for every standard, Scriptling, and extension library.",
 }

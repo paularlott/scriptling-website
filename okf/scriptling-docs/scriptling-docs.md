@@ -20,6 +20,7 @@ Scriptling is a minimal, sandboxed interpreter for Python-like scripting designe
 - **New to Scriptling:** Start with [Getting Started](https://scriptling.dev/okf/scriptling-docs/quick-start.md) to install the CLI or embed the interpreter, then learn the language from the [Reference](https://scriptling.dev/okf/scriptling-reference/scriptling-reference.md).
 - **Run a server:** Choose the CLI guide for [HTTP](https://scriptling.dev/okf/scriptling-docs/cli/http-server.md), [JSON-RPC](https://scriptling.dev/okf/scriptling-docs/cli/jsonrpc-server.md), [MCP](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md), or [plugin](https://scriptling.dev/okf/scriptling-docs/cli/plugin-server.md) server modes.
 - **Find a library:** Look it up in the [A–Z list](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md#all-libraries-az) or browse the [Library Reference](https://scriptling.dev/okf/scriptling-libraries/scriptling-libraries.md) by capability, and check registration requirements for your runtime.
+- **Run scripts from PHP:** Use the [FrankenScriptling](https://scriptling.dev/okf/scriptling-docs/frankenscriptling.md) Docker image, FrankenPHP with a `Scriptling` PHP class.
 - **Connect to a database:** Choose a driver or ORM from the [Database Libraries](https://scriptling.dev/okf/scriptling-libraries/databases.md).
 
 ## Guides
@@ -33,6 +34,8 @@ Scriptling is a minimal, sandboxed interpreter for Python-like scripting designe
 - [Security Guide](https://scriptling.dev/okf/scriptling-docs/security.md) - Sandbox configuration, path restrictions, and network access control
 
 - [Plugins](https://scriptling.dev/okf/scriptling-docs/plugins.md) - Extend Scriptling with Go, C, PHP, or any JSON-RPC language
+
+- [FrankenScriptling](https://scriptling.dev/okf/scriptling-docs/frankenscriptling.md) - Run Scriptling from PHP in a FrankenPHP Docker image
 
 - [LLM Script Generation Guide](https://scriptling.dev/okf/scriptling-docs/llm-guide.md) - Guidance for generating accurate Scriptling code with LLMs
 

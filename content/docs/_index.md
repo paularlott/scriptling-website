@@ -12,6 +12,7 @@ Scriptling is a minimal, sandboxed interpreter for Python-like scripting designe
 - **New to Scriptling:** Start with [Getting Started](quick-start/) to install the CLI or embed the interpreter, then learn the language from the [Reference](/reference/).
 - **Run a server:** Choose the CLI guide for [HTTP](cli/http-server/), [JSON-RPC](cli/jsonrpc-server/), [MCP](cli/mcp-server/), or [plugin](cli/plugin-server/) server modes.
 - **Find a library:** Look it up in the [A–Z list](/reference/libraries/#all-libraries-az) or browse the [Library Reference](/reference/libraries/) by capability, and check registration requirements for your runtime.
+- **Run scripts from PHP:** Use the [FrankenScriptling](frankenscriptling/) Docker image, FrankenPHP with a `Scriptling` PHP class.
 - **Connect to a database:** Choose a driver or ORM from the [Database Libraries](/reference/libraries/databases/).
 
 ## Guides
@@ -22,6 +23,7 @@ Scriptling is a minimal, sandboxed interpreter for Python-like scripting designe
 {{< card link="go-integration/" title="Go Integration" description="Embed the interpreter, register functions, and create custom libraries" >}}
 {{< card link="security/" title="Security Guide" description="Sandbox configuration, path restrictions, and network access control" >}}
 {{< card link="plugins/" title="Plugins" description="Extend Scriptling with Go, C, PHP, or any JSON-RPC language" >}}
+{{< card link="frankenscriptling/" title="FrankenScriptling" description="Run Scriptling from PHP in a FrankenPHP Docker image" >}}
 {{< card link="llm-guide/" title="LLM Script Generation Guide" description="Guidance for generating accurate Scriptling code with LLMs" >}}
 {{< card link="tutorials/" title="Tutorials" description="Step-by-step guides: API data, rules engines, MCP servers and plugins" >}}
 {{< card link="script-metadata/" title="Script Metadata" description="Declare the scriptling version, libraries and plugins a script needs" >}}

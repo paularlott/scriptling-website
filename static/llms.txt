@@ -4,7 +4,7 @@
 
 Docs: https://scriptling.dev/docs/
 
-All 195 OKF 0.2 concepts below are plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
+All 199 OKF 0.2 concepts below are plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
 
 ## Essential
 
@@ -18,14 +18,14 @@ All 195 OKF 0.2 concepts below are plain markdown served from https://scriptling
 
 Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 
-- [scriptling-docs](https://scriptling.dev/okf/scriptling-docs/index.md): Guides: quick start, CLI usage, Go integration, plugins, security, and tutorials.
+- [scriptling-docs](https://scriptling.dev/okf/scriptling-docs/index.md): Guides: quick start, CLI usage, Go integration, plugins, security, FrankenScriptling (PHP), and tutorials.
 - [scriptling-reference](https://scriptling.dev/okf/scriptling-reference/index.md): Language reference: syntax, types, operators, control flow, functions, classes, and error handling.
 - [scriptling-libraries](https://scriptling.dev/okf/scriptling-libraries/index.md): API reference for every standard, Scriptling, and extension library.
 - [OKF catalog](https://scriptling.dev/okf/index.md): Markdown index of all bundles
 
 ## scriptling-docs
 
-> Guides: quick start, CLI usage, Go integration, plugins, security, and tutorials.
+> Guides: quick start, CLI usage, Go integration, plugins, security, FrankenScriptling (PHP), and tutorials.
 
 - [Changelog](https://scriptling.dev/okf/scriptling-docs/changelog.md): Scriptling release history.
 - [Basic Usage](https://scriptling.dev/okf/scriptling-docs/cli/basic-usage.md): Running scripts, interactive mode, and lint mode.
@@ -38,6 +38,10 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [Packages](https://scriptling.dev/okf/scriptling-docs/cli/packages.md): Create, distribute, and load Scriptling packages.
 - [Plugin Server Mode](https://scriptling.dev/okf/scriptling-docs/cli/plugin-server.md): Run a Scriptling script as a first-class plugin that clients can load with scriptling=True.
 - [CLI Guide](https://scriptling.dev/okf/scriptling-docs/cli.md): Command-line interface for Scriptling.
+- [Configuration](https://scriptling.dev/okf/scriptling-docs/frankenscriptling/configuration.md): Enable libraries, allow paths and hosts, and set resource limits, secrets and plugins for FrankenScriptling.
+- [Extending the Image](https://scriptling.dev/okf/scriptling-docs/frankenscriptling/extending.md): Add PHP extensions and Caddy modules to FrankenScriptling, run it without root, and use its Mercure hub.
+- [PHP API](https://scriptling.dev/okf/scriptling-docs/frankenscriptling/php-api.md): The Scriptling PHP class in FrankenScriptling - running scripts, passing data, libraries, calling PHP functions and limits.
+- [FrankenScriptling](https://scriptling.dev/okf/scriptling-docs/frankenscriptling.md): Run Scriptling from PHP with a FrankenPHP Docker image that adds a Scriptling class.
 - [Basics](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md): Creating interpreters, variable exchange, and calling functions.
 - [Builder Classes](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-classes.md): Type-safe class builder with automatic method conversion.
 - [Builder Functions](https://scriptling.dev/okf/scriptling-docs/go-integration/builder-functions.md): Type-safe function builder with automatic type conversion.

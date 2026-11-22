@@ -10,6 +10,9 @@ speaks JSON-RPC over HTTP POST, so any language that can read and write JSON
 can host a plugin and no SDK is needed. The contract is a handful of methods:
 the handshake, `function.call`, and the `object.*` pair for classes.
 
+This page is for scripts calling PHP. To run scripts from PHP instead, use
+[FrankenScriptling](/docs/frankenscriptling/).
+
 The complete, commented example lives at
 `examples/plugins/php-server` in the repository
 ([PHP 8](https://www.php.net/), no dependencies); this page shows its core.
