@@ -34,7 +34,7 @@ Regular expression functions for pattern matching, searching, substitution, and 
 | `re.MULTILINE` (alias `re.M`) | `^` and `$` match at line boundaries, not just string boundaries (`8`) |
 | `re.DOTALL` (alias `re.S`) | `.` also matches newline characters (`16`) |
 
-Combine flags with `|` (for example `re.I | re.M`). Pass them **positionally**, or inline in the pattern as `(?i)`, `(?m)`, `(?s)`: the `flags=` keyword form is currently ignored (see [Python Compatibility](#python-compatibility)).
+Combine flags with `|` (for example `re.I | re.M`). Pass them as `flags=`, positionally, or inline in the pattern as `(?i)`, `(?m)`, `(?s)`.
 
 ## Example
 
@@ -69,8 +69,8 @@ print(re.split("[,;]", "a,b;c;d", maxsplit=2))  # ['a', 'b', 'c;d']
 
 print(re.escape("a.b+c"))                       # a\.b\+c
 
-# Flags: pass positionally, or inline as (?i), (?m), (?s)
-print(re.sub("hello", "hi", "Hello HELLO hello", 0, re.I))  # hi hi hi
+# Flags: as flags=, positionally, or inline as (?i), (?m), (?s)
+print(re.sub("hello", "hi", "Hello HELLO hello", flags=re.I))  # hi hi hi
 print(re.search("(?i)world", "HELLO WORLD").group())        # WORLD
 
 # Named groups
@@ -80,7 +80,7 @@ print(m.group("user"), m.groupdict()["host"])   # user example.com
 
 ## Compiled Patterns
 
-`compile()` returns a `Regex` object whose methods take only the string (the pattern and flags are already bound). Scriptling also caches compiled patterns internally, so calling the module-level functions repeatedly with the same pattern is not expensive. An invalid pattern raises an error at compile time.
+`compile()` returns a pattern object whose methods take only the string (the pattern and flags are already bound); `pattern.pattern` and `pattern.flags` give them back. Scriptling also caches compiled patterns internally, so calling the module-level functions repeatedly with the same pattern is not expensive. An invalid pattern raises an error at compile time.
 
 | Method | Description |
 |--------|-------------|
@@ -88,8 +88,10 @@ print(m.group("user"), m.groupdict()["host"])   # user example.com
 | `pattern.search(string)` | Search anywhere in `string`. Returns `Match` or `None`. |
 | `pattern.findall(string)` | All matches, as for `findall()`. |
 | `pattern.finditer(string)` | All matches as a `list` of `Match` objects. |
-
-`Regex` objects have no `sub`, `split`, or `fullmatch` methods; call the module-level functions instead.
+| `pattern.fullmatch(string)` | Match the whole of `string`. |
+| `pattern.sub(repl, string, count=0)` | Replace matches, as for `sub()`. |
+| `pattern.subn(repl, string, count=0)` | As `sub()`, returning `(new_string, count)`. |
+| `pattern.split(string, maxsplit=0)` | Split at each match, as for `split()`. |
 
 ```python
 import re
@@ -106,14 +108,12 @@ print(word.search("Say HELLO").group())  # HELLO
 
 | Method | Description |
 |--------|-------------|
-| `group(n=0)` | Text of group `n` (`0` is the whole match), or of a named group `group("name")`. |
-| `groups()` | Tuple of all capturing groups, excluding group `0`. |
-| `groupdict()` | Dict of named groups (`(?P<name>...)`) to their text. |
-| `start(n=0)` | Start index of the match. |
-| `end(n=0)` | End index of the match. |
-| `span(n=0)` | `(start, end)` tuple for the match. |
-
-`start()`, `end()`, and `span()` support only group `0`; passing another group number raises an error.
+| `group(n=0, ...)` | Text of group `n` (`0` is the whole match), or of a named group `group("name")`; `None` for a group that did not take part. Several groups give a tuple. `m[n]` is the same as `m.group(n)`. |
+| `groups(default=None)` | Tuple of all capturing groups, excluding group `0`. |
+| `groupdict(default=None)` | Dict of named groups (`(?P<name>...)`) to their text. |
+| `start(n=0)` | Start index of group `n`. |
+| `end(n=0)` | End index of group `n`. |
+| `span(n=0)` | `(start, end)` tuple for group `n`. |
 
 ## Regular Expression Syntax
 
@@ -201,13 +201,9 @@ for tag, content in matches:
 
 Other differences worth noting:
 
-- The `flags=` keyword argument is ignored by `match`, `search`, `fullmatch`, `findall`, `finditer`, `sub`, `subn`, `split`, and `compile`: `re.search("world", "HELLO WORLD", flags=re.I)` returns `None`. Pass flags positionally (`re.search("world", "HELLO WORLD", re.I)`) or use inline flags. The `count=` and `maxsplit=` keywords work.
 - Only `IGNORECASE`, `MULTILINE`, and `DOTALL` exist; there is no `re.VERBOSE`, `re.ASCII`, or `re.purge()`.
 - `finditer()` returns a list, not an iterator.
-- A group that did not participate in the match is `""`, not `None` (for example `re.search(r"(a)|(b)", "b").groups()` is `('', 'b')`).
-- `split()` with capturing groups in the pattern does not include the captured separators in the result.
-- `Match` objects are not subscriptable (`m[1]`) and `group()` takes a single argument; use `m.group(1)` or `m.groups()`.
-- `Match.start()`, `Match.end()`, and `Match.span()` only support group `0`.
+- `Match` objects have no `string`, `re` or `pos` attributes.
 
 ## See Also
 

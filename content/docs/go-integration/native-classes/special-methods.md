@@ -81,7 +81,7 @@ print(c["oranges"])  # 0 (default)
 `)
 ```
 
-**Note:** Use `object.NewStringDict()` to create dicts and `GetByString()`/`SetByString()` for access. Never manipulate the internal `Pairs` map keys directly: they use a type-prefixed canonical format.
+**Note:** Use `object.NewStringDict()` to create dicts and `GetByString()`/`SetByString()` for access. For keys that are not strings, pass `object.DictKey(key)` to `Lookup()`, `Store()` and `Delete()`: dicts index their pairs by a type-prefixed canonical form of the key.
 
 ## Properties and Static Methods
 

@@ -380,7 +380,7 @@ var HTTPClientClass = &object.Class{
 
                 // Add headers
                 headers := instance.Field("headers").(*object.Dict)
-                for _, pair := range headers.Pairs {
+                for _, pair := range headers.All() {
                     key := pair.Key.Inspect()
                     valStr, _ := pair.Value.AsString()
                     req.Header.Set(key, valStr)

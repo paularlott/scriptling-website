@@ -4,7 +4,7 @@
 
 Docs: https://scriptling.dev/docs/
 
-All 194 OKF 0.2 concepts below are plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
+All 195 OKF 0.2 concepts below are plain markdown served from https://scriptling.dev/okf/. Links here and inside every document are absolute URLs: fetch any of them directly.
 
 ## Essential
 
@@ -155,6 +155,7 @@ Fetchable markdown (OKF 0.2) — each bundle's index.md lists its concepts:
 - [urllib.parse](https://scriptling.dev/okf/scriptling-libraries/http-process/urllib.md): Parse, split, join, and percent-encode/decode URLs and query strings without network access.
 - [HTTP & Process](https://scriptling.dev/okf/scriptling-libraries/http-process.md): HTTP requests, URL parsing, and subprocess management.
 - [base64](https://scriptling.dev/okf/scriptling-libraries/math-numbers/base64.md): Base64 encoding and decoding.
+- [decimal](https://scriptling.dev/okf/scriptling-libraries/math-numbers/decimal.md): Exact decimal arithmetic for money, with explicit rounding.
 - [hashlib](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hashlib.md): Cryptographic hash functions.
 - [hmac](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hmac.md): Keyed-hashing for message authentication (HMAC).
 - [Vectors & FloatArray](https://scriptling.dev/okf/scriptling-libraries/math-numbers/math/vectors.md): Vector and matrix functions in the math library, and the FloatArray type returned by math.array().

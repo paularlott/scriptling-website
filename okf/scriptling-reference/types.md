@@ -353,17 +353,12 @@ if value is None:
 ## Type Checking
 
 ```python
-# type() returns the type name as a string, as Python's type(x).__name__
-type(42)        # "int"
-type(3.14)      # "float"
-type("hello")   # "str"
-type([1, 2])    # "list"
-type({"a": 1})  # "dict"
-type(True)      # "bool"
-type(None)      # "NoneType"
-type((1, 2))    # "tuple"
-type(math.array([1.0]))  # "FloatArray"
-type(42) == int # True
+# type() returns the type, as in Python
+type(42)                  # <class 'int'>
+type(42) is int           # True
+type("hello").__name__    # "str"
+type(None).__name__       # "NoneType"
+type(math.array([1.0])).__name__  # "FloatArray"
 
 # isinstance() checks type
 isinstance(42, "int")       # True

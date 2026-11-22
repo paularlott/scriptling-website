@@ -24,9 +24,17 @@ The `pathlib` library provides object-oriented filesystem path operations, simil
 | `name` | Final path component (filename). |
 | `stem` | Final component without its suffix. |
 | `suffix` | File extension of the final component. |
-| `parent` | Parent directory. |
+| `suffixes` | List of every extension, such as `[".tar", ".gz"]`. |
+| `parent` | Parent directory, as a `Path`. |
 | `parts` | Tuple of the path's components. |
 | `joinpath(*other)` | Combine with other path components. |
+| `with_name(name)` | A new path with the final component replaced. |
+| `with_suffix(suffix)` | A new path with the extension changed, added or removed. |
+| `with_stem(stem)` | A new path with the stem changed, keeping the extension. |
+| `is_absolute()` | Check if the path starts at the root. |
+| `as_posix()` | The path as a string with forward slashes. |
+| `relative_to(other)` | This path relative to `other`. |
+| `is_relative_to(other)` | Check if this path is under `other`. |
 | `exists()` | Check if the path exists. |
 | `is_file()` | Check if the path is a regular file. |
 | `is_dir()` | Check if the path is a directory. |
@@ -61,7 +69,7 @@ p = pathlib.Path("/home/user/documents/file.txt")
 print(p.name)      # "file.txt"
 print(p.stem)      # "file"
 print(p.suffix)    # ".txt"
-print(p.parent)    # "/home/user/documents"
+print(p.parent)    # /home/user/documents (a Path)
 ```
 
 ## Path Properties
@@ -110,14 +118,19 @@ print(p2.suffix)  # ""
 
 ### `parent`
 
-The parent directory of the path.
+The parent directory of the path, as a `Path`, so it can be chained and joined.
 
-**Returns:** `str`: the parent directory.
+**Returns:** `Path`: the parent directory.
 
 ```python
 p = pathlib.Path("/home/user/file.txt")
-print(p.parent)  # "/home/user"
+print(p.parent)                  # /home/user
+print(p.parent.parent)           # /home
+print(p.parent / "other.txt")    # /home/user/other.txt
+print(p.parent.name)             # user
 ```
+
+Up to v0.42 `parent` was a string. Code that compared it with a string needs `str(p.parent)`.
 
 ### `parts`
 

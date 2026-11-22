@@ -58,21 +58,20 @@ print(time.ctime(now))            # local time, e.g. "Mon Jan 15 10:30:45 2024"
 
 ## Time Tuple Format
 
-Time tuples are 9-element lists with the following structure:
+`localtime()`, `gmtime()` and `strptime()` return a `struct_time`, as in Python: read its fields by name
+(`t.tm_year`) or by position (`t[0]`), unpack it, or pass it to `mktime()` and `strftime()`.
 
-```text
-[year, month, day, hour, minute, second, weekday, yearday, dst]
-```
-
-- `year`: Year (e.g., 2025)
-- `month`: Month (1-12)
-- `day`: Day of month (1-31)
-- `hour`: Hour (0-23)
-- `minute`: Minute (0-59)
-- `second`: Second (0-59)
-- `weekday`: Day of week (0=Sunday, 6=Saturday). This follows Go's convention and differs from Python, where Monday is 0.
-- `yearday`: Day of year (1-366)
-- `dst`: Daylight saving time flag. Always `0` (not currently determined).
+| Position | Field | Value |
+|:---:|-------|-------|
+| 0 | `tm_year` | Year, such as 2025 |
+| 1 | `tm_mon` | Month (1-12) |
+| 2 | `tm_mday` | Day of month (1-31) |
+| 3 | `tm_hour` | Hour (0-23) |
+| 4 | `tm_min` | Minute (0-59) |
+| 5 | `tm_sec` | Second (0-59) |
+| 6 | `tm_wday` | Day of week, Monday is 0 |
+| 7 | `tm_yday` | Day of year (1-366) |
+| 8 | `tm_isdst` | Daylight saving flag |
 
 ## Format Codes
 
@@ -92,11 +91,9 @@ Time tuples are 9-element lists with the following structure:
 
 ## Differences from Python
 
-- Time tuples are plain 9-element **lists**, not `struct_time`: index them (`t[0]`) rather than using `t.tm_year`. `mktime()` accepts a list.
-- The weekday field counts from Sunday (`0`), not Monday, and `dst` is always `0`.
-- Only the format codes in the table above are supported by `strftime()`/`strptime()`; others (such as `%I`, `%j`, `%y`, `%Z`) are left in the output unchanged. [datetime](../datetime/) formatting also supports `%I`, `%Z` and `%z`.
+- `strftime()` and `strptime()` take the same [format codes](../datetime/#format-codes) as `datetime`.
 - `ctime()`/`asctime()` do not pad single-digit days (`"Fri Jan 5 ..."`; Python gives `"Fri Jan  5 ..."`).
-- `time.now()` is an addition. `monotonic()`, `time_ns()`, `process_time()` and the other `*_ns` variants are not available; use `perf_counter()`.
+- `time.now()` is an addition. `time_ns()`, `process_time()` and the other `*_ns` variants are not available; use `perf_counter()` or `monotonic()`.
 
 ## See Also
 

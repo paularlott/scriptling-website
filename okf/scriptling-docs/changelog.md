@@ -16,6 +16,45 @@ type: Guide
 
 ## November 2026
 
+### v0.43.0
+
+
+**changed**
+
+- Scripts run faster and use less memory: keyword arguments and generators about twice as fast, and scripts holding many dicts or objects use a third to a half less memory
+- **Breaking (Go API):** `object.Dict`, `object.Set` and `object.Kwargs` no longer expose their maps; use their methods instead ([migration tables](https://scriptling.dev/okf/scriptling-docs/go-integration/basics.md#migrating-from-v042)). Scripts are unaffected
+- **Behaviour change:** Errors carry Python's exception types, so `except ValueError` and `except TypeError` catch what they catch in Python; many were a plain `Exception`
+- **Behaviour change:** A keyword argument a function does not know raises `TypeError`, for builtins and libraries as well as your own functions; a misspelt one such as `sorted(xs, revrse=True)` was silently ignored
+- **Behaviour change:** A date or time parsed without an offset is local time, as in Python; `strptime()` and `fromisoformat()` results used to be UTC ([docs](https://scriptling.dev/okf/scriptling-libraries/time-system/datetime.md#differences-from-python)). Out-of-range dates such as `datetime(2020, 2, 30)` raise `ValueError` instead of rolling over
+- **Behaviour change:** `json.dumps` raises `TypeError` for a set, datetime or object instead of writing it as a quoted string; pass `default=str` for the old output
+- **Behaviour change:** Generator expressions are lazy generators rather than lists, and keyword arguments keep the order written, so `dict(z=1, a=2)` and `**kwargs` are no longer sorted ([docs](https://scriptling.dev/okf/scriptling-reference/python-differences.md))
+- **Behaviour change:** A dataclass can be ordered with `<` only when declared with `order=True`, and one with `eq` but not `frozen` cannot be a dict key, as in Python. A class with `__slots__` refuses other attributes
+- **Behaviour change:** `type(x)` returns the type rather than its name, so `print(type(1))` shows `<class 'int'>` and `type(self)(...)` makes a new instance. `type(x) is int` and `type(x).__name__` work as before, but `type(x) == "int"` is now `False`, as in Python; use `type(x).__name__ == "int"` or `isinstance()`. Your classes print with their module, as `<class '__main__.Point'>`
+- **Behaviour change:** `Path.parent` is a `Path` rather than a string, `urlsplit()` returns a named result rather than a list, `urlencode()` needs `doseq=True` to expand a list, and `True | False` is a `bool` rather than `1`
+
+
+**added**
+
+- Full generators: `yield from`, `send()`, `throw()`, `close()`, and `yield` inside `try`, `with` and `match`
+- New modules: [`decimal`](https://scriptling.dev/okf/scriptling-libraries/math-numbers/decimal.md) for exact money arithmetic, `bisect`, `heapq`, `operator` and `abc`
+- `strftime()` and `strptime()` support every standard format code, and `datetime` gains `timezone`, `time`, `date()`, `combine()` and timedelta arithmetic
+- Python 3.12 f-strings (`f"{d["key"]}"`), several context managers in one `with`, sequence and class patterns in `match`, `raise ... from`, `__init_subclass__`, and unary `+`
+- Compiled regular expressions gain `sub()`, `subn()`, `split()` and `fullmatch()`
+- Much more of `typing`, `enum`, `dataclasses`, `itertools`, `functools`, `statistics`, `math`, `pathlib` and the `bytes` methods
+
+
+**fixed**
+
+- Fix many results that differed from Python: `csv` fields spanning lines, `urlparse` and `urljoin`, `re` groups and offsets, non-ASCII `upper()`/`lower()`/`swapcase()`, float `//` and `divmod`, and `sum()` of floats
+- Fix values silently going wrong: `x += 1` wrapping at the 64-bit limit, `urlencode` dropping values that are not strings, `math` functions returning `nan` outside their domain, and `{"a": 1} == {"a": 1.0}` being `False`
+- Fix `import datetime` after `from datetime import datetime` leaving the name bound to the class
+- Fix your own classes inside containers: `[V(1)] == [V(1)]` now uses `__eq__`, an object with `__hash__` is one key inside a tuple key or a `Counter`, and dataclasses, namedtuples and `deque` show nested objects through their `__repr__`
+- Fix an exception class held in a variable not matching in `except`, `type(x) is C` being `False` for your own classes, and `isinstance(x, date)` failing
+- Fix `a, (b, c), *rest = ...` and `[x for *_, x in pairs]` not parsing, and `a, b = b, a = 1, 2` assigning in the wrong order
+
+
+---
+
 ### v0.42.0
 
 

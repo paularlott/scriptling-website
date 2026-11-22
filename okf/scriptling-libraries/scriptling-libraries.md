@@ -23,13 +23,13 @@ Modules that mirror Python's standard library, grouped by subject:
 
 - [Data Formats](https://scriptling.dev/okf/scriptling-libraries/data-formats.md): json, yaml, toml, msgpack, bytes
 - [Text Processing](https://scriptling.dev/okf/scriptling-libraries/text-processing.md): re, string, html, html.parser, difflib, shlex, textwrap, io
-- [Math & Numbers](https://scriptling.dev/okf/scriptling-libraries/math-numbers.md): math, random, statistics, base64, hashlib, hmac, uuid, secrets
+- [Math & Numbers](https://scriptling.dev/okf/scriptling-libraries/math-numbers.md): math, random, statistics, decimal, base64, hashlib, hmac, uuid, secrets
 - [Collections & Iteration](https://scriptling.dev/okf/scriptling-libraries/collections-iteration.md): collections, itertools, functools, contextlib
 - [Time & System](https://scriptling.dev/okf/scriptling-libraries/time-system.md): time, datetime, platform, sys, logging
 - [File System](https://scriptling.dev/okf/scriptling-libraries/filesystem.md): os, os.path, pathlib, glob, fs, shutil, tempfile, tarfile, zipfile
 - [HTTP & Process](https://scriptling.dev/okf/scriptling-libraries/http-process.md): requests, scriptling.oauth, urllib.parse, subprocess
 
-Libraries come in two tiers. The *standard* libraries (json, re, time, datetime, math, random, statistics, base64, hashlib, hmac, secrets, uuid, string, html, html.parser, shlex, textwrap, difflib, io, urllib and urllib.parse, collections, itertools, functools, contextlib, copy, enum, dataclasses, typing, msgpack, and csv and xml, also importable as scriptling.csv and scriptling.xml) have no access to the host and are registered together by `stdlib.RegisterAll`. Everything else, `platform` included because it reveals the host name, is an *extension* library: each lives in its own Go package and is registered one by one, because it reaches the file system, network, processes or host, or is heavy enough (`yaml`, `toml`, templates) to be opt-in. See [Availability](#availability).
+Libraries come in two tiers. The *standard* libraries (json, re, time, datetime, math, random, statistics, base64, hashlib, hmac, secrets, uuid, string, html, html.parser, shlex, textwrap, difflib, io, urllib and urllib.parse, collections, itertools, functools, contextlib, operator, bisect, heapq, abc, decimal, copy, enum, dataclasses, typing, msgpack, and csv and xml, also importable as scriptling.csv and scriptling.xml) have no access to the host and are registered together by `stdlib.RegisterAll`. Everything else, `platform` included because it reveals the host name, is an *extension* library: each lives in its own Go package and is registered one by one, because it reaches the file system, network, processes or host, or is heavy enough (`yaml`, `toml`, templates) to be opt-in. See [Availability](#availability).
 
 ## Scriptling Libraries
 

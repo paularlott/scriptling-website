@@ -216,10 +216,76 @@ if err != nil {
     case *object.String:
         fmt.Printf("String: %s\n", value.StringValue())
     case *object.Dict:
-        fmt.Printf("Dict with %d keys\n", len(value.Pairs))
+        fmt.Printf("Dict with %d keys\n", value.Len())
     }
 }
 ```
+
+### Working with Dicts
+
+An `*object.Dict` keeps its pairs in insertion order, as Python does, and is read and changed through methods:
+
+| Method | Use |
+|--------|-----|
+| `object.NewDict()`, `object.NewDictSized(n)` | Create an empty dict |
+| `object.NewStringDict(map[string]object.Object)` | Create a dict from string keys, in sorted key order |
+| `d.Len()` | Number of pairs |
+| `d.GetByString(name)`, `d.SetByString(name, value)`, `d.HasByString(name)`, `d.DeleteByString(name)` | Read and write string keys |
+| `d.Lookup(key)`, `d.Has(key)`, `d.Store(key, keyObject, value)`, `d.Delete(key)` | Read and write any key |
+| `d.All()` | Iterate over the pairs in insertion order |
+| `d.OrderedKeys()`, `d.OrderedPairs()` | Snapshots of the keys or pairs, in insertion order |
+
+The `key` taken by `Lookup`, `Has`, `Store` and `Delete` is the dict's canonical form of a key object: get it with `object.DictKey(keyObject)`, or `object.DictStringKey(name)` for a string.
+
+```go
+d := object.NewDict()
+d.SetByString("name", object.NewString("Ada"))
+d.Store(object.DictKey(object.NewInteger(7)), object.NewInteger(7), object.NewString("seven"))
+
+for _, pair := range d.All() {
+    fmt.Println(pair.Key.Inspect(), "=", pair.Value.Inspect())
+}
+```
+
+#### Migrating from v0.42
+
+Up to v0.42 a dict's storage was the exported field `Pairs map[string]DictPair`. That field is gone; replace each use as follows:
+
+| v0.42 | v0.43 |
+|-------|-------|
+| `len(d.Pairs)` | `d.Len()` |
+| `pair, ok := d.Pairs[key]` | `pair, ok := d.Lookup(key)` |
+| `d.Pairs[key] = object.DictPair{Key: k, Value: v}` | `d.Store(key, k, v)` |
+| `delete(d.Pairs, key)` | `d.Delete(key)` |
+| `for key, pair := range d.Pairs` | `for key, pair := range d.All()` |
+| `&object.Dict{Pairs: make(map[string]object.DictPair)}` | `object.NewDict()` |
+| `d.ResetOrder()` | `d.SortKeys()` |
+
+`range d.All()` visits the pairs in insertion order, where ranging over the map visited them in random order.
+
+A set's storage was likewise the exported field `Elements map[string]Object`, and is replaced the same way:
+
+| v0.42 | v0.43 |
+|-------|-------|
+| `len(s.Elements)` | `s.Len()` |
+| `_, ok := s.Elements[key]` | `s.ContainsKeyed(key)` or `s.Lookup(key)` |
+| `s.Elements[key] = value` | `s.AddKeyed(key, value)` |
+| `delete(s.Elements, key)` | `s.DeleteKeyed(key)` |
+| `for key, value := range s.Elements` | `for key, value := range s.All()` |
+| `s.Elements = make(map[string]object.Object)` | `s.Clear()` |
+| `&object.Set{Elements: m}` | `object.NewSet()` then `AddKeyed` |
+
+Use `s.Values()` or `s.Keys()` for a snapshot when the loop body changes the set. Sets have no defined order.
+
+The keyword arguments a Go function receives, `object.Kwargs`, no longer expose their map either. The helper methods (`Get`, `Has`, `Len`, `Keys`, `GetString`, `MustGetInt` and the rest) are unchanged:
+
+| v0.42 | v0.43 |
+|-------|-------|
+| `v, ok := kwargs.Kwargs["x"]` | `v, ok := kwargs.Lookup("x")` |
+| `len(kwargs.Kwargs)` | `kwargs.Len()` |
+| `for name, v := range kwargs.Kwargs` | `for name, v := range kwargs.All()` |
+| passing `kwargs.Kwargs` as a map | `kwargs.Map()` (a copy the caller owns) |
+| `object.Kwargs{Kwargs: m}` | `object.NewKwargs(m)` |
 
 ## Calling Functions
 

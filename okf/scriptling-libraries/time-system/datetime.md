@@ -27,8 +27,8 @@ import datetime
 | `datetime(year, month, day, hour=0, minute=0, second=0, microsecond=0)` | Create a datetime in local time. |
 | `datetime.now()` | Current local datetime. |
 | `datetime.utcnow()` | Current UTC datetime. |
-| `datetime.strptime(date_string, format)` | Parse a string using [format codes](#format-codes); the result is in UTC. |
-| `datetime.fromisoformat(date_string)` | Parse an ISO 8601 datetime string; the result is in UTC. |
+| `datetime.strptime(date_string, format)` | Parse a string using [format codes](#format-codes). The result is naive (local wall-clock time) unless the format has `%z`, which gives an aware datetime. |
+| `datetime.fromisoformat(date_string)` | Parse an ISO 8601 datetime string: naive (local wall-clock time) without an offset, aware with one. |
 | `datetime.fromtimestamp(timestamp)` | Local datetime from a Unix timestamp. |
 | `datetime.strftime(format, timestamp_or_datetime)` | Scriptling-specific module-level formatter: accepts a Unix timestamp (`int`/`float`) or a datetime. |
 | `date(year, month, day)` | Create a date (no time component). |
@@ -47,7 +47,7 @@ Fields are read-only **attributes**, as in Python: write `dt.year`, not `dt.year
 | `.days`, `.seconds`, `.microseconds` | | | Yes | Normalised duration fields, as in Python. |
 | `.weekday()` | Yes | Yes | | Day of week, Monday is `0`. |
 | `.isoweekday()` | Yes | Yes | | Day of week, Monday is `1`. |
-| `.isoformat()` | Yes | Yes | | `YYYY-MM-DDTHH:MM:SS` or `YYYY-MM-DD` (microseconds are not included). |
+| `.isoformat()` | Yes | Yes | | `YYYY-MM-DDTHH:MM:SS[.ffffff]` or `YYYY-MM-DD`; `timespec=` selects the precision. |
 | `.strftime(format)` | Yes | Yes | | Format using [format codes](#format-codes). |
 | `.replace(**fields)` | Yes | Yes | | New instance with the given fields changed. |
 | `.timestamp()` | Yes | | | Unix timestamp as a `float`. |
@@ -139,16 +139,29 @@ print(datetime.timedelta(minutes=-5))  # -1 day, 23:55:00
 | `%B` | Full month | January |
 | `%b` | Abbreviated month | Jan |
 | `%p` | AM/PM | PM |
-| `%Z` | Timezone name | MST |
-| `%z` | Timezone offset | -0700 |
+| `%Z` | Timezone name (empty for a naive value) | UTC |
+| `%z` | Timezone offset (empty for a naive value) | -0700 |
+| `%y` | Year without century (00-99) | 24 |
+| `%f` | Microsecond (000000-999999) | 123456 |
+| `%j` | Day of year (001-366) | 015 |
+| `%w` | Weekday number, Sunday is 0 | 1 |
+| `%u` | ISO weekday number, Monday is 1 | 1 |
+| `%U`, `%W` | Week of year, weeks starting Sunday or Monday | 02 |
+| `%G`, `%V` | ISO year and ISO week | 2024, 03 |
+| `%e` | Day of month, space padded | 15 |
+| `%c`, `%x`, `%X` | Date and time, date, time | Mon Jan 15 10:30:45 2024 |
+| `%%` | A literal `%` | % |
+
+`strptime()` accepts the same codes and follows Python's rules: numbers may have fewer digits than the maximum,
+names match in any case, and text left over after the format raises `ValueError`.
 
 ## Differences from Python
 
-- Instances are naive (no `tzinfo`; there is no `datetime.timezone` or `datetime.time`). `datetime()`, `now()`, `fromtimestamp()` and `date.today()` use local time, while `utcnow()`, `strptime()` and `fromisoformat()` produce UTC values. Their printed form is the same, but comparisons and `.timestamp()` use the underlying instant, so `strptime("2024-01-15 10:30:45", ...)` is not equal to `datetime(2024, 1, 15, 10, 30, 45)` unless the local zone is UTC.
-- Subtracting two `datetime` or `date` instances gives a number (seconds or days), not a `timedelta`, and instances accept plain numbers in `+`/`-` (see above).
-- `timedelta` supports `str()`, `.days`, `.seconds`, `.microseconds` and `.total_seconds()`, but no arithmetic or ordering between `timedelta` values (`td1 + td2`, `td * 2`, `-td`, `td1 < td2` all fail, and `==` is identity). Positional arguments are rejected: write `timedelta(days=1)`, not `timedelta(1)`.
-- `.isoformat()` omits microseconds. Methods such as `.date()`, `.time()`, `.ctime()` and `datetime.combine()` are not available.
-- Format codes not listed above (for example `%j`, `%y`, `%f`) are left in the output unchanged.
+- A naive `datetime` is a local wall-clock time, as in Python: `datetime()`, `now()`, `strptime()` and `fromisoformat()` without an offset all build the same value, and `.timestamp()` reads it in the local zone. Attach a zone with `.replace(tzinfo=datetime.timezone.utc)` when the value is in UTC.
+- `datetime + 60` and `datetime - 60` are accepted and mean seconds; Python requires a `timedelta`.
+- There is no `fold` attribute, so the repeated hour at the end of daylight saving is always read as its first occurrence.
+- Years run from 1 to 9999, and values outside raise `OverflowError` or `ValueError`.
+- Format codes follow the C locale (English day and month names). A code that is not recognised is left in the output unchanged.
 
 ## See Also
 

@@ -49,7 +49,6 @@ Scriptling is a sandboxed, Python-like scripting language for Go applications. G
 ## Important Differences from Python
 
 - No `async` / `await`.
-- No `yield`-based generator functions.
 - No `from module import *`; import the names you need.
 - A walrus bound inside a comprehension does not leak to the enclosing scope; collect through the comprehension result instead.
 - No multiple inheritance (nested classes are supported).
@@ -59,7 +58,6 @@ Scriptling is a sandboxed, Python-like scripting language for Go applications. G
 - Default arguments are evaluated on each call, not once at `def` time; bind values with a factory function when that matters.
 - Regex uses RE2 semantics: no backreferences, no lookaround.
 - Booleans display as `True` / `False` (matching Python); machine formats such as `json.dumps` and query parameters stay lowercase.
-- `type(x)` returns the type name as a string, spelled as Python's `type(x).__name__` (`"int"`, `"str"`, `"NoneType"`, a class instance gives its class name, a raised exception gives the class it was raised as such as `"ValueError"`); `type(x) == int` and `type(x).__name__` both work, but `print(type(x))` shows `int`, not `<class 'int'>`.
 
 Two differences matter a lot:
 

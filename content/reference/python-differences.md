@@ -14,7 +14,7 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | Feature | Notes |
 |---------|-------|
 | `async`/`await` | Not supported; use [`runtime.background()`](/reference/libraries/runtime/runtime/) for concurrency |
-| `yield from` and `generator.send()` | Generator functions with `yield` work, but delegation (`yield from iterable`) and `send(value)` are not supported; loop or iterate manually |
+| `yield` inside an expression | Generators support `yield`, `yield from`, `x = yield`, `send()`, `throw()` and `close()`, including inside `try`, `with` and `match`; a `yield` nested in a larger expression (`print((yield))`, `1 + (yield)`) is not supported |
 | Multiple inheritance | Only single inheritance is supported |
 | Metaclasses | Custom metaclasses are not supported |
 | Descriptors | The descriptor protocol is not implemented: a `__get__` method is never invoked, attribute access returns the object itself |
@@ -70,14 +70,12 @@ Scriptling is inspired by Python but has intentional limitations for embedded sc
 | `__future__` imports | Not applicable |
 | `__next__` returning a `StopIteration()` *value* | Ends iteration without yielding it — only *raising* `StopIteration` signals end-of-iteration |
 | Type annotations | Parsed and ignored, including `def f(a: int) -> str`, `x: int = 5`, and `self.n: int = 0`; there is no `__annotations__` and no runtime checking, and comma subscripts parse as tuple indexes (`dict[str, int]`) |
-| `**kwargs` order | The `**kwargs` dict holds the names in alphabetical order, not call order (deterministic, but not Python's order) |
 | Subclassing built-in containers | `class C(dict)`, `class C(list)`, `class C(OrderedDict)` and `class C(defaultdict)` are not supported (`Counter` can be subclassed) |
 | `OrderedDict` | An ordinary insertion-ordered dict: `move_to_end()` and `popitem(last=False)` work, but they are also accepted on plain dicts, and it prints like a plain dict |
 | `obj.__dict__` | A fresh dict view per access that writes through to the object; `obj.__dict__ = {...}` is an `AttributeError`, names are not mangled (`__x` stays `__x`), and `SomeClass.__dict__` is not available |
 | Dicts from other formats | Dicts built from YAML, TOML, MessagePack and plugin results have their keys in sorted order (those formats give no key order); `json.loads()`, `requests` `.json()` and literals keep document/insertion order |
-| Walrus in a comprehension | `y` in `[y for x in a if (y := f(x))]` binds inside the comprehension and does not leak to the enclosing scope, unlike Python (PEP 572); use the collected list instead |
-| `type(x)` | Returns the type's name as a string rather than a type object: `type(42)` is `"int"`, and `type(42) == int`, `type(42) is int` and `type(42).__name__` all work as in Python, but `print(type(42))` shows `int`, not `<class 'int'>`, and the result can't be called to construct a value. A raised built-in exception reports the class it was raised as (`"ValueError"`). `OrderedDict` reports `"dict"`, a compiled regex `"Regex"`, and `iter()` of an iterator such as a `range` returns it unchanged, keeping its name |
-| Generator expressions | `(x for x in a)` syntax works but is evaluated eagerly into a list, not a lazy generator object; over an endless iterator such as `itertools.count()` it raises an error instead of hanging (`any(map(f, itertools.count()))` does terminate: `map`/`filter` and `any`/`all` pull lazily over them) |
+| `type(x)` | Returns the type as in Python, but a compiled regex's type is `Regex` rather than `re.Pattern` |
+| Generator expressions | `(x for x in a)` is a lazy generator, as in Python. As the only argument of `sum`, `min`, `max`, `sorted`, `list`, `tuple`, `set`, `frozenset`, `dict` or `.join()` it is built as a list first, which is faster and gives the same result; over an endless iterator such as `itertools.count()` those calls raise an error instead of hanging |
 | `\N{name}` string escapes | Not supported; use `\u` with the code point |
 | Number methods | `bit_length()`, `bit_count()`, `is_integer()`, `hex()`, `fromhex()` and `as_integer_ratio()` work ([see Built-in Functions](../builtins/#number-methods)); other number attributes (`x.real`, `x.imag`, `(5).to_bytes()`) do not exist |
 | `dir()` with no argument | Lists the builtin names, not the local scope |

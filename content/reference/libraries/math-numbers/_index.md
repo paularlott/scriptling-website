@@ -10,6 +10,7 @@ weight: 4
 | [math](math/) | Mathematical functions and constants |
 | [random](random/) | Random number generation |
 | [statistics](statistics/) | Statistical functions |
+| [decimal](decimal/) | Exact decimal arithmetic for money |
 | [hashlib](hashlib/) | Secure hash algorithms |
 | [hmac](hmac/) | Keyed-Hash Message Authentication Codes |
 | [base64](base64/) | Base64 encoding and decoding |

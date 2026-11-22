@@ -18,13 +18,13 @@ Modules that mirror Python's standard library, grouped by subject:
 
 - [Data Formats](data-formats/): json, yaml, toml, msgpack, bytes
 - [Text Processing](text-processing/): re, string, html, html.parser, difflib, shlex, textwrap, io
-- [Math & Numbers](math-numbers/): math, random, statistics, base64, hashlib, hmac, uuid, secrets
+- [Math & Numbers](math-numbers/): math, random, statistics, decimal, base64, hashlib, hmac, uuid, secrets
 - [Collections & Iteration](collections-iteration/): collections, itertools, functools, contextlib
 - [Time & System](time-system/): time, datetime, platform, sys, logging
 - [File System](filesystem/): os, os.path, pathlib, glob, fs, shutil, tempfile, tarfile, zipfile
 - [HTTP & Process](http-process/): requests, scriptling.oauth, urllib.parse, subprocess
 
-Libraries come in two tiers. The *standard* libraries (json, re, time, datetime, math, random, statistics, base64, hashlib, hmac, secrets, uuid, string, html, html.parser, shlex, textwrap, difflib, io, urllib and urllib.parse, collections, itertools, functools, contextlib, copy, enum, dataclasses, typing, msgpack, and csv and xml, also importable as scriptling.csv and scriptling.xml) have no access to the host and are registered together by `stdlib.RegisterAll`. Everything else, `platform` included because it reveals the host name, is an *extension* library: each lives in its own Go package and is registered one by one, because it reaches the file system, network, processes or host, or is heavy enough (`yaml`, `toml`, templates) to be opt-in. See [Availability](#availability).
+Libraries come in two tiers. The *standard* libraries (json, re, time, datetime, math, random, statistics, base64, hashlib, hmac, secrets, uuid, string, html, html.parser, shlex, textwrap, difflib, io, urllib and urllib.parse, collections, itertools, functools, contextlib, operator, bisect, heapq, abc, decimal, copy, enum, dataclasses, typing, msgpack, and csv and xml, also importable as scriptling.csv and scriptling.xml) have no access to the host and are registered together by `stdlib.RegisterAll`. Everything else, `platform` included because it reveals the host name, is an *extension* library: each lives in its own Go package and is registered one by one, because it reaches the file system, network, processes or host, or is heavy enough (`yaml`, `toml`, templates) to be opt-in. See [Availability](#availability).
 
 ## Scriptling Libraries
 

@@ -19,6 +19,7 @@ type: API Reference
 | [math](https://scriptling.dev/okf/scriptling-libraries/math-numbers/math.md) | Mathematical functions and constants |
 | [random](https://scriptling.dev/okf/scriptling-libraries/math-numbers/random.md) | Random number generation |
 | [statistics](https://scriptling.dev/okf/scriptling-libraries/math-numbers/statistics.md) | Statistical functions |
+| [decimal](https://scriptling.dev/okf/scriptling-libraries/math-numbers/decimal.md) | Exact decimal arithmetic for money |
 | [hashlib](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hashlib.md) | Secure hash algorithms |
 | [hmac](https://scriptling.dev/okf/scriptling-libraries/math-numbers/hmac.md) | Keyed-Hash Message Authentication Codes |
 | [base64](https://scriptling.dev/okf/scriptling-libraries/math-numbers/base64.md) | Base64 encoding and decoding |

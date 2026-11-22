@@ -65,7 +65,7 @@ Scriptling provides many built-in functions that are always available without im
 | [`sum(iterable[, start])`](#math-functions) | Sum of items |
 | [`super()`](../classes/#the-super-function) | Call the parent class |
 | [`tuple(iterable)`](#tuple) | Create a tuple |
-| [`type(x)`](#type) | Type name of a value |
+| [`type(x)`](#type) | Type of a value |
 | [`yield_now()`](#yield_now) | Let other tasks run |
 | [`zip(*iterables)`](#iteration-utilities) | Combine iterables item by item |
 
@@ -211,29 +211,27 @@ dict()  # {}
 
 ### type()
 
-Get the type's name as a string, spelled as Python's `type(x).__name__`:
+Get the type of a value, as Python does:
 
 ```python
-type(42)        # "int"
-type(3.14)      # "float"
-type("hello")   # "str"
-type([1, 2])    # "list"
-type({"a": 1})  # "dict"
-type(True)      # "bool"
-type(None)      # "NoneType"
-type((1, 2))    # "tuple"
-type(range(3))  # "range"
-type(len)       # "builtin_function_or_method"
-
-type(42) == int           # True
+type(42)                  # <class 'int'>
+type(42) is int           # True
 type(42).__name__         # "int"
+type(None)                # <class 'NoneType'>
+type(len).__name__        # "builtin_function_or_method"
+
+class Point:
+    def __init__(self, x):
+        self.x = x
+    def moved(self, dx):
+        return type(self)(self.x + dx)   # a new instance of the same class
 ```
 
-A class instance gives its class name, and an exception gives the class it
-was raised as (`"ValueError"`).
-
-Before 0.32.0, `type()` returned scriptling's own names (`"INTEGER"`,
-`"STRING"`, `"NULL"`, `"ITERATOR"`, ...); those names no longer match.
+A class instance gives its class, and an exception gives the class it was
+raised as (`ValueError`). A class you define prints with its module, as
+`<class '__main__.Point'>`. Before 0.43.0 `type()` returned the name as a
+string; `type(42) == "int"` is now `False`, as in Python, so compare names
+with `type(42).__name__ == "int"`.
 
 ### .type() Method
 
