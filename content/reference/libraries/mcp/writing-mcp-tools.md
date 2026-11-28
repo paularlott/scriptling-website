@@ -247,6 +247,33 @@ typically expects. `return_structured` requires its argument to be a dict
 (structuredContent must be a JSON object per the MCP spec); use
 `return_object` for a list, string, or other non-object value.
 
+### Asking the Person
+
+A tool can ask the person using the MCP client to approve an action or fill
+in a few fields, when the client supports it (MCP elicitation):
+
+```python
+import scriptling.mcp.tool as tool
+
+name = tool.get_string("name")
+if find_client(name):
+    tool.return_error("A client named " + name + " already exists")
+if not tool.confirm("Create the client " + name + "?"):
+    tool.return_error("Not confirmed, nothing was created")
+create_client(name)
+tool.return_string("Created " + name)
+```
+
+`confirm()` returns `False` when the client can't be asked, and `ask()`
+returns `None`; check `tool.can_ask()` to choose another path, such as a
+`confirmed` parameter the model sets after asking in the conversation.
+
+Some clients answer by calling the tool again, so **the script may run twice**:
+it stops at the question and runs again from the top with the answer. Check
+everything before asking, write only after the answer, and keep slow work for
+the second run with `tool.remember()` / `tool.recall()`. See
+[Asking the Person](/reference/libraries/mcp/tool/#asking-the-person-elicitation).
+
 ## Complete Examples
 
 ### Hello Tool

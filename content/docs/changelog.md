@@ -8,6 +8,16 @@ nav-skip: true
 
 ## November 2026
 
+{{< version "v0.45.0" >}}
+
+{{< changelog-item "added" >}}
+- MCP tools can ask the person using the client (MCP elicitation): [`tool.confirm()`](/reference/libraries/mcp/tool/#asking-the-person-elicitation) for an approval, `tool.ask()` for a form, and `tool.can_ask()` to check first. A client that answers by calling the tool again runs the script again from the top, and `tool.remember()` / `tool.recall()` keep slow work for that run
+- The MCP server gives clients that initialize an MCP session, so clients on MCP 2025-06-18 and 2025-11-25 can be asked mid-call too. Sessions are optional: requests without one, such as a plain `curl` call, work as before
+- `--mcp-secret` (`SCRIPTLING_MCP_SECRET`) shares the MCP session and question-state keys between server instances behind a load balancer, and across restarts
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.44.0" >}}
 
 {{< changelog-item "changed" >}}

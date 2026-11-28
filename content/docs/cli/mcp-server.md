@@ -111,6 +111,19 @@ printf '%s\n' \
 
 Tools, the execution tool, or an app bundle declaring MCP activates the server. Resource and prompt flags only add content to an activated MCP server. Add `--server <addr>` to serve over HTTP at `/mcp`; without it, the activated server runs over stdio.
 
+## Sessions and Several Instances
+
+Each client that initializes gets an MCP session, which lets a tool ask clients on MCP 2025-06-18 and 2025-11-25 a question mid-call with `tool.confirm()` or `tool.ask()`; clients on 2026-07-28 are asked without one. Sessions are optional: a request without an `MCP-Session-Id`, such as a plain `curl` call, is still served, it just can't be asked anything. Sessions are signed tokens that expire after 24 hours, and the server keeps nothing for them beyond a little state it sweeps once a session goes idle.
+
+By default each process signs sessions, and the state a 2026-07-28 client sends back with its answers, with its own random key. When several instances run behind a load balancer, give them all the same secret (`--mcp-secret`, at least 32 characters). Every instance then accepts every session, a 2026-07-28 client's answer can land on any instance, and sessions stay valid across a restart. A session id the server can't verify (from another instance without the secret, an earlier run, or past its 24 hours) is served as if no session were sent, so nothing stops working; that client just can't be asked questions until it initializes again. A question waits up to 4 minutes for its answer, then counts as dismissed.
+
+Asking a 2025 client mid-call is the exception: what the client declared at `initialize` and the question waiting for its answer live in the instance it connected to. For that, have the load balancer route by the `MCP-Session-Id` header (sticky sessions); without it the tool may not be able to ask, or may wait for an answer that went to another instance.
+
+```bash
+SCRIPTLING_MCP_SECRET='a long random value, at least 32 characters' \
+  scriptling --server :8000 --mcp-tools ./tools setup.py
+```
+
 ## Script Execution Tool
 
 The `--mcp-exec-script` flag enables a built-in MCP tool that allows AI assistants to execute Scriptling code directly.
