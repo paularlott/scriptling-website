@@ -16,6 +16,17 @@ type: Guide
 
 ## November 2026
 
+### v0.45.1
+
+
+**fixed**
+
+- Update gorilla/websocket past GO-2026-6278 (a weak random source for WebSocket mask keys), so govulncheck passes again
+- `zipfile` extraction refuses a member whose name is not a plain relative path before joining it to the destination, alongside the existing check on the result
+
+
+---
+
 ### v0.45.0
 
 
