@@ -16,6 +16,21 @@ type: Guide
 
 ## November 2026
 
+### v0.45.3
+
+
+**changed**
+
+- Update to mcp v0.41.0, which has the same code as v0.39.0: v0.40.0 added a way for a cluster of servers to ask MCP 2025 clients questions, and v0.41.0 removed it again. Nothing changes for scriptling, which never used it
+
+
+**fixed**
+
+- The [MCP server docs](https://scriptling.dev/okf/scriptling-docs/cli/mcp-server.md) say what `--mcp-secret` keeps across a restart: sessions and 2026-07-28 questions stay valid, but a client on MCP 2025-06-18 or 2025-11-25 can't be asked questions until it initializes again
+
+
+---
+
 ### v0.45.2
 
 
