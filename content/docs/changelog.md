@@ -8,6 +8,14 @@ nav-skip: true
 
 ## November 2026
 
+{{< version "v0.45.2" >}}
+
+{{< changelog-item "fixed" >}}
+- `tool.recall()` returns a kept whole number as an `int`, also inside lists and dicts, instead of a `float`: a kept `3` used to come back as `3.0`, so `range()` and indexing failed on it
+{{< /changelog-item >}}
+
+---
+
 {{< version "v0.45.1" >}}
 
 {{< changelog-item "fixed" >}}

@@ -448,7 +448,7 @@ Keeps `value` for the tool's re-run after a question, so work done before the qu
 
 ### `mcp.tool.recall(name, default=None)`
 
-Returns the value an earlier run of this same tool call kept with `remember(name, value)`, or `default` when there is none.
+Returns the value an earlier run of this same tool call kept with `remember(name, value)`, or `default` when there is none. A kept value travels as JSON, so it comes back with JSON's types: a whole number is an `int` (also inside lists and dicts), any other number a `float`, a tuple a `list`.
 
 ```python
 import scriptling.mcp.tool as tool
